@@ -1,3 +1,17 @@
 <resources>
-    <string name="app_name">Shopping List</string>
+    <string name="app_name">Shopping list</string>
+
+    <string name="list_name">Мой список</string>
+    <string name="add_item">Добавить товар</string>
+    <string name="spent_money">Потрачено</string>
+    <string name="all_money">Всего</string>
+    <string name="price">цена</string>
+
+    <string-array name="units">
+        <item>шт.</item>
+        <item>кг</item>
+        <item>л</item>
+        <item>гр</item>
+    </string-array>
+
 </resources>
