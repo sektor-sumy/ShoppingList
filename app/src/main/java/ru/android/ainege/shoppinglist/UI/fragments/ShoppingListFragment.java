@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist;
+package ru.android.ainege.shoppinglist.ui.fragments;
 
 import android.app.ListFragment;
 import android.os.Bundle;
@@ -14,6 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 
 /**
  * Created by Belkin on 06.06.2015.

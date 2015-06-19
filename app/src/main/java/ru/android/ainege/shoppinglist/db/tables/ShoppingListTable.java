@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist;
+package ru.android.ainege.shoppinglist.db.tables;
 
 import android.database.sqlite.SQLiteDatabase;
 

@@ -1,8 +1,13 @@
-package ru.android.ainege.shoppinglist;
+package ru.android.ainege.shoppinglist.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
+import ru.android.ainege.shoppinglist.db.tables.ListsTable;
+import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
+import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 

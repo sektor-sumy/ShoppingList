@@ -1,9 +1,11 @@
-package ru.android.ainege.shoppinglist;
+package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+
+import ru.android.ainege.shoppinglist.R;
 
 /**
  * Created by Belkin on 06.06.2015.
