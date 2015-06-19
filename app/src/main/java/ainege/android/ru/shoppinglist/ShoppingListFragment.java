@@ -67,7 +67,11 @@ public class ShoppingListFragment extends ListFragment {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if(b){
-                    Toast.makeText(getActivity(), "Добавление нового товара", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "Добавление нового товара", Toast.LENGTH_SHORT).show();
+                    ShoppingListSQLiteHelper helper = new ShoppingListSQLiteHelper(getActivity().getApplicationContext());
+                    helper.getReadableDatabase();
+
+                    Toast.makeText(getActivity(), "БД создана", Toast.LENGTH_SHORT).show();
                 }
             }
         });
