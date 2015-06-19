@@ -1,4 +1,4 @@
-package ainege.android.ru.shoppinglist;
+package ru.android.ainege.shoppinglist;
 
 import android.app.Fragment;
 

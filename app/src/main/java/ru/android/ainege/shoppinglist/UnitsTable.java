@@ -1,10 +1,10 @@
-package ainege.android.ru.shoppinglist;
+package ru.android.ainege.shoppinglist;
 
 import android.database.sqlite.SQLiteDatabase;
 
-public class ListsTable {
+public class UnitsTable {
 
-    public static final String TABLE_NAME = "Lists";
+    public static final String TABLE_NAME = "Units";
 
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "name";
@@ -23,4 +23,5 @@ public class ListsTable {
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(database);
     }
+
 }

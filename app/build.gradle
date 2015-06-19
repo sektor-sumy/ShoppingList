@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "ainege.android.ru.shoppinglist"
+        applicationId "ru.android.ainege.shoppinglist"
         minSdkVersion 14
         targetSdkVersion 22
         versionCode 1
