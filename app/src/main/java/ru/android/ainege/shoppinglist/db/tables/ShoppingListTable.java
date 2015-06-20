@@ -51,7 +51,7 @@ public class ShoppingListTable {
             ContentValues contentValue = new ContentValues();
             contentValue.put(COLUMN_ID_ITEM, sl.getIdItem());
             contentValue.put(COLUMN_ID_LIST, sl.getIdList());
-            contentValue.put(COLUMN_IS_BOUGHT, sl.getIsBought());
+            contentValue.put(COLUMN_IS_BOUGHT, sl.isBought());
             database.insert(TABLE_NAME, null, contentValue);
         }
     }

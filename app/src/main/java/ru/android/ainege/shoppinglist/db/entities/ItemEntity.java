@@ -1,14 +1,12 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-/**
- * Created by i on 20.06.2015.
- */
 public class ItemEntity {
     private int _id;
     private String mName;
     private int mAmount;
     private int mIdUnit;
     private double mPrice;
+    private UnitEntity mUnit;
 
     public ItemEntity(String name){
         mName = name;
@@ -73,5 +71,13 @@ public class ItemEntity {
 
     public void setPrice(double price) {
         this.mPrice = price;
+    }
+
+    public UnitEntity getUnit() {
+        return mUnit;
+    }
+
+    public void setUnit(UnitEntity unit) {
+        mUnit = unit;
     }
 }

@@ -9,7 +9,6 @@
         android:id="@+id/list_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/list_name"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText

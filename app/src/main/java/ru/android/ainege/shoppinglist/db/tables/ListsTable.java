@@ -3,6 +3,8 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
+import ru.android.ainege.shoppinglist.db.entities.ListEntity;
+
 public class ListsTable {
 
     public static final String TABLE_NAME = "Lists";
@@ -27,14 +29,14 @@ public class ListsTable {
     }
 
     private static void initialData(SQLiteDatabase database){
-        String[] lists = {
-                "Мой список",
-                "Купить на ДР",
+        ListEntity[] lists = {
+                new ListEntity("Мой список"),
+                new ListEntity("Купить на ДР"),
         };
 
-        for(String list : lists){
+        for(ListEntity list : lists){
             ContentValues contentValue = new ContentValues();
-            contentValue.put(COLUMN_NAME, list);
+            contentValue.put(COLUMN_NAME, list.getName());
             database.insert(TABLE_NAME, null, contentValue);
         }
     }

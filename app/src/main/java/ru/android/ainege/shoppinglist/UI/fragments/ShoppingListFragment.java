@@ -16,28 +16,32 @@ import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
+import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
+import ru.android.ainege.shoppinglist.db.entities.ListEntity;
+import ru.android.ainege.shoppinglist.db.entities.ShoppingListEntity;
 
 
 public class ShoppingListFragment extends ListFragment {
-    ArrayList<String> list;
-    ListView mItems;
+    ListEntity mListEntity;
+    ListsDataSource mListsDataSource;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int idList = 1;
 
-        list = new ArrayList<>();
-        list.add("Мясо1");
-        list.add("Мясо2");
-        list.add("Мясо2");
-        list.add("Мясо3");
+        mListsDataSource = new ListsDataSource(getActivity().getApplicationContext());
+        mListEntity = mListsDataSource.get(idList, true);
 
-        setListAdapter(new ItemAdapter(list));
+        setListAdapter(new ItemAdapter(mListEntity.getItemsInList()));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
+
+        TextView listName = (TextView) v.findViewById(R.id.list_name);
+        listName.setText(mListEntity.getName());
 
         EditText newItemName = (EditText) v.findViewById(R.id.new_item_name);
         newItemName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -53,13 +57,11 @@ public class ShoppingListFragment extends ListFragment {
             }
         });
 
-        mItems = (ListView) v.findViewById(android.R.id.list);
         return v;
     }
 
-    private class ItemAdapter extends ArrayAdapter<String> {
-
-        public ItemAdapter(ArrayList<String> items) {
+    private class ItemAdapter extends ArrayAdapter<ShoppingListEntity> {
+        public ItemAdapter(ArrayList<ShoppingListEntity> items) {
             super(getActivity(), 0, items);
         }
 
@@ -69,15 +71,20 @@ public class ShoppingListFragment extends ListFragment {
                 convertView = getActivity().getLayoutInflater().inflate(R.layout._shopping_list_item, null);
             }
 
-            String s = getItem(position);
+            ShoppingListEntity s = getItem(position);
 
             CheckBox buyCheckBox = (CheckBox) convertView.findViewById(R.id.is_item_bought);
+            buyCheckBox.setChecked(s.isBought());
             TextView nameTextView = (TextView) convertView.findViewById(R.id.item_name);
-            nameTextView.setText(s);
+            nameTextView.setText(s.getItem().getName());
             TextView numberTextView = (TextView) convertView.findViewById(R.id.item_amount);
-            numberTextView.setText("2 шт.");
+            if(s.getItem().getUnit() == null){
+                numberTextView.setText("-");
+            }else{
+                numberTextView.setText(s.getItem().getAmount() + " " + s.getItem().getUnit().getName());
+            }
             TextView priceTextView = (TextView) convertView.findViewById(R.id.item_price);
-            priceTextView.setText("150");
+            priceTextView.setText(String.valueOf(s.getItem().getPrice()));
 
             return convertView;
         }

@@ -3,6 +3,8 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
+import ru.android.ainege.shoppinglist.db.entities.UnitEntity;
+
 public class UnitsTable {
 
     public static final String TABLE_NAME = "Units";
@@ -27,15 +29,15 @@ public class UnitsTable {
     }
 
     private static void initialData(SQLiteDatabase database){
-        String[] units = {
-                "шт",
-                "кг",
-                "л",
+        UnitEntity[] units = {
+                new UnitEntity("шт"),
+                new UnitEntity("кг"),
+                new UnitEntity("л"),
         };
 
-        for(String unit : units){
+        for(UnitEntity unit : units){
             ContentValues contentValue = new ContentValues();
-            contentValue.put(COLUMN_NAME, unit);
+            contentValue.put(COLUMN_NAME, unit.getName());
             database.insert(TABLE_NAME, null, contentValue);
         }
     }
