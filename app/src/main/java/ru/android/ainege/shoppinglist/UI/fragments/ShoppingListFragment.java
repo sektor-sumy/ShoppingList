@@ -28,6 +28,8 @@ public class ShoppingListFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //edit later
         int idList = 1;
 
         mListsDataSource = new ListsDataSource(getActivity().getApplicationContext());
@@ -56,6 +58,11 @@ public class ShoppingListFragment extends ListFragment {
                 }
             }
         });
+
+        TextView spentMoney = (TextView) v.findViewById(R.id.spent_money);
+        spentMoney.setText(String.valueOf(mListEntity.sumSpentMoney()));
+        TextView totalMoney = (TextView) v.findViewById(R.id.total_money);
+        totalMoney.setText(String.valueOf(mListEntity.sumTotalMoney()));
 
         return v;
     }

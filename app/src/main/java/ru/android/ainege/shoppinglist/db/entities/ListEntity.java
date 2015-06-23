@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class ListEntity {
     private int _id;
     private String mName;
-    private ArrayList<ShoppingListEntity> itemsInList;
+    private ArrayList<ShoppingListEntity> mItemsInList;
 
     public ListEntity(String name){
         mName = name;
@@ -33,11 +33,29 @@ public class ListEntity {
     }
 
     public ArrayList<ShoppingListEntity> getItemsInList() {
-        return itemsInList;
+        return mItemsInList;
     }
 
     public void setItemsInList(ArrayList<ShoppingListEntity> itemsInList) {
-        this.itemsInList = itemsInList;
+        this.mItemsInList = itemsInList;
+    }
+
+    public double sumSpentMoney(){
+        double sum = 0;
+        for(ShoppingListEntity item : mItemsInList) {
+            if(item.isBought()) {
+                sum += item.getItem().getPrice();
+            }
+        }
+        return sum;
+    }
+
+    public double sumTotalMoney(){
+        double sum = 0;
+        for(ShoppingListEntity item : mItemsInList) {
+            sum += item.getItem().getPrice();
+        }
+        return sum;
     }
 }
 
