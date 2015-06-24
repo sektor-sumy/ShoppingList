@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.entities.ListEntity;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingListEntity;
 
@@ -24,6 +25,8 @@ import ru.android.ainege.shoppinglist.db.entities.ShoppingListEntity;
 public class ShoppingListFragment extends ListFragment {
     ListEntity mListEntity;
     ListsDataSource mListsDataSource;
+    TextView mSpentMoney;
+    TextView mTotalMoney;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,12 +62,16 @@ public class ShoppingListFragment extends ListFragment {
             }
         });
 
-        TextView spentMoney = (TextView) v.findViewById(R.id.spent_money);
-        spentMoney.setText(String.valueOf(mListEntity.sumSpentMoney()));
-        TextView totalMoney = (TextView) v.findViewById(R.id.total_money);
-        totalMoney.setText(String.valueOf(mListEntity.sumTotalMoney()));
+        mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
+        mTotalMoney = (TextView) v.findViewById(R.id.total_money);
+        updateSums();
 
         return v;
+    }
+
+    private void updateSums(){
+        mSpentMoney.setText(String.valueOf(mListEntity.sumSpentMoney()));
+        mTotalMoney.setText(String.valueOf(mListEntity.sumTotalMoney()));
     }
 
     private class ItemAdapter extends ArrayAdapter<ShoppingListEntity> {
@@ -77,10 +84,19 @@ public class ShoppingListFragment extends ListFragment {
             if (convertView == null) {
                 convertView = getActivity().getLayoutInflater().inflate(R.layout._shopping_list_item, null);
             }
-
-            ShoppingListEntity s = getItem(position);
+            final ShoppingListEntity s = getItem(position);
 
             CheckBox buyCheckBox = (CheckBox) convertView.findViewById(R.id.is_item_bought);
+            buyCheckBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CheckBox cb = (CheckBox) v ;
+                    s.setBought(cb.isChecked());
+                    ShoppingListDataSource slDataSource = new ShoppingListDataSource(getActivity());
+                    slDataSource.update(s);
+                    updateSums();
+                }
+            });
             buyCheckBox.setChecked(s.isBought());
             TextView nameTextView = (TextView) convertView.findViewById(R.id.item_name);
             nameTextView.setText(s.getItem().getName());

@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.db.dataSources;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -40,5 +41,15 @@ public class ShoppingListDataSource {
             cursor.close();
         }
         return inList;
+    }
+
+    public int update(ShoppingListEntity sl) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ShoppingListTable.COLUMN_IS_BOUGHT, sl.isBought());
+        return db.update(ShoppingListTable.TABLE_NAME,
+                         values,
+                         ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
+                         new String[] { String.valueOf(sl.getIdItem()), String.valueOf(sl.getIdList()) });
     }
 }
