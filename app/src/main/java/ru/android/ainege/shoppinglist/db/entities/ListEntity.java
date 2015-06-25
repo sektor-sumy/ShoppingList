@@ -44,7 +44,7 @@ public class ListEntity {
         double sum = 0;
         for(ShoppingListEntity item : mItemsInList) {
             if(item.isBought()) {
-                sum += item.getItem().getPrice();
+                sum += item.getItem().getPrice() * (item.getItem().getAmount()==0 ? 1 : item.getItem().getAmount());
             }
         }
         return sum;
@@ -53,7 +53,7 @@ public class ListEntity {
     public double sumTotalMoney(){
         double sum = 0;
         for(ShoppingListEntity item : mItemsInList) {
-            sum += item.getItem().getPrice();
+            sum += item.getItem().getPrice() * (item.getItem().getAmount()==0 ? 1 : item.getItem().getAmount());
         }
         return sum;
     }
