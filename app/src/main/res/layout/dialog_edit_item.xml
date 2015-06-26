@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/edit_item_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:paddingLeft="10dp"
+        android:layout_marginTop="20dp"/>
+
+    <EditText
+        android:id="@+id/edit_amount_item"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:inputType="number|numberDecimal"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
+        android:gravity="center"
+        android:layout_below="@+id/edit_item_name"
+        android:layout_alignLeft="@+id/edit_item_name"
+        android:layout_alignStart="@+id/edit_item_name" />
+
+    <Spinner
+        android:id="@+id/amount_units"
+        android:layout_width="55dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_below="@+id/edit_item_name"
+        android:layout_toRightOf="@+id/edit_amount_item"
+        android:layout_toEndOf="@+id/edit_amount_item"
+        android:layout_alignBottom="@+id/edit_amount_item" />
+
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/price"
+        android:layout_alignBaseline="@+id/item_price_in"
+        android:layout_alignBottom="@+id/item_price_in"
+        android:layout_toLeftOf="@+id/item_price_in"
+        android:layout_toStartOf="@+id/item_price_in" />
+
+    <EditText
+        android:id="@+id/item_price_in"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:gravity="center"
+        android:layout_below="@+id/edit_item_name"
+        android:layout_alignRight="@+id/edit_item_name"
+        android:layout_alignEnd="@+id/edit_item_name"
+        android:inputType="numberDecimal"/>
+
+    <CheckBox
+        android:id="@+id/is_bought"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/is_bought"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/amount_units" />
+
+</RelativeLayout>

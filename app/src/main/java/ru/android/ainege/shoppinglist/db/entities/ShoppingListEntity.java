@@ -1,25 +1,27 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-public class ShoppingListEntity {
+import java.io.Serializable;
+
+public class ShoppingListEntity implements Serializable {
     private int mIdItem;
     private int mIdList;
     private boolean mIsBought;
     private ItemEntity mItem;
     private ListEntity mList;
 
-    public ShoppingListEntity(int idItem, int idList, int isBought){
+    public ShoppingListEntity(int idItem, int idList, int isBought) {
         mIdItem = idItem;
         mIdList = idList;
         mIsBought = isBought == 1;
     }
 
-    public ShoppingListEntity(int idItem, int idList, boolean isBought){
+    public ShoppingListEntity(int idItem, int idList, boolean isBought) {
         mIdItem = idItem;
         mIdList = idList;
         mIsBought = isBought;
     }
 
-    public ShoppingListEntity(int idItem, int idList, boolean isBought, ItemEntity item){
+    public ShoppingListEntity(int idItem, int idList, boolean isBought, ItemEntity item) {
         this(idItem, idList, isBought);
         mItem = item;
     }
@@ -53,7 +55,8 @@ public class ShoppingListEntity {
     }
 
     public void setItem(ItemEntity item) {
-        this.mItem = item;
+        mItem = item;
+        mIdItem = mItem.getId();
     }
 
     public ListEntity getList() {
@@ -61,6 +64,7 @@ public class ShoppingListEntity {
     }
 
     public void setList(ListEntity list) {
-        this.mList = list;
+        mList = list;
+        mIdList = mList.getId();
     }
 }

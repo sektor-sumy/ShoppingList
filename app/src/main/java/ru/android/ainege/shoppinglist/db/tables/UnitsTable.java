@@ -12,6 +12,8 @@ public class UnitsTable {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "name";
 
+    public static final int ID_NULL = 0;
+
     private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
             + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -28,14 +30,14 @@ public class UnitsTable {
         onCreate(database);
     }
 
-    private static void initialData(SQLiteDatabase database){
+    private static void initialData(SQLiteDatabase database) {
         UnitEntity[] units = {
                 new UnitEntity("шт"),
                 new UnitEntity("кг"),
                 new UnitEntity("л"),
         };
 
-        for(UnitEntity unit : units){
+        for(UnitEntity unit : units) {
             ContentValues contentValue = new ContentValues();
             contentValue.put(COLUMN_NAME, unit.getName());
             database.insert(TABLE_NAME, null, contentValue);

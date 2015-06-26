@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.db.dataSources;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 import ru.android.ainege.shoppinglist.db.entities.ItemEntity;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
+import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class ItemDataSource {
     private Context mContext;
@@ -35,10 +37,28 @@ public class ItemDataSource {
 
     public ItemEntity get(int id, boolean withUnit) {
         ItemEntity item = get(id);
-        if(item.getIdUnit() != 0 && withUnit) {
-            UnitsDataSource unitsDataSource = new UnitsDataSource(mContext);
-            item.setUnit(unitsDataSource.get(item.getIdUnit()));
+        if(item.getIdUnit() != UnitsTable.ID_NULL && withUnit) {
+            UnitsDataSource unitDS = new UnitsDataSource(mContext);
+            item.setUnit(unitDS.get(item.getIdUnit()));
         }
         return item;
+    }
+
+    public int update(ItemEntity item) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ItemsTable.COLUMN_NAME, item.getName());
+        if(item.getAmount() != 0) {
+            values.put(ItemsTable.COLUMN_AMOUNT, item.getAmount());
+            values.put(ItemsTable.COLUMN_ID_UNIT, item.getIdUnit());
+        } else {
+            values.put(ItemsTable.COLUMN_AMOUNT, 0);
+            values.put(ItemsTable.COLUMN_ID_UNIT, UnitsTable.ID_NULL);
+        }
+        values.put(ItemsTable.COLUMN_PRICE, item.getPrice());
+        return db.update(ItemsTable.TABLE_NAME,
+                values,
+                ItemsTable.COLUMN_ID + " = ?",
+                new String[]{String.valueOf(item.getId())});
     }
 }

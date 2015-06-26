@@ -4,6 +4,11 @@
     <string name="add_item">Добавить товар</string>
     <string name="spent_money">Потрачено</string>
     <string name="all_money">Всего</string>
-    <string name="price">цена</string>
+
+    <string name="edit">Изменить</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="price">Цена</string>
+    <string name="is_bought">В корзине?</string>
 
 </resources>

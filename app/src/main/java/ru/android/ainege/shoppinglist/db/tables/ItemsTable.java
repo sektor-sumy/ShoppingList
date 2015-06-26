@@ -21,7 +21,7 @@ public class ItemsTable {
             + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_NAME + " TEXT NOT NULL, "
-            + COLUMN_AMOUNT + " INTEGER, "
+            + COLUMN_AMOUNT + " REAL, "
             + COLUMN_ID_UNIT + " INTEGER, "
             + COLUMN_PRICE + " REAL, "
             + "FOREIGN KEY (" + COLUMN_ID_UNIT + ") REFERENCES " + UnitsTable.TABLE_NAME + " (" + UnitsTable.COLUMN_ID + ")"
@@ -37,7 +37,7 @@ public class ItemsTable {
         onCreate(database);
     }
 
-    private static void initialData(SQLiteDatabase database){
+    private static void initialData(SQLiteDatabase database) {
         ArrayList<ItemEntity> items = new ArrayList<>();
         items.add(new ItemEntity("молоко"));
         items.add(new ItemEntity("хлеб", 1, 1));
@@ -50,7 +50,7 @@ public class ItemsTable {
         items.add(new ItemEntity("икра мойвы"));
         items.add(new ItemEntity("черный чай", 75));
 
-        for(ItemEntity item : items){
+        for(ItemEntity item : items) {
             ContentValues contentValue = new ContentValues();
             contentValue.put(COLUMN_NAME, item.getName());
             contentValue.put(COLUMN_AMOUNT, item.getAmount());

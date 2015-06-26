@@ -4,11 +4,11 @@ public class UnitEntity {
     private int _id;
     private String mName;
 
-    public UnitEntity(String name){
+    public UnitEntity(String name) {
         mName = name;
     }
 
-    public UnitEntity(int id, String name){
+    public UnitEntity(int id, String name) {
         this(name);
         _id = id;
     }
@@ -27,5 +27,10 @@ public class UnitEntity {
 
     public void setName(String name) {
         mName = name;
+    }
+
+    @Override
+    public String toString () {
+        return mName;
     }
 }

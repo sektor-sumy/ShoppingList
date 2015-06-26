@@ -1,8 +1,8 @@
-package ru.android.ainege.shoppinglist.ui.activities;
+package ru.android.ainege.shoppinglist.uis.activities;
 
 import android.app.Fragment;
 
-import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
+import ru.android.ainege.shoppinglist.uis.fragments.ShoppingListFragment;
 
 /**
  * Created by Belkin on 06.06.2015.
