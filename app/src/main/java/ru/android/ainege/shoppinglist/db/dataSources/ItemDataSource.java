@@ -61,4 +61,23 @@ public class ItemDataSource {
                 ItemsTable.COLUMN_ID + " = ?",
                 new String[]{String.valueOf(item.getId())});
     }
+
+    public long add(ItemEntity item) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(ItemsTable.COLUMN_NAME, item.getName());
+        if(item.getAmount() != 0) {
+            values.put(ItemsTable.COLUMN_AMOUNT, item.getAmount());
+            values.put(ItemsTable.COLUMN_ID_UNIT, item.getIdUnit());
+        } else {
+            values.put(ItemsTable.COLUMN_AMOUNT, 0);
+            values.put(ItemsTable.COLUMN_ID_UNIT, UnitsTable.ID_NULL);
+        }
+        values.put(ItemsTable.COLUMN_PRICE, item.getPrice());
+
+        long id = db.insert(ItemsTable.TABLE_NAME, null, values);
+        db.close();
+        return id;
+    }
 }

@@ -62,4 +62,17 @@ public class ShoppingListDataSource {
         return i;
     }
 
+    public long add(ShoppingListEntity itemInList) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(ShoppingListTable.COLUMN_ID_ITEM, itemInList.getIdItem());
+        values.put(ShoppingListTable.COLUMN_ID_LIST, itemInList.getIdList());
+        values.put(ShoppingListTable.COLUMN_IS_BOUGHT, itemInList.isBought());
+
+        long id = db.insert(ShoppingListTable.TABLE_NAME, null, values);
+        db.close();
+        return id;
+    }
+
 }

@@ -12,11 +12,11 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
-        android:id="@+id/new_item_name"
+        android:id="@+id/new_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/add_item"
-        android:singleLine="false" />
+        android:editable="false"/>
 
     <LinearLayout
         android:orientation="vertical"

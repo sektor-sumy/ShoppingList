@@ -17,18 +17,28 @@ public class ItemEntity {
         mPrice = price;
     }
 
-    public ItemEntity(String name, int amount, int idUnit) {
+    public ItemEntity(String name, double amount, int idUnit) {
         this(name);
         mAmount = amount;
         mIdUnit = idUnit;
     }
 
-    public ItemEntity(String name, int amount, int idUnit, double price) {
+    public ItemEntity(String name, double amount, int idUnit, double price) {
         this(name, amount, idUnit);
         mPrice = price;
     }
 
-    public ItemEntity(int id, String name, int amount, int idUnit, double price) {
+    public ItemEntity(String name, double amount, UnitEntity unit, double price) {
+        this(name);
+        mAmount = amount;
+        mUnit = unit;
+        if(unit != null) {
+            mIdUnit = unit.getId();
+        }
+        mPrice = price;
+    }
+
+    public ItemEntity(int id, String name, double amount, int idUnit, double price) {
         this(name, amount, idUnit, price);
         _id = id;
     }

@@ -11,4 +11,6 @@
     <string name="price">Цена</string>
     <string name="is_bought">В корзине?</string>
 
+    <string name="item_name">Название товара</string>
+
 </resources>

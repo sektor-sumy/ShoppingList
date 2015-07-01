@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.uis.activities;
+package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.Activity;
 import android.app.Fragment;
