@@ -2,10 +2,14 @@ package ru.android.ainege.shoppinglist.ui.fragments;
 
 import android.app.ListFragment;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -39,7 +43,7 @@ public class ShoppingListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mListDS = new ListsDataSource(getActivity().getApplicationContext());
+        mListDS = new ListsDataSource(getActivity());
         mList = mListDS.get(idList, true);
 
         mAdapter = new ItemAdapter(mList.getItemsInList());
@@ -72,6 +76,8 @@ public class ShoppingListFragment extends ListFragment {
         mTotalMoney = (TextView) v.findViewById(R.id.total_money);
         updateSums();
 
+        ListView list = (ListView) v.findViewById(android.R.id.list);
+        registerForContextMenu(list);
         return v;
     }
 
@@ -121,11 +127,40 @@ public class ShoppingListFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        EditItemDialogFragment editItemDialog = new EditItemDialogFragment();
+        ShoppingListEntity itemInList = getItem(position);
         Bundle args = new Bundle();
-        ShoppingListEntity itemInList = mList.getItemsInList().get(position);
         args.putSerializable(ITEM_IN_LIST, itemInList);
+        EditItemDialogFragment editItemDialog = new EditItemDialogFragment();
         editItemDialog.setArguments(args);
         editItemDialog.show(getFragmentManager(), "editItemDialog");
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.context_item_list, menu);
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.delete:
+                delete(getItem((int) info.id));
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    private ShoppingListEntity getItem(int position) {
+        return mList.getItemsInList().get(position);
+    }
+
+    private void delete(ShoppingListEntity itemInList) {
+        ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
+        itemInListDS.delete(itemInList);
+    }
+
 }

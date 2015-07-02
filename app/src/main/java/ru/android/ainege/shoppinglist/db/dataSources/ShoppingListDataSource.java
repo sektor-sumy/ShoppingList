@@ -50,7 +50,7 @@ public class ShoppingListDataSource {
         return db.update(ShoppingListTable.TABLE_NAME,
                          values,
                          ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
-                         new String[] { String.valueOf(itemInList.getIdItem()), String.valueOf(itemInList.getIdList())});
+                         new String[] { String.valueOf(itemInList.getIdItem()), String.valueOf(itemInList.getIdList()) });
     }
 
     public int update(ShoppingListEntity itemInList, boolean withItem) {
@@ -75,4 +75,11 @@ public class ShoppingListDataSource {
         return id;
     }
 
+    public void delete(ShoppingListEntity itemInList) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.delete(ShoppingListTable.TABLE_NAME,
+                ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
+                new String[] { String.valueOf(itemInList.getIdItem()), String.valueOf(itemInList.getIdList()) });
+        db.close();
+    }
 }

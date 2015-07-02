@@ -12,5 +12,6 @@
     <string name="is_bought">В корзине?</string>
 
     <string name="item_name">Название товара</string>
+    <string name="delete">Удалить</string>
 
 </resources>
