@@ -1,6 +1,8 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -27,14 +29,16 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 
 public class ShoppingListFragment extends ListFragment {
-    public static final String ITEM_IN_LIST = "itemInList";
-    public static final String ID_LIST = "idList";
+    private static final String ADD_DIALOG_DATE = "addItemDialog";
+    private static final String EDIT_DIALOG_DATE = "editItemDialog";
+    private static final int ADD_DIALOG_CODE = 0;
+    private static final int EDIT_DIALOG_CODE = 1;
 
-    ListEntity mList;
-    ListsDataSource mListDS;
-    TextView mSpentMoney;
-    TextView mTotalMoney;
-    ItemAdapter mAdapter;
+    private ListsDataSource mListDS;
+    private ListEntity mList;
+    private ArrayList<ShoppingListEntity> mItemsInList;
+    private ItemAdapter mAdapter;
+    private TextView mSpentMoney, mTotalMoney;
 
     //edit later
     int idList = 1;
@@ -44,46 +48,15 @@ public class ShoppingListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
 
         mListDS = new ListsDataSource(getActivity());
-        mList = mListDS.get(idList, true);
 
-        mAdapter = new ItemAdapter(mList.getItemsInList());
+        mItemsInList = getItemsInList();
+        mAdapter = new ItemAdapter(mItemsInList);
         setListAdapter(mAdapter);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
-
-        final TextView listName = (TextView) v.findViewById(R.id.list_name);
-        listName.setText(mList.getName());
-
-        EditText newItem = (EditText) v.findViewById(R.id.new_item);
-        newItem.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    AddItemDialogFragment addItemDialog = new AddItemDialogFragment();
-                    Bundle args = new Bundle();
-                    args.putInt(ID_LIST, idList);
-                    addItemDialog.setArguments(args);
-                    addItemDialog.show(getFragmentManager(), "addItemDialog");
-                }
-                return false;
-            }
-        });
-
-        mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
-        mTotalMoney = (TextView) v.findViewById(R.id.total_money);
-        updateSums();
-
-        ListView list = (ListView) v.findViewById(android.R.id.list);
-        registerForContextMenu(list);
-        return v;
-    }
-
-    private void updateSums() {
-        mSpentMoney.setText(String.valueOf(mList.sumSpentMoney()));
-        mTotalMoney.setText(String.valueOf(mList.sumTotalMoney()));
+    private ArrayList<ShoppingListEntity> getItemsInList() {
+        mList = mListDS.get(idList, true);
+        return mList.getItemsInList();
     }
 
     private class ItemAdapter extends ArrayAdapter<ShoppingListEntity> {
@@ -126,41 +99,94 @@ public class ShoppingListFragment extends ListFragment {
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        ShoppingListEntity itemInList = getItem(position);
-        Bundle args = new Bundle();
-        args.putSerializable(ITEM_IN_LIST, itemInList);
-        EditItemDialogFragment editItemDialog = new EditItemDialogFragment();
-        editItemDialog.setArguments(args);
-        editItemDialog.show(getFragmentManager(), "editItemDialog");
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
+
+        final TextView listName = (TextView) v.findViewById(R.id.list_name);
+        listName.setText(mList.getName());
+
+        EditText newItem = (EditText) v.findViewById(R.id.new_item);
+        newItem.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    AddItemDialogFragment addItemDialog = AddItemDialogFragment.newInstance(idList);
+                    addItemDialog.setTargetFragment(ShoppingListFragment.this, ADD_DIALOG_CODE);
+                    addItemDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
+                }
+                return false;
+            }
+        });
+
+        mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
+        mTotalMoney = (TextView) v.findViewById(R.id.total_money);
+        updateSums();
+
+        ListView list = (ListView) v.findViewById(android.R.id.list);
+        registerForContextMenu(list);
+        return v;
+    }
+
+    private void updateSums() {
+        mSpentMoney.setText(String.valueOf(mList.sumSpentMoney()));
+        mTotalMoney.setText(String.valueOf(mList.sumTotalMoney()));
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.context_item_list, menu);
-    }
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.delete:
-                delete(getItem((int) info.id));
-                return true;
-            default:
-                return super.onContextItemSelected(item);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) return;
+
+        switch(requestCode) {
+            case ADD_DIALOG_CODE:
+                updateData();
+                mAdapter.notifyDataSetChanged();
+                break;
+            case EDIT_DIALOG_CODE:
+                mAdapter.notifyDataSetChanged();
+                updateSums();
+                break;
         }
+    }
+
+    private void updateData() {
+        mItemsInList.clear();
+        mItemsInList.addAll(getItemsInList());
+        mAdapter.notifyDataSetChanged();
+        updateSums();
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(getItem(position));
+        editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
+        editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
     }
 
     private ShoppingListEntity getItem(int position) {
         return mList.getItemsInList().get(position);
     }
 
-    private void delete(ShoppingListEntity itemInList) {
-        ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-        itemInListDS.delete(itemInList);
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.context_item_list, menu);
     }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.delete:
+                ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
+                itemInListDS.delete(getItem((int) info.id));
+
+                updateData();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
 
 }

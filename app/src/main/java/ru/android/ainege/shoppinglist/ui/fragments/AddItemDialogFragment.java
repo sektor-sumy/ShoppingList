@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -25,11 +26,23 @@ import ru.android.ainege.shoppinglist.db.entities.ShoppingListEntity;
 import ru.android.ainege.shoppinglist.db.entities.UnitEntity;
 
 public class AddItemDialogFragment extends DialogFragment {
-    EditText mName;
-    EditText mAmount;
-    EditText mPrice;
-    CheckBox mIsBought;
-    Spinner mUnits;
+    public static final String ID_LIST = "idList";
+
+    private EditText mName;
+    private EditText mAmount;
+    private EditText mPrice;
+    private CheckBox mIsBought;
+    private Spinner mUnits;
+
+    public static AddItemDialogFragment newInstance(int id) {
+        Bundle args = new Bundle();
+        args.putInt(ID_LIST, id);
+
+        AddItemDialogFragment fragment = new AddItemDialogFragment();
+        fragment.setArguments(args);
+
+        return fragment;
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -42,6 +55,7 @@ public class AddItemDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         saveData();
+                        sendResult(Activity.RESULT_OK);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -68,6 +82,22 @@ public class AddItemDialogFragment extends DialogFragment {
         mIsBought = (CheckBox) v.findViewById(R.id.is_bought);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        if (getDialog() == null) {
+            return;
+        }
+
+        Window window = getDialog().getWindow();
+        window.setGravity(Gravity.TOP);
+        window.getAttributes().y = 30;
+        DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
+        int dw = (int) (displaymetrics.widthPixels);
+        window.setLayout(dw, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
     private void saveData() {
         String name = mName.getText().toString();
         Double amount = 0.0;
@@ -85,28 +115,18 @@ public class AddItemDialogFragment extends DialogFragment {
         ItemEntity item = new ItemEntity(name, amount, unit, price);
         ItemDataSource itemDS = new ItemDataSource(getActivity());
 
-        Bundle args = getArguments();
         int idItem = (int) itemDS.add(item);
 
-        int idList = args.getInt(ShoppingListFragment.ID_LIST);
+        int idList = getArguments().getInt(ID_LIST);
         ShoppingListEntity itemInList = new ShoppingListEntity(idItem, idList, isBought);
         ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
         itemInListDS.add(itemInList);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        if (getDialog() == null) {
+    private void sendResult(int resultCode) {
+        if (getTargetFragment() == null)
             return;
-        }
 
-        Window window = getDialog().getWindow();
-        window.setGravity(Gravity.TOP);
-        window.getAttributes().y = 30;
-        DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
-        int dw = (int) (displaymetrics.widthPixels);
-        window.setLayout(dw, ViewGroup.LayoutParams.WRAP_CONTENT);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, null);
     }
 }

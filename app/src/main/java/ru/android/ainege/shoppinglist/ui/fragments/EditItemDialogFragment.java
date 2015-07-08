@@ -1,9 +1,11 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +21,24 @@ import ru.android.ainege.shoppinglist.db.entities.ShoppingListEntity;
 import ru.android.ainege.shoppinglist.db.entities.UnitEntity;
 
 public class EditItemDialogFragment extends DialogFragment {
-    ShoppingListEntity mItem;
-    EditText mName;
-    EditText mAmount;
-    EditText mPrice;
-    CheckBox mIsBought;
-    Spinner mUnits;
+    public static final String ITEM_IN_LIST = "itemInList";
+
+    private ShoppingListEntity mItem;
+    private EditText mName;
+    private EditText mAmount;
+    private EditText mPrice;
+    private CheckBox mIsBought;
+    private Spinner mUnits;
+
+    public static EditItemDialogFragment newInstance(ShoppingListEntity itemInList) {
+        Bundle args = new Bundle();
+        args.putSerializable(ITEM_IN_LIST, itemInList);
+
+        EditItemDialogFragment fragment = new EditItemDialogFragment();
+        fragment.setArguments(args);
+
+        return fragment;
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -37,6 +51,7 @@ public class EditItemDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         saveData();
+                        sendResult(Activity.RESULT_OK);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -49,8 +64,7 @@ public class EditItemDialogFragment extends DialogFragment {
     }
 
     private void setData(View v) {
-        Bundle args = getArguments();
-        mItem = (ShoppingListEntity) args.getSerializable(ShoppingListFragment.ITEM_IN_LIST);
+        mItem = (ShoppingListEntity) getArguments().getSerializable(ITEM_IN_LIST);
 
         UnitsDataSource unitDS = new UnitsDataSource(getActivity());
         ArrayAdapter<UnitEntity> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, unitDS.getAll());
@@ -100,5 +114,12 @@ public class EditItemDialogFragment extends DialogFragment {
 
         ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
         itemInListDS.update(mItem, true);
+    }
+
+    private void sendResult(int resultCode) {
+        if (getTargetFragment() == null)
+            return;
+
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, null);
     }
 }
