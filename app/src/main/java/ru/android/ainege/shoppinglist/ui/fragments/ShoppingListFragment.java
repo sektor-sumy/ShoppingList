@@ -2,8 +2,11 @@ package ru.android.ainege.shoppinglist.ui.fragments;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -29,13 +32,14 @@ import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 
-public class ShoppingListFragment extends ListFragment {
+public class ShoppingListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String ADD_DIALOG_DATE = "addItemDialog";
     private static final String EDIT_DIALOG_DATE = "editItemDialog";
     private static final int ADD_DIALOG_CODE = 0;
     private static final int EDIT_DIALOG_CODE = 1;
 
-    private ListsDataSource mListDS;
+    private static final int DATA_LOADER = 0;
+
     private Cursor mItemsInList;
     private ItemAdapter mAdapter;
 
@@ -47,12 +51,157 @@ public class ShoppingListFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getLoaderManager().initLoader(DATA_LOADER, null, this);
+    }
 
-        mListDS = new ListsDataSource(getActivity());
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 
-        mItemsInList = mListDS.getItemsInList(idList);
-        mAdapter = new ItemAdapter(R.layout._shopping_list_item, mItemsInList);
-        setListAdapter(mAdapter);
+        final TextView listName = (TextView) v.findViewById(R.id.list_name);
+        Cursor listCursor = new ListsDataSource(getActivity()).get(idList);
+        listName.setText(listCursor.getString(listCursor.getColumnIndex(ListsTable.COLUMN_NAME)));
+
+        EditText newItem = (EditText) v.findViewById(R.id.new_item);
+        newItem.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    AddItemDialogFragment addItemDialog = AddItemDialogFragment.newInstance(idList);
+                    addItemDialog.setTargetFragment(ShoppingListFragment.this, ADD_DIALOG_CODE);
+                    addItemDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
+                }
+                return false;
+            }
+        });
+
+        mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
+        mTotalMoney = (TextView) v.findViewById(R.id.total_money);
+
+        ListView list = (ListView) v.findViewById(android.R.id.list);
+        registerForContextMenu(list);
+        return v;
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        mItemsInList.moveToPosition(position);
+
+        String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
+        double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
+        String nameUnit = mItemsInList.getString(mItemsInList.getColumnIndex(UnitsTable.COLUMN_NAME));
+        double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
+        boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
+        long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
+
+        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, idList);
+        editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
+        editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.context_item_list, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.delete:
+                mItemsInList.moveToPosition(info.position);
+                ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
+                itemInListDS.delete(mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID)), idList);
+                updateData();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) return;
+
+        switch(requestCode) {
+            case ADD_DIALOG_CODE:
+                updateData();
+                break;
+            case EDIT_DIALOG_CODE:
+                updateData();
+                break;
+        }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Loader<Cursor> loader = null;
+        switch (id) {
+            case DATA_LOADER:
+                loader = new MyCursorLoader(getActivity(), idList);
+                break;
+            default:
+                break;
+        }
+        return loader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case DATA_LOADER:
+                mItemsInList = data;
+                mSpentMoney.setText(String.valueOf(sumSpentMoney()));
+                mTotalMoney.setText(String.valueOf(sumTotalMoney()));
+                mAdapter = new ItemAdapter(R.layout._shopping_list_item, mItemsInList);
+                setListAdapter(mAdapter);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        switch (loader.getId()) {
+            case DATA_LOADER:
+                mAdapter.swapCursor(null);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void updateData() {
+        getLoaderManager().getLoader(DATA_LOADER).forceLoad();
+    }
+
+    private double sumSpentMoney() {
+        double sum = 0;
+        mItemsInList.moveToFirst();
+        do {
+            if(mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0) {
+                sum += sum();
+            }
+        } while(mItemsInList.moveToNext());
+        return sum;
+    }
+
+    private double sumTotalMoney() {
+        double sum = 0;
+        mItemsInList.moveToFirst();
+        do {
+            sum += sum();
+        } while(mItemsInList.moveToNext());
+        return sum;
+    }
+
+    private double sum() {
+        double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
+        double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
+        return price * (amount == 0 ? 1 : amount);
     }
 
     private class ItemAdapter extends ResourceCursorAdapter {
@@ -91,116 +240,20 @@ public class ShoppingListFragment extends ListFragment {
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
+    private static class MyCursorLoader extends CursorLoader {
+        private Context mContext;
+        private long mIdList;
 
-        final TextView listName = (TextView) v.findViewById(R.id.list_name);
-        Cursor listCursor = mListDS.get(idList);
-        listName.setText(listCursor.getString(listCursor.getColumnIndex(ListsTable.COLUMN_NAME)));
-
-        EditText newItem = (EditText) v.findViewById(R.id.new_item);
-        newItem.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    AddItemDialogFragment addItemDialog = AddItemDialogFragment.newInstance(idList);
-                    addItemDialog.setTargetFragment(ShoppingListFragment.this, ADD_DIALOG_CODE);
-                    addItemDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
-                }
-                return false;
-            }
-        });
-
-        mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
-        mTotalMoney = (TextView) v.findViewById(R.id.total_money);
-
-        mSpentMoney.setText(String.valueOf(sumSpentMoney()));
-        mTotalMoney.setText(String.valueOf(sumTotalMoney()));
-
-        ListView list = (ListView) v.findViewById(android.R.id.list);
-        registerForContextMenu(list);
-        return v;
-    }
-
-    private double sumSpentMoney(){
-        double sum = 0;
-        mItemsInList.moveToFirst();
-        do{
-            if(mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0) {
-                sum += mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE)) *
-                        (mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT)) == 0 ? 1 : mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT)));
-            }
-        } while(mItemsInList.moveToNext());
-        return sum;
-    }
-
-    private double sumTotalMoney(){
-        double sum = 0;
-        mItemsInList.moveToFirst();
-        do{
-            sum += mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE)) *
-                    (mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT)) == 0 ? 1 : mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT)));
-        } while(mItemsInList.moveToNext());
-        return sum;
-    }
-
-    private void updateData() {
-        mItemsInList = mListDS.getItemsInList(idList);
-        mAdapter.changeCursor(mItemsInList);
-        mSpentMoney.setText(String.valueOf(sumSpentMoney()));
-        mTotalMoney.setText(String.valueOf(sumTotalMoney()));
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != Activity.RESULT_OK) return;
-
-        switch(requestCode) {
-            case ADD_DIALOG_CODE:
-                updateData();
-                break;
-            case EDIT_DIALOG_CODE:
-                updateData();
-                break;
+        public MyCursorLoader(Context context, long idList) {
+            super(context);
+            mContext = context;
+            mIdList = idList;
         }
-    }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        mItemsInList.moveToPosition(position);
-
-        String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
-        double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
-        String nameUnit = mItemsInList.getString(mItemsInList.getColumnIndex(UnitsTable.COLUMN_NAME));
-        double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
-        boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
-        long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
-
-        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, idList);
-        editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
-        editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.context_item_list, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.delete:
-                mItemsInList.moveToPosition(info.position);
-                ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-                itemInListDS.delete(mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID)), idList);
-                updateData();
-                return true;
-            default:
-                return super.onContextItemSelected(item);
+        @Override
+        public Cursor loadInBackground() {
+            ListsDataSource mListDS = new ListsDataSource(mContext);
+            return mListDS.getItemsInList(mIdList);
         }
     }
 }
