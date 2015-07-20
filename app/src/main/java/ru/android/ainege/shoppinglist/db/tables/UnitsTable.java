@@ -3,14 +3,12 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import ru.android.ainege.shoppinglist.db.entities.UnitEntity;
-
 public class UnitsTable {
 
     public static final String TABLE_NAME = "Units";
 
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_NAME = "unit_name";
 
     public static final int ID_NULL = 0;
 
@@ -31,15 +29,15 @@ public class UnitsTable {
     }
 
     private static void initialData(SQLiteDatabase database) {
-        UnitEntity[] units = {
-                new UnitEntity("шт"),
-                new UnitEntity("кг"),
-                new UnitEntity("л"),
+        String[] units = {
+                "шт",
+                "кг",
+                "л",
         };
 
-        for(UnitEntity unit : units) {
+        for(String unit : units) {
             ContentValues contentValue = new ContentValues();
-            contentValue.put(COLUMN_NAME, unit.getName());
+            contentValue.put(COLUMN_NAME, unit);
             database.insert(TABLE_NAME, null, contentValue);
         }
     }

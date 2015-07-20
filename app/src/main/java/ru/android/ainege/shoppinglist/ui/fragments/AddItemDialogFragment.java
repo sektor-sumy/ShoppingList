@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -12,18 +13,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
-import ru.android.ainege.shoppinglist.db.entities.ItemEntity;
-import ru.android.ainege.shoppinglist.db.entities.ShoppingListEntity;
-import ru.android.ainege.shoppinglist.db.entities.UnitEntity;
+import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class AddItemDialogFragment extends DialogFragment {
     public static final String ID_LIST = "idList";
@@ -34,9 +33,9 @@ public class AddItemDialogFragment extends DialogFragment {
     private CheckBox mIsBought;
     private Spinner mUnits;
 
-    public static AddItemDialogFragment newInstance(int id) {
+    public static AddItemDialogFragment newInstance(long id) {
         Bundle args = new Bundle();
-        args.putInt(ID_LIST, id);
+        args.putLong(ID_LIST, id);
 
         AddItemDialogFragment fragment = new AddItemDialogFragment();
         fragment.setArguments(args);
@@ -69,7 +68,10 @@ public class AddItemDialogFragment extends DialogFragment {
 
     private void setData(View v) {
         UnitsDataSource unitDS = new UnitsDataSource(getActivity());
-        ArrayAdapter<UnitEntity> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, unitDS.getAll());
+
+        String[] from = new String[] {UnitsTable.COLUMN_NAME};
+        int[] to = new int[] {android.R.id.text1};
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item, unitDS.getAll(), from, to, 0);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         mUnits = (Spinner) v.findViewById(R.id.new_amount_units);
@@ -94,7 +96,7 @@ public class AddItemDialogFragment extends DialogFragment {
         window.setGravity(Gravity.TOP);
         window.getAttributes().y = 30;
         DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
-        int dw = (int) (displaymetrics.widthPixels);
+        int dw = displaymetrics.widthPixels;
         window.setLayout(dw, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
@@ -102,25 +104,23 @@ public class AddItemDialogFragment extends DialogFragment {
         String name = mName.getText().toString();
         Double amount = 0.0;
         Double price = 0.0;
-        UnitEntity unit = null;
+        long idUnit = 0;
         if(mAmount.getText().length() !=0) {
             amount = Double.parseDouble(mAmount.getText().toString());
-            unit = (UnitEntity) mUnits.getSelectedItem();
+            Cursor c = (Cursor) mUnits.getSelectedItem();
+            idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
         }
         if(mPrice.getText().length() != 0) {
             price = Double.parseDouble(mPrice.getText().toString());
         }
         Boolean isBought = mIsBought.isChecked();
 
-        ItemEntity item = new ItemEntity(name, amount, unit, price);
         ItemDataSource itemDS = new ItemDataSource(getActivity());
+        long idItem = (int) itemDS.add(name, amount, idUnit, price);
+        long idList = getArguments().getLong(ID_LIST);
 
-        int idItem = (int) itemDS.add(item);
-
-        int idList = getArguments().getInt(ID_LIST);
-        ShoppingListEntity itemInList = new ShoppingListEntity(idItem, idList, isBought);
         ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-        itemInListDS.add(itemInList);
+        itemInListDS.add(idItem, idList, isBought);
     }
 
     private void sendResult(int resultCode) {

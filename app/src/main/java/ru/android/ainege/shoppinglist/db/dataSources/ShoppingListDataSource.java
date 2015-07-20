@@ -2,14 +2,9 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
-
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
-import ru.android.ainege.shoppinglist.db.entities.ItemEntity;
-import ru.android.ainege.shoppinglist.db.entities.ShoppingListEntity;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 
 public class ShoppingListDataSource {
@@ -21,65 +16,33 @@ public class ShoppingListDataSource {
         mDbHelper = new ShoppingListSQLiteHelper(mContext);
     }
 
-    public ArrayList<ShoppingListEntity> getAllForList(int idList) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.query(ShoppingListTable.TABLE_NAME,
-                                 new String[]{ShoppingListTable.COLUMN_ID_ITEM, ShoppingListTable.COLUMN_ID_LIST, ShoppingListTable.COLUMN_IS_BOUGHT},
-                                 ShoppingListTable.COLUMN_ID_LIST + "=?",
-                                 new String[]{String.valueOf(idList)}, null, null, null, null);
-        ArrayList<ShoppingListEntity> itemsInList = new ArrayList<>();
-        if(cursor.moveToFirst()) {
-            do{
-                ShoppingListEntity itemInList = new ShoppingListEntity(cursor.getInt(0), cursor.getInt(1), cursor.getInt(2));
-                if(itemInList.getItem() == null) {
-                    ItemDataSource itemDS = new ItemDataSource(mContext);
-                    ItemEntity item = itemDS.get(itemInList.getIdItem(), true);
-                    itemInList.setItem(item);
-                }
-                itemsInList.add(itemInList);
-            } while(cursor.moveToNext());
-            cursor.close();
-        }
-        return itemsInList;
-    }
-
-    public int update(ShoppingListEntity itemInList) {
+    public int setIsBought(boolean isBought, long idItem, long idList) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(ShoppingListTable.COLUMN_IS_BOUGHT, itemInList.isBought());
+        ContentValues values = createContentValues(isBought);
         return db.update(ShoppingListTable.TABLE_NAME,
                          values,
                          ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
-                         new String[] { String.valueOf(itemInList.getIdItem()), String.valueOf(itemInList.getIdList()) });
+                         new String[] {String.valueOf(idItem), String.valueOf(idList)});
     }
 
-    public int update(ShoppingListEntity itemInList, boolean withItem) {
-        int i = update(itemInList);
-        if(i !=0 && withItem == true){
-            ItemDataSource itemDS = new ItemDataSource(mContext);
-            i = itemDS.update(itemInList.getItem());
-        }
-        return i;
-    }
-
-    public long add(ShoppingListEntity itemInList) {
+    public long add(long idItem, long idList, boolean isBought) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(ShoppingListTable.COLUMN_ID_ITEM, itemInList.getIdItem());
-        values.put(ShoppingListTable.COLUMN_ID_LIST, itemInList.getIdList());
-        values.put(ShoppingListTable.COLUMN_IS_BOUGHT, itemInList.isBought());
-
-        long id = db.insert(ShoppingListTable.TABLE_NAME, null, values);
-        db.close();
-        return id;
+        ContentValues values = createContentValues(isBought);
+        values.put(ShoppingListTable.COLUMN_ID_ITEM, idItem);
+        values.put(ShoppingListTable.COLUMN_ID_LIST, idList);
+        return db.insert(ShoppingListTable.TABLE_NAME, null, values);
     }
 
-    public void delete(ShoppingListEntity itemInList) {
+    public void delete(long idItem, long idList) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.delete(ShoppingListTable.TABLE_NAME,
                 ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
-                new String[] { String.valueOf(itemInList.getIdItem()), String.valueOf(itemInList.getIdList()) });
-        db.close();
+                new String[] { String.valueOf(idItem), String.valueOf(idList) });
+    }
+
+    private ContentValues createContentValues(boolean isBought) {
+        ContentValues values = new ContentValues();
+        values.put(ShoppingListTable.COLUMN_IS_BOUGHT, isBought);
+        return values;
     }
 }

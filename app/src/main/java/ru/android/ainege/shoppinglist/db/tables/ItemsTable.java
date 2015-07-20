@@ -3,16 +3,12 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
-
-import ru.android.ainege.shoppinglist.db.entities.ItemEntity;
-
 public class ItemsTable {
 
     public static final String TABLE_NAME = "Items";
 
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_NAME = "item_name";
     public static final String COLUMN_AMOUNT = "amount";
     public static final String COLUMN_ID_UNIT = "id_unit";
     public static final String COLUMN_PRICE = "price";
@@ -38,24 +34,27 @@ public class ItemsTable {
     }
 
     private static void initialData(SQLiteDatabase database) {
-        ArrayList<ItemEntity> items = new ArrayList<>();
-        items.add(new ItemEntity("молоко"));
-        items.add(new ItemEntity("хлеб", 1, 1));
-        items.add(new ItemEntity("масло сливочное", 2, 1, 70));
-        items.add(new ItemEntity("икра мойвы"));
-        items.add(new ItemEntity("черный чай", 75));
-        items.add(new ItemEntity("молоко", 2, 3));
-        items.add(new ItemEntity("хлеб"));
-        items.add(new ItemEntity("масло сливочное", 1, 1, 70));
-        items.add(new ItemEntity("икра мойвы"));
-        items.add(new ItemEntity("черный чай", 75));
+        String[] item = {
+                "молоко",
+                "хлеб",
+                "масло сливочное",
+                "черный чай",
+                "рис",
+                "гречка",
+        };
 
-        for(ItemEntity item : items) {
+        double[] amount = { 0, 1, 2, 0, 1, 1 };
+
+        int[] amountUnit = { 0, 1, 1, 0, 2, 2 };
+
+        double[] price = { 55.00, 19.5, 66, 87, 70, 105 };
+
+        for(int i = 0; i < item.length; i++) {
             ContentValues contentValue = new ContentValues();
-            contentValue.put(COLUMN_NAME, item.getName());
-            contentValue.put(COLUMN_AMOUNT, item.getAmount());
-            contentValue.put(COLUMN_ID_UNIT, item.getIdUnit());
-            contentValue.put(COLUMN_PRICE, item.getPrice());
+            contentValue.put(COLUMN_NAME, item[i]);
+            contentValue.put(COLUMN_AMOUNT, amount[i]);
+            contentValue.put(COLUMN_ID_UNIT, amountUnit[i]);
+            contentValue.put(COLUMN_PRICE, price[i]);
             database.insert(TABLE_NAME, null, contentValue);
         }
     }
