@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
@@ -98,6 +99,7 @@ public class AddItemDialogFragment extends DialogFragment {
         DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
         int dw = displaymetrics.widthPixels;
         window.setLayout(dw, ViewGroup.LayoutParams.WRAP_CONTENT);
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
     private void saveData() {
