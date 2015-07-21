@@ -14,5 +14,6 @@
     <string name="item_name">Название товара</string>
     <string name="delete">Удалить</string>
     <string name="empty_list">В списке нет ни одного товара</string>
+    <string name="empty_list_name">Вы забыли название</string>
 
 </resources>

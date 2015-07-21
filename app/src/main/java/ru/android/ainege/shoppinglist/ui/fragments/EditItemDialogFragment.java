@@ -9,10 +9,12 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
@@ -61,8 +63,7 @@ public class EditItemDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        saveData();
-                        sendResult(Activity.RESULT_OK);
+
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -114,22 +115,53 @@ public class EditItemDialogFragment extends DialogFragment {
         return index;
     }
 
-    private void saveData() {
-        String name = mName.getText().toString();
-        Double amount = 0.0;
-        long idUnit = 0;
-        if(mAmount.getText().length() > 0) {
-            amount = Double.parseDouble(mAmount.getText().toString());
-            Cursor c = (Cursor) mUnits.getSelectedItem();
-            idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
-        }
-        double price = Double.parseDouble(mPrice.getText().toString());
-        boolean isBought = mIsBought.isChecked();
+    @Override
+    public void onStart() {
+        super.onStart();
 
-        ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-        itemInListDS.setIsBought(isBought, getArguments().getLong(ID_ITEM), getArguments().getLong(ID_LIST));
-        ItemDataSource itemDS = new ItemDataSource(getActivity());
-        itemDS.update(name, amount, idUnit, price, getArguments().getLong(ID_ITEM));
+        if (getDialog() == null) {
+            return;
+        }
+
+        final AlertDialog dialog = (AlertDialog) getDialog();
+        if(dialog != null) {
+            Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Boolean wantToCloseDialog = saveData();
+                    if(wantToCloseDialog) {
+                        dialog.dismiss();
+                    }
+                }
+            });
+        }
+    }
+
+    private boolean saveData() {
+        boolean isSave = false;
+        String name = mName.getText().toString();
+        if(!name.equals("")) {
+            Double amount = 0.0;
+            long idUnit = 0;
+            if (mAmount.getText().length() > 0) {
+                amount = Double.parseDouble(mAmount.getText().toString());
+                Cursor c = (Cursor) mUnits.getSelectedItem();
+                idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
+            }
+            double price = Double.parseDouble(mPrice.getText().toString());
+            boolean isBought = mIsBought.isChecked();
+
+            ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
+            itemInListDS.setIsBought(isBought, getArguments().getLong(ID_ITEM), getArguments().getLong(ID_LIST));
+            ItemDataSource itemDS = new ItemDataSource(getActivity());
+            itemDS.update(name, amount, idUnit, price, getArguments().getLong(ID_ITEM));
+            sendResult(Activity.RESULT_OK);
+            isSave = true;
+        } else {
+            Toast.makeText(getActivity(), R.string.empty_list_name, Toast.LENGTH_LONG).show();
+        }
+        return isSave;
     }
 
     private void sendResult(int resultCode) {

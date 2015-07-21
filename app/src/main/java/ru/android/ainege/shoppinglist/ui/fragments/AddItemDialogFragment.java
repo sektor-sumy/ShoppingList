@@ -14,10 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
@@ -54,8 +56,7 @@ public class AddItemDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        saveData();
-                        sendResult(Activity.RESULT_OK);
+
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -93,36 +94,59 @@ public class AddItemDialogFragment extends DialogFragment {
             return;
         }
 
-        Window window = getDialog().getWindow();
+        final AlertDialog dialog = (AlertDialog) getDialog();
+        Window window = dialog.getWindow();
         window.setGravity(Gravity.TOP);
         window.getAttributes().y = 30;
         DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
         int dw = displaymetrics.widthPixels;
         window.setLayout(dw, ViewGroup.LayoutParams.WRAP_CONTENT);
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
+
+        if(dialog != null) {
+            Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Boolean wantToCloseDialog = saveData();
+                    if(wantToCloseDialog) {
+                        dialog.dismiss();
+                    }
+                }
+            });
+        }
     }
 
-    private void saveData() {
+    private boolean saveData() {
+        boolean isSave = false;
         String name = mName.getText().toString();
-        Double amount = 0.0;
-        Double price = 0.0;
-        long idUnit = 0;
-        if(mAmount.getText().length() !=0) {
-            amount = Double.parseDouble(mAmount.getText().toString());
-            Cursor c = (Cursor) mUnits.getSelectedItem();
-            idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
-        }
-        if(mPrice.getText().length() != 0) {
-            price = Double.parseDouble(mPrice.getText().toString());
-        }
-        Boolean isBought = mIsBought.isChecked();
+        if(!name.equals("")) {
+            Double amount = 0.0;
+            Double price = 0.0;
+            long idUnit = 0;
+            if (mAmount.getText().length() != 0) {
+                amount = Double.parseDouble(mAmount.getText().toString());
+                Cursor c = (Cursor) mUnits.getSelectedItem();
+                idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
+            }
+            if (mPrice.getText().length() != 0) {
+                price = Double.parseDouble(mPrice.getText().toString());
+            }
+            Boolean isBought = mIsBought.isChecked();
 
-        ItemDataSource itemDS = new ItemDataSource(getActivity());
-        long idItem = (int) itemDS.add(name, amount, idUnit, price);
-        long idList = getArguments().getLong(ID_LIST);
+            ItemDataSource itemDS = new ItemDataSource(getActivity());
+            long idItem = (int) itemDS.add(name, amount, idUnit, price);
+            long idList = getArguments().getLong(ID_LIST);
 
-        ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-        itemInListDS.add(idItem, idList, isBought);
+            ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
+            itemInListDS.add(idItem, idList, isBought);
+            sendResult(Activity.RESULT_OK);
+            isSave = true;
+        } else {
+            Toast.makeText(getActivity(), R.string.empty_list_name, Toast.LENGTH_LONG).show();
+        }
+        return isSave;
     }
 
     private void sendResult(int resultCode) {
