@@ -24,6 +24,8 @@ import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
+
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
@@ -213,7 +215,8 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     private double sum() {
         double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
         double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
-        return price * (amount == 0 ? 1 : amount);
+        double sum = price * (amount == 0 ? 1 : amount);
+        return new BigDecimal(sum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
     private class ItemAdapter extends ResourceCursorAdapter {
