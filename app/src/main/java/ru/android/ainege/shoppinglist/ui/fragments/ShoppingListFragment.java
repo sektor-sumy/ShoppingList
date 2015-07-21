@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
@@ -43,7 +44,8 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     private Cursor mItemsInList;
     private ItemAdapter mAdapter;
 
-    private TextView mSpentMoney, mTotalMoney;
+    private TextView mSpentMoney, mTotalMoney, mEmptyText;
+    private LinearLayout mListContainer;
 
     //edit later
     long idList = 1;
@@ -77,6 +79,9 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
 
         mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
         mTotalMoney = (TextView) v.findViewById(R.id.total_money);
+
+        mEmptyText = (TextView) v.findViewById(R.id.empty_list);
+        mListContainer = (LinearLayout) v.findViewById(R.id.list_container);
 
         ListView list = (ListView) v.findViewById(android.R.id.list);
         registerForContextMenu(list);
@@ -153,10 +158,17 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
         switch (loader.getId()) {
             case DATA_LOADER:
                 mItemsInList = data;
-                mSpentMoney.setText(String.valueOf(sumSpentMoney()));
-                mTotalMoney.setText(String.valueOf(sumTotalMoney()));
-                mAdapter = new ItemAdapter(R.layout._shopping_list_item, mItemsInList);
-                setListAdapter(mAdapter);
+                if(mItemsInList != null) {
+                    mSpentMoney.setText(String.valueOf(sumSpentMoney()));
+                    mTotalMoney.setText(String.valueOf(sumTotalMoney()));
+                    mAdapter = new ItemAdapter(R.layout._shopping_list_item, mItemsInList);
+                    setListAdapter(mAdapter);
+                    mListContainer.setVisibility(View.VISIBLE);
+                    mEmptyText.setVisibility(View.GONE);
+                } else {
+                    mListContainer.setVisibility(View.GONE);
+                    mEmptyText.setVisibility(View.VISIBLE);
+                }
                 break;
             default:
                 break;
