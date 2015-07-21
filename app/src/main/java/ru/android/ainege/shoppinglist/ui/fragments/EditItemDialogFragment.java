@@ -88,7 +88,9 @@ public class EditItemDialogFragment extends DialogFragment {
             mAmount.setText(String.valueOf(getArguments().getDouble(AMOUNT)));
         }
         mPrice = (EditText) v.findViewById(R.id.new_item_price);
-        mPrice.setText(String.valueOf(getArguments().getDouble(PRICE)));
+        if(getArguments().getDouble(PRICE) != 0) {
+            mPrice.setText(String.valueOf(getArguments().getDouble(PRICE)));
+        }
         mIsBought = (CheckBox) v.findViewById(R.id.is_bought);
         mIsBought.setChecked(getArguments().getBoolean(IS_BOUGHT));
 
