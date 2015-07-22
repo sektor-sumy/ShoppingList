@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical" >
 
     <EditText
         android:id="@+id/new_item_name"
@@ -13,49 +14,60 @@
         android:layout_marginTop="20dp"
         android:hint="@string/item_name" />
 
-    <EditText
-        android:id="@+id/new_amount_item"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:inputType="number|numberDecimal"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="5dp"
-        android:gravity="center"
-        android:layout_below="@+id/new_item_name"
-        android:layout_alignLeft="@+id/new_item_name"
-        android:layout_alignStart="@+id/new_item_name" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-    <Spinner
-        android:id="@+id/new_amount_units"
-        android:layout_width="55dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_below="@+id/new_item_name"
-        android:layout_toRightOf="@+id/new_amount_item"
-        android:layout_toEndOf="@+id/new_amount_item"
-        android:layout_alignBottom="@+id/new_amount_item" />
+        <EditText
+            android:id="@+id/new_amount_item"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@+id/new_item_name"
+            android:layout_alignLeft="@+id/new_item_name"
+            android:layout_alignStart="@+id/new_item_name"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:hint="@string/one"
+            android:inputType="numberDecimal" />
 
-    <TextView
-        android:id="@+id/price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/price"
-        android:layout_alignBaseline="@+id/new_item_price"
-        android:layout_alignBottom="@+id/new_item_price"
-        android:layout_toLeftOf="@+id/new_item_price"
-        android:layout_toStartOf="@+id/new_item_price" />
+        <Spinner
+            android:id="@+id/new_amount_units"
+            android:layout_width="55dp"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/new_item_name"
+            android:layout_toRightOf="@+id/new_amount_item"
+            android:layout_toEndOf="@+id/new_amount_item"
+            android:layout_alignBottom="@+id/new_amount_item"
+            android:gravity="center"
+            android:layout_marginRight="5dp" />
 
-    <EditText
-        android:id="@+id/new_item_price"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="10dp"
-        android:gravity="center"
-        android:layout_below="@+id/new_item_name"
-        android:layout_alignRight="@+id/new_item_name"
-        android:layout_alignEnd="@+id/new_item_name"
-        android:inputType="numberDecimal"/>
+        <TextView
+            android:id="@+id/price"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/price"
+            android:layout_alignBaseline="@+id/new_item_price"
+            android:layout_alignBottom="@+id/new_item_price"
+            android:layout_toLeftOf="@+id/new_item_price"
+            android:layout_toStartOf="@+id/new_item_price"
+            android:gravity="center"
+            android:layout_marginLeft="5dp" />
+
+        <EditText
+            android:id="@+id/new_item_price"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_below="@+id/new_item_name"
+            android:layout_alignRight="@+id/new_item_name"
+            android:layout_alignEnd="@+id/new_item_name"
+            android:gravity="center"
+            android:layout_weight="0.5"
+            android:hint="@string/zero_price"
+            android:inputType="numberDecimal"  />
+    </LinearLayout>
 
     <CheckBox
         android:id="@+id/is_bought"
@@ -64,6 +76,7 @@
         android:text="@string/is_bought"
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/new_amount_units" />
+        android:layout_below="@+id/new_amount_units"
+        android:layout_gravity="center_horizontal" />
 
-</RelativeLayout>
+</LinearLayout>
