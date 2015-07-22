@@ -7,6 +7,8 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,6 +28,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
+import ru.android.ainege.shoppinglist.ui.Validation;
 
 public class AddItemDialogFragment extends DialogFragment {
     public static final String ID_LIST = "idList";
@@ -81,8 +84,81 @@ public class AddItemDialogFragment extends DialogFragment {
         mUnits.setSelection(0);
 
         mName = (EditText) v.findViewById(R.id.new_item_name);
+        mName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) {
+                    mName.setError(getResources().getText(R.string.error_name));
+                } else {
+                    if(mName.getError() != null) {
+                        mName.setError(null);
+                    }
+                }
+            }
+        });
+
         mAmount = (EditText) v.findViewById(R.id.new_amount_item);
+        mAmount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s != null) {
+                    if(!Validation.isValid(mAmount.getText().toString().trim(), false)) {
+                        mAmount.setError(getResources().getText(R.string.error_value));
+                    } else {
+                        if(mAmount.getError() != null) {
+                            mAmount.setError(null);
+                        }
+                    }
+                }
+            }
+        });
+
         mPrice = (EditText) v.findViewById(R.id.new_item_price);
+        mPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s != null) {
+                    if (!Validation.isValid(mPrice.getText().toString().trim(), true)) {
+                        mPrice.setError(getResources().getText(R.string.error_value));
+                    } else {
+                        if(mPrice.getError() != null) {
+                            mPrice.setError(null);
+                        }
+                    }
+                }
+            }
+        });
+
         mIsBought = (CheckBox) v.findViewById(R.id.is_bought);
     }
 
@@ -90,7 +166,7 @@ public class AddItemDialogFragment extends DialogFragment {
     public void onStart() {
         super.onStart();
 
-        if (getDialog() == null) {
+        if(getDialog() == null) {
             return;
         }
 
@@ -103,35 +179,37 @@ public class AddItemDialogFragment extends DialogFragment {
         window.setLayout(dw, ViewGroup.LayoutParams.WRAP_CONTENT);
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
-
-        if(dialog != null) {
-            Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-            positiveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Boolean wantToCloseDialog = saveData();
-                    if(wantToCloseDialog) {
-                        dialog.dismiss();
-                    }
+        Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Boolean wantToCloseDialog = saveData();
+                if(wantToCloseDialog) {
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(getActivity(), R.string.wrong_value, Toast.LENGTH_LONG).show();
                 }
-            });
-        }
+            }
+        });
     }
 
     private boolean saveData() {
         boolean isSave = false;
         String name = mName.getText().toString();
-        if(!name.equals("")) {
-            Double amount = 0.0;
-            Double price = 0.0;
+        if(name.equals("")) {
+            mName.setError(getResources().getText(R.string.error_value));
+        }
+        if (mName.getError() == null && mAmount.getError() == null && mPrice.getError() == null) {
+            double amount = 0.0;
+            double price = 0.0;
             long idUnit = 0;
             if (mAmount.getText().length() != 0) {
-                amount = Double.parseDouble(mAmount.getText().toString());
+                amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
                 Cursor c = (Cursor) mUnits.getSelectedItem();
                 idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
             }
             if (mPrice.getText().length() != 0) {
-                price = Double.parseDouble(mPrice.getText().toString());
+                price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
             }
             Boolean isBought = mIsBought.isChecked();
 
@@ -143,8 +221,6 @@ public class AddItemDialogFragment extends DialogFragment {
             itemInListDS.add(idItem, idList, isBought);
             sendResult(Activity.RESULT_OK);
             isSave = true;
-        } else {
-            Toast.makeText(getActivity(), R.string.empty_list_name, Toast.LENGTH_LONG).show();
         }
         return isSave;
     }

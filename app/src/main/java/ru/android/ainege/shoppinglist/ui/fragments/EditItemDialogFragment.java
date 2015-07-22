@@ -7,6 +7,8 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +23,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
+import ru.android.ainege.shoppinglist.ui.Validation;
 
 public class EditItemDialogFragment extends DialogFragment {
     public static final String ITEM_NAME = "itemName";
@@ -88,11 +91,55 @@ public class EditItemDialogFragment extends DialogFragment {
         mName = (EditText) v.findViewById(R.id.new_item_name);
         mName.setText(getArguments().getString(ITEM_NAME));
         mName.setSelection(mName.getText().length());
+        mName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 0) {
+                    mName.setError(getResources().getText(R.string.error_name));
+                } else {
+                    if (mName.getError() != null) {
+                        mName.setError(null);
+                    }
+                }
+            }
+        });
 
         mAmount = (EditText) v.findViewById(R.id.new_amount_item);
         if(getArguments().getDouble(AMOUNT) != 0) {
             mAmount.setText(String.format("%.2f", getArguments().getDouble(AMOUNT)));
         }
+        mAmount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s != null) {
+                    if(!Validation.isValid(mAmount.getText().toString().trim(), false)) {
+                        mAmount.setError(getResources().getText(R.string.error_value));
+                    } else {
+                        if(mAmount.getError() != null) { mAmount.setError(null); }
+                    }
+                }
+            }
+        });
 
         mUnits = (Spinner) v.findViewById(R.id.new_amount_units);
         mUnits.setAdapter(adapter);
@@ -106,6 +153,28 @@ public class EditItemDialogFragment extends DialogFragment {
         if(getArguments().getDouble(PRICE) != 0) {
            mPrice.setText(String.format("%.2f", getArguments().getDouble(PRICE)));
         }
+        mPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s != null) {
+                    if(!Validation.isValid(mPrice.getText().toString().trim(), true)) {
+                        mPrice.setError(getResources().getText(R.string.error_value));
+                    } else {
+                        if(mPrice.getError() != null) { mPrice.setError(null); }
+                    }
+                }
+            }
+        });
     }
 
     private int getPosition(Spinner spinner, String name) {
@@ -128,24 +197,24 @@ public class EditItemDialogFragment extends DialogFragment {
         }
 
         final AlertDialog dialog = (AlertDialog) getDialog();
-        if(dialog != null) {
-            Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-            positiveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Boolean wantToCloseDialog = saveData();
-                    if(wantToCloseDialog) {
-                        dialog.dismiss();
-                    }
+        Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Boolean wantToCloseDialog = saveData();
+                if(wantToCloseDialog) {
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(getActivity(), R.string.wrong_value, Toast.LENGTH_LONG).show();
                 }
-            });
-        }
+            }
+        });
     }
 
     private boolean saveData() {
         boolean isSave = false;
-        String name = mName.getText().toString();
-        if(!name.equals("")) {
+        if(mName.getError() == null && mAmount.getError() == null &&  mPrice.getError() == null) {
+            String name = mName.getText().toString();
             double amount = 0.0;
             long idUnit = 0;
             if (mAmount.getText().length() > 0) {
@@ -165,8 +234,6 @@ public class EditItemDialogFragment extends DialogFragment {
             itemDS.update(name, amount, idUnit, price, getArguments().getLong(ID_ITEM));
             sendResult(Activity.RESULT_OK);
             isSave = true;
-        } else {
-            Toast.makeText(getActivity(), R.string.empty_list_name, Toast.LENGTH_LONG).show();
         }
         return isSave;
     }

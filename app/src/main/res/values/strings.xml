@@ -14,7 +14,9 @@
     <string name="item_name">Название товара</string>
     <string name="delete">Удалить</string>
     <string name="empty_list">В списке нет ни одного товара</string>
-    <string name="empty_list_name">Вы забыли название</string>
+    <string name="wrong_value">Проверьте ввод данных</string>
+    <string name="error_value">Неверное значение</string>
+    <string name="error_name">Введите название</string>
     <string name="zero_price">0,0</string>
     <string name="one">1,0</string>
 

@@ -30,7 +30,8 @@
             android:layout_weight="0.5"
             android:gravity="center"
             android:hint="@string/one"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal"
+            android:digits="0123456789.,"/>
 
         <Spinner
             android:id="@+id/new_amount_units"
@@ -66,7 +67,8 @@
             android:gravity="center"
             android:layout_weight="0.5"
             android:hint="@string/zero_price"
-            android:inputType="numberDecimal"  />
+            android:inputType="numberDecimal"
+            android:digits="0123456789.," />
     </LinearLayout>
 
     <CheckBox
