@@ -82,18 +82,17 @@ public class EditItemDialogFragment extends DialogFragment {
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item, unitDS.getAll(), from, to, 0);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        mName = (EditText) v.findViewById(R.id.new_item_name);
-        mName.setText(getArguments().getString(ITEM_NAME));
-        mAmount = (EditText) v.findViewById(R.id.new_amount_item);
-        if(getArguments().getDouble(AMOUNT) != 0) {
-            mAmount.setText(String.valueOf(getArguments().getDouble(AMOUNT)));
-        }
-        mPrice = (EditText) v.findViewById(R.id.new_item_price);
-        if(getArguments().getDouble(PRICE) != 0) {
-            mPrice.setText(String.valueOf(getArguments().getDouble(PRICE)));
-        }
         mIsBought = (CheckBox) v.findViewById(R.id.is_bought);
         mIsBought.setChecked(getArguments().getBoolean(IS_BOUGHT));
+
+        mName = (EditText) v.findViewById(R.id.new_item_name);
+        mName.setText(getArguments().getString(ITEM_NAME));
+        mName.setSelection(mName.getText().length());
+
+        mAmount = (EditText) v.findViewById(R.id.new_amount_item);
+        if(getArguments().getDouble(AMOUNT) != 0) {
+            mAmount.setText(String.format("%.2f", getArguments().getDouble(AMOUNT)));
+        }
 
         mUnits = (Spinner) v.findViewById(R.id.new_amount_units);
         mUnits.setAdapter(adapter);
@@ -101,6 +100,11 @@ public class EditItemDialogFragment extends DialogFragment {
             mUnits.setSelection(0);
         } else {
             mUnits.setSelection(getPosition(mUnits, getArguments().getString(UNIT)));
+        }
+
+        mPrice = (EditText) v.findViewById(R.id.new_item_price);
+        if(getArguments().getDouble(PRICE) != 0) {
+           mPrice.setText(String.format("%.2f", getArguments().getDouble(PRICE)));
         }
     }
 
@@ -142,14 +146,17 @@ public class EditItemDialogFragment extends DialogFragment {
         boolean isSave = false;
         String name = mName.getText().toString();
         if(!name.equals("")) {
-            Double amount = 0.0;
+            double amount = 0.0;
             long idUnit = 0;
             if (mAmount.getText().length() > 0) {
-                amount = Double.parseDouble(mAmount.getText().toString());
+                amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
                 Cursor c = (Cursor) mUnits.getSelectedItem();
                 idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
             }
-            double price = Double.parseDouble(mPrice.getText().toString());
+            double price = 0.0;
+            if(mPrice.getText().length() > 0) {
+                price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
+            }
             boolean isBought = mIsBought.isChecked();
 
             ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());

@@ -161,8 +161,8 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
             case DATA_LOADER:
                 mItemsInList = data;
                 if(mItemsInList != null) {
-                    mSpentMoney.setText(String.valueOf(sumSpentMoney()));
-                    mTotalMoney.setText(String.valueOf(sumTotalMoney()));
+                    mSpentMoney.setText(String.format("%.2f", sumSpentMoney()));
+                    mTotalMoney.setText(String.format("%.2f", sumTotalMoney()));
                     mAdapter = new ItemAdapter(R.layout._shopping_list_item, mItemsInList);
                     setListAdapter(mAdapter);
                     mListContainer.setVisibility(View.VISIBLE);
@@ -247,11 +247,11 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
             if (cursor.getDouble(cursor.getColumnIndex(ItemsTable.COLUMN_AMOUNT)) == 0) {
                 amount.setText("-");
             } else {
-                amount.setText(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COLUMN_AMOUNT))
-                        + " " + cursor.getString(cursor.getColumnIndex(UnitsTable.COLUMN_NAME))); //problem
+                amount.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex(ItemsTable.COLUMN_AMOUNT)))
+                        + " " + cursor.getString(cursor.getColumnIndex(UnitsTable.COLUMN_NAME)));
             }
             TextView price = (TextView) view.findViewById(R.id.item_price);
-            price.setText(cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_PRICE)));
+            price.setText(String.format("%.2f",cursor.getDouble(cursor.getColumnIndex(ItemsTable.COLUMN_PRICE))));
         }
     }
 
