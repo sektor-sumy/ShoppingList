@@ -18,6 +18,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
+
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
@@ -116,7 +118,7 @@ public class EditItemDialogFragment extends DialogFragment {
 
         mAmount = (EditText) v.findViewById(R.id.new_amount_item);
         if(getArguments().getDouble(AMOUNT) != 0) {
-            mAmount.setText(String.format("%.2f", getArguments().getDouble(AMOUNT)));
+            mAmount.setText(new DecimalFormat("#.######").format(getArguments().getDouble(AMOUNT)));
         }
         mAmount.addTextChangedListener(new TextWatcher() {
             @Override
