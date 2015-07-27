@@ -25,6 +25,7 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
@@ -161,8 +162,8 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
             case DATA_LOADER:
                 mItemsInList = data;
                 if(mItemsInList != null) {
-                    mSpentMoney.setText(String.format("%.2f", sumSpentMoney()));
-                    mTotalMoney.setText(String.format("%.2f", sumTotalMoney()));
+                    mSpentMoney.setText(NumberFormat.getInstance().format(sumSpentMoney()));
+                    mTotalMoney.setText(NumberFormat.getInstance().format(sumTotalMoney()));
                     mAdapter = new ItemAdapter(R.layout._shopping_list_item, mItemsInList);
                     setListAdapter(mAdapter);
                     mListContainer.setVisibility(View.VISIBLE);
@@ -247,11 +248,11 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
             if (cursor.getDouble(cursor.getColumnIndex(ItemsTable.COLUMN_AMOUNT)) == 0) {
                 amount.setText("-");
             } else {
-                amount.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex(ItemsTable.COLUMN_AMOUNT)))
+                amount.setText(NumberFormat.getInstance().format(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COLUMN_AMOUNT)))
                         + " " + cursor.getString(cursor.getColumnIndex(UnitsTable.COLUMN_NAME)));
             }
             TextView price = (TextView) view.findViewById(R.id.item_price);
-            price.setText(String.format("%.2f",cursor.getDouble(cursor.getColumnIndex(ItemsTable.COLUMN_PRICE))));
+            price.setText(NumberFormat.getInstance().format(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COLUMN_PRICE))));
         }
     }
 
