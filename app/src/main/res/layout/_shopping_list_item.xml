@@ -17,20 +17,28 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/black"
+        android:singleLine="true"
+        android:ellipsize="end" />
 
     <TextView
         android:id="@+id/item_amount"
         android:layout_width="75dp"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
         android:gravity="center"
-        android:textColor="@android:color/black" />
+        android:singleLine="true"
+        android:ellipsize="middle"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
 
     <TextView
         android:id="@+id/item_price"
         android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/black"
+        android:singleLine="true"
+        android:ellipsize="end" />
 
 </LinearLayout>
