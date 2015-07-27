@@ -49,6 +49,8 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
 
     private TextView mSpentMoney, mTotalMoney, mEmptyText;
     private LinearLayout mListContainer;
+    private ListView mList;
+    private int savePosition = 0;
 
     //edit later
     long idList = 1;
@@ -86,14 +88,15 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
         mEmptyText = (TextView) v.findViewById(R.id.empty_list);
         mListContainer = (LinearLayout) v.findViewById(R.id.list_container);
 
-        ListView list = (ListView) v.findViewById(android.R.id.list);
-        registerForContextMenu(list);
+        mList = (ListView) v.findViewById(android.R.id.list);
+        registerForContextMenu(mList);
         return v;
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         mItemsInList.moveToPosition(position);
+        savePosition = position;
 
         String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
         double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
@@ -168,6 +171,12 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                     setListAdapter(mAdapter);
                     mListContainer.setVisibility(View.VISIBLE);
                     mEmptyText.setVisibility(View.GONE);
+                    mList.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mList.setSelection(savePosition);
+                        }
+                    });
                 } else {
                     mListContainer.setVisibility(View.GONE);
                     mEmptyText.setVisibility(View.VISIBLE);
