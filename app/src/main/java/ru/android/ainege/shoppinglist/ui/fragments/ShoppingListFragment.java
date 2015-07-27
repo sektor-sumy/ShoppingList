@@ -50,7 +50,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     private TextView mSpentMoney, mTotalMoney, mEmptyText;
     private LinearLayout mListContainer;
     private ListView mList;
-    private int savePosition = 0;
+    private int mSavePosition = 0;
 
     //edit later
     long idList = 1;
@@ -68,6 +68,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
         final TextView listName = (TextView) v.findViewById(R.id.list_name);
         Cursor listCursor = new ListsDataSource(getActivity()).get(idList);
         listName.setText(listCursor.getString(listCursor.getColumnIndex(ListsTable.COLUMN_NAME)));
+        listCursor.close();
 
         EditText newItem = (EditText) v.findViewById(R.id.new_item);
         newItem.setOnTouchListener(new View.OnTouchListener() {
@@ -96,7 +97,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         mItemsInList.moveToPosition(position);
-        savePosition = position;
+        mSavePosition = position;
 
         String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
         double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
@@ -174,7 +175,8 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                     mList.post(new Runnable() {
                         @Override
                         public void run() {
-                            mList.setSelection(savePosition);
+                            mList.setSelection(mSavePosition);
+                            mSavePosition = 0;
                         }
                     });
                 } else {
@@ -254,7 +256,6 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                     CheckBox cb = (CheckBox) v;
                     ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
                     itemInListDS.setIsBought(cb.isChecked(), idItem, idList);
-                    updateData();
                 }
             });
             isBuy.setChecked(cursor.getInt(cursor.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0);
