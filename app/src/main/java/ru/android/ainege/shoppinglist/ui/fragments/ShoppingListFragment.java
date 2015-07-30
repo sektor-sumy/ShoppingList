@@ -51,6 +51,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     private LinearLayout mListContainer;
     private ListView mList;
     private int mSavePosition = 0;
+    private double mSaveSpentMoney;
 
     //edit later
     long idList = 1;
@@ -166,7 +167,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
             case DATA_LOADER:
                 mItemsInList = data;
                 if(mItemsInList != null) {
-                    mSpentMoney.setText(localValue(sumSpentMoney()));
+                    updateSpentSum(sumSpentMoney());
                     mTotalMoney.setText(localValue(sumTotalMoney()));
                     mAdapter = new ItemAdapter(R.layout._shopping_list_item, mItemsInList);
                     setListAdapter(mAdapter);
@@ -204,29 +205,34 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
         getLoaderManager().getLoader(DATA_LOADER).forceLoad();
     }
 
+    private void updateSpentSum(double newSum) {
+        mSpentMoney.setText(localValue(newSum));
+    }
+
     private double sumSpentMoney() {
         double sum = 0;
         mItemsInList.moveToFirst();
         do {
             if(mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0) {
-                sum += sum();
+                sum += sum(mItemsInList);
             }
         } while(mItemsInList.moveToNext());
-        return sum;
+        mSaveSpentMoney = sum;
+        return mSaveSpentMoney;
     }
 
     private double sumTotalMoney() {
         double sum = 0;
         mItemsInList.moveToFirst();
         do {
-            sum += sum();
+            sum += sum(mItemsInList);
         } while(mItemsInList.moveToNext());
         return sum;
     }
 
-    private double sum() {
-        double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
-        double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
+    private double sum(Cursor c) {
+        double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
+        double amount = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
         double sum = price * (amount == 0 ? 1 : amount);
         return new BigDecimal(sum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
@@ -246,16 +252,27 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
 
         @Override
         public void bindView(View view, Context context, final Cursor cursor) {
-
-            final long idItem =  cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID));
+            final int position = cursor.getPosition();
 
             CheckBox isBuy = (CheckBox) view.findViewById(R.id.is_item_bought);
             isBuy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    cursor.moveToPosition(position);
                     CheckBox cb = (CheckBox) v;
                     ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-                    itemInListDS.setIsBought(cb.isChecked(), idItem, idList);
+                    itemInListDS.setIsBought(cb.isChecked(), cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID)), idList);
+                    double sum = sum(cursor);
+                    if (mSaveSpentMoney != 0) {
+                        if (cb.isChecked()) {
+                            mSaveSpentMoney += sum;
+                        } else {
+                            mSaveSpentMoney -= sum;
+                        }
+                        updateSpentSum(mSaveSpentMoney);
+                    } else {
+                        updateData();
+                    }
                 }
             });
             isBuy.setChecked(cursor.getInt(cursor.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0);
