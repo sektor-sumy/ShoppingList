@@ -41,7 +41,13 @@ public class ListsDataSource {
                                         " LEFT JOIN " + UnitsTable.TABLE_NAME + " ON " +
                                         ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID_UNIT + " = " + UnitsTable.TABLE_NAME + "." + UnitsTable.COLUMN_ID +
                             " WHERE " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " = ?";
-        Cursor cursor = db.rawQuery(selectQuery, new String[] {String.valueOf(id)});
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
+        return cursor.moveToFirst() ? cursor : null;
+    }
+
+    public Cursor getAll() {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.query(ListsTable.TABLE_NAME, null, null, null, null, null, null, null);
         return cursor.moveToFirst() ? cursor : null;
     }
 }

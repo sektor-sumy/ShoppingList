@@ -31,12 +31,12 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
-import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 
 public class ShoppingListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static final String ID_LIST = "idList";
     private static final String ADD_DIALOG_DATE = "addItemDialog";
     private static final String EDIT_DIALOG_DATE = "editItemDialog";
     private static final int ADD_DIALOG_CODE = 0;
@@ -53,12 +53,12 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     private int mSavePosition = 0;
     private double mSaveSpentMoney;
 
-    //edit later
-    long idList = 1;
+    private long mIdList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mIdList = getArguments().getLong(ID_LIST);
         getLoaderManager().initLoader(DATA_LOADER, null, this);
     }
 
@@ -66,17 +66,12 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 
-        final TextView listName = (TextView) v.findViewById(R.id.list_name);
-        Cursor listCursor = new ListsDataSource(getActivity()).get(idList);
-        listName.setText(listCursor.getString(listCursor.getColumnIndex(ListsTable.COLUMN_NAME)));
-        listCursor.close();
-
         EditText newItem = (EditText) v.findViewById(R.id.new_item);
         newItem.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    AddItemDialogFragment addItemDialog = AddItemDialogFragment.newInstance(idList);
+                    AddItemDialogFragment addItemDialog = AddItemDialogFragment.newInstance(mIdList);
                     addItemDialog.setTargetFragment(ShoppingListFragment.this, ADD_DIALOG_CODE);
                     addItemDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
                 }
@@ -107,7 +102,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
         boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
         long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
 
-        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, idList);
+        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList);
         editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
         editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
     }
@@ -126,7 +121,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
             case R.id.delete:
                 mItemsInList.moveToPosition(info.position);
                 ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-                itemInListDS.delete(mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID)), idList);
+                itemInListDS.delete(mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
                 updateData();
                 return true;
             default:
@@ -153,7 +148,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
         Loader<Cursor> loader = null;
         switch (id) {
             case DATA_LOADER:
-                loader = new MyCursorLoader(getActivity(), idList);
+                loader = new MyCursorLoader(getActivity(), mIdList);
                 break;
             default:
                 break;
@@ -194,7 +189,9 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     public void onLoaderReset(Loader<Cursor> loader) {
         switch (loader.getId()) {
             case DATA_LOADER:
-                mAdapter.swapCursor(null);
+                if (mAdapter != null) {
+                    mAdapter.swapCursor(null);
+                }
                 break;
             default:
                 break;
@@ -261,7 +258,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                     cursor.moveToPosition(position);
                     CheckBox cb = (CheckBox) v;
                     ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-                    itemInListDS.setIsBought(cb.isChecked(), cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID)), idList);
+                    itemInListDS.setIsBought(cb.isChecked(), cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
                     double sum = sum(cursor);
                     if (mSaveSpentMoney != 0) {
                         if (cb.isChecked()) {

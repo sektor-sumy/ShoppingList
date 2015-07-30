@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Shopping list</string>
+    <string name="drawer_open">drawer_open</string>
+    <string name="drawer_close">drawer_close</string>
 
     <string name="add_item">Добавить товар</string>
     <string name="spent_money">Потрачено</string>
@@ -19,5 +21,6 @@
     <string name="error_name">Введите название</string>
     <string name="zero_price">0,0</string>
     <string name="one">1,0</string>
+    <string name="you_lists">Ваши списки:</string>
 
 </resources>
