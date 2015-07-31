@@ -22,5 +22,11 @@
     <string name="zero_price">0,0</string>
     <string name="one">1,0</string>
     <string name="you_lists">Ваши списки:</string>
+    <string name="list_name">Название списка</string>
+
+    <string name="new_list">Новый список</string>
+    <string name="delete_list">Удалить список</string>
+    <string name="update_list">Изменить список</string>
+    <string name="delete_all_bought">Удалить все выбраное</string>
 
 </resources>

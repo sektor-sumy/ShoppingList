@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.db.dataSources;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -49,5 +50,17 @@ public class ListsDataSource {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cursor = db.query(ListsTable.TABLE_NAME, null, null, null, null, null, null, null);
         return cursor.moveToFirst() ? cursor : null;
+    }
+
+    public long add(String name) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = createContentValues(name);
+        return db.insert(ListsTable.TABLE_NAME, null, values);
+    }
+
+    private ContentValues createContentValues(String name) {
+        ContentValues values = new ContentValues();
+        values.put(ListsTable.COLUMN_NAME, name);
+        return values;
     }
 }

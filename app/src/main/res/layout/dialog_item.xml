@@ -34,7 +34,7 @@
 
         <Spinner
             android:id="@+id/new_amount_units"
-            android:layout_width="55dp"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:layout_marginRight="5dp"/>
