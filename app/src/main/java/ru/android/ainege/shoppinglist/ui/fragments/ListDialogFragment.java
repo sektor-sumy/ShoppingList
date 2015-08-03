@@ -15,14 +15,26 @@ import android.widget.EditText;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 
-public class AddListDialogFragment extends DialogFragment {
-    public static final String ID_NEW_LIST = "idNewList";
+public class ListDialogFragment extends DialogFragment {
+    public static final String ID_LIST = "idList";
+    public static final String NAME = "name";
 
     private EditText mName;
     private long mIdNewList;
 
     public interface List {
         void updateResult(long idList);
+    }
+
+    public static ListDialogFragment newInstance(long idList, String name) {
+        Bundle args = new Bundle();
+        args.putLong(ID_LIST, idList);
+        args.putString(NAME, name);
+
+        ListDialogFragment fragment = new ListDialogFragment();
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
@@ -49,6 +61,10 @@ public class AddListDialogFragment extends DialogFragment {
 
     private void setData(View v) {
         mName = (EditText) v.findViewById(R.id.new_list_name);
+        if (getArguments() != null) {
+            mName.setText(getArguments().getString(NAME));
+            mName.setSelection(mName.getText().length());
+        }
     }
 
     @Override
@@ -85,8 +101,13 @@ public class AddListDialogFragment extends DialogFragment {
         }
         if (mName.getError() == null) {
             ListsDataSource listDS = new ListsDataSource(getActivity());
-            mIdNewList = (int) listDS.add(name);
 
+            if (getArguments() != null) {
+                mIdNewList = getArguments().getLong(ID_LIST);
+                listDS.update(mIdNewList, name);
+            } else {
+                mIdNewList = (int) listDS.add(name);
+            }
             List l = (List) getActivity();
             l.updateResult(mIdNewList);
             isSave = true;

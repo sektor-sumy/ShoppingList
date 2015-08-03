@@ -25,16 +25,17 @@ import android.widget.Toast;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
-import ru.android.ainege.shoppinglist.ui.fragments.AddListDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.ListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 
 
-public class ShoppingListActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>, AddListDialogFragment.List {
+public class ShoppingListActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>, ListDialogFragment.List {
     public static final String APP_PREFERENCES = "setting";
     public static final String APP_PREFERENCES_ID = "idList";
 
     private static final int DATA_LOADER = 0;
     private static final String ADD_DIALOG_DATE = "addListDialog";
+    private static final String UPDATE_DIALOG_DATE = "updateListDialog";
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -76,7 +77,6 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
 
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                mTitle = getActionBar().getTitle();
                 getActionBar().setTitle(mDrawerTitle);
             }
         };
@@ -120,7 +120,7 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
             case R.id.delete_all_bought:
                 return true;
             case R.id.add_list:
-                AddListDialogFragment addListDialog = new AddListDialogFragment();
+                ListDialogFragment addListDialog = new ListDialogFragment();
                 addListDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
                 return true;
             case R.id.delete_list:
@@ -130,10 +130,13 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
                     updateData();
                     mId = -1;
                 } else {
-                    Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.error_delete_list, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             case R.id.update_list:
+                ListDialogFragment editListDialog = ListDialogFragment.newInstance(mId,
+                        mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME)));
+                editListDialog.show(getFragmentManager(), UPDATE_DIALOG_DATE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -170,7 +173,11 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
                                 mCursor.moveToFirst();
                                 selectItem(mCursor.getLong(mCursor.getColumnIndex(ListsTable.COLUMN_ID)));
                             }
-                            mDrawerList.setItemChecked(getPosition(mId), true);
+                            int position = getPosition(mId);
+                            mCursor.moveToPosition(position);
+                            mTitle = mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME));
+                            getActionBar().setTitle(mTitle);
+                            mDrawerList.setItemChecked(position, true);
                         }
                     });
                 }
@@ -238,10 +245,12 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
 
     @Override
     public void updateResult(long idList) {
-        if (idList != -1) {
+        if (idList != -1 && idList != mId) {
             updateData();
             mId = idList;
             selectItem(mId);
+        } else {
+            updateData();
         }
     }
 

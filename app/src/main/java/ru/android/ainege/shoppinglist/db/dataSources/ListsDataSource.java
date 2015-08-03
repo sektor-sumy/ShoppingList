@@ -65,6 +65,12 @@ public class ListsDataSource {
                 new String[] { String.valueOf(id) });
     }
 
+    public int update(long id, String name) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = createContentValues(name);
+        return db.update(ListsTable.TABLE_NAME, values, ListsTable.COLUMN_ID + " = ? ", new String[] {String.valueOf(id) });
+    }
+
     private ContentValues createContentValues(String name) {
         ContentValues values = new ContentValues();
         values.put(ListsTable.COLUMN_NAME, name);

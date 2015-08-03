@@ -31,7 +31,6 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
-import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
@@ -66,10 +65,6 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
-
-        Cursor listCursor = new ListsDataSource(getActivity()).get(mIdList);
-        getActivity().getActionBar().setTitle(listCursor.getString(listCursor.getColumnIndex(ListsTable.COLUMN_NAME)));
-        listCursor.close();
 
         EditText newItem = (EditText) v.findViewById(R.id.new_item);
         newItem.setOnTouchListener(new View.OnTouchListener() {
