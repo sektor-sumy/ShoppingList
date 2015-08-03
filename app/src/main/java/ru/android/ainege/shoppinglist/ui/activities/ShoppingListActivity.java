@@ -232,13 +232,8 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
     }
 
     private void selectItem(long id) {
-        Fragment fragment = new ShoppingListFragment();
-        Bundle args = new Bundle();
-        args.putLong(ShoppingListFragment.ID_LIST, id);
-        fragment.setArguments(args);
-
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragment_container, ShoppingListFragment.newInstance(id)).commit();
 
         mDrawerLayout.closeDrawer(mDrawerList);
         if (!mSettings.contains(APP_PREFERENCES_ID) || mId != mSettings.getLong(APP_PREFERENCES_ID, mId)) {

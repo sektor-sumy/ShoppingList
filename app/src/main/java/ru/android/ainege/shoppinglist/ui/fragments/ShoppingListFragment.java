@@ -55,6 +55,16 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
 
     private long mIdList;
 
+    public static ShoppingListFragment newInstance(long id) {
+        Bundle args = new Bundle();
+        args.putLong(ID_LIST, id);
+
+        ShoppingListFragment fragment = new ShoppingListFragment();
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
