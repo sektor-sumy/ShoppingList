@@ -202,12 +202,11 @@ public class AddItemDialogFragment extends DialogFragment {
         if (mName.getError() == null && mAmount.getError() == null && mPrice.getError() == null) {
             double amount = 0.0;
             double price = 0.0;
-            long idUnit = 0;
             if (mAmount.getText().length() != 0) {
                 amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
-                Cursor c = (Cursor) mUnits.getSelectedItem();
-                idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
             }
+            Cursor c = (Cursor) mUnits.getSelectedItem();
+            long idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
             if (mPrice.getText().length() != 0) {
                 price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
             }

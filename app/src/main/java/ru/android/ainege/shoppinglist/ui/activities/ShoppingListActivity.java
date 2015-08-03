@@ -85,7 +85,9 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
         mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         if (mSettings.contains(APP_PREFERENCES_ID)) {
             mId = mSettings.getLong(APP_PREFERENCES_ID, mId);
-            selectItem(mId);
+            if (mId != -1) {
+                selectItem(mId);
+            }
         }
 
         getLoaderManager().initLoader(DATA_LOADER, null, this);

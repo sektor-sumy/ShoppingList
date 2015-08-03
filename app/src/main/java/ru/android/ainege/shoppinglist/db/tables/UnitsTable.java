@@ -10,8 +10,6 @@ public class UnitsTable {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "unit_name";
 
-    public static final int ID_NULL = 0;
-
     private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
             + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
