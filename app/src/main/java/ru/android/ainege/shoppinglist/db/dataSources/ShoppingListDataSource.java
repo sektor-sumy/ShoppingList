@@ -40,6 +40,13 @@ public class ShoppingListDataSource {
                 new String[] { String.valueOf(idItem), String.valueOf(idList) });
     }
 
+    public void deleteAllBought(long idList) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.delete(ShoppingListTable.TABLE_NAME,
+                ShoppingListTable.COLUMN_IS_BOUGHT + " = 1 AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
+                new String[] { String.valueOf(idList) });
+    }
+
     private ContentValues createContentValues(boolean isBought) {
         ContentValues values = new ContentValues();
         values.put(ShoppingListTable.COLUMN_IS_BOUGHT, isBought);

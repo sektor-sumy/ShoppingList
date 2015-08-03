@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.ui.fragments.ListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
@@ -118,6 +119,9 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
         }
         switch(item.getItemId()) {
             case R.id.delete_all_bought:
+                ShoppingListDataSource itemInListDS = new ShoppingListDataSource(this);
+                itemInListDS.deleteAllBought(mId);
+                selectItem(mId);
                 return true;
             case R.id.add_list:
                 ListDialogFragment addListDialog = new ListDialogFragment();
