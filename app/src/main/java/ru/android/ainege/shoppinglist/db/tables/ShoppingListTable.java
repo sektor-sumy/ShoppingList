@@ -16,7 +16,7 @@ public class ShoppingListTable {
             + COLUMN_ID_LIST + " INTEGER NOT NULL, "
             + COLUMN_IS_BOUGHT + " INTEGER NOT NULL, "
             + "FOREIGN KEY (" + COLUMN_ID_ITEM + ") REFERENCES " + ItemsTable.TABLE_NAME + " (" + ItemsTable.COLUMN_ID + "), "
-            + "FOREIGN KEY (" + COLUMN_ID_LIST + ") REFERENCES " + ListsTable.TABLE_NAME + " (" + ListsTable.COLUMN_ID + ") "
+            + "FOREIGN KEY (" + COLUMN_ID_LIST + ") REFERENCES " + ListsTable.TABLE_NAME + " (" + ListsTable.COLUMN_ID + ") ON DELETE CASCADE "
             + "PRIMARY KEY (" + COLUMN_ID_ITEM + ", " + COLUMN_ID_LIST + ")"
             + ");";
 

@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
@@ -121,6 +122,14 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
                 addListDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
                 return true;
             case R.id.delete_list:
+                ListsDataSource listDS = new ListsDataSource(this);
+                if (mId != -1) {
+                    listDS.delete(mId);
+                    updateData();
+                    mId = -1;
+                } else {
+                    Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.update_list:
                 return true;

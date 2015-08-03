@@ -58,6 +58,13 @@ public class ListsDataSource {
         return db.insert(ListsTable.TABLE_NAME, null, values);
     }
 
+    public void delete(long id) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.delete(ListsTable.TABLE_NAME,
+                ListsTable.COLUMN_ID + " = ? ",
+                new String[] { String.valueOf(id) });
+    }
+
     private ContentValues createContentValues(String name) {
         ContentValues values = new ContentValues();
         values.put(ListsTable.COLUMN_NAME, name);
