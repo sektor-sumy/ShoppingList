@@ -1,7 +1,5 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.Context;
@@ -14,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +29,7 @@ import ru.android.ainege.shoppinglist.ui.fragments.ListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 
 
-public class ShoppingListActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>, ListDialogFragment.List {
+public class ShoppingListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, ListDialogFragment.List {
     public static final String APP_PREFERENCES = "setting";
     public static final String APP_PREFERENCES_ID = "idList";
 
@@ -62,8 +61,8 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getSupportActionBar().setHomeButtonEnabled(true);
 
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,
@@ -73,12 +72,12 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
         ) {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getActionBar().setTitle(mTitle);
+                setAppTitle(mTitle);
             }
 
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getActionBar().setTitle(mDrawerTitle);
+                setAppTitle(mDrawerTitle);
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -180,7 +179,7 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
                             int position = getPosition(mId);
                             mCursor.moveToPosition(position);
                             mTitle = mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME));
-                            getActionBar().setTitle(mTitle);
+                            setAppTitle(mTitle);
                             mDrawerList.setItemChecked(position, true);
                         }
                     });
@@ -217,6 +216,10 @@ public class ShoppingListActivity extends Activity implements LoaderManager.Load
             }
         }
         return index;
+    }
+
+    private void setAppTitle(CharSequence appTitle) {
+        this.getSupportActionBar().setTitle(appTitle);
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
