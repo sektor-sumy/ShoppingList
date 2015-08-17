@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -140,6 +141,10 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
                 ListDialogFragment editListDialog = ListDialogFragment.newInstance(mId,
                         mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME)));
                 editListDialog.show(getFragmentManager(), UPDATE_DIALOG_DATE);
+                return true;
+            case R.id.settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
