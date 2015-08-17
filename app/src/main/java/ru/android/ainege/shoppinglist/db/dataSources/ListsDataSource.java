@@ -41,7 +41,9 @@ public class ListsDataSource {
                                         ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_ITEM + " = " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID +
                                         " LEFT JOIN " + UnitsTable.TABLE_NAME + " ON " +
                                         ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID_UNIT + " = " + UnitsTable.TABLE_NAME + "." + UnitsTable.COLUMN_ID +
-                            " WHERE " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " = ?";
+                            " WHERE " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " = ? " +
+                            " ORDER BY " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_IS_BOUGHT + ", " +
+                                           ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_NAME;
         Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
         return cursor.moveToFirst() ? cursor : null;
     }

@@ -52,6 +52,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     private ListView mList;
     private int mSavePosition = 0;
     private double mSaveSpentMoney;
+    private boolean mDefaultSort = true;
 
     private long mIdList;
 
@@ -270,15 +271,20 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                     ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
                     itemInListDS.setIsBought(cb.isChecked(), cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
                     double sum = sum(cursor);
-                    if (mSaveSpentMoney != 0) {
-                        if (cb.isChecked()) {
-                            mSaveSpentMoney += sum;
-                        } else {
-                            mSaveSpentMoney -= sum;
-                        }
-                        updateSpentSum(mSaveSpentMoney);
-                    } else {
+                    if (mDefaultSort) {
+                        mSavePosition = position;
                         updateData();
+                    } else {
+                        if (mSaveSpentMoney != 0) {
+                            if (cb.isChecked()) {
+                                mSaveSpentMoney += sum;
+                            } else {
+                                mSaveSpentMoney -= sum;
+                            }
+                            updateSpentSum(mSaveSpentMoney);
+                        } else {
+                            updateData();
+                        }
                     }
                 }
             });
