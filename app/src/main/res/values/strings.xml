@@ -31,4 +31,13 @@
     <string name="delete_all_bought">Удалить все выбраное</string>
     <string name="settings">Настройки</string>
 
+    <string name="settings_category_sort">Сортировка товаров в списке</string>
+    <string name="settings_key_sort_isBought">sort_isBought</string>
+    <string name="settings_title_sort_isBought">Сначала не купленные</string>
+    <string name="settings_summary_sort_isBought">В списке сначала идут некупленные товары, потом купленные</string>
+    <string name="settings_key_sort_type">sort_type</string>
+    <string name="settings_title_sort_type">Порядок сортировки</string>
+    <string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
+    <string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
+
 </resources>
