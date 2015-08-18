@@ -37,6 +37,8 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class ShoppingListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String ID_LIST = "idList";
+    public static final String IS_BOUGHT_FIRST = "isBoughtFirst";
+
     private static final String ADD_DIALOG_DATE = "addItemDialog";
     private static final String EDIT_DIALOG_DATE = "editItemDialog";
     private static final int ADD_DIALOG_CODE = 0;
@@ -52,13 +54,14 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     private ListView mList;
     private int mSavePosition = 0;
     private double mSaveSpentMoney;
-    private boolean mDefaultSort = true;
+    private boolean mIsBoughtFirst;
 
     private long mIdList;
 
-    public static ShoppingListFragment newInstance(long id) {
+    public static ShoppingListFragment newInstance(long id, boolean isBoughtFirst) {
         Bundle args = new Bundle();
         args.putLong(ID_LIST, id);
+        args.putBoolean(IS_BOUGHT_FIRST, isBoughtFirst);
 
         ShoppingListFragment fragment = new ShoppingListFragment();
         fragment.setArguments(args);
@@ -70,6 +73,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mIdList = getArguments().getLong(ID_LIST);
+        mIsBoughtFirst = getArguments().getBoolean(IS_BOUGHT_FIRST);
         getLoaderManager().initLoader(DATA_LOADER, null, this);
     }
 
@@ -271,7 +275,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                     ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
                     itemInListDS.setIsBought(cb.isChecked(), cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
                     double sum = sum(cursor);
-                    if (mDefaultSort) {
+                    if (mIsBoughtFirst) {
                         mSavePosition = position;
                         updateData();
                     } else {
@@ -304,18 +308,16 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     }
 
     private static class MyCursorLoader extends CursorLoader {
-        private Context mContext;
         private long mIdList;
 
         public MyCursorLoader(Context context, long idList) {
             super(context);
-            mContext = context;
             mIdList = idList;
         }
 
         @Override
         public Cursor loadInBackground() {
-            ListsDataSource mListDS = new ListsDataSource(mContext);
+            ListsDataSource mListDS = ListsDataSource.getInstance();
             return mListDS.getItemsInList(mIdList);
         }
     }

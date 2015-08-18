@@ -100,7 +100,7 @@ public class ListDialogFragment extends DialogFragment {
             mName.setError(null);
         }
         if (mName.getError() == null) {
-            ListsDataSource listDS = new ListsDataSource(getActivity());
+            ListsDataSource listDS = ListsDataSource.getInstance();
 
             if (getArguments() != null) {
                 mIdNewList = getArguments().getLong(ID_LIST);

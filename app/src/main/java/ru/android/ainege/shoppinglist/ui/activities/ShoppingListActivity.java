@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -50,6 +51,8 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
     private SharedPreferences mSettings;
     private long mId = -1;
 
+    private boolean mIsBoughtFirst;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,16 +85,13 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-        if (mSettings.contains(APP_PREFERENCES_ID)) {
-            mId = mSettings.getLong(APP_PREFERENCES_ID, mId);
-            if (mId != -1) {
-                selectItem(mId);
-            }
-        }
-
         getLoaderManager().initLoader(DATA_LOADER, null, this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateItemsList();
     }
 
     @Override
@@ -128,7 +128,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
                 addListDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
                 return true;
             case R.id.delete_list:
-                ListsDataSource listDS = new ListsDataSource(this);
+                ListsDataSource listDS = ListsDataSource.getInstance();
                 if (mId != -1) {
                     listDS.delete(mId);
                     updateData();
@@ -179,6 +179,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
                         public void run() {
                             if (mId == -1) {
                                 mCursor.moveToFirst();
+                                getSettings();
                                 selectItem(mCursor.getLong(mCursor.getColumnIndex(ListsTable.COLUMN_ID)));
                             }
                             int position = getPosition(mId);
@@ -241,7 +242,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
 
     private void selectItem(long id) {
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_container, ShoppingListFragment.newInstance(id)).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragment_container, ShoppingListFragment.newInstance(id, mIsBoughtFirst)).commit();
 
         mDrawerLayout.closeDrawer(mDrawerList);
         if (!mSettings.contains(APP_PREFERENCES_ID) || mId != mSettings.getLong(APP_PREFERENCES_ID, mId)) {
@@ -277,8 +278,53 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
 
         @Override
         public Cursor loadInBackground() {
-            ListsDataSource listDS = new ListsDataSource(mContext);
+            ListsDataSource listDS;
+            try{
+                listDS = ListsDataSource.getInstance();
+            }catch (NullPointerException e) {
+                listDS = ListsDataSource.getInstance(mContext);
+            }
+
             return listDS.getAll();
+        }
+    }
+
+    private void getSettings() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mIsBoughtFirst = prefs.getBoolean(getString(R.string.settings_key_sort_isBought), true);
+
+        String sortType = null;
+        String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
+        if (regular.contains(getResources().getString(R.string.sort_order_alphabet))) {
+            sortType = ListsDataSource.ALPHABET;
+        } else if (regular.contains(getResources().getString(R.string.sort_order_up_price))) {
+            sortType = ListsDataSource.UP_PRICE;
+        } else if (regular.contains(getResources().getString(R.string.sort_order_down_price))) {
+            sortType = ListsDataSource.DOWN_PRICE;
+        } else if (regular.contains(getResources().getString(R.string.sort_order_adding))) {
+            sortType = ListsDataSource.ORDER_ADDING;
+        } else {
+            sortType = ListsDataSource.ALPHABET;
+        }
+
+        ListsDataSource listDS;
+        try{
+            listDS = ListsDataSource.getInstance();
+        }catch (NullPointerException e) {
+            listDS = ListsDataSource.getInstance(this);
+        }
+        listDS.setSortSettings(mIsBoughtFirst, sortType);
+    }
+
+    private void updateItemsList() {
+        mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        if (mSettings.contains(APP_PREFERENCES_ID)) {
+            mId = mSettings.getLong(APP_PREFERENCES_ID, mId);
+            if (mId != -1) {
+                getSettings();
+                selectItem(mId);
+            }
         }
     }
 }

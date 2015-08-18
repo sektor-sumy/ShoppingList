@@ -40,4 +40,9 @@
     <string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
     <string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
 
+    <string name="sort_order_alphabet">алфавиту</string>
+    <string name="sort_order_up_price">возрастанию цены</string>
+    <string name="sort_order_down_price">убыванию цены</string>
+    <string name="sort_order_adding">порядку добавления</string>
+
 </resources>

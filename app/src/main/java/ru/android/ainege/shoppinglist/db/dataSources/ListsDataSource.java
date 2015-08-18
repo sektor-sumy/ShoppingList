@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
@@ -12,12 +13,44 @@ import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class ListsDataSource {
+    public final static String ALPHABET = "alphabet";
+    public final static String UP_PRICE = "upPrice";
+    public final static String DOWN_PRICE = "downPrice";
+    public final static String ORDER_ADDING = "orderAdding";
+
+    private static ListsDataSource instance;
+
     private Context mContext;
     private ShoppingListSQLiteHelper mDbHelper;
+    public boolean mIsBoughtFirst;
+    public String mType;
+    private String order;
 
-    public ListsDataSource(Context context) {
+    private ListsDataSource(Context context) {
         mContext = context;
         mDbHelper = new ShoppingListSQLiteHelper(mContext);
+    }
+
+    public static ListsDataSource getInstance(Context context) {
+        if (instance == null) {
+            instance = new ListsDataSource(context);
+        }
+
+        return instance;
+    }
+
+    public static ListsDataSource getInstance() {
+        if (instance == null) {
+            throw new NullPointerException();
+        }
+
+        return instance;
+    }
+
+    public void setSortSettings(boolean isBoughtFirst, String type) {
+        mIsBoughtFirst = isBoughtFirst;
+        mType = type;
+        order = getOrder(mIsBoughtFirst, mType);
     }
 
     public Cursor get(long id) {
@@ -42,8 +75,7 @@ public class ListsDataSource {
                                         " LEFT JOIN " + UnitsTable.TABLE_NAME + " ON " +
                                         ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID_UNIT + " = " + UnitsTable.TABLE_NAME + "." + UnitsTable.COLUMN_ID +
                             " WHERE " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " = ? " +
-                            " ORDER BY " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_IS_BOUGHT + ", " +
-                                           ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_NAME;
+                            " ORDER BY " + order;
         Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
         return cursor.moveToFirst() ? cursor : null;
     }
@@ -77,5 +109,27 @@ public class ListsDataSource {
         ContentValues values = new ContentValues();
         values.put(ListsTable.COLUMN_NAME, name);
         return values;
+    }
+
+    private String getOrder(boolean isBoughtFirst, String type){
+        String order = "";
+        if (isBoughtFirst) {
+            order += ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_IS_BOUGHT + ", ";
+        }
+        switch(type) {
+            case ALPHABET:
+                order += ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_NAME;
+                break;
+            case UP_PRICE:
+                order += ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_PRICE;
+                break;
+            case DOWN_PRICE:
+                order += ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_PRICE + " DESC";
+                break;
+            case ORDER_ADDING:
+                order += ItemsTable.TABLE_NAME + "." + BaseColumns._ID;
+                break;
+        }
+        return order;
     }
 }
