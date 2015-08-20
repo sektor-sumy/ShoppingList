@@ -58,22 +58,37 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment);
 
-        mTitle = mDrawerTitle = getTitle();
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        initDrawer();
+
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mCursor.moveToPosition(position);
+                mId = mCursor.getLong(mCursor.getColumnIndex(ListsTable.COLUMN_ID));
 
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+                if (mDrawerLayout != null) {
+                    mTitle = mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME));
+                }
 
-        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getSupportActionBar().setHomeButtonEnabled(true);
+                mDrawerList.setItemChecked(position, true);
+                selectItem(mId);
+            }
+        });
 
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,
-                mDrawerLayout,
-                R.string.drawer_open,
-                R.string.drawer_close
-        ) {
+        getLoaderManager().initLoader(DATA_LOADER, null, this);
+    }
+
+    private void initDrawer() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mTitle = mDrawerTitle = getTitle();
+
+        if (mDrawerLayout == null) {
+            setAppTitle(mTitle);
+            return;
+        }
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 setAppTitle(mTitle);
@@ -85,7 +100,10 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getLoaderManager().initLoader(DATA_LOADER, null, this);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getSupportActionBar().setHomeButtonEnabled(true);
     }
 
     @Override
@@ -94,16 +112,59 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         updateItemsList();
     }
 
+    private void updateItemsList() {
+        mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        if (mSettings.contains(APP_PREFERENCES_ID)) {
+            mId = mSettings.getLong(APP_PREFERENCES_ID, mId);
+            if (mId != -1) {
+                getSettings();
+                selectItem(mId);
+            }
+        }
+    }
+
+    private void getSettings() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mIsBoughtFirst = prefs.getBoolean(getString(R.string.settings_key_sort_isBought), true);
+
+        String sortType = null;
+        String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
+        if (regular.contains(getResources().getString(R.string.sort_order_alphabet))) {
+            sortType = ListsDataSource.ALPHABET;
+        } else if (regular.contains(getResources().getString(R.string.sort_order_up_price))) {
+            sortType = ListsDataSource.UP_PRICE;
+        } else if (regular.contains(getResources().getString(R.string.sort_order_down_price))) {
+            sortType = ListsDataSource.DOWN_PRICE;
+        } else if (regular.contains(getResources().getString(R.string.sort_order_adding))) {
+            sortType = ListsDataSource.ORDER_ADDING;
+        } else {
+            sortType = ListsDataSource.ALPHABET;
+        }
+
+        ListsDataSource listDS;
+        try{
+            listDS = ListsDataSource.getInstance();
+        }catch (NullPointerException e) {
+            listDS = ListsDataSource.getInstance(this);
+        }
+        listDS.setSortSettings(mIsBoughtFirst, sortType);
+    }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
+        if (mDrawerToggle != null) {
+            mDrawerToggle.syncState();
+        }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        if (mDrawerToggle != null) {
+            mDrawerToggle.onConfigurationChanged(newConfig);
+        }
     }
 
     @Override
@@ -114,7 +175,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         switch(item.getItemId()) {
@@ -183,9 +244,11 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
                                 selectItem(mCursor.getLong(mCursor.getColumnIndex(ListsTable.COLUMN_ID)));
                             }
                             int position = getPosition(mId);
-                            mCursor.moveToPosition(position);
-                            mTitle = mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME));
-                            setAppTitle(mTitle);
+                            if (mDrawerLayout != null) {
+                                mCursor.moveToPosition(position);
+                                mTitle = mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME));
+                                setAppTitle(mTitle);
+                            }
                             mDrawerList.setItemChecked(position, true);
                         }
                     });
@@ -224,33 +287,6 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         return index;
     }
 
-    private void setAppTitle(CharSequence appTitle) {
-        this.getSupportActionBar().setTitle(appTitle);
-    }
-
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            mCursor.moveToPosition(position);
-            mId = mCursor.getLong(mCursor.getColumnIndex(ListsTable.COLUMN_ID));
-            mTitle = mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME));
-
-            mDrawerList.setItemChecked(position, true);
-            selectItem(mId);
-        }
-    }
-
-    private void selectItem(long id) {
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_container, ShoppingListFragment.newInstance(id, mIsBoughtFirst)).commit();
-
-        mDrawerLayout.closeDrawer(mDrawerList);
-        if (!mSettings.contains(APP_PREFERENCES_ID) || mId != mSettings.getLong(APP_PREFERENCES_ID, mId)) {
-            saveId();
-        }
-
-    }
-
     @Override
     public void updateResult(long idList) {
         if (idList != -1 && idList != mId) {
@@ -262,10 +298,27 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-    public void saveId() {
+    private void selectItem(long id) {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.fragment_container, ShoppingListFragment.newInstance(id, mIsBoughtFirst)).commit();
+
+        if (mDrawerLayout != null) {
+            mDrawerLayout.closeDrawer(mDrawerList);
+        }
+
+        if (!mSettings.contains(APP_PREFERENCES_ID) || mId != mSettings.getLong(APP_PREFERENCES_ID, mId)) {
+            saveId();
+        }
+    }
+
+    private void saveId() {
         SharedPreferences.Editor editor = mSettings.edit();
         editor.putLong(APP_PREFERENCES_ID, mId);
         editor.apply();
+    }
+
+    private void setAppTitle(CharSequence appTitle) {
+        this.getSupportActionBar().setTitle(appTitle);
     }
 
     private static class MyCursorLoader extends CursorLoader {
@@ -286,45 +339,6 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
             }
 
             return listDS.getAll();
-        }
-    }
-
-    private void getSettings() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        mIsBoughtFirst = prefs.getBoolean(getString(R.string.settings_key_sort_isBought), true);
-
-        String sortType = null;
-        String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
-        if (regular.contains(getResources().getString(R.string.sort_order_alphabet))) {
-            sortType = ListsDataSource.ALPHABET;
-        } else if (regular.contains(getResources().getString(R.string.sort_order_up_price))) {
-            sortType = ListsDataSource.UP_PRICE;
-        } else if (regular.contains(getResources().getString(R.string.sort_order_down_price))) {
-            sortType = ListsDataSource.DOWN_PRICE;
-        } else if (regular.contains(getResources().getString(R.string.sort_order_adding))) {
-            sortType = ListsDataSource.ORDER_ADDING;
-        } else {
-            sortType = ListsDataSource.ALPHABET;
-        }
-
-        ListsDataSource listDS;
-        try{
-            listDS = ListsDataSource.getInstance();
-        }catch (NullPointerException e) {
-            listDS = ListsDataSource.getInstance(this);
-        }
-        listDS.setSortSettings(mIsBoughtFirst, sortType);
-    }
-
-    private void updateItemsList() {
-        mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-        if (mSettings.contains(APP_PREFERENCES_ID)) {
-            mId = mSettings.getLong(APP_PREFERENCES_ID, mId);
-            if (mId != -1) {
-                getSettings();
-                selectItem(mId);
-            }
         }
     }
 }
