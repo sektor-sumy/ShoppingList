@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -52,7 +53,8 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     private TextView mSpentMoney, mTotalMoney, mEmptyText;
     private LinearLayout mListContainer;
     private ListView mList;
-    private int mSavePosition = 0;
+    private long mSaveItemId = -1;
+    private Parcelable mListState;
     private double mSaveSpentMoney;
     private boolean mIsBoughtFirst;
 
@@ -108,7 +110,6 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         mItemsInList.moveToPosition(position);
-        mSavePosition = position;
 
         String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
         double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
@@ -120,6 +121,8 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
         EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList);
         editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
         editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
+
+        mSaveItemId = idItem;
     }
 
     @Override
@@ -137,6 +140,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                 mItemsInList.moveToPosition(info.position);
                 ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
                 itemInListDS.delete(mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
+                mListState = mList.onSaveInstanceState();
                 updateData();
                 return true;
             default:
@@ -150,6 +154,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
 
         switch(requestCode) {
             case ADD_DIALOG_CODE:
+                mSaveItemId = data.getLongExtra(AddItemDialogFragment.ID_ITEM, -1);
                 updateData();
                 break;
             case EDIT_DIALOG_CODE:
@@ -181,15 +186,15 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                     mTotalMoney.setText(localValue(sumTotalMoney()));
                     mAdapter = new ItemAdapter(R.layout._shopping_list_item, mItemsInList);
                     setListAdapter(mAdapter);
+                    if (mListState != null) {
+                        mList.onRestoreInstanceState(mListState);
+                        mListState = null;
+                    } else if (mSaveItemId != -1) {
+                        mList.setSelection(getPosition(mSaveItemId));
+                        mSaveItemId = -1;
+                    }
                     mListContainer.setVisibility(View.VISIBLE);
                     mEmptyText.setVisibility(View.GONE);
-                    mList.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mList.setSelection(mSavePosition);
-                            mSavePosition = 0;
-                        }
-                    });
                 } else {
                     mListContainer.setVisibility(View.GONE);
                     mEmptyText.setVisibility(View.VISIBLE);
@@ -276,7 +281,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                     itemInListDS.setIsBought(cb.isChecked(), cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
                     double sum = sum(cursor);
                     if (mIsBoughtFirst) {
-                        mSavePosition = position;
+                        mListState = mList.onSaveInstanceState();
                         updateData();
                     } else {
                         if (mSaveSpentMoney != 0) {
@@ -287,6 +292,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
                             }
                             updateSpentSum(mSaveSpentMoney);
                         } else {
+                            mListState = mList.onSaveInstanceState();
                             updateData();
                         }
                     }
@@ -320,5 +326,16 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
             ListsDataSource mListDS = ListsDataSource.getInstance();
             return mListDS.getItemsInList(mIdList);
         }
+    }
+
+    private int getPosition(long id) {
+        int index = 0;
+        for (int i = 0; i < mList.getCount(); i++) {
+            if (mList.getItemIdAtPosition(i) == id) {
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 }

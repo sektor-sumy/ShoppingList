@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
@@ -32,6 +33,7 @@ import ru.android.ainege.shoppinglist.ui.Validation;
 
 public class AddItemDialogFragment extends DialogFragment {
     public static final String ID_LIST = "idList";
+    public static final String ID_ITEM = "idItem";
 
     private EditText mName;
     private EditText mAmount;
@@ -217,17 +219,17 @@ public class AddItemDialogFragment extends DialogFragment {
             long idList = getArguments().getLong(ID_LIST);
 
             ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-            itemInListDS.add(idItem, idList, isBought);
-            sendResult(Activity.RESULT_OK);
+            long id = itemInListDS.add(idItem, idList, isBought);
+            sendResult(Activity.RESULT_OK, id);
             isSave = true;
         }
         return isSave;
     }
 
-    private void sendResult(int resultCode) {
+    private void sendResult(int resultCode, long id) {
         if (getTargetFragment() == null)
             return;
 
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, null);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, new Intent().putExtra(ID_ITEM, id));
     }
 }
