@@ -10,10 +10,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:maxLength="80"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:paddingLeft="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="@dimen/dialog_margin"
+        android:layout_marginRight="@dimen/dialog_margin"
+        android:paddingLeft="@dimen/dialog_padding_hint"
+        android:layout_marginTop="@dimen/dialog_margin_top"
+        android:layout_marginBottom="@dimen/dialog_margin"
         android:hint="@string/list_name"/>
 </LinearLayout>

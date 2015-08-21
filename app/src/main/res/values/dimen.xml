@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="drawer_wight">240dp</dimen>
+    <dimen name="drawer_text_padding">16dp</dimen>
+
+    <dimen name="sum_wight">160dp</dimen>
+    <dimen name="column_wight">75dp</dimen>
+
+    <dimen name="dialog_margin">10dp</dimen>
+    <dimen name="dialog_margin_top">20dp</dimen>
+    <dimen name="dialog_padding_hint">10dp</dimen>
+    <dimen name="dialog_item_amount_weight">75dp</dimen>
+    <dimen name="dialog_item_spinner_weight">60dp</dimen>
+    <dimen name="dialog_item_price_weight">100dp</dimen>
+</resources>

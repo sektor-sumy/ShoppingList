@@ -23,7 +23,7 @@
 
     <TextView
         android:id="@+id/item_amount"
-        android:layout_width="75dp"
+        android:layout_width="@dimen/column_wight"
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"
         android:gravity="center"
@@ -34,7 +34,7 @@
 
     <TextView
         android:id="@+id/item_price"
-        android:layout_width="75dp"
+        android:layout_width="@dimen/column_wight"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textColor="@android:color/black"

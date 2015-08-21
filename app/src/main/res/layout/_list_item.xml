@@ -5,9 +5,9 @@
           android:layout_height="wrap_content"
           android:textAppearance="?android:attr/textAppearanceListItemSmall"
           android:gravity="center_vertical"
-          android:paddingLeft="16dp"
-          android:paddingRight="16dp"
+          android:paddingLeft="@dimen/drawer_text_padding"
+          android:paddingRight="@dimen/drawer_text_padding"
           android:maxLength="80"
-          android:textColor="#fff"
+          android:textColor="@color/drawer_color_text"
           android:background="?android:attr/activatedBackgroundIndicator"
           android:minHeight="?android:attr/listPreferredItemHeightSmall"/>

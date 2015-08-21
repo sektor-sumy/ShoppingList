@@ -6,13 +6,10 @@
 
     <ListView
         android:id="@+id/left_drawer"
-        android:layout_width="240dp"
+        android:layout_width="@dimen/drawer_wight"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="#ff232323"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"/>
+        android:background="@color/drawer_color"
+        android:choiceMode="singleChoice"/>
 
     <FrameLayout
         android:id="@+id/fragment_container"

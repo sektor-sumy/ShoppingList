@@ -26,14 +26,14 @@
             android:layout_weight="1"/>
 
         <View
-            android:layout_width="160dp"
+            android:layout_width="@dimen/sum_wight"
             android:layout_height="1dp"
             android:layout_gravity="end"
             android:layout_marginBottom="2dp"
             android:background="@android:color/black"/>
 
         <View
-            android:layout_width="160dp"
+            android:layout_width="@dimen/sum_wight"
             android:layout_height="1dp"
             android:layout_gravity="end"
             android:layout_marginBottom="3dp"
@@ -45,10 +45,10 @@
             android:orientation="horizontal"
             android:layout_marginRight="3dp"
             android:layout_gravity="right"
-            android:minWidth="160dp">
+            android:minWidth="@dimen/sum_wight">
 
             <TextView
-                android:layout_width="75dp"
+                android:layout_width="@dimen/column_wight"
                 android:layout_height="wrap_content"
                 android:text="@string/spent_money"
                 android:textStyle="bold"/>
@@ -71,10 +71,10 @@
             android:layout_marginBottom="7dp"
             android:orientation="horizontal"
             android:layout_marginRight="3dp"
-            android:minWidth="160dp">
+            android:minWidth="@dimen/sum_wight">
 
             <TextView
-                android:layout_width="75dp"
+                android:layout_width="@dimen/column_wight"
                 android:layout_height="wrap_content"
                 android:text="@string/all_money"
                 android:textStyle="bold"/>
