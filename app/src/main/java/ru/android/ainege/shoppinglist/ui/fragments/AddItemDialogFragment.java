@@ -215,11 +215,11 @@ public class AddItemDialogFragment extends DialogFragment {
             Boolean isBought = mIsBought.isChecked();
 
             ItemDataSource itemDS = new ItemDataSource(getActivity());
-            long idItem = (int) itemDS.add(name, amount, idUnit, price);
+            long idItem = (int) itemDS.add(name);
             long idList = getArguments().getLong(ID_LIST);
 
             ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-            long id = itemInListDS.add(idItem, idList, isBought);
+            long id = itemInListDS.add(idItem, idList, isBought, amount, idUnit, price);
             sendResult(Activity.RESULT_OK, id);
             isSave = true;
         }

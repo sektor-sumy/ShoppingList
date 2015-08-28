@@ -230,9 +230,9 @@ public class EditItemDialogFragment extends DialogFragment {
             boolean isBought = mIsBought.isChecked();
 
             ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-            itemInListDS.setIsBought(isBought, getArguments().getLong(ID_ITEM), getArguments().getLong(ID_LIST));
+            itemInListDS.update(isBought, amount, idUnit, price, getArguments().getLong(ID_ITEM), getArguments().getLong(ID_LIST));
             ItemDataSource itemDS = new ItemDataSource(getActivity());
-            itemDS.update(name, amount, idUnit, price, getArguments().getLong(ID_ITEM));
+            itemDS.updateName(name, getArguments().getLong(ID_ITEM));
             sendResult(Activity.RESULT_OK);
             isSave = true;
         }

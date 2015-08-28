@@ -67,13 +67,13 @@ public class ListsDataSource {
         String selectQuery = "SELECT " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID + ", " +
                                        ShoppingListTable.COLUMN_IS_BOUGHT + ", " +
                                        ItemsTable.COLUMN_NAME + ", " +
-                                       ItemsTable.COLUMN_AMOUNT + ", " +
+                                       ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_AMOUNT + ", " +
                                        UnitsTable.COLUMN_NAME + ", " +
-                                       ItemsTable.COLUMN_PRICE +
+                                       ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_PRICE +
                             " FROM " +  ShoppingListTable.TABLE_NAME + " INNER JOIN " + ItemsTable.TABLE_NAME + " ON " +
                                         ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_ITEM + " = " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID +
                                         " LEFT JOIN " + UnitsTable.TABLE_NAME + " ON " +
-                                        ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID_UNIT + " = " + UnitsTable.TABLE_NAME + "." + UnitsTable.COLUMN_ID +
+                                        ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_UNIT + " = " + UnitsTable.TABLE_NAME + "." + UnitsTable.COLUMN_ID +
                             " WHERE " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " = ? " +
                             " ORDER BY " + order;
         Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});

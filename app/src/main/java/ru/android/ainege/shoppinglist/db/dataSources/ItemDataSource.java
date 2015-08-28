@@ -25,15 +25,35 @@ public class ItemDataSource {
                 new String[] {String.valueOf(idItem)});
     }
 
+    public int updateName(String name, long idItem) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = createContentValues(name);
+        return db.update(ItemsTable.TABLE_NAME,
+                values,
+                ItemsTable.COLUMN_ID + " = ?",
+                new String[] {String.valueOf(idItem)});
+    }
+
+    public long add(String name) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = createContentValues(name);
+        return db.insert(ItemsTable.TABLE_NAME, null, values);
+    }
+
     public long add(String name, double amount, long idUnit, double price) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = createContentValues(name, amount, idUnit, price);
         return db.insert(ItemsTable.TABLE_NAME, null, values);
     }
 
-    private ContentValues createContentValues(String name, double amount, long idUnit, double price) {
+    private ContentValues createContentValues(String name) {
         ContentValues values = new ContentValues();
         values.put(ItemsTable.COLUMN_NAME, name);
+        return values;
+    }
+
+    private ContentValues createContentValues(String name, double amount, long idUnit, double price) {
+        ContentValues values = createContentValues(name);
         values.put(ItemsTable.COLUMN_AMOUNT, amount);
         values.put(ItemsTable.COLUMN_ID_UNIT, idUnit);
         values.put(ItemsTable.COLUMN_PRICE, price);
