@@ -17,9 +17,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -28,6 +31,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
@@ -35,11 +39,15 @@ public class AddItemDialogFragment extends DialogFragment {
     public static final String ID_LIST = "idList";
     public static final String ID_ITEM = "idItem";
 
-    private EditText mName;
+    private AutoCompleteTextView mName;
     private EditText mAmount;
     private EditText mPrice;
     private CheckBox mIsBought;
     private Spinner mUnits;
+
+    private boolean mIsNewItem = true;
+    private long mIdSelectedItem = -1;
+    private SimpleCursorAdapter completeTextAdapter;
 
     public static AddItemDialogFragment newInstance(long id) {
         Bundle args = new Bundle();
@@ -74,18 +82,17 @@ public class AddItemDialogFragment extends DialogFragment {
     }
 
     private void setData(View v) {
-        UnitsDataSource unitDS = new UnitsDataSource(getActivity());
-
-        String[] from = new String[] {UnitsTable.COLUMN_NAME};
-        int[] to = new int[] {android.R.id.text1};
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item, unitDS.getAll(), from, to, 0);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         mUnits = (Spinner) v.findViewById(R.id.new_amount_units);
-        mUnits.setAdapter(adapter);
+        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
+                android.R.layout.simple_spinner_item,
+                new UnitsDataSource(getActivity()).getAll(),
+                new String[] {UnitsTable.COLUMN_NAME},
+                new int[] {android.R.id.text1}, 0);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mUnits.setAdapter(spinnerAdapter);
         mUnits.setSelection(0);
 
-        mName = (EditText) v.findViewById(R.id.new_item_name);
+        mName = (AutoCompleteTextView) v.findViewById(R.id.new_item_name);
         mName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -99,15 +106,41 @@ public class AddItemDialogFragment extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) {
+                if (s.length() == 0) {
                     mName.setError(getResources().getText(R.string.error_name));
                 } else {
-                    if(mName.getError() != null) {
+                    if (mName.getError() != null) {
                         mName.setError(null);
                     }
                 }
             }
         });
+        mName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mIsNewItem = false;
+                mIdSelectedItem = l;
+            }
+        });
+        completeTextAdapter = new SimpleCursorAdapter(getActivity(),
+                android.R.layout.simple_dropdown_item_1line,
+                null,
+                new String[]{ItemsTable.COLUMN_NAME},
+                new int[] {android.R.id.text1}, 0);
+        completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
+            @Override
+            public CharSequence convertToString(Cursor cursor) {
+                return cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME));
+            }
+        });
+        completeTextAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence charSequence) {
+                Cursor managedCursor = new ItemDataSource(getActivity()).getNames((charSequence != null ? charSequence.toString() : null));
+                return managedCursor;
+            }
+        });
+        mName.setAdapter(completeTextAdapter);
 
         mAmount = (EditText) v.findViewById(R.id.new_amount_item);
         mAmount.addTextChangedListener(new TextWatcher() {
@@ -215,7 +248,13 @@ public class AddItemDialogFragment extends DialogFragment {
             Boolean isBought = mIsBought.isChecked();
 
             ItemDataSource itemDS = new ItemDataSource(getActivity());
-            long idItem = (int) itemDS.add(name);
+
+            long idItem;
+            if (mIsNewItem) {
+                idItem = (int) itemDS.add(name);
+            } else {
+                idItem = mIdSelectedItem;
+            }
             long idList = getArguments().getLong(ID_LIST);
 
             ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());

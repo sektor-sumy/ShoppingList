@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -36,7 +37,7 @@ public class EditItemDialogFragment extends DialogFragment {
     public static final String ID_LIST = "idList";
     public static final String ID_ITEM = "idItem";
 
-    private EditText mName;
+    private AutoCompleteTextView mName;
     private EditText mAmount;
     private EditText mPrice;
     private CheckBox mIsBought;
@@ -81,16 +82,10 @@ public class EditItemDialogFragment extends DialogFragment {
     }
 
     private void setData(View v) {
-        UnitsDataSource unitDS = new UnitsDataSource(getActivity());
-        String[] from = new String[] {UnitsTable.COLUMN_NAME};
-        int[] to = new int[] {android.R.id.text1};
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item, unitDS.getAll(), from, to, 0);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         mIsBought = (CheckBox) v.findViewById(R.id.is_bought);
         mIsBought.setChecked(getArguments().getBoolean(IS_BOUGHT));
 
-        mName = (EditText) v.findViewById(R.id.new_item_name);
+        mName = (AutoCompleteTextView) v.findViewById(R.id.new_item_name);
         mName.setText(getArguments().getString(ITEM_NAME));
         mName.setSelection(mName.getText().length());
         mName.addTextChangedListener(new TextWatcher() {
@@ -144,7 +139,13 @@ public class EditItemDialogFragment extends DialogFragment {
         });
 
         mUnits = (Spinner) v.findViewById(R.id.new_amount_units);
-        mUnits.setAdapter(adapter);
+        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
+                android.R.layout.simple_spinner_item,
+                new UnitsDataSource(getActivity()).getAll(),
+                new String[] {UnitsTable.COLUMN_NAME},
+                new int[] {android.R.id.text1}, 0);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mUnits.setAdapter(spinnerAdapter);
         if (getArguments().getDouble(AMOUNT) == 0) {
             mUnits.setSelection(0);
         } else {
@@ -229,10 +230,10 @@ public class EditItemDialogFragment extends DialogFragment {
             }
             boolean isBought = mIsBought.isChecked();
 
-            ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-            itemInListDS.update(isBought, amount, idUnit, price, getArguments().getLong(ID_ITEM), getArguments().getLong(ID_LIST));
             ItemDataSource itemDS = new ItemDataSource(getActivity());
             itemDS.updateName(name, getArguments().getLong(ID_ITEM));
+            ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
+            itemInListDS.update(isBought, amount, idUnit, price, getArguments().getLong(ID_ITEM), getArguments().getLong(ID_LIST));
             sendResult(Activity.RESULT_OK);
             isSave = true;
         }

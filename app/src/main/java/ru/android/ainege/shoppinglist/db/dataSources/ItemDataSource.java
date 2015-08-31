@@ -2,6 +2,7 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
@@ -14,6 +15,12 @@ public class ItemDataSource {
     public ItemDataSource(Context context) {
         mContext = context;
         mDbHelper = new ShoppingListSQLiteHelper(mContext);
+    }
+
+    public Cursor getNames(String substring) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Select * from " + ItemsTable.TABLE_NAME + " where " + ItemsTable.COLUMN_NAME + " like '" + substring + "%';", null);
+        return cursor.moveToFirst() ? cursor : null;
     }
 
     public int update(String name, double amount, long idUnit, double price, long idItem) {
