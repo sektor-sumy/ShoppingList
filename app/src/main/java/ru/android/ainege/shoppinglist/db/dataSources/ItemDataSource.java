@@ -17,6 +17,12 @@ public class ItemDataSource {
         mDbHelper = new ShoppingListSQLiteHelper(mContext);
     }
 
+    public Cursor getName(String name) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.query(ItemsTable.TABLE_NAME, new String[]{ItemsTable.COLUMN_NAME}, ItemsTable.COLUMN_NAME + " like ?", new String[]{name}, null, null, null);
+        return cursor.moveToFirst() ? cursor : null;
+    }
+
     public Cursor getNames(String substring) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("Select * from " + ItemsTable.TABLE_NAME + " where " + ItemsTable.COLUMN_NAME + " like '" + substring + "%';", null);

@@ -25,6 +25,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
@@ -104,8 +105,14 @@ public class EditItemDialogFragment extends DialogFragment {
                 if (s.length() == 0) {
                     mName.setError(getResources().getText(R.string.error_name));
                 } else {
-                    if (mName.getError() != null) {
-                        mName.setError(null);
+                    Cursor cursor = new ItemDataSource(getActivity()).getName((s.toString()));
+                    if (cursor != null &&
+                            !cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME)).equals(getArguments().getString(ITEM_NAME))) {
+                        mName.setError(getResources().getText(R.string.error_existing_name));
+                    } else {
+                        if (mName.getError() != null) {
+                            mName.setError(null);
+                        }
                     }
                 }
             }
