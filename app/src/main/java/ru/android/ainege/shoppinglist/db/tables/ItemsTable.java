@@ -42,12 +42,9 @@ public class ItemsTable {
                 "рис",
                 "гречка",
         };
-
-        double[] amount = { 0, 1, 2, 0, 1, 1 };
-
-        int[] amountUnit = { 0, 1, 1, 0, 2, 2 };
-
-        double[] price = { 55.00, 19.5, 66, 87, 70, 105 };
+        double[] amount = { 10, 11, 0, 20, 13, 14 };
+        int[] amountUnit = { 2, 2, 2, 1, 1, 1 };
+        double[] price = { 1055.00, 0, 1066, 1087, 1070, 1005 };
 
         for(int i = 0; i < item.length; i++) {
             ContentValues contentValue = new ContentValues();

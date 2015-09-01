@@ -27,6 +27,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
+
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
@@ -45,7 +47,6 @@ public class AddItemDialogFragment extends DialogFragment {
     private CheckBox mIsBought;
     private Spinner mUnits;
 
-    private boolean mIsNewItem = true;
     private long mIdSelectedItem = -1;
     private SimpleCursorAdapter completeTextAdapter;
 
@@ -109,6 +110,12 @@ public class AddItemDialogFragment extends DialogFragment {
                 if (s.length() == 0) {
                     mName.setError(getResources().getText(R.string.error_name));
                 } else {
+                    if (mIdSelectedItem != -1) {
+                        mAmount.setText("");
+                        mUnits.setSelection(0);
+                        mPrice.setText("");
+                        mIdSelectedItem = -1;
+                    }
                     if (mName.getError() != null) {
                         mName.setError(null);
                     }
@@ -118,8 +125,17 @@ public class AddItemDialogFragment extends DialogFragment {
         mName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                mIsNewItem = false;
                 mIdSelectedItem = l;
+                Cursor c = new ItemDataSource(getActivity()).getItem(mIdSelectedItem);
+                double amount = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
+                if (amount > 0) {
+                    mAmount.setText(new DecimalFormat("#.######").format(amount));
+                    mUnits.setSelection(c.getInt(c.getColumnIndex(ItemsTable.COLUMN_ID_UNIT)));
+                }
+                double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
+                if (price > 0) {
+                    mPrice.setText(String.format("%.2f", price));
+                }
             }
         });
         completeTextAdapter = new SimpleCursorAdapter(getActivity(),
@@ -136,6 +152,7 @@ public class AddItemDialogFragment extends DialogFragment {
         completeTextAdapter.setFilterQueryProvider(new FilterQueryProvider() {
             @Override
             public Cursor runQuery(CharSequence charSequence) {
+                mIdSelectedItem = -1;
                 Cursor managedCursor = new ItemDataSource(getActivity()).getNames((charSequence != null ? charSequence.toString() : null));
                 return managedCursor;
             }
@@ -248,12 +265,11 @@ public class AddItemDialogFragment extends DialogFragment {
             Boolean isBought = mIsBought.isChecked();
 
             ItemDataSource itemDS = new ItemDataSource(getActivity());
-
             long idItem;
-            if (mIsNewItem) {
-                idItem = (int) itemDS.add(name);
-            } else {
+            if (mIdSelectedItem != -1) {
                 idItem = mIdSelectedItem;
+            } else {
+                idItem = (int) itemDS.add(name);
             }
             long idList = getArguments().getLong(ID_LIST);
 

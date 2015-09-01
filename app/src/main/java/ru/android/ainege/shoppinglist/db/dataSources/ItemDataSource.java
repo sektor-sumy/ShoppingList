@@ -29,6 +29,12 @@ public class ItemDataSource {
         return cursor.moveToFirst() ? cursor : null;
     }
 
+    public Cursor getItem(long id) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.query(ItemsTable.TABLE_NAME, null, ItemsTable.COLUMN_ID + " = ?", new String[]{ String.valueOf(id) }, null, null, null);
+        return cursor.moveToFirst() ? cursor : null;
+    }
+
     public int update(String name, double amount, long idUnit, double price, long idItem) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = createContentValues(name, amount, idUnit, price);
