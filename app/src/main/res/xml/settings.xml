@@ -16,4 +16,12 @@
             android:entryValues="@array/sort_order"
             android:dialogTitle="@string/settings_dialog_title_sort_type" />
     </PreferenceCategory>
+    <ListPreference
+        android:key="@string/settings_key_sort_data_item"
+        android:title="@string/settings_title_sort_data_item"
+        android:summary="@string/settings_summary_sort_data_item"
+        android:defaultValue="1"
+        android:entries="@array/data_item"
+        android:entryValues="@array/data_item"
+        android:dialogTitle="@string/settings_dialog_title_sort_data_item" />
 </PreferenceScreen>

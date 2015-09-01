@@ -30,8 +30,8 @@
     <string name="delete_list">Удалить список</string>
     <string name="update_list">Изменить список</string>
     <string name="delete_all_bought">Удалить все выбраное</string>
-    <string name="settings">Настройки</string>
 
+    <string name="settings">Настройки</string>
     <string name="settings_category_sort">Сортировка товаров в списке</string>
     <string name="settings_key_sort_isBought">sort_isBought</string>
     <string name="settings_title_sort_isBought">Сначала не купленные</string>
@@ -41,9 +41,18 @@
     <string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
     <string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
 
+    <string name="settings_key_sort_data_item">sort_data_item</string>
+    <string name="settings_title_sort_data_item">Сохранение данных о товаре</string>
+    <string name="settings_summary_sort_data_item">Настройка обновления данных по умолчанию. Используется для автоматического заполнения полей</string>
+    <string name="settings_dialog_title_sort_data_item">Выберите способ обновления данных:</string>
+
     <string name="sort_order_alphabet">алфавиту</string>
     <string name="sort_order_up_price">возрастанию цены</string>
     <string name="sort_order_down_price">убыванию цены</string>
     <string name="sort_order_adding">порядку добавления</string>
+
+    <string name="data_item_button">показать специальную кнопку</string>
+    <string name="data_item_always">всегда при сохранении данных о товаре</string>
+    <string name="data_item_never">некогда не обновлять</string>
 
 </resources>
