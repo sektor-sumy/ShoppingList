@@ -33,13 +33,13 @@ public class ShoppingListDataSource {
         return db.insert(ShoppingListTable.TABLE_NAME, null, values);
     }
 
-    public int update( boolean isBought, double amount, long idUnit, double price, long idItem, long idList) {
+    public int update( boolean isBought, double amount, long idUnit, double price, long idItemNew, long idItem, long idList) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        ContentValues values = createContentValues(isBought, amount, idUnit, price);
+        ContentValues values = createContentValues(isBought, amount, idUnit, price, idItemNew);
         return db.update(ShoppingListTable.TABLE_NAME,
                 values,
                 ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
-                new String[] {String.valueOf(idItem), String.valueOf(idList)});
+                new String[]{String.valueOf(idItem), String.valueOf(idList)});
     }
 
     public void delete(long idItem, long idList) {
@@ -64,6 +64,15 @@ public class ShoppingListDataSource {
 
     private ContentValues createContentValues(boolean isBought, double amount, long idUnit, double price) {
         ContentValues values = createContentValues(isBought);
+        values.put(ShoppingListTable.COLUMN_AMOUNT, amount);
+        values.put(ShoppingListTable.COLUMN_ID_UNIT, idUnit);
+        values.put(ShoppingListTable.COLUMN_PRICE, price);
+        return values;
+    }
+
+    private ContentValues createContentValues(boolean isBought, double amount, long idUnit, double price, long idItem) {
+        ContentValues values = createContentValues(isBought);
+        values.put(ShoppingListTable.COLUMN_ID_ITEM, idItem);
         values.put(ShoppingListTable.COLUMN_AMOUNT, amount);
         values.put(ShoppingListTable.COLUMN_ID_UNIT, idUnit);
         values.put(ShoppingListTable.COLUMN_PRICE, price);

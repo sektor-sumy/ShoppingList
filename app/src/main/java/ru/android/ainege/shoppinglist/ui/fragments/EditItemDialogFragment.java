@@ -11,10 +11,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -43,6 +45,9 @@ public class EditItemDialogFragment extends DialogFragment {
     private EditText mPrice;
     private CheckBox mIsBought;
     private Spinner mUnits;
+
+    private long mIdSelectedItem = -1;
+    private SimpleCursorAdapter completeTextAdapter;
 
     public static EditItemDialogFragment newInstance(String name, double amount, double price, boolean isBought, String nameUnit, long idItem, long idList) {
         Bundle args = new Bundle();
@@ -105,18 +110,42 @@ public class EditItemDialogFragment extends DialogFragment {
                 if (s.length() == 0) {
                     mName.setError(getResources().getText(R.string.error_name));
                 } else {
-                    Cursor cursor = new ItemDataSource(getActivity()).getName((s.toString()));
-                    if (cursor != null &&
-                            !cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME)).equals(getArguments().getString(ITEM_NAME))) {
-                        mName.setError(getResources().getText(R.string.error_existing_name));
-                    } else {
-                        if (mName.getError() != null) {
-                            mName.setError(null);
-                        }
+                    if (mName.getError() != null) {
+                        mName.setError(null);
                     }
                 }
             }
         });
+        mName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mIdSelectedItem = l;
+                Cursor c = new ItemDataSource(getActivity()).getItem(mIdSelectedItem);
+                double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
+                if (price > 0) {
+                    mPrice.setText(String.format("%.2f", price));
+                }
+            }
+        });
+        completeTextAdapter = new SimpleCursorAdapter(getActivity(),
+                android.R.layout.simple_dropdown_item_1line,
+                null,
+                new String[]{ItemsTable.COLUMN_NAME},
+                new int[] {android.R.id.text1}, 0);
+        completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
+            @Override
+            public CharSequence convertToString(Cursor cursor) {
+                return cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME));
+            }
+        });
+        completeTextAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence charSequence) {
+                Cursor managedCursor = new ItemDataSource(getActivity()).getNames((charSequence != null ? charSequence.toString() : null));
+                return managedCursor;
+            }
+        });
+        mName.setAdapter(completeTextAdapter);
 
         mAmount = (EditText) v.findViewById(R.id.new_amount_item);
         if(getArguments().getDouble(AMOUNT) != 0) {
@@ -238,9 +267,14 @@ public class EditItemDialogFragment extends DialogFragment {
             boolean isBought = mIsBought.isChecked();
 
             ItemDataSource itemDS = new ItemDataSource(getActivity());
-            itemDS.updateName(name, getArguments().getLong(ID_ITEM));
+            long idItem = getArguments().getLong(ID_ITEM);
+            long idItemNew = idItem;
+            if (mIdSelectedItem != -1) {
+                idItemNew = mIdSelectedItem;
+            }
+            itemDS.updateName(name, idItemNew);
             ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-            itemInListDS.update(isBought, amount, idUnit, price, getArguments().getLong(ID_ITEM), getArguments().getLong(ID_LIST));
+            itemInListDS.update(isBought, amount, idUnit, price, idItemNew, idItem, getArguments().getLong(ID_LIST));
             sendResult(Activity.RESULT_OK);
             isSave = true;
         }
