@@ -49,6 +49,10 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
     private CheckBox mIsBought;
     private Spinner mUnits;
 
+    private String mAddedAmount = "";
+    private String mAddedPrice = "";
+    private int mAddedUnit = 0;
+
     private long mIdSelectedItem = -1;
     private SimpleCursorAdapter completeTextAdapter;
 
@@ -104,6 +108,19 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
 
     private void setData(View v) {
         mUnits = (Spinner) v.findViewById(R.id.new_amount_units);
+        mUnits.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (mIdSelectedItem == -1) {
+                    mAddedUnit = mUnits.getSelectedItemPosition();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_item,
                 new UnitsDataSource(getActivity()).getAll(),
@@ -131,9 +148,9 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                     mName.setError(getResources().getText(R.string.error_name));
                 } else {
                     if (mIdSelectedItem != -1 && mIsNotDefault) {
-                        mAmount.setText("");
-                        mUnits.setSelection(0);
-                        mPrice.setText("");
+                        mAmount.setText(mAddedAmount);
+                        mUnits.setSelection(mAddedUnit);
+                        mPrice.setText(mAddedPrice);
                         mIdSelectedItem = -1;
                     }
                     if (mName.getError() != null) {
@@ -199,6 +216,9 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                     if (!Validation.isValid(mAmount.getText().toString().trim(), false)) {
                         mAmount.setError(getResources().getText(R.string.error_value));
                     } else {
+                        if (mIdSelectedItem == -1) {
+                            mAddedAmount = String.valueOf(s);
+                        }
                         if (mAmount.getError() != null) {
                             mAmount.setError(null);
                         }
@@ -225,6 +245,9 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                     if (!Validation.isValid(mPrice.getText().toString().trim(), true)) {
                         mPrice.setError(getResources().getText(R.string.error_value));
                     } else {
+                        if (mIdSelectedItem == -1) {
+                            mAddedPrice = String.valueOf(s);
+                        }
                         if (mPrice.getError() != null) {
                             mPrice.setError(null);
                         }
