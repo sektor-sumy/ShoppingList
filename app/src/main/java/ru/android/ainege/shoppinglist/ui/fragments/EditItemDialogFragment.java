@@ -72,7 +72,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        if (getArguments().getString(DATA_SAVE).equals(DATA_SAVE_ALWAYS)) {
+        if (DATA_SAVE_ALWAYS.equals(getArguments().getString(DATA_SAVE))) {
             mIsAlwaysSave = true;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -91,7 +91,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                         dialog.cancel();
                     }
                 });
-        if (getArguments().getString(DATA_SAVE).equals(DATA_SAVE_BUTTON)) {
+        if (DATA_SAVE_BUTTON.equals(getArguments().getString(DATA_SAVE))) {
             builder.setNeutralButton(R.string.update, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -142,10 +142,12 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mIdSelectedItem = l;
-                Cursor c = new ItemDataSource(getActivity()).getItem(mIdSelectedItem);
-                double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
-                if (price > 0) {
-                    mPrice.setText(String.format("%.2f", price));
+                if (!DATA_NOT_DEFAULT.equals(getArguments().getString(DATA_SAVE))) {
+                    Cursor c = new ItemDataSource(getActivity()).getItem(mIdSelectedItem);
+                    double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
+                    if (price > 0) {
+                        mPrice.setText(String.format("%.2f", price));
+                    }
                 }
             }
         });
@@ -315,20 +317,6 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                 itemInListDS.update(isBought, amount, idUnit, price, idItemNew, idItem, getArguments().getLong(ID_LIST));
                 sendResult(Activity.RESULT_OK);
             }
-            /*
-            long idItem = getArguments().getLong(ID_ITEM);
-            long idItemNew = idItem;
-            if (mIdSelectedItem != -1) {
-                idItemNew = mIdSelectedItem;
-            }
-            if (mIsAlwaysSave) { //сохранение если выбрана настройка "сохранять всегда"
-                itemDS.update(name, amount, idUnit, price, idItemNew);
-            } else { //сохранение если выбрана настройка "не сохранять"
-                itemDS.updateName(name, idItemNew);
-            }
-            ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-            itemInListDS.update(isBought, amount, idUnit, price, idItemNew, idItem, getArguments().getLong(ID_LIST));
-            sendResult(Activity.RESULT_OK);*/
             isSave = true;
         }
         return isSave;

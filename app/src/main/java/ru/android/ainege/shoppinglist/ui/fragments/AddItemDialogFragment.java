@@ -53,6 +53,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
     private SimpleCursorAdapter completeTextAdapter;
 
     private boolean mIsAlwaysSave = false;
+    private boolean mIsNotDefault = false;
 
     public static AddItemDialogFragment newInstance(long id, String dataSave) {
         Bundle args = new Bundle();
@@ -67,8 +68,11 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        if (getArguments().getString(DATA_SAVE).equals(DATA_SAVE_ALWAYS)) {
+        if (DATA_SAVE_ALWAYS.equals(getArguments().getString(DATA_SAVE))) {
             mIsAlwaysSave = true;
+        }
+        if (!DATA_NOT_DEFAULT.equals(getArguments().getString(DATA_SAVE))) {
+            mIsNotDefault = true;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -86,7 +90,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                         dialog.cancel();
                     }
                 });
-        if (getArguments().getString(DATA_SAVE).equals(DATA_SAVE_BUTTON)) {
+        if (DATA_SAVE_BUTTON.equals(getArguments().getString(DATA_SAVE))) {
             builder.setNeutralButton(R.string.update, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -126,7 +130,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                 if (s.length() == 0) {
                     mName.setError(getResources().getText(R.string.error_name));
                 } else {
-                    if (mIdSelectedItem != -1) {
+                    if (mIdSelectedItem != -1 && mIsNotDefault) {
                         mAmount.setText("");
                         mUnits.setSelection(0);
                         mPrice.setText("");
@@ -142,15 +146,17 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mIdSelectedItem = l;
-                Cursor c = new ItemDataSource(getActivity()).getItem(mIdSelectedItem);
-                double amount = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
-                if (amount > 0) {
-                    mAmount.setText(new DecimalFormat("#.######").format(amount));
-                    mUnits.setSelection(c.getInt(c.getColumnIndex(ItemsTable.COLUMN_ID_UNIT)));
-                }
-                double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
-                if (price > 0) {
-                    mPrice.setText(String.format("%.2f", price));
+                if (mIsNotDefault) {
+                    Cursor c = new ItemDataSource(getActivity()).getItem(mIdSelectedItem);
+                    double amount = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
+                    if (amount > 0) {
+                        mAmount.setText(new DecimalFormat("#.######").format(amount));
+                        mUnits.setSelection(c.getInt(c.getColumnIndex(ItemsTable.COLUMN_ID_UNIT)));
+                    }
+                    double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
+                    if (price > 0) {
+                        mPrice.setText(String.format("%.2f", price));
+                    }
                 }
             }
         });

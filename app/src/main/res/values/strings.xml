@@ -37,17 +37,21 @@
 
     <string name="settings">Настройки</string>
     <string name="settings_category_sort">Сортировка товаров в списке</string>
-    <string name="settings_key_sort_isBought">sort_isBought</string>
-    <string name="settings_title_sort_isBought">Сначала не купленные</string>
-    <string name="settings_summary_sort_isBought">В списке сначала идут некупленные товары, потом купленные</string>
+    <string name="settings_key_sort_is_bought">sort_is_bought</string>
+    <string name="settings_title_sort_is_bought">Сначала не купленные</string>
+    <string name="settings_summary_sort_is_bought">В списке сначала идут некупленные товары, потом купленные</string>
     <string name="settings_key_sort_type">sort_type</string>
     <string name="settings_title_sort_type">Порядок сортировки</string>
     <string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
     <string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
 
+    <string name="settings_category_data_item">Данные о товаре по умолчанию</string>
+    <string name="settings_key_sort_is_default_data">sort_is_default_data</string>
+    <string name="settings_title_sort_is_default_data">Использовать данные по умолчанию</string>
+    <string name="settings_summary_sort_is_default_data">Автоматическое заполнение полей о товаре: количество, цена</string>
     <string name="settings_key_sort_data_item">sort_data_item</string>
-    <string name="settings_title_sort_data_item">Сохранение данных о товаре</string>
-    <string name="settings_summary_sort_data_item">Настройка обновления данных по умолчанию. Используется для автоматического заполнения полей</string>
+    <string name="settings_title_sort_data_item">Способ обновление данных</string>
+    <string name="settings_summary_sort_data_item">Настройка обновления данных по умолчанию</string>
     <string name="settings_dialog_title_sort_data_item">Выберите способ обновления данных:</string>
 
     <string name="sort_order_alphabet">алфавиту</string>

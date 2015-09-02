@@ -128,7 +128,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
     private void getSettings() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        mIsBoughtFirst = prefs.getBoolean(getString(R.string.settings_key_sort_isBought), true);
+        mIsBoughtFirst = prefs.getBoolean(getString(R.string.settings_key_sort_is_bought), true);
         String sortType = null;
         String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
         if (regular.contains(getResources().getString(R.string.sort_order_alphabet))) {
@@ -150,13 +150,17 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         }
         listDS.setSortSettings(mIsBoughtFirst, sortType);
 
-        String save = prefs.getString(getString(R.string.settings_key_sort_data_item), "");
-        if (save.contains(getResources().getString(R.string.data_item_button))) {
-            mDataSave = SettingsDataItem.DATA_SAVE_BUTTON;
-        } else if (save.contains(getResources().getString(R.string.data_item_always))) {
-            mDataSave = SettingsDataItem.DATA_SAVE_ALWAYS;
-        } else if (save.contains(getResources().getString(R.string.data_item_never))) {
-            mDataSave = SettingsDataItem.DATA_SAVE_NEVER;
+        if (!prefs.getBoolean(getString(R.string.settings_key_sort_is_default_data), true)) {
+            mDataSave = SettingsDataItem.DATA_NOT_DEFAULT;
+        } else {
+            String save = prefs.getString(getString(R.string.settings_key_sort_data_item), "");
+            if (save.contains(getResources().getString(R.string.data_item_button))) {
+                mDataSave = SettingsDataItem.DATA_SAVE_BUTTON;
+            } else if (save.contains(getResources().getString(R.string.data_item_always))) {
+                mDataSave = SettingsDataItem.DATA_SAVE_ALWAYS;
+            } else if (save.contains(getResources().getString(R.string.data_item_never))) {
+                mDataSave = SettingsDataItem.DATA_SAVE_NEVER;
+            }
         }
     }
 
