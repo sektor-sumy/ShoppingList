@@ -110,6 +110,12 @@ public class EditItemDialogFragment extends DialogFragment {
                 if (s.length() == 0) {
                     mName.setError(getResources().getText(R.string.error_name));
                 } else {
+                    if (mIdSelectedItem != -1) {
+                        if(getArguments().getDouble(PRICE) != 0) {
+                            mPrice.setText(String.format("%.2f", getArguments().getDouble(PRICE)));
+                        }
+                        mIdSelectedItem = -1;
+                    }
                     if (mName.getError() != null) {
                         mName.setError(null);
                     }
