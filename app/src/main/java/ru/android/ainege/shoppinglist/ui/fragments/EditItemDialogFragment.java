@@ -91,6 +91,14 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                         dialog.cancel();
                     }
                 });
+        if (getArguments().getString(DATA_SAVE).equals(DATA_SAVE_BUTTON)) {
+            builder.setNeutralButton(R.string.update, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+        }
         setData(v);
         return builder.create();
     }
@@ -254,7 +262,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
         positiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Boolean wantToCloseDialog = saveData();
+                Boolean wantToCloseDialog = saveData(false);
                 if(wantToCloseDialog) {
                     dialog.dismiss();
                 } else {
@@ -262,9 +270,18 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                 }
             }
         });
+        Button neutralButton = dialog.getButton(Dialog.BUTTON_NEUTRAL);
+        neutralButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (saveData(true)) {
+                    Toast.makeText(getActivity(), R.string.data_is_save, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
-    private boolean saveData() {
+    private boolean saveData(boolean isUpdateData) {
         boolean isSave = false;
         if(mName.getError() == null && mAmount.getError() == null &&  mPrice.getError() == null) {
             String name = mName.getText().toString();
@@ -286,6 +303,24 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
             if (mIdSelectedItem != -1) {
                 idItemNew = mIdSelectedItem;
             }
+            if(isUpdateData) { //сохранение если выбрана настройка "кнопка" и нажата кнопка
+                itemDS.update(name, amount, idUnit, price, idItemNew);
+            } else {
+                if (mIsAlwaysSave) { //сохранение если выбрана настройка "сохранять всегда"
+                    itemDS.update(name, amount, idUnit, price, idItemNew);
+                } else { //сохранение если выбрана настройка "не сохранять"
+                    itemDS.updateName(name, idItemNew);
+                }
+                ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
+                itemInListDS.update(isBought, amount, idUnit, price, idItemNew, idItem, getArguments().getLong(ID_LIST));
+                sendResult(Activity.RESULT_OK);
+            }
+            /*
+            long idItem = getArguments().getLong(ID_ITEM);
+            long idItemNew = idItem;
+            if (mIdSelectedItem != -1) {
+                idItemNew = mIdSelectedItem;
+            }
             if (mIsAlwaysSave) { //сохранение если выбрана настройка "сохранять всегда"
                 itemDS.update(name, amount, idUnit, price, idItemNew);
             } else { //сохранение если выбрана настройка "не сохранять"
@@ -293,7 +328,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
             }
             ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
             itemInListDS.update(isBought, amount, idUnit, price, idItemNew, idItem, getArguments().getLong(ID_LIST));
-            sendResult(Activity.RESULT_OK);
+            sendResult(Activity.RESULT_OK);*/
             isSave = true;
         }
         return isSave;
