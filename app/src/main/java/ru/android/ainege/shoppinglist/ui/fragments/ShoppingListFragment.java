@@ -39,6 +39,7 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 public class ShoppingListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String ID_LIST = "idList";
     public static final String IS_BOUGHT_FIRST = "isBoughtFirst";
+    public static final String DATA_SAVE = "dataSave";
 
     private static final String ADD_DIALOG_DATE = "addItemDialog";
     private static final String EDIT_DIALOG_DATE = "editItemDialog";
@@ -60,10 +61,11 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
 
     private long mIdList;
 
-    public static ShoppingListFragment newInstance(long id, boolean isBoughtFirst) {
+    public static ShoppingListFragment newInstance(long id, boolean isBoughtFirst, String dataSave) {
         Bundle args = new Bundle();
         args.putLong(ID_LIST, id);
         args.putBoolean(IS_BOUGHT_FIRST, isBoughtFirst);
+        args.putString(DATA_SAVE, dataSave);
 
         ShoppingListFragment fragment = new ShoppingListFragment();
         fragment.setArguments(args);
@@ -88,7 +90,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    AddItemDialogFragment addItemDialog = AddItemDialogFragment.newInstance(mIdList);
+                    AddItemDialogFragment addItemDialog = AddItemDialogFragment.newInstance(mIdList, getArguments().getString(DATA_SAVE));
                     addItemDialog.setTargetFragment(ShoppingListFragment.this, ADD_DIALOG_CODE);
                     addItemDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
                 }
@@ -118,7 +120,7 @@ public class ShoppingListFragment extends ListFragment implements LoaderManager.
         boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
         long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
 
-        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList);
+        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList, getArguments().getString(DATA_SAVE));
         editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
         editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
 

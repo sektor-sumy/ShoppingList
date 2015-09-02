@@ -27,6 +27,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
+import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.fragments.ListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 
@@ -52,6 +53,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
     private long mId = -1;
 
     private boolean mIsBoughtFirst;
+    private String mDataSave;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -127,7 +129,6 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         mIsBoughtFirst = prefs.getBoolean(getString(R.string.settings_key_sort_isBought), true);
-
         String sortType = null;
         String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
         if (regular.contains(getResources().getString(R.string.sort_order_alphabet))) {
@@ -141,7 +142,6 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         } else {
             sortType = ListsDataSource.ALPHABET;
         }
-
         ListsDataSource listDS;
         try{
             listDS = ListsDataSource.getInstance();
@@ -149,6 +149,15 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
             listDS = ListsDataSource.getInstance(this);
         }
         listDS.setSortSettings(mIsBoughtFirst, sortType);
+
+        String save = prefs.getString(getString(R.string.settings_key_sort_data_item), "");
+        if (save.contains(getResources().getString(R.string.data_item_button))) {
+            mDataSave = SettingsDataItem.DATA_SAVE_BUTTON;
+        } else if (save.contains(getResources().getString(R.string.data_item_always))) {
+            mDataSave = SettingsDataItem.DATA_SAVE_ALWAYS;
+        } else if (save.contains(getResources().getString(R.string.data_item_never))) {
+            mDataSave = SettingsDataItem.DATA_SAVE_NEVER;
+        }
     }
 
     @Override
@@ -300,7 +309,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
 
     private void selectItem(long id) {
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_container, ShoppingListFragment.newInstance(id, mIsBoughtFirst)).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragment_container, ShoppingListFragment.newInstance(id, mIsBoughtFirst, mDataSave)).commit();
 
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mDrawerList);

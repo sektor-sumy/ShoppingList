@@ -29,9 +29,10 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
+import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
-public class EditItemDialogFragment extends DialogFragment {
+public class EditItemDialogFragment extends DialogFragment implements SettingsDataItem {
     public static final String ITEM_NAME = "itemName";
     public static final String AMOUNT = "amount";
     public static final String PRICE = "price";
@@ -39,6 +40,7 @@ public class EditItemDialogFragment extends DialogFragment {
     public static final String UNIT = "nameUnit";
     public static final String ID_LIST = "idList";
     public static final String ID_ITEM = "idItem";
+    public static final String DATA_SAVE = "dataSave";
 
     private AutoCompleteTextView mName;
     private EditText mAmount;
@@ -49,7 +51,9 @@ public class EditItemDialogFragment extends DialogFragment {
     private long mIdSelectedItem = -1;
     private SimpleCursorAdapter completeTextAdapter;
 
-    public static EditItemDialogFragment newInstance(String name, double amount, double price, boolean isBought, String nameUnit, long idItem, long idList) {
+    private boolean mIsAlwaysSave = false;
+
+    public static EditItemDialogFragment newInstance(String name, double amount, double price, boolean isBought, String nameUnit, long idItem, long idList, String dataSave) {
         Bundle args = new Bundle();
         args.putString(ITEM_NAME, name);
         args.putDouble(AMOUNT, amount);
@@ -58,6 +62,7 @@ public class EditItemDialogFragment extends DialogFragment {
         args.putString(UNIT, nameUnit);
         args.putLong(ID_ITEM, idItem);
         args.putLong(ID_LIST, idList);
+        args.putString(DATA_SAVE, dataSave);
 
         EditItemDialogFragment fragment = new EditItemDialogFragment();
         fragment.setArguments(args);
@@ -67,6 +72,9 @@ public class EditItemDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (getArguments().getString(DATA_SAVE).equals(DATA_SAVE_ALWAYS)) {
+            mIsAlwaysSave = true;
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_item, null);
@@ -278,7 +286,11 @@ public class EditItemDialogFragment extends DialogFragment {
             if (mIdSelectedItem != -1) {
                 idItemNew = mIdSelectedItem;
             }
-            itemDS.updateName(name, idItemNew);
+            if (mIsAlwaysSave) { //сохранение если выбрана настройка "сохранять всегда"
+                itemDS.update(name, amount, idUnit, price, idItemNew);
+            } else { //сохранение если выбрана настройка "не сохранять"
+                itemDS.updateName(name, idItemNew);
+            }
             ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
             itemInListDS.update(isBought, amount, idUnit, price, idItemNew, idItem, getArguments().getLong(ID_LIST));
             sendResult(Activity.RESULT_OK);

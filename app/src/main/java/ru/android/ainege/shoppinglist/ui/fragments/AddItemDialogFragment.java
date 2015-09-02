@@ -35,11 +35,13 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
+import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
-public class AddItemDialogFragment extends DialogFragment {
+public class AddItemDialogFragment extends DialogFragment implements SettingsDataItem {
     public static final String ID_LIST = "idList";
     public static final String ID_ITEM = "idItem";
+    public static final String DATA_SAVE = "dataSave";
 
     private AutoCompleteTextView mName;
     private EditText mAmount;
@@ -50,9 +52,12 @@ public class AddItemDialogFragment extends DialogFragment {
     private long mIdSelectedItem = -1;
     private SimpleCursorAdapter completeTextAdapter;
 
-    public static AddItemDialogFragment newInstance(long id) {
+    private boolean mIsAlwaysSave = false;
+
+    public static AddItemDialogFragment newInstance(long id, String dataSave) {
         Bundle args = new Bundle();
         args.putLong(ID_LIST, id);
+        args.putString(DATA_SAVE, dataSave);
 
         AddItemDialogFragment fragment = new AddItemDialogFragment();
         fragment.setArguments(args);
@@ -62,6 +67,9 @@ public class AddItemDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (getArguments().getString(DATA_SAVE).equals(DATA_SAVE_ALWAYS)) {
+            mIsAlwaysSave = true;
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_item, null);
@@ -199,11 +207,11 @@ public class AddItemDialogFragment extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s != null) {
+                if (s != null) {
                     if (!Validation.isValid(mPrice.getText().toString().trim(), true)) {
                         mPrice.setError(getResources().getText(R.string.error_value));
                     } else {
-                        if(mPrice.getError() != null) {
+                        if (mPrice.getError() != null) {
                             mPrice.setError(null);
                         }
                     }
@@ -266,10 +274,19 @@ public class AddItemDialogFragment extends DialogFragment {
 
             ItemDataSource itemDS = new ItemDataSource(getActivity());
             long idItem;
-            if (mIdSelectedItem != -1) {
-                idItem = mIdSelectedItem;
-            } else {
-                idItem = (int) itemDS.add(name);
+            if (mIsAlwaysSave) { //сохранение если выбрана настройка "сохранять всегда"
+                if (mIdSelectedItem != -1) {
+                    idItem = mIdSelectedItem;
+                    itemDS.update(name, amount, idUnit, price, idItem);
+                } else {
+                    idItem = (int) itemDS.add(name, amount, idUnit, price);
+                }
+            } else { //сохранение если выбрана настройка "не сохранять"
+                if (mIdSelectedItem != -1) {
+                    idItem = mIdSelectedItem;
+                } else {
+                    idItem = (int) itemDS.add(name);
+                }
             }
             long idList = getArguments().getLong(ID_LIST);
 
