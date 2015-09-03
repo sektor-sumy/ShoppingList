@@ -93,7 +93,7 @@ public class ListDialogFragment extends DialogFragment {
 
     private boolean saveData() {
         boolean isSave = false;
-        String name = mName.getText().toString();
+        String name = mName.getText().toString().trim();
         if(name.equals("")) {
             mName.setError(getResources().getText(R.string.error_name));
         } else {

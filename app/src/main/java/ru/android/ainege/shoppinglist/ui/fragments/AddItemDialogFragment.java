@@ -304,7 +304,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
 
     private boolean saveData(boolean isUpdateData) {
         boolean isSave = false;
-        String name = mName.getText().toString();
+        String name = mName.getText().toString().trim();
         if(name.equals("")) {
             mName.setError(getResources().getText(R.string.error_value));
         }

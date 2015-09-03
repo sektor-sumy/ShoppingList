@@ -286,7 +286,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
     private boolean saveData(boolean isUpdateData) {
         boolean isSave = false;
         if(mName.getError() == null && mAmount.getError() == null &&  mPrice.getError() == null) {
-            String name = mName.getText().toString();
+            String name = mName.getText().toString().trim();
             double amount = 0.0;
             if (mAmount.getText().length() > 0) {
                 amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
