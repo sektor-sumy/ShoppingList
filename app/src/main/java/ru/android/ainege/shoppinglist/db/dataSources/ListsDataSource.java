@@ -121,13 +121,13 @@ public class ListsDataSource {
                 order += ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_NAME;
                 break;
             case UP_PRICE:
-                order += ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_PRICE;
+                order += ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_PRICE;
                 break;
             case DOWN_PRICE:
-                order += ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_PRICE + " DESC";
+                order += ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_PRICE + " DESC";
                 break;
             case ORDER_ADDING:
-                order += ItemsTable.TABLE_NAME + "." + BaseColumns._ID;
+                order += ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_DATE;
                 break;
         }
         return order;

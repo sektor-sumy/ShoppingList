@@ -361,7 +361,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                 if (mIdExistItem != -1) {
                     itemInListDS.update(isBought, amount, idUnit, price, mIdExistItem, mIdExistItem, idList);
                 } else {
-                    id = itemInListDS.add(idItem, idList, isBought, amount, idUnit, price);
+                    id = itemInListDS.add(idItem, idList, isBought, amount, idUnit, price, System.currentTimeMillis() / 1000L);
                 }
                 sendResult(Activity.RESULT_OK, id);
             }

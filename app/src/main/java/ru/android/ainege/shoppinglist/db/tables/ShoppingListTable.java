@@ -12,6 +12,7 @@ public class ShoppingListTable {
     public static final String COLUMN_AMOUNT = "amount";
     public static final String COLUMN_ID_UNIT = "id_unit";
     public static final String COLUMN_PRICE = "price";
+    public static final String COLUMN_DATE = "date";
 
     private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
             + "("
@@ -21,6 +22,7 @@ public class ShoppingListTable {
             + COLUMN_AMOUNT + " REAL, "
             + COLUMN_ID_UNIT + " INTEGER, "
             + COLUMN_PRICE + " REAL, "
+            + COLUMN_DATE + " INTEGER, "
             + "FOREIGN KEY (" + COLUMN_ID_UNIT + ") REFERENCES " + UnitsTable.TABLE_NAME + " (" + UnitsTable.COLUMN_ID + ")"
             + "FOREIGN KEY (" + COLUMN_ID_ITEM + ") REFERENCES " + ItemsTable.TABLE_NAME + " (" + ItemsTable.COLUMN_ID + "), "
             + "FOREIGN KEY (" + COLUMN_ID_LIST + ") REFERENCES " + ListsTable.TABLE_NAME + " (" + ListsTable.COLUMN_ID + ") ON DELETE CASCADE "
@@ -53,6 +55,7 @@ public class ShoppingListTable {
             contentValue.put(COLUMN_AMOUNT, amount[i]);
             contentValue.put(COLUMN_ID_UNIT, amountUnit[i]);
             contentValue.put(COLUMN_PRICE, price[i]);
+            contentValue.put(COLUMN_DATE, i);
             database.insert(TABLE_NAME, null, contentValue);
         }
     }

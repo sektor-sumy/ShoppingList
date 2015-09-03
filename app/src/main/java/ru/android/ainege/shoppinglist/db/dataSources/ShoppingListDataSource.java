@@ -36,11 +36,11 @@ public class ShoppingListDataSource {
                          new String[] {String.valueOf(idItem), String.valueOf(idList)});
     }
 
-    public long add(long idItem, long idList, boolean isBought, double amount, long idUnit, double price) {
+    public long add(long idItem, long idList, boolean isBought, double amount, long idUnit, double price, long date) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        ContentValues values = createContentValues(isBought, amount, idUnit, price);
-        values.put(ShoppingListTable.COLUMN_ID_ITEM, idItem);
+        ContentValues values = createContentValues(isBought, amount, idUnit, price, idItem);
         values.put(ShoppingListTable.COLUMN_ID_LIST, idList);
+        values.put(ShoppingListTable.COLUMN_DATE, date);
         return db.insert(ShoppingListTable.TABLE_NAME, null, values);
     }
 
@@ -73,20 +73,12 @@ public class ShoppingListDataSource {
         return values;
     }
 
-    private ContentValues createContentValues(boolean isBought, double amount, long idUnit, double price) {
-        ContentValues values = createContentValues(isBought);
-        values.put(ShoppingListTable.COLUMN_AMOUNT, amount);
-        values.put(ShoppingListTable.COLUMN_ID_UNIT, idUnit);
-        values.put(ShoppingListTable.COLUMN_PRICE, price);
-        return values;
-    }
-
     private ContentValues createContentValues(boolean isBought, double amount, long idUnit, double price, long idItem) {
         ContentValues values = createContentValues(isBought);
-        values.put(ShoppingListTable.COLUMN_ID_ITEM, idItem);
         values.put(ShoppingListTable.COLUMN_AMOUNT, amount);
         values.put(ShoppingListTable.COLUMN_ID_UNIT, idUnit);
         values.put(ShoppingListTable.COLUMN_PRICE, price);
+        values.put(ShoppingListTable.COLUMN_ID_ITEM, idItem);
         return values;
     }
 }
