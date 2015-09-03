@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
+import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.Context;
@@ -29,10 +30,11 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.fragments.ListDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 
 
-public class ShoppingListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, ListDialogFragment.List {
+public class ShoppingListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, ListDialogFragment.List, QuestionDialogFragment.DialogListener {
     public static final String APP_PREFERENCES = "setting";
     public static final String APP_PREFERENCES_ID = "idList";
 
@@ -202,14 +204,8 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
                 addListDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
                 return true;
             case R.id.delete_list:
-                ListsDataSource listDS = ListsDataSource.getInstance();
-                if (mId != -1) {
-                    listDS.delete(mId);
-                    updateData();
-                    mId = -1;
-                } else {
-                    Toast.makeText(this, R.string.error_delete_list, Toast.LENGTH_SHORT).show();
-                }
+                QuestionDialogFragment dialogFrag = new QuestionDialogFragment();
+                dialogFrag.show(getFragmentManager(), "dialog");
                 return true;
             case R.id.update_list:
                 ListDialogFragment editListDialog = ListDialogFragment.newInstance(mId,
@@ -222,6 +218,18 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        ListsDataSource listDS = ListsDataSource.getInstance();
+        if (mId != -1) {
+            listDS.delete(mId);
+            updateData();
+            mId = -1;
+        } else {
+            Toast.makeText(this, R.string.error_delete_list, Toast.LENGTH_SHORT).show();
         }
     }
 
