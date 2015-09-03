@@ -23,6 +23,7 @@
     <string name="error_name">Введите название</string>
     <string name="error_existing_name">Такое название уже есть</string>
     <string name="error_delete_list">Ошибка удаления</string>
+    <string name="info_exit_item_in_list">Товар есть в списке и будет перезаписан</string>
     <string name="zero_price">0,0</string>
     <string name="one">1,0</string>
     <string name="you_lists">Ваши списки:</string>

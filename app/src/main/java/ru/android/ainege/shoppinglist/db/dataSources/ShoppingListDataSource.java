@@ -2,9 +2,11 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
+import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 
 public class ShoppingListDataSource {
@@ -14,6 +16,15 @@ public class ShoppingListDataSource {
     public ShoppingListDataSource(Context context) {
         mContext = context;
         mDbHelper = new ShoppingListSQLiteHelper(mContext);
+    }
+
+    public Cursor existItemInList(String name, long idList) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Select * from " + ShoppingListTable.TABLE_NAME + " INNER JOIN " + ItemsTable.TABLE_NAME +
+                " ON " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_ITEM + " = " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID +
+                " where " + ItemsTable.COLUMN_NAME + " like '" + name +
+                "' AND " + ShoppingListTable.COLUMN_ID_LIST + " = " + idList, null);
+        return cursor.moveToFirst() ? cursor : null;
     }
 
     public int setIsBought(boolean isBought, long idItem, long idList) {

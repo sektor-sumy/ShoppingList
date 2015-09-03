@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
@@ -48,12 +49,14 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
     private EditText mPrice;
     private CheckBox mIsBought;
     private Spinner mUnits;
+    private TextView mInfo;
 
     private String mAddedAmount = "";
     private String mAddedPrice = "";
     private int mAddedUnit = 0;
 
     private long mIdSelectedItem = -1;
+    private long mIdExistItem = -1;
     private SimpleCursorAdapter completeTextAdapter;
 
     private boolean mIsAlwaysSave = false;
@@ -131,6 +134,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
         mUnits.setSelection(0);
 
         mName = (AutoCompleteTextView) v.findViewById(R.id.new_item_name);
+        mInfo = (TextView) v.findViewById(R.id.info);
         mName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -152,6 +156,15 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                         mUnits.setSelection(mAddedUnit);
                         mPrice.setText(mAddedPrice);
                         mIdSelectedItem = -1;
+                    }
+                    Cursor cursor = new ShoppingListDataSource(getActivity()).existItemInList(s.toString(), getArguments().getLong(ID_LIST));
+                    if (cursor != null) {
+                        mInfo.setText(R.string.info_exit_item_in_list);
+                        mInfo.setVisibility(View.VISIBLE);
+                        mIdExistItem = cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID));
+                    } else {
+                        mInfo.setVisibility(View.GONE);
+                        mIdExistItem = -1;
                     }
                     if (mName.getError() != null) {
                         mName.setError(null);
@@ -344,7 +357,12 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                 long idList = getArguments().getLong(ID_LIST);
 
                 ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-                long id = itemInListDS.add(idItem, idList, isBought, amount, idUnit, price);
+                long id = mIdExistItem;
+                if (mIdExistItem != -1) {
+                    itemInListDS.update(isBought, amount, idUnit, price, mIdExistItem, mIdExistItem, idList);
+                } else {
+                    id = itemInListDS.add(idItem, idList, isBought, amount, idUnit, price);
+                }
                 sendResult(Activity.RESULT_OK, id);
             }
             isSave = true;
