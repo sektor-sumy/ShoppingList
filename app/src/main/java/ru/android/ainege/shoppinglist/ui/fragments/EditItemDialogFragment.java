@@ -128,7 +128,8 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                         mIdSelectedItem = -1;
                     }
                     Cursor cursor = new ShoppingListDataSource(getActivity()).existItemInList(s.toString(), getArguments().getLong(ID_LIST));
-                    if (cursor != null) {
+                    if (cursor != null &&
+                            !cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME)).equals(getArguments().getString(ITEM_NAME))) {
                         mInfo.setText(R.string.info_exit_item_in_list_dont_save);
                         mInfo.setVisibility(View.VISIBLE);
                     } else {
