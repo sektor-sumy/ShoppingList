@@ -201,7 +201,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                         }
                     }
                 } else {
-                    mFinishPrice.setText("");
+                    mFinishPrice.setVisibility(View.GONE);
                 }
             }
         });
@@ -247,7 +247,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                         }
                     }
                 } else {
-                    mFinishPrice.setText("");
+                    mFinishPrice.setVisibility(View.GONE);
                 }
             }
         });
@@ -262,6 +262,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
         double amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
         double price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
         mFinishPrice.setText(localValue(amount * price));
+        mFinishPrice.setVisibility(View.VISIBLE);
     }
 
     private int getPosition(Spinner spinner, String name) {

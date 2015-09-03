@@ -232,7 +232,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                         }
                     }
                 } else {
-                    mFinishPrice.setText("");
+                    mFinishPrice.setVisibility(View.GONE);
                 }
             }
         });
@@ -266,7 +266,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                         }
                     }
                 } else {
-                    mFinishPrice.setText("");
+                    mFinishPrice.setVisibility(View.GONE);
                 }
             }
         });
@@ -283,6 +283,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
         double amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
         double price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
         mFinishPrice.setText(localValue(amount * price));
+        mFinishPrice.setVisibility(View.VISIBLE);
     }
 
     @Override
