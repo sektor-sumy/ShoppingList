@@ -86,24 +86,14 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
         View v = inflater.inflate(R.layout.dialog_item, null);
         builder.setView(v)
                 .setCancelable(false)
-                .setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
+                .setPositiveButton(R.string.add, null)
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
+                        dialog.dismiss();
                     }
                 });
         if (DATA_SAVE_BUTTON.equals(getArguments().getString(DATA_SAVE))) {
-            builder.setNeutralButton(R.string.update, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            });
+            builder.setNeutralButton(R.string.update, null);
         }
         setData(v);
         return builder.create();
