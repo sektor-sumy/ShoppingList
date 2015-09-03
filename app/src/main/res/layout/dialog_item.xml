@@ -15,13 +15,16 @@
         android:hint="@string/item_name" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Small Text"
         android:id="@+id/info"
         android:layout_gravity="center_horizontal"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:layout_marginLeft="@dimen/dialog_margin"
+        android:layout_marginRight="@dimen/dialog_margin"
+        android:gravity="center_horizontal"/>
 
     <LinearLayout
         android:orientation="horizontal"

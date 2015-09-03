@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
@@ -47,6 +48,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
     private EditText mPrice;
     private CheckBox mIsBought;
     private Spinner mUnits;
+    private TextView mInfo;
 
     private long mIdSelectedItem = -1;
     private SimpleCursorAdapter completeTextAdapter;
@@ -110,6 +112,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
         mName = (AutoCompleteTextView) v.findViewById(R.id.new_item_name);
         mName.setText(getArguments().getString(ITEM_NAME));
         mName.setSelection(mName.getText().length());
+        mInfo = (TextView) v.findViewById(R.id.info);
         mName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -131,6 +134,13 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                             mPrice.setText(String.format("%.2f", getArguments().getDouble(PRICE)));
                         }
                         mIdSelectedItem = -1;
+                    }
+                    Cursor cursor = new ShoppingListDataSource(getActivity()).existItemInList(s.toString(), getArguments().getLong(ID_LIST));
+                    if (cursor != null) {
+                        mInfo.setText(R.string.info_exit_item_in_list_dont_save);
+                        mInfo.setVisibility(View.VISIBLE);
+                    } else {
+                        mInfo.setVisibility(View.GONE);
                     }
                     if (mName.getError() != null) {
                         mName.setError(null);
@@ -314,7 +324,9 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                     itemDS.updateName(name, idItemNew);
                 }
                 ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-                itemInListDS.update(isBought, amount, idUnit, price, idItemNew, idItem, getArguments().getLong(ID_LIST));
+                if (mInfo.getVisibility() == View.GONE) {
+                    itemInListDS.update(isBought, amount, idUnit, price, idItemNew, idItem, getArguments().getLong(ID_LIST));
+                }
                 sendResult(Activity.RESULT_OK);
             }
             isSave = true;
