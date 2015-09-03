@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
@@ -49,6 +50,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
     private CheckBox mIsBought;
     private Spinner mUnits;
     private TextView mInfo;
+    private TextView mFinishPrice;
 
     private long mIdSelectedItem = -1;
     private SimpleCursorAdapter completeTextAdapter;
@@ -120,7 +122,7 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
                     mName.setError(getResources().getText(R.string.error_name));
                 } else {
                     if (mIdSelectedItem != -1) {
-                        if(getArguments().getDouble(PRICE) != 0) {
+                        if (getArguments().getDouble(PRICE) != 0) {
                             mPrice.setText(String.format("%.2f", getArguments().getDouble(PRICE)));
                         }
                         mIdSelectedItem = -1;
@@ -188,12 +190,17 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s != null) {
+                if (s != null && s.length() > 0) {
                     if(!Validation.isValid(mAmount.getText().toString().trim(), false)) {
                         mAmount.setError(getResources().getText(R.string.error_value));
                     } else {
                         if(mAmount.getError() != null) { mAmount.setError(null); }
+                        if (mPrice.getText().length() > 0) {
+                            setFinishPrice();
+                        }
                     }
+                } else {
+                    mFinishPrice.setText("");
                 }
             }
         });
@@ -229,15 +236,31 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s != null) {
+                if (s != null && s.length() > 0) {
                     if(!Validation.isValid(mPrice.getText().toString().trim(), true)) {
                         mPrice.setError(getResources().getText(R.string.error_value));
                     } else {
-                        if(mPrice.getError() != null) { mPrice.setError(null); }
+                        if (mPrice.getError() != null) { mPrice.setError(null); }
+                        if (mAmount.getText().length() > 0) {
+                            setFinishPrice();
+                        }
                     }
+                } else {
+                    mFinishPrice.setText("");
                 }
             }
         });
+
+        mFinishPrice = (TextView) v.findViewById(R.id.finishPrice);
+        if (mAmount.getText().length() > 0 && mPrice.getText().length() > 0) {
+            setFinishPrice();
+        }
+    }
+
+    private void setFinishPrice() {
+        double amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
+        double price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
+        mFinishPrice.setText(localValue(amount * price));
     }
 
     private int getPosition(Spinner spinner, String name) {
@@ -329,5 +352,12 @@ public class EditItemDialogFragment extends DialogFragment implements SettingsDa
             return;
 
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, null);
+    }
+
+    private String localValue(double value) {
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setMinimumFractionDigits(2);
+        nf.setMaximumFractionDigits(2);
+        return nf.format(value);
     }
 }
