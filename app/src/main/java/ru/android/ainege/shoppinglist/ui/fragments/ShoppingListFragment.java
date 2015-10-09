@@ -12,23 +12,20 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
@@ -105,37 +102,37 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         mList = (RecyclerView) v.findViewById(R.id.items_list);
         mList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        registerForContextMenu(mList);
+        mList.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), mList, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        mItemsInList.moveToPosition(position);
+
+                        String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
+                        double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
+                        String nameUnit = mItemsInList.getString(mItemsInList.getColumnIndex(UnitsTable.COLUMN_NAME));
+                        double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
+                        boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
+                        long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
+
+                        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList, getArguments().getString(DATA_SAVE));
+                        editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
+                        editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
+
+                        mSaveItemId = idItem;
+                    }
+
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+                        Toast.makeText(getActivity(), position + " long click", Toast.LENGTH_SHORT).show();
+                    }
+                })
+        );
         return v;
     }
 
-    //old version TODO: on item click
-    /*public void onListItemClick(ListView l, View v, int position, long id) {
-        mItemsInList.moveToPosition(position);
-
-        String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
-        double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
-        String nameUnit = mItemsInList.getString(mItemsInList.getColumnIndex(UnitsTable.COLUMN_NAME));
-        double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
-        boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
-        long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
-
-        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList, getArguments().getString(DATA_SAVE));
-        editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
-        editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
-
-        mSaveItemId = idItem;
-    }*/
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.context_item_list, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    //old version TODO delete item
+    /*public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.delete:
@@ -148,7 +145,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             default:
                 return super.onContextItemSelected(item);
         }
-    }
+    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
