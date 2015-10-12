@@ -126,6 +126,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                     public void onItemLongClick(View view, int position) {
                         Toast.makeText(getActivity(), position + " long click", Toast.LENGTH_SHORT).show();
                     }
+
+                    @Override
+                    public void onSwipeRight(View view, int position) {
+                        Toast.makeText(getActivity(), position + " swipe right", Toast.LENGTH_SHORT).show();
+                    }
                 })
         );
         return v;
