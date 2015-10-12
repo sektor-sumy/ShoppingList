@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
@@ -53,7 +54,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     private long mSaveItemId = -1;
     private Parcelable mListState;
     private double mSaveSpentMoney;
-    private boolean mIsBoughtFirst;
+    private boolean mIsBoughtEndInList;
 
     private long mIdList;
 
@@ -73,7 +74,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mIdList = getArguments().getLong(ID_LIST);
-        mIsBoughtFirst = getArguments().getBoolean(IS_BOUGHT_FIRST);
+        mIsBoughtEndInList = getArguments().getBoolean(IS_BOUGHT_FIRST);
         getLoaderManager().initLoader(DATA_LOADER, null, this);
     }
 
@@ -130,7 +131,39 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
                     @Override
                     public void onSwipeRight(View view, int position) {
-                        Toast.makeText(getActivity(), position + " swipe right", Toast.LENGTH_SHORT).show();
+                        MyAdapter.ViewHolder holder = (MyAdapter.ViewHolder) mList.findViewHolderForAdapterPosition(position);
+                        boolean isBought;
+                        if (holder.mIsBought.getVisibility() == View.VISIBLE) {
+                            holder.mIsBought.setVisibility(View.GONE);
+                            isBought = false;
+                        } else {
+                            holder.mIsBought.setVisibility(View.VISIBLE);
+                            isBought = true;
+                        }
+
+                        mItemsInList.moveToPosition(position);
+                        ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
+                        itemInListDS.setIsBought(isBought, mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
+
+                        //if set bought items in the end of list - refresh list
+                        //if it isn`t - try to update only spent sum
+                        if (mIsBoughtEndInList) {
+                            //mListState = mList.onSaveInstanceState();
+                            updateData();
+                        } else {
+                            double sum = sumOneItem(mItemsInList);
+                            if (mSaveSpentMoney != 0) {
+                                if (isBought) {
+                                    mSaveSpentMoney += sum;
+                                } else {
+                                    mSaveSpentMoney -= sum;
+                                }
+                                updateSpentSum(mSaveSpentMoney);
+                            } else {
+                                //mListState = mList.onSaveInstanceState();
+                                 updateData();
+                            }
+                        }
                     }
                 })
         );
@@ -252,7 +285,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         mItemsInList.moveToFirst();
         do {
             if(mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0) {
-                sum += sum(mItemsInList);
+                sum += sumOneItem(mItemsInList);
             }
         } while(mItemsInList.moveToNext());
         mSaveSpentMoney = sum;
@@ -263,12 +296,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         double sum = 0;
         mItemsInList.moveToFirst();
         do {
-            sum += sum(mItemsInList);
+            sum += sumOneItem(mItemsInList);
         } while(mItemsInList.moveToNext());
         return sum;
     }
 
-    private double sum(Cursor c) {
+    private double sumOneItem(Cursor c) {
         double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
         double amount = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
         double sum = price * (amount == 0 ? 1 : amount);
@@ -339,36 +372,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             return mDataset.getCount();
         }
     }
-
-    //part of last version
-    //old version TODO: swipe item and cross off it
-            /*CheckBox isBuy = (CheckBox) view.findViewById(R.id.is_item_bought);
-            isBuy.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    cursor.moveToPosition(position);
-                    CheckBox cb = (CheckBox) v;
-                    ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-                    itemInListDS.setIsBought(cb.isChecked(), cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
-                    double sum = sum(cursor);
-                    if (mIsBoughtFirst) {
-                        mListState = mList.onSaveInstanceState();
-                        updateData();
-                    } else {
-                        if (mSaveSpentMoney != 0) {
-                            if (cb.isChecked()) {
-                                mSaveSpentMoney += sum;
-                            } else {
-                                mSaveSpentMoney -= sum;
-                            }
-                            updateSpentSum(mSaveSpentMoney);
-                        } else {
-                            mListState = mList.onSaveInstanceState();
-                            updateData();
-                        }
-                    }
-                }
-            });*/
 
     private static class MyCursorLoader extends CursorLoader {
         private long mIdList;
