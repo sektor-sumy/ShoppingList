@@ -290,6 +290,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             public TextView mTextView;
             public TextView mAmount;
             public TextView mPrice;
+            public View mIsBought;
 
             public ViewHolder(View v) {
                 super(v);
@@ -297,6 +298,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                 mTextView = (TextView) v.findViewById(R.id.item_name_list);
                 mAmount = (TextView) v.findViewById(R.id.item_amount_list);
                 mPrice = (TextView) v.findViewById(R.id.item_price_list);
+                mIsBought = v.findViewById(R.id.is_bought_list);
             }
         }
 
@@ -314,15 +316,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             mDataset.moveToPosition(position);
+
             holder.mImage.setImageResource(R.drawable.food);
             holder.mTextView.setText(mDataset.getString(mDataset.getColumnIndex(ItemsTable.COLUMN_NAME)));
             if (mDataset.getDouble(mDataset.getColumnIndex(ItemsTable.COLUMN_AMOUNT)) == 0) {
                 holder.mAmount.setText("-");
             } else {
-                holder.mAmount.setText(NumberFormat.getInstance().format(mDataset.getDouble(mDataset.getColumnIndex(ItemsTable.COLUMN_AMOUNT)))
-                        + " " + mDataset.getString(mDataset.getColumnIndex(UnitsTable.COLUMN_NAME)));
+                String amount = NumberFormat.getInstance().format(mDataset.getDouble(mDataset.getColumnIndex(ItemsTable.COLUMN_AMOUNT)))
+                        + " " + mDataset.getString(mDataset.getColumnIndex(UnitsTable.COLUMN_NAME));
+                holder.mAmount.setText(amount);
             }
             holder.mPrice.setText(localValue(mDataset.getDouble(mDataset.getColumnIndex(ItemsTable.COLUMN_PRICE))));
+            int visibility = View.GONE;
+            if (mDataset.getInt(mDataset.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) == 1){
+                visibility = View.VISIBLE;
+            }
+            holder.mIsBought.setVisibility(visibility);
         }
 
         @Override
