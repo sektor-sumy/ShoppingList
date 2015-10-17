@@ -89,8 +89,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                 case R.id.move:
                     return true;
                 case R.id.select_bought:
+                    mAdapter.selectItems(true);
                     return true;
                 case R.id.select_not_bought:
+                    mAdapter.selectItems(false);
                     return true;
                 default:
                     return false;
@@ -453,6 +455,21 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         public void clearSelections() {
             selectedItems.clear();
             notifyDataSetChanged();
+        }
+
+        public void selectItems(boolean isBought) {
+            int  i = 0;
+            if (isBought) i = 1;
+            mDataset.moveToFirst();
+            do {
+                if (mDataset.getInt(mDataset.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) == i) {
+                    int position = mDataset.getPosition();
+                    if (!selectedItems.contains(position)) {
+                        selectedItems.add(position);
+                        notifyItemChanged(position);
+                    }
+                }
+            } while (mDataset.moveToNext());
         }
     }
 
