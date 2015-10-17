@@ -13,7 +13,11 @@ import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -23,6 +27,8 @@ import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
@@ -57,6 +63,46 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     private boolean mIsBoughtEndInList;
 
     private long mIdList;
+
+    private List<Integer> selectedItems = new ArrayList<>();
+    private android.view.ActionMode mActionMode;
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.cab_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.delete:
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                case R.id.move:
+                    return true;
+                case R.id.select_bought:
+                    return true;
+                case R.id.select_not_bought:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mAdapter.clearSelections();
+            mActionMode = null;
+        }
+    };
 
     public static ShoppingListFragment newInstance(long id, boolean isBoughtFirst, String dataSave) {
         Bundle args = new Bundle();
@@ -108,29 +154,42 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                 new RecyclerItemClickListener(getActivity(), mList, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        mItemsInList.moveToPosition(position);
+                        if (mActionMode != null) {
+                            mAdapter.toggleSelection(position);
+                        }
+                        else {
+                            mItemsInList.moveToPosition(position);
 
-                        String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
-                        double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
-                        String nameUnit = mItemsInList.getString(mItemsInList.getColumnIndex(UnitsTable.COLUMN_NAME));
-                        double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
-                        boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
-                        long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
+                            String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
+                            double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
+                            String nameUnit = mItemsInList.getString(mItemsInList.getColumnIndex(UnitsTable.COLUMN_NAME));
+                            double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
+                            boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
+                            long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
 
-                        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList, getArguments().getString(DATA_SAVE));
-                        editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
-                        editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
+                            EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList, getArguments().getString(DATA_SAVE));
+                            editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
+                            editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
 
-                        mSaveItemId = idItem;
+                            mSaveItemId = idItem;
+                        }
                     }
 
                     @Override
                     public void onItemLongClick(View view, int position) {
-                        Toast.makeText(getActivity(), position + " long click", Toast.LENGTH_SHORT).show();
+                        if (mActionMode != null) {
+                            return;
+                        }
+                        mActionMode = getActivity().startActionMode(mActionModeCallback);
+                        mAdapter.toggleSelection(position);
                     }
 
                     @Override
                     public void onSwipeRight(View view, int position) {
+                        if (mActionMode != null) {
+                            return;
+                        }
+
                         MyAdapter.ViewHolder holder = (MyAdapter.ViewHolder) mList.findViewHolderForAdapterPosition(position);
                         boolean isBought;
                         if (holder.mIsBought.getVisibility() == View.VISIBLE) {
@@ -317,8 +376,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
     public static class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         private Cursor mDataset;
+        private List<Integer> selectedItems = new ArrayList<>();
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
+            public View mView;
             public ImageView mImage;
             public TextView mTextView;
             public TextView mAmount;
@@ -327,6 +388,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
             public ViewHolder(View v) {
                 super(v);
+                mView = v;
                 mImage = (ImageView) v.findViewById(R.id.item_image_list);
                 mTextView = (TextView) v.findViewById(R.id.item_name_list);
                 mAmount = (TextView) v.findViewById(R.id.item_amount_list);
@@ -348,6 +410,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
+            holder.mView.setSelected(selectedItems.contains(position));
+
             mDataset.moveToPosition(position);
 
             holder.mImage.setImageResource(R.drawable.food);
@@ -370,6 +434,25 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         @Override
         public int getItemCount() {
             return mDataset.getCount();
+        }
+
+        public void toggleSelection(int pos) {
+            if (selectedItems.contains(pos)) {
+                for (int i = 0; i < selectedItems.size(); i++) {
+                    if (selectedItems.get(i) == pos) {
+                        selectedItems.remove(i);
+                        break;
+                    }
+                }
+            } else {
+                selectedItems.add(pos);
+            }
+            notifyItemChanged(pos);
+        }
+
+        public void clearSelections() {
+            selectedItems.clear();
+            notifyDataSetChanged();
         }
     }
 

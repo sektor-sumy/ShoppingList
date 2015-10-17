@@ -17,8 +17,13 @@
     <string name="price">Цена</string>
     <string name="is_bought">В корзине?</string>
 
-    <string name="item_name">Название товара</string>
+    <!--CAB menu-->
     <string name="delete">Удалить</string>
+    <string name="move">Переместить</string>
+    <string name="select_bought">Выбрать купленые</string>
+    <string name="select_not_bought">Выбрать не купленые</string>
+
+    <string name="item_name">Название товара</string>
     <string name="empty_list">В списке нет ни одного товара</string>
     <string name="wrong_value">Проверьте ввод данных</string>
     <string name="error_value">Неверное значение</string>
