@@ -64,7 +64,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
     private long mIdList;
 
-    private List<Integer> selectedItems = new ArrayList<>();
     private android.view.ActionMode mActionMode;
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
@@ -152,29 +151,28 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         mList = (RecyclerView) v.findViewById(R.id.items_list);
         mList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mList.addOnItemTouchListener(
-                new RecyclerItemClickListener(getActivity(), mList, new RecyclerItemClickListener.OnItemClickListener() {
+        mList.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mList, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
                         if (mActionMode != null) {
                             mAdapter.toggleSelection(position);
+                            return;
                         }
-                        else {
-                            mItemsInList.moveToPosition(position);
 
-                            String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
-                            double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
-                            String nameUnit = mItemsInList.getString(mItemsInList.getColumnIndex(UnitsTable.COLUMN_NAME));
-                            double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
-                            boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
-                            long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
+                        mItemsInList.moveToPosition(position);
 
-                            EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList, getArguments().getString(DATA_SAVE));
-                            editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
-                            editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
+                        String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
+                        double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
+                        String nameUnit = mItemsInList.getString(mItemsInList.getColumnIndex(UnitsTable.COLUMN_NAME));
+                        double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
+                        boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
+                        long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
 
-                            mSaveItemId = idItem;
-                        }
+                        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList, getArguments().getString(DATA_SAVE));
+                        editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
+                        editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
+
+                        mSaveItemId = idItem;
                     }
 
                     @Override
@@ -182,6 +180,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                         if (mActionMode != null) {
                             return;
                         }
+
                         mActionMode = getActivity().startActionMode(mActionModeCallback);
                         mAdapter.toggleSelection(position);
                     }
@@ -222,7 +221,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                                 updateSpentSum(mSaveSpentMoney);
                             } else {
                                 //mListState = mList.onSaveInstanceState();
-                                 updateData();
+                                updateData();
                             }
                         }
                     }
@@ -266,7 +265,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) return;
 
-        switch(requestCode) {
+        switch (requestCode) {
             case ADD_DIALOG_CODE:
                 mSaveItemId = data.getLongExtra(AddItemDialogFragment.ID_ITEM, -1);
                 updateData();
@@ -295,7 +294,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         switch (loader.getId()) {
             case DATA_LOADER:
                 mItemsInList = data;
-                if(mItemsInList != null) {
+                if (mItemsInList != null) {
                     updateSpentSum(sumSpentMoney());
                     mTotalMoney.setText(localValue(sumTotalMoney()));
                     mAdapter = new MyAdapter(mItemsInList);
@@ -345,10 +344,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         double sum = 0;
         mItemsInList.moveToFirst();
         do {
-            if(mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0) {
+            if (mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0) {
                 sum += sumOneItem(mItemsInList);
             }
-        } while(mItemsInList.moveToNext());
+        } while (mItemsInList.moveToNext());
         mSaveSpentMoney = sum;
         return mSaveSpentMoney;
     }
@@ -358,7 +357,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         mItemsInList.moveToFirst();
         do {
             sum += sumOneItem(mItemsInList);
-        } while(mItemsInList.moveToNext());
+        } while (mItemsInList.moveToNext());
         return sum;
     }
 
@@ -427,7 +426,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             }
             holder.mPrice.setText(localValue(mDataset.getDouble(mDataset.getColumnIndex(ItemsTable.COLUMN_PRICE))));
             int visibility = View.GONE;
-            if (mDataset.getInt(mDataset.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) == 1){
+            if (mDataset.getInt(mDataset.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) == 1) {
                 visibility = View.VISIBLE;
             }
             holder.mIsBought.setVisibility(visibility);
@@ -438,18 +437,18 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             return mDataset.getCount();
         }
 
-        public void toggleSelection(int pos) {
-            if (selectedItems.contains(pos)) {
+        public void toggleSelection(int position) {
+            if (selectedItems.contains(position)) {
                 for (int i = 0; i < selectedItems.size(); i++) {
-                    if (selectedItems.get(i) == pos) {
+                    if (selectedItems.get(i) == position) {
                         selectedItems.remove(i);
                         break;
                     }
                 }
             } else {
-                selectedItems.add(pos);
+                selectedItems.add(position);
             }
-            notifyItemChanged(pos);
+            notifyItemChanged(position);
         }
 
         public void clearSelections() {
@@ -458,7 +457,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         }
 
         public void selectItems(boolean isBought) {
-            int  i = 0;
+            int i = 0;
             if (isBought) i = 1;
             mDataset.moveToFirst();
             do {
