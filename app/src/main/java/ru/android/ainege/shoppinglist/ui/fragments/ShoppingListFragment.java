@@ -151,6 +151,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         mList = (RecyclerView) v.findViewById(R.id.items_list);
         mList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mAdapter = new MyAdapter();
+        mList.setAdapter(mAdapter);
         mList.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mList, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
@@ -297,8 +299,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                 if (mItemsInList != null) {
                     updateSpentSum(sumSpentMoney());
                     mTotalMoney.setText(localValue(sumTotalMoney()));
-                    mAdapter = new MyAdapter(mItemsInList);
-                    mList.setAdapter(mAdapter);
+                    mAdapter.setCursor(mItemsInList);
                     //TODO: check it
                    /* if (mListState != null) {
                         //mList.onRestoreInstanceState(mListState); //doesn't use in rw
@@ -398,8 +399,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             }
         }
 
-        public MyAdapter(Cursor myDataset) {
-            mDataset = myDataset;
+        public MyAdapter() {
+            mDataset = null;
+        }
+
+        public void setCursor(Cursor newCursor) {
+            mDataset = newCursor;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -434,7 +440,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         @Override
         public int getItemCount() {
-            return mDataset.getCount();
+            return mDataset != null ? mDataset.getCount() : 0;
         }
 
         public void toggleSelection(int position) {
