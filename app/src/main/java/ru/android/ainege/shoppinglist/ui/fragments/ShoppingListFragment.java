@@ -28,6 +28,7 @@ import android.widget.Toast;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ru.android.ainege.shoppinglist.R;
@@ -84,7 +85,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.delete:
-                    mode.finish(); // Action picked, so close the CAB
+                    deleteSelectedItems();
                     return true;
                 case R.id.move:
                     return true;
@@ -313,6 +314,20 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         getLoaderManager().getLoader(DATA_LOADER).forceLoad();
     }
 
+    private void deleteSelectedItems() {
+        List<Integer> items = mAdapterRV.getSelectedItems();
+        Collections.sort(items);
+
+        ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance();
+        for (int i = items.size() - 1; i >= 0; i--) {
+            mItemsInList.moveToPosition(items.get(i));
+            ShoppingList item = mItemsInList.getItem();
+            itemInListDS.delete(item.getIdItem(), mIdList);
+            //mListState = mList.onSaveInstanceState(); //doesn't use in rw
+            mAdapterRV.removeItem(items.get(i));
+        }
+    }
+
     private double sumSpentMoney() {
         double sum = 0;
         mItemsInList.moveToFirst();
@@ -346,23 +361,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     private void updateSpentSum(double newSum) {
         mSpentMoney.setText(localValue(newSum));
     }
-
-
-    //old version TODO delete item
-    /*public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.delete:
-                mItemsInList.moveToPosition(info.position);
-                ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-                itemInListDS.delete(mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
-                //mListState = mItemsListRV.onSaveInstanceState(); //doesn't use in rw
-                updateData();
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -465,6 +463,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             return mItems.size();
         }
 
+        public void removeItem(int position) {
+            mItems.remove(position);
+            if (selectedItems.contains(position)) {
+                selectedItems.remove(selectedItems.indexOf(position));
+            }
+            notifyItemRemoved(position);
+        }
+
         public void toggleSelection(int position) {
             if (selectedItems.contains(position)) {
                 for (int i = 0; i < selectedItems.size(); i++) {
@@ -494,6 +500,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                     }
                 }
             }
+        }
+
+        public List<Integer> getSelectedItems() {
+            return selectedItems;
         }
     }
 
