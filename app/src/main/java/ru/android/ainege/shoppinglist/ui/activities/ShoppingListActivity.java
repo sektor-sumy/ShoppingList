@@ -138,23 +138,23 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         String sortType = null;
         String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
         if (regular.contains(getResources().getString(R.string.sort_order_alphabet))) {
-            sortType = ListsDataSource.ALPHABET;
+            sortType = ShoppingListDataSource.ALPHABET;
         } else if (regular.contains(getResources().getString(R.string.sort_order_up_price))) {
-            sortType = ListsDataSource.UP_PRICE;
+            sortType = ShoppingListDataSource.UP_PRICE;
         } else if (regular.contains(getResources().getString(R.string.sort_order_down_price))) {
-            sortType = ListsDataSource.DOWN_PRICE;
+            sortType = ShoppingListDataSource.DOWN_PRICE;
         } else if (regular.contains(getResources().getString(R.string.sort_order_adding))) {
-            sortType = ListsDataSource.ORDER_ADDING;
+            sortType = ShoppingListDataSource.ORDER_ADDING;
         } else {
-            sortType = ListsDataSource.ALPHABET;
+            sortType = ShoppingListDataSource.ALPHABET;
         }
-        ListsDataSource listDS;
-        try{
-            listDS = ListsDataSource.getInstance();
-        }catch (NullPointerException e) {
-            listDS = ListsDataSource.getInstance(this);
+        ShoppingListDataSource itemsInListDS;
+        try {
+            itemsInListDS = ShoppingListDataSource.getInstance();
+        } catch (NullPointerException e) {
+            itemsInListDS = ShoppingListDataSource.getInstance(this);
         }
-        listDS.setSortSettings(mIsBoughtFirst, sortType);
+        itemsInListDS.setSortSettings(mIsBoughtFirst, sortType);
 
         if (!prefs.getBoolean(getString(R.string.settings_key_sort_is_default_data), true)) {
             mDataSave = SettingsDataItem.DATA_NOT_DEFAULT;
@@ -199,7 +199,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         }
         switch(item.getItemId()) {
             case R.id.delete_all_bought:
-                ShoppingListDataSource itemInListDS = new ShoppingListDataSource(this);
+                ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance();
                 itemInListDS.deleteAllBought(mId);
                 selectItem(mId);
                 return true;
@@ -227,7 +227,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
-        ListsDataSource listDS = ListsDataSource.getInstance();
+        ListsDataSource listDS = new ListsDataSource(this);
         if (mId != -1) {
             listDS.delete(mId);
             updateData();
@@ -356,12 +356,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
 
         @Override
         public Cursor loadInBackground() {
-            ListsDataSource listDS;
-            try{
-                listDS = ListsDataSource.getInstance();
-            }catch (NullPointerException e) {
-                listDS = ListsDataSource.getInstance(mContext);
-            }
+            ListsDataSource listDS = new ListsDataSource(mContext);
 
             return listDS.getAll();
         }

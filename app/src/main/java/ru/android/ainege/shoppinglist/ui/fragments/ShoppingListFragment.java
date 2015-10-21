@@ -32,37 +32,38 @@ import java.util.List;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
-import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
-import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
+import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
+import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String ID_LIST = "idList";
-    public static final String IS_BOUGHT_FIRST = "isBoughtFirst";
+    public static final String IS_BOUGHT_END_IN_LIST = "isBoughtEndInList";
     public static final String DATA_SAVE = "dataSave";
+
+    private static final int DATA_LOADER = 0;
 
     private static final String ADD_DIALOG_DATE = "addItemDialog";
     private static final String EDIT_DIALOG_DATE = "editItemDialog";
     private static final int ADD_DIALOG_CODE = 0;
     private static final int EDIT_DIALOG_CODE = 1;
 
-    private static final int DATA_LOADER = 0;
-
-    private Cursor mItemsInList;
-    private MyAdapter mAdapter;
+    private long mIdList;
+    private RecyclerView mItemsListRV;
+    private RecyclerViewAdapter mAdapterRV;
+    private ShoppingListCursor mItemsInList;
 
     private TextView mSpentMoney, mTotalMoney, mEmptyText;
+    private double mSaveSpentMoney;
     private LinearLayout mListContainer;
-    private RecyclerView mList;
     private long mSaveItemId = -1;
     private Parcelable mListState;
-    private double mSaveSpentMoney;
     private boolean mIsBoughtEndInList;
 
-    private long mIdList;
 
     private android.view.ActionMode mActionMode;
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -88,10 +89,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                 case R.id.move:
                     return true;
                 case R.id.select_bought:
-                    mAdapter.selectItems(true);
+                    mAdapterRV.selectItems(true);
                     return true;
                 case R.id.select_not_bought:
-                    mAdapter.selectItems(false);
+                    mAdapterRV.selectItems(false);
                     return true;
                 default:
                     return false;
@@ -100,15 +101,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            mAdapter.clearSelections();
+            mAdapterRV.clearSelections();
             mActionMode = null;
         }
     };
 
-    public static ShoppingListFragment newInstance(long id, boolean isBoughtFirst, String dataSave) {
+    public static ShoppingListFragment newInstance(long id, boolean isBoughtEndInList, String dataSave) {
         Bundle args = new Bundle();
         args.putLong(ID_LIST, id);
-        args.putBoolean(IS_BOUGHT_FIRST, isBoughtFirst);
+        args.putBoolean(IS_BOUGHT_END_IN_LIST, isBoughtEndInList);
         args.putString(DATA_SAVE, dataSave);
 
         ShoppingListFragment fragment = new ShoppingListFragment();
@@ -121,7 +122,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mIdList = getArguments().getLong(ID_LIST);
-        mIsBoughtEndInList = getArguments().getBoolean(IS_BOUGHT_FIRST);
+        mIsBoughtEndInList = getArguments().getBoolean(IS_BOUGHT_END_IN_LIST);
         getLoaderManager().initLoader(DATA_LOADER, null, this);
     }
 
@@ -149,15 +150,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         mEmptyText = (TextView) v.findViewById(R.id.empty_list);
         mListContainer = (LinearLayout) v.findViewById(R.id.list_container);
 
-        mList = (RecyclerView) v.findViewById(R.id.items_list);
-        mList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAdapter = new MyAdapter();
-        mList.setAdapter(mAdapter);
-        mList.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mList, new RecyclerItemClickListener.OnItemClickListener() {
+        mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
+        mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mAdapterRV = new RecyclerViewAdapter();
+        mItemsListRV.setAdapter(mAdapterRV);
+        mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
                         if (mActionMode != null) {
-                            mAdapter.toggleSelection(position);
+                            mAdapterRV.toggleSelection(position);
                             return;
                         }
 
@@ -184,7 +185,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                         }
 
                         mActionMode = getActivity().startActionMode(mActionModeCallback);
-                        mAdapter.toggleSelection(position);
+                        mAdapterRV.toggleSelection(position);
                     }
 
                     @Override
@@ -193,7 +194,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                             return;
                         }
 
-                        MyAdapter.ViewHolder holder = (MyAdapter.ViewHolder) mList.findViewHolderForAdapterPosition(position);
+                        RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mItemsListRV.findViewHolderForAdapterPosition(position);
                         boolean isBought;
                         if (holder.mIsBought.getVisibility() == View.VISIBLE) {
                             holder.mIsBought.setVisibility(View.GONE);
@@ -204,16 +205,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                         }
 
                         mItemsInList.moveToPosition(position);
-                        ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
-                        itemInListDS.setIsBought(isBought, mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
+                        ShoppingListDataSource itemsInListDS;
+                        try {
+                            itemsInListDS = ShoppingListDataSource.getInstance();
+                        } catch (NullPointerException e) {
+                            itemsInListDS = ShoppingListDataSource.getInstance(getActivity());
+                        }
+                        ShoppingList item = mItemsInList.getItem();
+                        itemsInListDS.setIsBought(isBought, item.getIdItem(), mIdList);
 
                         //if set bought items in the end of list - refresh list
                         //if it isn`t - try to update only spent sum
                         if (mIsBoughtEndInList) {
-                            //mListState = mList.onSaveInstanceState();
+                            //mListState = mItemsListRV.onSaveInstanceState();
                             updateData();
                         } else {
-                            double sum = sumOneItem(mItemsInList);
+                            double sum = sumOneItem(item);
                             if (mSaveSpentMoney != 0) {
                                 if (isBought) {
                                     mSaveSpentMoney += sum;
@@ -222,7 +229,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                                 }
                                 updateSpentSum(mSaveSpentMoney);
                             } else {
-                                //mListState = mList.onSaveInstanceState();
+                                //mListState = mItemsListRV.onSaveInstanceState();
                                 updateData();
                             }
                         }
@@ -242,10 +249,104 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             }
 
         });
-        itemTouchHelper.attachToRecyclerView(mList);
+        itemTouchHelper.attachToRecyclerView(mItemsListRV);
 
         return v;
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Loader<Cursor> loader = null;
+        switch (id) {
+            case DATA_LOADER:
+                loader = new MyCursorLoader(getActivity(), mIdList);
+                break;
+            default:
+                break;
+        }
+        return loader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case DATA_LOADER:
+                mItemsInList = (ShoppingListCursor) data;
+                if (mItemsInList != null) {
+                    mAdapterRV.setData(mItemsInList.getItemsAsList());       //update data in adapter
+                    updateSpentSum(sumSpentMoney());        //update spent money
+                    mTotalMoney.setText(localValue(sumTotalMoney()));       //update total money
+                    //TODO: check it
+                   /* if (mListState != null) {
+                        //mItemsListRV.onRestoreInstanceState(mListState); //doesn't use in rw
+                        mListState = null;
+                    } else if (mSaveItemId != -1) {
+                        //mItemsListRV.setSelection(getPosition(mSaveItemId));
+                        mSaveItemId = -1;
+                    }
+                    mListContainer.setVisibility(View.VISIBLE);
+                    mEmptyText.setVisibility(View.GONE);*/
+                } else {
+                    /*mListContainer.setVisibility(View.GONE);
+                    mEmptyText.setVisibility(View.VISIBLE);*/
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        switch (loader.getId()) {
+            case DATA_LOADER:
+                if (mAdapterRV != null) {
+                    //mAdapterRV.swapCursor(null);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void updateData() {
+        getLoaderManager().getLoader(DATA_LOADER).forceLoad();
+    }
+
+    private double sumSpentMoney() {
+        double sum = 0;
+        mItemsInList.moveToFirst();
+        do {
+            ShoppingList item = mItemsInList.getItem();
+            if (item.isBought()) {
+                sum += sumOneItem(item);
+            }
+        } while (mItemsInList.moveToNext());
+        mSaveSpentMoney = sum;
+        return mSaveSpentMoney;
+    }
+
+    private double sumTotalMoney() {
+        double sum = 0;
+        mItemsInList.moveToFirst();
+        do {
+            ShoppingList item = mItemsInList.getItem();
+            sum += sumOneItem(item);
+        } while (mItemsInList.moveToNext());
+        return sum;
+    }
+
+    private double sumOneItem(ShoppingList item) {
+        double price = item.getPrice();
+        double amount = item.getAmount();
+        double sum = price * (amount == 0 ? 1 : amount);
+        return new BigDecimal(sum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+
+    private void updateSpentSum(double newSum) {
+        mSpentMoney.setText(localValue(newSum));
+    }
+
 
     //old version TODO delete item
     /*public boolean onContextItemSelected(MenuItem item) {
@@ -255,7 +356,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                 mItemsInList.moveToPosition(info.position);
                 ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
                 itemInListDS.delete(mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID)), mIdList);
-                //mListState = mList.onSaveInstanceState(); //doesn't use in rw
+                //mListState = mItemsListRV.onSaveInstanceState(); //doesn't use in rw
                 updateData();
                 return true;
             default:
@@ -278,96 +379,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Loader<Cursor> loader = null;
-        switch (id) {
-            case DATA_LOADER:
-                loader = new MyCursorLoader(getActivity(), mIdList);
+    ////doesn't use yet
+    /*private int getPosition(long id) {
+        int index = 0;
+        for (int i = 0; i < mItemsListRV.getCount(); i++) {
+            if (mItemsListRV.getItemIdAtPosition(i) == id) {
+                index = i;
                 break;
-            default:
-                break;
-        }
-        return loader;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case DATA_LOADER:
-                mItemsInList = data;
-                if (mItemsInList != null) {
-                    updateSpentSum(sumSpentMoney());
-                    mTotalMoney.setText(localValue(sumTotalMoney()));
-                    mAdapter.setCursor(mItemsInList);
-                    //TODO: check it
-                   /* if (mListState != null) {
-                        //mList.onRestoreInstanceState(mListState); //doesn't use in rw
-                        mListState = null;
-                    } else if (mSaveItemId != -1) {
-                        //mList.setSelection(getPosition(mSaveItemId));
-                        mSaveItemId = -1;
-                    }
-                    mListContainer.setVisibility(View.VISIBLE);
-                    mEmptyText.setVisibility(View.GONE);*/
-                } else {
-                    /*mListContainer.setVisibility(View.GONE);
-                    mEmptyText.setVisibility(View.VISIBLE);*/
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        switch (loader.getId()) {
-            case DATA_LOADER:
-                if (mAdapter != null) {
-                    //mAdapter.swapCursor(null);
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void updateData() {
-        getLoaderManager().getLoader(DATA_LOADER).forceLoad();
-    }
-
-    private void updateSpentSum(double newSum) {
-        mSpentMoney.setText(localValue(newSum));
-    }
-
-    private double sumSpentMoney() {
-        double sum = 0;
-        mItemsInList.moveToFirst();
-        do {
-            if (mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0) {
-                sum += sumOneItem(mItemsInList);
             }
-        } while (mItemsInList.moveToNext());
-        mSaveSpentMoney = sum;
-        return mSaveSpentMoney;
-    }
-
-    private double sumTotalMoney() {
-        double sum = 0;
-        mItemsInList.moveToFirst();
-        do {
-            sum += sumOneItem(mItemsInList);
-        } while (mItemsInList.moveToNext());
-        return sum;
-    }
-
-    private double sumOneItem(Cursor c) {
-        double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
-        double amount = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
-        double sum = price * (amount == 0 ? 1 : amount);
-        return new BigDecimal(sum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-    }
+        }
+        return index;
+    }*/
 
     private static String localValue(double value) {
         NumberFormat nf = NumberFormat.getInstance();
@@ -376,8 +398,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         return nf.format(value);
     }
 
-    public static class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-        private Cursor mDataset;
+    public static class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+        private ArrayList<ShoppingList> mItems;
         private List<Integer> selectedItems = new ArrayList<>();
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -399,17 +421,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             }
         }
 
-        public MyAdapter() {
-            mDataset = null;
+        public RecyclerViewAdapter() {
+            mItems = new ArrayList<>();
         }
 
-        public void setCursor(Cursor newCursor) {
-            mDataset = newCursor;
+        public void setData(ArrayList<ShoppingList> items) {
+            mItems = items;
             notifyDataSetChanged();
         }
 
         @Override
-        public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._shopping_list_item, parent, false);
             ViewHolder vh = new ViewHolder(v);
             return vh;
@@ -417,22 +439,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
+            ShoppingList itemInList = mItems.get(position);
+
             holder.mView.setSelected(selectedItems.contains(position));
 
-            mDataset.moveToPosition(position);
-
             holder.mImage.setImageResource(R.drawable.food);
-            holder.mTextView.setText(mDataset.getString(mDataset.getColumnIndex(ItemsTable.COLUMN_NAME)));
-            if (mDataset.getDouble(mDataset.getColumnIndex(ItemsTable.COLUMN_AMOUNT)) == 0) {
+            holder.mTextView.setText(itemInList.getItem().getName());
+            if (itemInList.getAmount() == 0) {
                 holder.mAmount.setText("-");
             } else {
-                String amount = NumberFormat.getInstance().format(mDataset.getDouble(mDataset.getColumnIndex(ItemsTable.COLUMN_AMOUNT)))
-                        + " " + mDataset.getString(mDataset.getColumnIndex(UnitsTable.COLUMN_NAME));
+                String amount = NumberFormat.getInstance().format(itemInList.getAmount())
+                        + " " + itemInList.getUnit().getName();
                 holder.mAmount.setText(amount);
             }
-            holder.mPrice.setText(localValue(mDataset.getDouble(mDataset.getColumnIndex(ItemsTable.COLUMN_PRICE))));
+            holder.mPrice.setText(localValue(itemInList.getPrice()));
             int visibility = View.GONE;
-            if (mDataset.getInt(mDataset.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) == 1) {
+            if (itemInList.isBought()) {
                 visibility = View.VISIBLE;
             }
             holder.mIsBought.setVisibility(visibility);
@@ -440,7 +462,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         @Override
         public int getItemCount() {
-            return mDataset != null ? mDataset.getCount() : 0;
+            return mItems.size();
         }
 
         public void toggleSelection(int position) {
@@ -463,45 +485,38 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         }
 
         public void selectItems(boolean isBought) {
-            int i = 0;
-            if (isBought) i = 1;
-            mDataset.moveToFirst();
-            do {
-                if (mDataset.getInt(mDataset.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) == i) {
-                    int position = mDataset.getPosition();
+            for (ShoppingList item : mItems){
+                if (item.isBought() == isBought) {
+                    int position = mItems.indexOf(item);
                     if (!selectedItems.contains(position)) {
                         selectedItems.add(position);
                         notifyItemChanged(position);
                     }
                 }
-            } while (mDataset.moveToNext());
+            }
         }
     }
 
     private static class MyCursorLoader extends CursorLoader {
+        private Context mContext;
         private long mIdList;
 
         public MyCursorLoader(Context context, long idList) {
             super(context);
+            mContext = context;
             mIdList = idList;
         }
 
         @Override
         public Cursor loadInBackground() {
-            ListsDataSource mListDS = ListsDataSource.getInstance();
-            return mListDS.getItemsInList(mIdList);
+            ShoppingListDataSource mItemsInListDS;
+            try {
+                mItemsInListDS = ShoppingListDataSource.getInstance();
+            } catch (NullPointerException e) {
+                mItemsInListDS = ShoppingListDataSource.getInstance(mContext);
+            }
+
+            return mItemsInListDS.getItemsInList(mIdList);
         }
     }
-
-    ////doesn't use yet
-    /*private int getPosition(long id) {
-        int index = 0;
-        for (int i = 0; i < mList.getCount(); i++) {
-            if (mList.getItemIdAtPosition(i) == id) {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }*/
 }

@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
@@ -165,6 +166,15 @@ public class ShoppingListDataSource {
             }
 
             return shoppingList;
+        }
+
+        public ArrayList<ShoppingList> getItemsAsList(){
+            ArrayList<ShoppingList> itemsInList = new ArrayList<>();
+            moveToFirst();
+            do {
+                itemsInList.add(getItem());
+            } while (moveToNext());
+            return itemsInList;
         }
     }
 
