@@ -18,12 +18,10 @@ public class ShoppingList implements Serializable {
         mItem = item;
     }
 
-    public ShoppingList(long idItem, long idList, boolean isBought, double amount, long idUnit, double price, Date date) {
+    public ShoppingList(long idItem, boolean isBought, double amount, double price, Date date) {
         mIdItem = idItem;
-        mIdList = idList;
         mIsBought = isBought;
         mAmount = amount;
-        mIdUnit = idUnit;
         mPrice = price;
         mDate = date;
     }

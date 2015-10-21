@@ -12,6 +12,11 @@ public class Item {
         mName = name;
     }
 
+    public Item(long id, String name) {
+        this(name);
+        mId = id;
+    }
+
     public Item(String name, double price) {
         this(name);
         mPrice = price;
