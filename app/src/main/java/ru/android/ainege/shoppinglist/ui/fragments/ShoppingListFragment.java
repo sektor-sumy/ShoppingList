@@ -35,9 +35,6 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
-import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
-import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 
 
@@ -56,7 +53,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     private long mIdList;
     private RecyclerView mItemsListRV;
     private RecyclerViewAdapter mAdapterRV;
-    private ShoppingListCursor mItemsInList;
+    private ArrayList<ShoppingList> mItemsInList;
 
     private TextView mSpentMoney, mTotalMoney, mEmptyText;
     private double mSaveSpentMoney;
@@ -163,14 +160,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                             return;
                         }
 
-                        mItemsInList.moveToPosition(position);
+                        ShoppingList item = mItemsInList.get(position);
 
-                        String name = mItemsInList.getString(mItemsInList.getColumnIndex(ItemsTable.COLUMN_NAME));
-                        double amount = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
-                        String nameUnit = mItemsInList.getString(mItemsInList.getColumnIndex(UnitsTable.COLUMN_NAME));
-                        double price = mItemsInList.getDouble(mItemsInList.getColumnIndex(ItemsTable.COLUMN_PRICE));
-                        boolean isBought = mItemsInList.getInt(mItemsInList.getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) != 0;
-                        long idItem = mItemsInList.getLong(mItemsInList.getColumnIndex(ItemsTable.COLUMN_ID));
+                        String name = item.getItem().getName();
+                        double amount = item.getAmount();
+                        String nameUnit = item.getUnit().getName();
+                        double price = item.getPrice();
+                        boolean isBought = item.isBought();
+                        long idItem = item.getIdItem();
 
                         EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList, getArguments().getString(DATA_SAVE));
                         editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
@@ -205,14 +202,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                             isBought = true;
                         }
 
-                        mItemsInList.moveToPosition(position);
                         ShoppingListDataSource itemsInListDS;
                         try {
                             itemsInListDS = ShoppingListDataSource.getInstance();
                         } catch (NullPointerException e) {
                             itemsInListDS = ShoppingListDataSource.getInstance(getActivity());
                         }
-                        ShoppingList item = mItemsInList.getItem();
+                        ShoppingList item = mItemsInList.get(position);
                         itemsInListDS.setIsBought(isBought, item.getIdItem(), mIdList);
 
                         //if set bought items in the end of list - refresh list
@@ -272,11 +268,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
             case DATA_LOADER:
-                mItemsInList = (ShoppingListCursor) data;
-                if (mItemsInList != null) {
-                    mAdapterRV.setData(mItemsInList.getItemsAsList());       //update data in adapter
-                    updateSpentSum(sumSpentMoney());        //update spent money
-                    mTotalMoney.setText(localValue(sumTotalMoney()));       //update total money
+                if (data != null) {
+                    mItemsInList = ((ShoppingListCursor) data).getItemsAsList();
+                    mAdapterRV.setData(mItemsInList);       //update data in adapter
+                    updateSums();
                     //TODO: check it
                    /* if (mListState != null) {
                         //mItemsListRV.onRestoreInstanceState(mListState); //doesn't use in rw
@@ -320,34 +315,24 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance();
         for (int i = items.size() - 1; i >= 0; i--) {
-            mItemsInList.moveToPosition(items.get(i));
-            ShoppingList item = mItemsInList.getItem();
-            itemInListDS.delete(item.getIdItem(), mIdList);
+            int position = items.get(i);
+            itemInListDS.delete(mItemsInList.get(position).getIdItem(), mIdList);
             //mListState = mList.onSaveInstanceState(); //doesn't use in rw
-            mAdapterRV.removeItem(items.get(i));
+            mAdapterRV.removeItem(position);
+            updateSums();
         }
     }
 
-    private double sumSpentMoney() {
+    private double sumMoney(boolean onlyBought) {
         double sum = 0;
-        mItemsInList.moveToFirst();
-        do {
-            ShoppingList item = mItemsInList.getItem();
-            if (item.isBought()) {
+        for (ShoppingList item : mItemsInList) {
+            if ((onlyBought && item.isBought()) || !onlyBought) {
                 sum += sumOneItem(item);
             }
-        } while (mItemsInList.moveToNext());
-        mSaveSpentMoney = sum;
-        return mSaveSpentMoney;
-    }
-
-    private double sumTotalMoney() {
-        double sum = 0;
-        mItemsInList.moveToFirst();
-        do {
-            ShoppingList item = mItemsInList.getItem();
-            sum += sumOneItem(item);
-        } while (mItemsInList.moveToNext());
+        }
+        if (onlyBought) {
+            mSaveSpentMoney = sum;
+        }
         return sum;
     }
 
@@ -356,6 +341,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         double amount = item.getAmount();
         double sum = price * (amount == 0 ? 1 : amount);
         return new BigDecimal(sum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+
+    private void updateSums() {
+        updateSpentSum(sumMoney(true));        //update spent money
+        mTotalMoney.setText(localValue(sumMoney(false)));       //update total money
     }
 
     private void updateSpentSum(double newSum) {
@@ -398,7 +388,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
     public static class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
         private ArrayList<ShoppingList> mItems;
-        private List<Integer> selectedItems = new ArrayList<>();
+        private List<Integer> mSelectedItems = new ArrayList<>();
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public View mView;
@@ -439,7 +429,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         public void onBindViewHolder(ViewHolder holder, int position) {
             ShoppingList itemInList = mItems.get(position);
 
-            holder.mView.setSelected(selectedItems.contains(position));
+            holder.mView.setSelected(mSelectedItems.contains(position));
 
             holder.mImage.setImageResource(R.drawable.food);
             holder.mTextView.setText(itemInList.getItem().getName());
@@ -465,28 +455,28 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         public void removeItem(int position) {
             mItems.remove(position);
-            if (selectedItems.contains(position)) {
-                selectedItems.remove(selectedItems.indexOf(position));
+            if (mSelectedItems.contains(position)) {
+                mSelectedItems.remove(mSelectedItems.indexOf(position));
             }
             notifyItemRemoved(position);
         }
 
         public void toggleSelection(int position) {
-            if (selectedItems.contains(position)) {
-                for (int i = 0; i < selectedItems.size(); i++) {
-                    if (selectedItems.get(i) == position) {
-                        selectedItems.remove(i);
+            if (mSelectedItems.contains(position)) {
+                for (int i = 0; i < mSelectedItems.size(); i++) {
+                    if (mSelectedItems.get(i) == position) {
+                        mSelectedItems.remove(i);
                         break;
                     }
                 }
             } else {
-                selectedItems.add(position);
+                mSelectedItems.add(position);
             }
             notifyItemChanged(position);
         }
 
         public void clearSelections() {
-            selectedItems.clear();
+            mSelectedItems.clear();
             notifyDataSetChanged();
         }
 
@@ -494,8 +484,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             for (ShoppingList item : mItems){
                 if (item.isBought() == isBought) {
                     int position = mItems.indexOf(item);
-                    if (!selectedItems.contains(position)) {
-                        selectedItems.add(position);
+                    if (!mSelectedItems.contains(position)) {
+                        mSelectedItems.add(position);
                         notifyItemChanged(position);
                     }
                 }
@@ -503,7 +493,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         }
 
         public List<Integer> getSelectedItems() {
-            return selectedItems;
+            return mSelectedItems;
         }
     }
 
