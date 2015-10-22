@@ -224,6 +224,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                             mIdCrossOffItem = item.getIdItem();
                             updateData();
                         } else {
+                            mAdapterRV.getItem(position).setBought(isBought);
                             double sum = sumOneItem(item);
                             if (mSaveSpentMoney != 0) {
                                 if (isBought) {
@@ -283,9 +284,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                         if (toPosition != -1) {
                             mAdapterRV.notifyItemMoved(mPositionCrossOffItem, toPosition);
                             mItemsListRV.scrollToPosition(toPosition);
+                            mAdapterRV.setData(mItemsInList);
                         }
                     } else {
-                        mAdapterRV.setData(mItemsInList);       //update data in adapter
+                        mAdapterRV.setData(mItemsInList, true);       //update data in adapter
                     }
                     updateSums();
                     //TODO: check it
@@ -430,7 +432,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         public void setData(ArrayList<ShoppingList> items) {
             mItems = items;
-            notifyDataSetChanged();
+        }
+
+        public void setData(ArrayList<ShoppingList> items, boolean isNeedNotify) {
+            setData(items);
+            if (isNeedNotify) {
+                notifyDataSetChanged();
+            }
         }
 
         @Override
@@ -474,6 +482,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                 mSelectedItems.remove(mSelectedItems.indexOf(position));
             }
             notifyItemRemoved(position);
+        }
+
+        public ShoppingList getItem(int position) {
+            return mItems.get(position);
         }
 
         public void toggleSelection(int position) {
