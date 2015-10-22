@@ -55,13 +55,16 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     private RecyclerViewAdapter mAdapterRV;
     private ArrayList<ShoppingList> mItemsInList;
 
-    private TextView mSpentMoney, mTotalMoney, mEmptyText;
+    private TextView mSpentMoney, mTotalMoney;
     private double mSaveSpentMoney;
+    private boolean mIsBoughtEndInList;
+    private int mPositionCrossOffItem = -1;
+    private long mIdCrossOffItem;
+
+    private TextView mEmptyText;
     private LinearLayout mListContainer;
     private long mSaveItemId = -1;
     private Parcelable mListState;
-    private boolean mIsBoughtEndInList;
-
 
     private android.view.ActionMode mActionMode;
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -192,6 +195,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                             return;
                         }
 
+                        //show is item cross off or not
                         RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mItemsListRV.findViewHolderForAdapterPosition(position);
                         boolean isBought;
                         if (holder.mIsBought.getVisibility() == View.VISIBLE) {
@@ -202,6 +206,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                             isBought = true;
                         }
 
+                        //update data in db
                         ShoppingListDataSource itemsInListDS;
                         try {
                             itemsInListDS = ShoppingListDataSource.getInstance();
@@ -211,10 +216,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                         ShoppingList item = mItemsInList.get(position);
                         itemsInListDS.setIsBought(isBought, item.getIdItem(), mIdList);
 
+                        //update recyclerview
                         //if set bought items in the end of list - refresh list
                         //if it isn`t - try to update only spent sum
                         if (mIsBoughtEndInList) {
-                            //mListState = mItemsListRV.onSaveInstanceState();
+                            mPositionCrossOffItem = position;
+                            mIdCrossOffItem = item.getIdItem();
                             updateData();
                         } else {
                             double sum = sumOneItem(item);
@@ -226,7 +233,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                                 }
                                 updateSpentSum(mSaveSpentMoney);
                             } else {
-                                //mListState = mItemsListRV.onSaveInstanceState();
                                 updateData();
                             }
                         }
@@ -270,7 +276,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             case DATA_LOADER:
                 if (data != null) {
                     mItemsInList = ((ShoppingListCursor) data).getItemsAsList();
-                    mAdapterRV.setData(mItemsInList);       //update data in adapter
+                    //if cross off item in list - find new it position and move
+                    //else set new data to adapter
+                    if (mPositionCrossOffItem != -1) {
+                        int toPosition = getPosition(mIdCrossOffItem);
+                        if (toPosition != -1) {
+                            mAdapterRV.notifyItemMoved(mPositionCrossOffItem, toPosition);
+                            mItemsListRV.scrollToPosition(toPosition);
+                        }
+                    } else {
+                        mAdapterRV.setData(mItemsInList);       //update data in adapter
+                    }
                     updateSums();
                     //TODO: check it
                    /* if (mListState != null) {
@@ -309,6 +325,21 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         getLoaderManager().getLoader(DATA_LOADER).forceLoad();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) return;
+
+        switch (requestCode) {
+            case ADD_DIALOG_CODE:
+                mSaveItemId = data.getLongExtra(AddItemDialogFragment.ID_ITEM, -1);
+                updateData();
+                break;
+            case EDIT_DIALOG_CODE:
+                updateData();
+                break;
+        }
+    }
+
     private void deleteSelectedItems() {
         List<Integer> items = mAdapterRV.getSelectedItems();
         Collections.sort(items);
@@ -321,6 +352,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             mAdapterRV.removeItem(position);
             updateSums();
         }
+    }
+
+    private int getPosition(long id) {
+        int index = -1;
+        for(int i = 0; i < mItemsInList.size(); ++i) {
+            if (mItemsInList.get(i).getIdItem() == id) {
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 
     private double sumMoney(boolean onlyBought) {
@@ -351,33 +393,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     private void updateSpentSum(double newSum) {
         mSpentMoney.setText(localValue(newSum));
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != Activity.RESULT_OK) return;
-
-        switch (requestCode) {
-            case ADD_DIALOG_CODE:
-                mSaveItemId = data.getLongExtra(AddItemDialogFragment.ID_ITEM, -1);
-                updateData();
-                break;
-            case EDIT_DIALOG_CODE:
-                updateData();
-                break;
-        }
-    }
-
-    ////doesn't use yet
-    /*private int getPosition(long id) {
-        int index = 0;
-        for (int i = 0; i < mItemsListRV.getCount(); i++) {
-            if (mItemsListRV.getItemIdAtPosition(i) == id) {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }*/
 
     private static String localValue(double value) {
         NumberFormat nf = NumberFormat.getInstance();
