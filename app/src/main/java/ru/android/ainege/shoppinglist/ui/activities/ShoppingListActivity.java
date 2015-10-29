@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -65,6 +66,9 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ImageView appBarImage = (ImageView) findViewById(R.id.appbar_image);
+        appBarImage.setImageResource(R.drawable.list);
 
         initDrawer();
 
