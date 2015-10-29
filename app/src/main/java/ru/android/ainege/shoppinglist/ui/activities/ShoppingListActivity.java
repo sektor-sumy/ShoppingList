@@ -12,6 +12,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -43,6 +44,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
     private static final int DATA_LOADER = 0;
     private static final String ADD_DIALOG_DATE = "addListDialog";
     private static final String UPDATE_DIALOG_DATE = "updateListDialog";
+    public final static String EXTRA_ID_LIST = "idList";
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -85,6 +87,16 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
 
                 mDrawerList.setItemChecked(position, true);
                 selectItem(mId);
+            }
+        });
+
+        FloatingActionButton addItemFAB = (FloatingActionButton) findViewById(R.id.add_fab);
+        addItemFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ShoppingListActivity.this, AddItemActivity.class);
+                i.putExtra(EXTRA_ID_LIST, mId);
+                startActivity(i);
             }
         });
 
