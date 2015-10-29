@@ -13,78 +13,75 @@
         android:orientation="vertical"
         android:visibility="visible">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/padding_16dp"
+            android:paddingRight="@dimen/padding_16dp">
+
+            <TextView
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:text="@string/spent_money"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_weight="0.5"/>
+
+            <TextView
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:text="@string/all_money"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_weight="0.5"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/padding_16dp"
+            android:paddingRight="@dimen/padding_16dp">
+
+            <TextView
+                android:id="@+id/spent_money"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="@dimen/column_wight"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_weight="0.5"
+                android:singleLine="true"
+                android:layout_marginRight="2dp" />
+
+            <TextView
+                android:id="@+id/total_money"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="@dimen/column_wight"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_weight="0.5"
+                android:singleLine="true"
+                android:layout_marginLeft="2dp" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="end"
+            android:layout_marginBottom="2dp"
+            android:background="@android:color/black"/>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/items_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scrollbars="vertical"/>
-
-        <!--TODO: sticking to the list-->
-        <View
-            android:layout_width="@dimen/sum_wight"
-            android:layout_height="1dp"
-            android:layout_gravity="end"
-            android:layout_marginBottom="2dp"
-            android:background="@android:color/black"/>
-
-        <View
-            android:layout_width="@dimen/sum_wight"
-            android:layout_height="1dp"
-            android:layout_gravity="end"
-            android:layout_marginBottom="3dp"
-            android:background="@android:color/black"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginRight="3dp"
-            android:layout_gravity="right"
-            android:minWidth="@dimen/sum_wight">
-
-            <TextView
-                android:layout_width="@dimen/column_wight"
-                android:layout_height="wrap_content"
-                android:text="@string/spent_money"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/spent_money"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity="right"
-                android:layout_weight="1"
-                android:singleLine="true"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginBottom="7dp"
-            android:orientation="horizontal"
-            android:layout_marginRight="3dp"
-            android:minWidth="@dimen/sum_wight">
-
-            <TextView
-                android:layout_width="@dimen/column_wight"
-                android:layout_height="wrap_content"
-                android:text="@string/all_money"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/total_money"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity="right"
-                android:layout_weight="1"
-                android:singleLine="true"/>
-
-        </LinearLayout>
 
     </LinearLayout>
 
