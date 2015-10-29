@@ -9,16 +9,17 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".ui.activities.ShoppingListActivity"
-            android:label="@string/you_lists" >
+            android:label="@string/you_lists"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.activities.SettingsActivity"
-            android:label="@string/settings" >
+            android:label="@string/settings"
+            android:theme="@style/AppTheme.NoActionBar" >
         </activity>
     </application>
 

@@ -8,6 +8,8 @@
     <dimen name="drawer_wight">240dp</dimen>
     <dimen name="drawer_text_padding">16dp</dimen>
 
+    <dimen name="app_bar_height">180dp</dimen>
+
     <dimen name="sum_wight">160dp</dimen>
     <dimen name="column_wight">75dp</dimen>
 
