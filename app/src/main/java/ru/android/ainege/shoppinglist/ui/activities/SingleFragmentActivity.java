@@ -1,16 +1,13 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import ru.android.ainege.shoppinglist.R;
 
-/**
- * Created by Belkin on 06.06.2015.
- */
-public abstract class SingleFragmentActivity extends Activity {
+public abstract class SingleFragmentActivity extends AppCompatActivity {
     protected abstract Fragment createFragment();
 
     @Override

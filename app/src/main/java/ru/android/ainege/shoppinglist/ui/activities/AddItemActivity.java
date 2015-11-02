@@ -1,15 +1,16 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Fragment;
+import android.content.Intent;
 
-import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.ui.fragments.AddItemDialogFragment;
 
-public class AddItemActivity extends AppCompatActivity {
+public class AddItemActivity extends SingleFragmentActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_item);
+    protected Fragment createFragment() {
+        Intent intent = getIntent();
+        long id =intent.getLongExtra(ShoppingListActivity.EXTRA_ID_LIST, 0);
+        return AddItemDialogFragment.newInstance(id, "null");
     }
 }

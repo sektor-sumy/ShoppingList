@@ -1,32 +1,23 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.DialogInterface;
+import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -43,7 +34,7 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
-public class AddItemDialogFragment extends DialogFragment implements SettingsDataItem {
+public class AddItemDialogFragment extends Fragment implements SettingsDataItem {
     public static final String ID_LIST = "idList";
     public static final String ID_ITEM = "idItem";
     public static final String DATA_SAVE = "dataSave";
@@ -67,7 +58,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
     private boolean mIsAlwaysSave = false;
     private boolean mIsNotDefault = false;
 
-    public static AddItemDialogFragment newInstance(long id, String dataSave) {
+    public static Fragment newInstance(long id, String dataSave) {
         Bundle args = new Bundle();
         args.putLong(ID_LIST, id);
         args.putString(DATA_SAVE, dataSave);
@@ -79,29 +70,24 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         if (DATA_SAVE_ALWAYS.equals(getArguments().getString(DATA_SAVE))) {
             mIsAlwaysSave = true;
         }
         if (!DATA_NOT_DEFAULT.equals(getArguments().getString(DATA_SAVE))) {
             mIsNotDefault = true;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View v = inflater.inflate(R.layout.dialog_item, null);
-        builder.setView(v)
-                .setCancelable(false)
-                .setPositiveButton(R.string.add, null)
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
         if (DATA_SAVE_BUTTON.equals(getArguments().getString(DATA_SAVE))) {
-            builder.setNeutralButton(R.string.update, null);
+
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.dialog_item, container, false);
         setData(v);
-        return builder.create();
+        return v;
     }
 
     private void setData(View v) {
@@ -290,7 +276,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
         mFinishPrice.setVisibility(View.VISIBLE);
     }
 
-    @Override
+/*    @Override
     public void onStart() {
         super.onStart();
 
@@ -328,7 +314,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                 }
             }
         });
-    }
+    }*/
 
     private boolean saveData(boolean isUpdateData) {
         boolean isSave = false;
