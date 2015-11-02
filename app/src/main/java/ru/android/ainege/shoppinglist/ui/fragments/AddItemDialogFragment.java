@@ -30,11 +30,14 @@ import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Date;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.entities.Item;
+import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
@@ -149,7 +152,8 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
                         mPrice.setText(mAddedPrice);
                         mIdSelectedItem = -1;
                     }
-                    Cursor cursor = new ShoppingListDataSource(getActivity()).existItemInList(s.toString(), getArguments().getLong(ID_LIST));
+                    //Cursor cursor = new ShoppingListDataSource(getActivity()).existItemInList(s.toString(), getArguments().getLong(ID_LIST));
+                    Cursor cursor = ShoppingListDataSource.getInstance(getActivity()).existItemInList(s.toString(), getArguments().getLong(ID_LIST));
                     if (cursor != null) {
                         mInfo.setText(R.string.info_exit_item_in_list);
                         mInfo.setVisibility(View.VISIBLE);
@@ -169,7 +173,7 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mIdSelectedItem = l;
                 if (mIsNotDefault) {
-                    Cursor c = new ItemDataSource(getActivity()).getItem(mIdSelectedItem);
+                    Cursor c = new ItemDataSource(getActivity()).get(mIdSelectedItem);
                     double amount = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
                     if (amount > 0) {
                         mAmount.setText(new DecimalFormat("#.######").format(amount));
@@ -348,34 +352,36 @@ public class AddItemDialogFragment extends DialogFragment implements SettingsDat
             ItemDataSource itemDS = new ItemDataSource(getActivity());
             if(isUpdateData) { //сохранение если выбрана настройка "кнопка" и нажата кнопка
                 if (mIdSelectedItem != -1) {
-                    itemDS.update(name, amount, idUnit, price, mIdSelectedItem);
+                    //itemDS.update(name, amount, idUnit, price, mIdSelectedItem);
+                    itemDS.update(new Item(name, amount, idUnit, price));
                 } else {
-                    mIdSelectedItem = (int) itemDS.add(name, amount, idUnit, price);
+                    //mIdSelectedItem = (int) itemDS.add(name, amount, idUnit, price);
+                    mIdSelectedItem = (int) itemDS.add(new Item(name, amount, idUnit, price));
                 }
             } else {
                 long idItem;
                 if (mIsAlwaysSave) { //сохранение если выбрана настройка "сохранять всегда"
                     if (mIdSelectedItem != -1) {
                         idItem = mIdSelectedItem;
-                        itemDS.update(name, amount, idUnit, price, idItem);
+                        itemDS.update(new Item(name, amount, idUnit, price));
                     } else {
-                        idItem = (int) itemDS.add(name, amount, idUnit, price);
+                        idItem = (int) itemDS.add(new Item(name, amount, idUnit, price));
                     }
                 } else { //сохранение если выбрана настройка "не сохранять"
                     if (mIdSelectedItem != -1) {
                         idItem = mIdSelectedItem;
                     } else {
-                        idItem = (int) itemDS.add(name);
+                        idItem = (int) itemDS.add(new Item(name));
                     }
                 }
                 long idList = getArguments().getLong(ID_LIST);
 
-                ShoppingListDataSource itemInListDS = new ShoppingListDataSource(getActivity());
+                ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance(getActivity());
                 long id = mIdExistItem;
                 if (mIdExistItem != -1) {
-                    itemInListDS.update(isBought, amount, idUnit, price, mIdExistItem, mIdExistItem, idList);
+                    itemInListDS.update(new ShoppingList(mIdExistItem, idList, isBought, amount, idUnit, price,  new Date()));
                 } else {
-                    id = itemInListDS.add(idItem, idList, isBought, amount, idUnit, price, System.currentTimeMillis() / 1000L);
+                    id = itemInListDS.add(new ShoppingList(idItem, idList, isBought, amount, idUnit, price, new Date(System.currentTimeMillis() / 1000L)));
                 }
                 sendResult(Activity.RESULT_OK, id);
             }

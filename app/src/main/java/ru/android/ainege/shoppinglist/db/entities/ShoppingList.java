@@ -26,10 +26,10 @@ public class ShoppingList implements Serializable {
         mDate = date;
     }
 
-    public ShoppingList(long idItem, long idList, long isBought, double amount, long idUnit, double price, Date date) {
+    public ShoppingList(long idItem, long idList, boolean isBought, double amount, long idUnit, double price, Date date) {
         mIdItem = idItem;
         mIdList = idList;
-        mIsBought = isBought == 1;
+        mIsBought = isBought;
         mAmount = amount;
         mIdUnit = idUnit;
         mPrice = price;
