@@ -64,7 +64,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment);
+        setContentView(R.layout.activity_shopping_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
