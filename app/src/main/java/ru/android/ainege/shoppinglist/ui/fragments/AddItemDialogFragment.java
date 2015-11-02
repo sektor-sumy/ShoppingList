@@ -10,6 +10,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -75,14 +79,14 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+
         if (DATA_SAVE_ALWAYS.equals(getArguments().getString(DATA_SAVE))) {
             mIsAlwaysSave = true;
         }
         if (!DATA_NOT_DEFAULT.equals(getArguments().getString(DATA_SAVE))) {
             mIsNotDefault = true;
-        }
-        if (DATA_SAVE_BUTTON.equals(getArguments().getString(DATA_SAVE))) {
-
         }
     }
 
@@ -105,6 +109,45 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
 
         setData(v);
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.item_menu, menu);
+        if (DATA_SAVE_BUTTON.equals(getArguments().getString(DATA_SAVE))) {
+            menu.findItem(R.id.update_item).setVisible(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.update_item:
+                if (saveData(true)) {
+                    Toast.makeText(getActivity(), R.string.data_is_save, Toast.LENGTH_LONG).show();
+                }
+                return true;
+            case R.id.save_item:
+                Boolean wantToCloseDialog = saveData(false);
+                if (wantToCloseDialog) {
+                    getActivity().onBackPressed();
+                } else {
+                    Toast.makeText(getActivity(), R.string.wrong_value, Toast.LENGTH_LONG).show();
+                }
+                return true;
+            case R.id.take_photo:
+                Toast.makeText(getActivity(), "new photo", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.select_from_gallery:
+                Toast.makeText(getActivity(), "image from gallery", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.reset_image:
+                Toast.makeText(getActivity(), "random image", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setData(View v) {
@@ -292,46 +335,6 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
         mFinishPrice.setText(localValue(amount * price));
         mFinishPrice.setVisibility(View.VISIBLE);
     }
-
-/*    @Override
-    public void onStart() {
-        super.onStart();
-
-        if(getDialog() == null) {
-            return;
-        }
-
-        final AlertDialog dialog = (AlertDialog) getDialog();
-        Window window = dialog.getWindow();
-        window.setGravity(Gravity.TOP);
-        window.getAttributes().y = 30;
-        DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
-        int dw = displaymetrics.widthPixels;
-        window.setLayout(dw, ViewGroup.LayoutParams.WRAP_CONTENT);
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-
-        Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-        positiveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Boolean wantToCloseDialog = saveData(false);
-                if (wantToCloseDialog) {
-                    dialog.dismiss();
-                } else {
-                    Toast.makeText(getActivity(), R.string.wrong_value, Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        Button neutralButton = dialog.getButton(Dialog.BUTTON_NEUTRAL);
-        neutralButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (saveData(true)) {
-                    Toast.makeText(getActivity(), R.string.data_is_save, Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }*/
 
     private boolean saveData(boolean isUpdateData) {
         boolean isSave = false;

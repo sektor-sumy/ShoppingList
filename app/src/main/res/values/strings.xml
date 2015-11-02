@@ -23,6 +23,12 @@
     <string name="select_bought">Выбрать купленые</string>
     <string name="select_not_bought">Выбрать не купленые</string>
 
+    <!--Item menu-->
+    <string name="take_photo">"Сделать снимок</string>
+    <string name="select_from_gallery">Выбрать из галереи</string>
+    <string name="reset_image">Сбросить изображение</string>
+
+
     <string name="item_name">Название товара</string>
     <string name="empty_list">В списке нет ни одного товара</string>
     <string name="wrong_value">Проверьте ввод данных</string>

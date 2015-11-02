@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/update_item"
+        android:title="@string/update"
+        android:icon="@drawable/ic_refresh_white_24dp"
+        app:showAsAction="always|withText"
+        android:visible="false"/>
+    <item
+        android:id="@+id/save_item"
+        android:title="@string/save"
+        android:icon="@drawable/ic_done_white_24dp"
+        app:showAsAction="always|withText"/>
+    <item
+        android:id="@+id/take_photo"
+        android:title="@string/take_photo"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/select_from_gallery"
+        android:title="@string/select_from_gallery"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/reset_image"
+        android:title="@string/reset_image"
+        app:showAsAction="never"/>
+</menu>
