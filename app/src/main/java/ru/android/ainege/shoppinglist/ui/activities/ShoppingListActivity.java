@@ -173,15 +173,15 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         itemsInListDS.setSortSettings(mIsBoughtFirst, sortType);
 
         if (!prefs.getBoolean(getString(R.string.settings_key_sort_is_default_data), true)) {
-            mDataSave = SettingsDataItem.DATA_NOT_DEFAULT;
+            mDataSave = SettingsDataItem.NOT_USE_DEFAULT_DATA;
         } else {
             String save = prefs.getString(getString(R.string.settings_key_sort_data_item), "");
             if (save.contains(getResources().getString(R.string.data_item_button))) {
-                mDataSave = SettingsDataItem.DATA_SAVE_BUTTON;
+                mDataSave = SettingsDataItem.SAVE_DATA_BUTTON;
             } else if (save.contains(getResources().getString(R.string.data_item_always))) {
-                mDataSave = SettingsDataItem.DATA_SAVE_ALWAYS;
+                mDataSave = SettingsDataItem.ALWAYS_SAVE_DATA;
             } else if (save.contains(getResources().getString(R.string.data_item_never))) {
-                mDataSave = SettingsDataItem.DATA_SAVE_NEVER;
+                mDataSave = SettingsDataItem.NEVER_SAVE_DAT;
             }
         }
     }

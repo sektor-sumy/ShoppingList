@@ -1,8 +1,8 @@
 package ru.android.ainege.shoppinglist.ui;
 
 public interface SettingsDataItem {
-    String DATA_NOT_DEFAULT = "dataNotDefault";
-    String DATA_SAVE_BUTTON = "dataSaveButton";
-    String DATA_SAVE_ALWAYS = "dataSaveAlways";
-    String DATA_SAVE_NEVER = "dataSaveNever";
+    String NOT_USE_DEFAULT_DATA = "notUseDefaultData";
+    String SAVE_DATA_BUTTON = "saveDataButton";
+    String ALWAYS_SAVE_DATA = "alwaysSaveData";
+    String NEVER_SAVE_DAT = "neverSaveData";
 }

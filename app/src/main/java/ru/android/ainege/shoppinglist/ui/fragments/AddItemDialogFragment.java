@@ -44,7 +44,10 @@ import ru.android.ainege.shoppinglist.ui.Validation;
 public class AddItemDialogFragment extends Fragment implements SettingsDataItem {
     public static final String ID_LIST = "idList";
     public static final String ID_ITEM = "idItem";
-    public static final String DATA_SAVE = "dataSave";
+    public static final String DEFAULT_SAVE_DATA = "dataSave";
+
+    private boolean mIsUseDefaultData = false;
+    private boolean mIsAlwaysSave = false;
 
     private AutoCompleteTextView mName;
     private EditText mAmount;
@@ -62,13 +65,11 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
     private long mIdExistItem = -1;
     private SimpleCursorAdapter completeTextAdapter;
 
-    private boolean mIsAlwaysSave = false;
-    private boolean mIsNotDefault = false;
 
     public static Fragment newInstance(long id, String dataSave) {
         Bundle args = new Bundle();
         args.putLong(ID_LIST, id);
-        args.putString(DATA_SAVE, dataSave);
+        args.putString(DEFAULT_SAVE_DATA, dataSave);
 
         AddItemDialogFragment fragment = new AddItemDialogFragment();
         fragment.setArguments(args);
@@ -82,11 +83,11 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
 
         setHasOptionsMenu(true);
 
-        if (DATA_SAVE_ALWAYS.equals(getArguments().getString(DATA_SAVE))) {
+        if (ALWAYS_SAVE_DATA.equals(getArguments().getString(DEFAULT_SAVE_DATA))) {
             mIsAlwaysSave = true;
         }
-        if (!DATA_NOT_DEFAULT.equals(getArguments().getString(DATA_SAVE))) {
-            mIsNotDefault = true;
+        if (!NOT_USE_DEFAULT_DATA.equals(getArguments().getString(DEFAULT_SAVE_DATA))) {
+            mIsUseDefaultData = true;
         }
     }
 
@@ -115,7 +116,7 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.item_menu, menu);
-        if (DATA_SAVE_BUTTON.equals(getArguments().getString(DATA_SAVE))) {
+        if (SAVE_DATA_BUTTON.equals(getArguments().getString(DEFAULT_SAVE_DATA))) {
             menu.findItem(R.id.update_item).setVisible(true);
         }
     }
@@ -192,7 +193,7 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
                 if (s.length() == 0) {
                     mName.setError(getResources().getText(R.string.error_name));
                 } else {
-                    if (mIdSelectedItem != -1 && mIsNotDefault) {
+                    if (mIdSelectedItem != -1 && mIsUseDefaultData) {
                         mAmount.setText(mAddedAmount);
                         mUnits.setSelection(mAddedUnit);
                         mPrice.setText(mAddedPrice);
@@ -218,7 +219,7 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mIdSelectedItem = l;
-                if (mIsNotDefault) {
+                if (mIsUseDefaultData) {
                     Cursor c = new ItemDataSource(getActivity()).get(mIdSelectedItem);
                     double amount = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
                     if (amount > 0) {
