@@ -13,9 +13,14 @@
 
     <dimen name="column_wight">75dp</dimen>
 
+    <!--fragment_item-->
+    <dimen name="column_left">100dp</dimen>
+    <dimen name="margin_top">30dp</dimen>
+    <dimen name="column_right">70dp</dimen>
+    <dimen name="padding_hint">10dp</dimen>
+
     <dimen name="dialog_margin">10dp</dimen>
     <dimen name="dialog_margin_top">20dp</dimen>
-    <dimen name="dialog_padding_hint">10dp</dimen>
     <dimen name="dialog_item_amount_weight">75dp</dimen>
     <dimen name="dialog_item_spinner_weight">60dp</dimen>
     <dimen name="dialog_item_price_weight">100dp</dimen>

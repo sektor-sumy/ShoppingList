@@ -16,7 +16,7 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_scrollFlags="enterAlways"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="?attr/colorPrimary"
             android:fitsSystemWindows="true">
 
@@ -38,155 +38,165 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="@dimen/padding_16dp"
-        android:paddingRight="@dimen/padding_16dp"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <CheckBox
-            android:id="@+id/is_bought"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/is_bought" />
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/padding_16dp"
+            android:paddingRight="@dimen/padding_16dp">
 
-        <AutoCompleteTextView
-            android:id="@+id/new_item_name"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:paddingLeft="@dimen/dialog_padding_hint"
-            android:hint="@string/item_name"
-            android:layout_below="@+id/is_bought" />
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/name_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/info"
-            android:layout_gravity="center_horizontal"
-            android:visibility="gone"
-            android:gravity="center_horizontal"
-            android:layout_below="@+id/new_item_name" />
+                <AutoCompleteTextView
+                    android:id="@+id/new_item_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/padding_hint"
+                    android:hint="@string/item_name" />
 
-        <TextView
-            android:id="@+id/amount_text"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="Количество"
-            android:gravity="left"
-            android:layout_alignBottom="@+id/new_amount_item"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
+            </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            android:id="@+id/new_amount_item"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:gravity="center"
-            android:hint="@string/one"
-            android:inputType="numberDecimal"
-            android:digits="0123456789.,"
-            android:singleLine="true"
-            android:layout_below="@+id/info"
-            android:layout_toRightOf="@+id/amount_text"
-            android:layout_toLeftOf="@+id/new_amount_units" />
+            <TextView
+                android:id="@+id/info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"
+                android:gravity="center_horizontal"
+                android:layout_below="@id/name_input_layout" />
 
-        <Spinner
-            android:id="@+id/new_amount_units"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_below="@+id/new_item_name"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_above="@+id/price" />
+            <TextView
+                android:id="@+id/amount_text"
+                android:layout_width="@dimen/column_left"
+                android:layout_height="wrap_content"
+                android:text="@string/amount"
+                android:gravity="left"
+                android:layout_alignTop="@+id/amount_input_layout"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="@dimen/margin_top" />
 
-        <TextView
-            android:id="@+id/price"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="@string/price"
-            android:gravity="left"
-            android:layout_alignBottom="@+id/new_item_price"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/amount_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/info"
+                android:layout_toRightOf="@+id/amount_text"
+                android:layout_toLeftOf="@+id/new_amount_units" >
 
-        <EditText
-            android:id="@+id/new_item_price"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:gravity="center"
-            android:layout_weight="0.5"
-            android:hint="@string/zero_price"
-            android:inputType="numberDecimal"
-            android:digits="0123456789.,"
-            android:singleLine="true"
-            android:layout_below="@+id/new_amount_item"
-            android:layout_toRightOf="@+id/price"
-            android:layout_toLeftOf="@+id/val"/>
+                <EditText
+                    android:id="@+id/new_amount_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:digits="0123456789.,"
+                    android:singleLine="true"/>
 
-        <TextView
-            android:id="@+id/val"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="руб"
-            android:gravity="center"
-            android:layout_alignBottom="@+id/price"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignLeft="@+id/new_amount_units"
-            android:layout_alignStart="@+id/new_amount_units" />
+            </android.support.design.widget.TextInputLayout>
 
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/finishPriceText"
-            android:gravity="left"
-            android:visibility="visible"
-            android:text="Итоговая цена: "
-            android:layout_alignBottom="@+id/finishPrice"/>
+            <Spinner
+                android:id="@+id/new_amount_units"
+                android:layout_width="@dimen/column_right"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_alignTop="@+id/amount_input_layout"
+                android:layout_toRightOf="@+id/price_input_layout"
+                android:layout_toEndOf="@+id/price_input_layout"
+                android:layout_marginTop="@dimen/margin_top" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/finishPrice"
-            android:gravity="right"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:visibility="visible"
-            android:text="555 руб"
-            android:layout_below="@+id/new_item_price"
-            android:layout_toRightOf="@+id/finishPriceText"
-            android:layout_alignLeft="@+id/new_item_price"
-            android:layout_marginTop="3dp"/>
+            <TextView
+                android:id="@+id/price_text"
+                android:layout_width="@dimen/column_left"
+                android:layout_height="wrap_content"
+                android:text="@string/price"
+                android:gravity="left"
+                android:layout_below="@+id/amount_input_layout"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="@dimen/margin_top" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/coment"
-            android:layout_gravity="center"
-            android:gravity="left"
-            android:visibility="visible"
-            android:text="Коментарий"
-            android:layout_below="@+id/finishPrice"
-            android:layout_marginTop="15dp"/>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/price_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/amount_input_layout"
+                android:layout_toRightOf="@+id/price_text"
+                android:layout_toLeftOf="@+id/currency" >
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:id="@+id/editText"
-            android:layout_below="@+id/coment"
-            android:layout_alignLeft="@+id/coment"
-            android:layout_alignStart="@+id/coment"
-            android:layout_alignRight="@+id/coment"
-            android:layout_alignEnd="@+id/coment" />
+                <EditText
+                    android:id="@+id/new_item_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:digits="0123456789.,"
+                    android:singleLine="true" />
 
-    </RelativeLayout>
+            </android.support.design.widget.TextInputLayout>
 
+            <TextView
+                android:id="@+id/currency"
+                android:layout_width="@dimen/column_right"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_below="@+id/amount_input_layout"
+                android:layout_alignRight="@+id/comment_input_layout"
+                android:layout_alignEnd="@+id/comment_input_layout"
+                android:layout_marginTop="@dimen/margin_top" />
+
+            <TextView
+                android:id="@+id/finish_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:gravity="right"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:visibility="gone"
+                android:layout_below="@+id/price_input_layout" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/comment_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/finish_price">
+
+                <EditText
+                    android:id="@+id/comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:maxLength="210"
+                    android:maxLines="5"
+                    android:hint="@string/comment"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <ToggleButton
+                android:id="@+id/is_bought"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:drawableRight="@drawable/ic_toggle_button"
+                android:textOff="@string/in_card"
+                android:textOn="@string/bought"
+                android:layout_below="@+id/comment_input_layout"
+                android:layout_alignRight="@+id/new_amount_units"
+                android:layout_alignEnd="@+id/new_amount_units" />
+
+        </RelativeLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
 </android.support.design.widget.CoordinatorLayout>

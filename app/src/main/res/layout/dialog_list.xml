@@ -12,7 +12,7 @@
         android:maxLength="80"
         android:layout_marginLeft="@dimen/dialog_margin"
         android:layout_marginRight="@dimen/dialog_margin"
-        android:paddingLeft="@dimen/dialog_padding_hint"
+        android:paddingLeft="@dimen/padding_hint"
         android:layout_marginTop="@dimen/dialog_margin_top"
         android:layout_marginBottom="@dimen/dialog_margin"
         android:hint="@string/list_name"/>

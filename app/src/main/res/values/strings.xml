@@ -14,7 +14,6 @@
     <string name="update">Обновить</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="price">Цена</string>
     <string name="is_bought">В корзине?</string>
 
     <!--CAB menu-->
@@ -28,8 +27,14 @@
     <string name="select_from_gallery">Выбрать из галереи</string>
     <string name="reset_image">Сбросить изображение</string>
 
-
+    <!--fragment_item-->
     <string name="item_name">Название товара</string>
+    <string name="amount">Количество</string>
+    <string name="price">Цена</string>
+    <string name="comment">Коментарий</string>
+    <string name="in_card">В корзину </string>
+    <string name="bought">Куплено </string>
+
     <string name="empty_list">В списке нет ни одного товара</string>
     <string name="wrong_value">Проверьте ввод данных</string>
     <string name="error_value">Неверное значение</string>
