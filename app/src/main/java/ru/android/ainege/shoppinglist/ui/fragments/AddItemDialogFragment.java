@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -17,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ImageView;
@@ -25,6 +25,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -33,7 +34,9 @@ import java.util.Date;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource.UnitCursor;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
@@ -49,22 +52,195 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
     private boolean mIsUseDefaultData = false;
     private boolean mIsAlwaysSave = false;
 
+    private TextInputLayout mNameInputLayout;
     private AutoCompleteTextView mName;
-    private EditText mAmount;
-    private EditText mPrice;
-    private CheckBox mIsBought;
-    private Spinner mUnits;
     private TextView mInfo;
+    private TextInputLayout mAmountInputLayout;
+    private EditText mAmount;
+    private Spinner mUnits;
+    private TextInputLayout mPriceInputLayout;
+    private EditText mPrice;
+    private TextView mCurrency;
     private TextView mFinishPrice;
+    private TextInputLayout mCommentInputLayout;
+    private EditText mComment;
+    private ToggleButton mIsBought;
 
+    private String mCurrencyList;
     private String mAddedAmount = "";
-    private String mAddedPrice = "";
     private int mAddedUnit = 0;
+    private String mAddedPrice = "";
+    private String mAddedComment = "";
 
+    private long mIdList;
     private long mIdSelectedItem = -1;
     private long mIdExistItem = -1;
-    private SimpleCursorAdapter completeTextAdapter;
 
+    private TextWatcher mNameChangedListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (s.length() == 0) {
+                mNameInputLayout.setErrorEnabled(true);
+                mNameInputLayout.setError(getString(R.string.error_name));
+            } else {
+                if (mNameInputLayout.getError() != null) {
+                    mNameInputLayout.setError(null);
+                    mNameInputLayout.setErrorEnabled(false);
+                }
+                //Check is the goods in the list. If there is a warning display
+                ShoppingListCursor cursor = ShoppingListDataSource.getInstance(getActivity()).existItemInList(s.toString(), mIdList);
+                if (cursor.moveToFirst()) {
+                    mInfo.setText(R.string.info_exit_item_in_list);
+                    mInfo.setVisibility(View.VISIBLE);
+                    mIdExistItem = cursor.getItem().getIdItem();
+                } else {
+                    mInfo.setVisibility(View.GONE);
+                    mIdExistItem = -1;
+                }
+                //If you select a existent goods and default data are used,
+                //fill in the data that have been previously introduced
+                if (mIsUseDefaultData && mIdSelectedItem != -1) {
+                    mAmount.setText(mAddedAmount);
+                    mUnits.setSelection(mAddedUnit);
+                    mPrice.setText(mAddedPrice);
+                    mComment.setText(mAddedComment);
+                    mIdSelectedItem = -1;
+                }
+            }
+        }
+    };
+    private TextWatcher mAmountChangedListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (s != null && s.length() > 0) {
+                if (!Validation.isValid(mAmount.getText().toString().trim(), false)) {
+                    mAmountInputLayout.setError(getString(R.string.error_value));
+                } else {
+                    if (mAmountInputLayout.getError() != null) {
+                        mAmountInputLayout.setError(null);
+                        mAmountInputLayout.setErrorEnabled(false);
+                    }
+                    if (mPrice.getText().length() > 0) {
+                        setFinishPrice();
+                    }
+                    if (mIdSelectedItem == -1) {
+                        mAddedAmount = String.valueOf(s);
+                    }
+                }
+            } else {
+                mFinishPrice.setVisibility(View.GONE);
+            }
+        }
+    };
+    private TextWatcher mPriceChangedListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (s != null && s.length() > 0) {
+                if (!Validation.isValid(mPrice.getText().toString().trim(), true)) {
+                    mPriceInputLayout.setErrorEnabled(true);
+                    mPriceInputLayout.setError(getString(R.string.error_value));
+                } else {
+                    if (mPriceInputLayout.getError() != null) {
+                        mPriceInputLayout.setError(null);
+                        mPriceInputLayout.setErrorEnabled(false);
+                    }
+                    if (mAmount.getText().length() > 0) {
+                        setFinishPrice();
+                    }
+                    if (mIdSelectedItem == -1) {
+                        mAddedPrice = String.valueOf(s);
+                    }
+                }
+            } else {
+                mFinishPrice.setVisibility(View.GONE);
+            }
+        }
+    };
+    private TextWatcher mCommentChangedListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (s != null && s.length() > 0) {
+                mAddedComment = String.valueOf(s);
+            }
+        }
+    };
+
+    private AdapterView.OnItemClickListener mOnNameClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            mIdSelectedItem = l;
+            //If default data are used, they fill in the fields
+            if (mIsUseDefaultData) {
+                ItemDataSource.ItemCursor c = new ItemDataSource(getActivity()).get(mIdSelectedItem);
+                c.moveToFirst();
+                Item item = c.getItem();
+
+                double amount = item.getAmount();
+                if (amount > 0) {
+                    mAmount.setText(new DecimalFormat("#.######").format(amount));
+                    mUnits.setSelection((int) item.getIdUnit());
+                }
+                double price = item.getPrice();
+                if (price > 0) {
+                    mPrice.setText(String.format("%.2f", price));
+                }
+                mComment.setText(item.getComment());
+            }
+        }
+    };
+    private AdapterView.OnItemSelectedListener mOnUnitSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            if (mIdSelectedItem == -1) {
+                mAddedUnit = mUnits.getSelectedItemPosition();
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+
+        }
+    };
 
     public static Fragment newInstance(long id, String dataSave) {
         Bundle args = new Bundle();
@@ -80,8 +256,10 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true);
+
+        mIdList = getArguments().getLong(ID_LIST);
+        mCurrencyList = "руб"; //TODO get from settings
 
         if (ALWAYS_SAVE_DATA.equals(getArguments().getString(DEFAULT_SAVE_DATA))) {
             mIsAlwaysSave = true;
@@ -106,7 +284,7 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
         });
 
         ImageView appBarImage = (ImageView) v.findViewById(R.id.appbar_image);
-        appBarImage.setImageResource(R.drawable.list);
+        appBarImage.setImageResource(R.drawable.list); //TODO get image from db
 
         setData(v);
         return v;
@@ -152,98 +330,45 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
     }
 
     private void setData(View v) {
+        mInfo = (TextView) v.findViewById(R.id.info);
+
+        mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
+        mName = (AutoCompleteTextView) v.findViewById(R.id.new_item_name);
+        mName.addTextChangedListener(mNameChangedListener);
+        mName.setAdapter(getCompleteTextAdapter());
+        mName.setOnItemClickListener(mOnNameClickListener);
+
+        mFinishPrice = (TextView) v.findViewById(R.id.finish_price);
+
+        mAmountInputLayout = (TextInputLayout) v.findViewById(R.id.amount_input_layout);
+        mAmount = (EditText) v.findViewById(R.id.new_amount_item);
+        mAmount.addTextChangedListener(mAmountChangedListener);
+
         mUnits = (Spinner) v.findViewById(R.id.new_amount_units);
-        mUnits.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (mIdSelectedItem == -1) {
-                    mAddedUnit = mUnits.getSelectedItemPosition();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
-                android.R.layout.simple_spinner_item,
-                new UnitsDataSource(getActivity()).getAll(),
-                new String[] {UnitsTable.COLUMN_NAME},
-                new int[] {android.R.id.text1}, 0);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mUnits.setAdapter(spinnerAdapter);
+        mUnits.setAdapter(getSpinnerAdapter());
+        mUnits.setOnItemSelectedListener(mOnUnitSelectedListener);
         mUnits.setSelection(0);
 
-        mName = (AutoCompleteTextView) v.findViewById(R.id.new_item_name);
-        mInfo = (TextView) v.findViewById(R.id.info);
-        mName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        mPriceInputLayout = (TextInputLayout) v.findViewById(R.id.price_input_layout);
+        mPrice = (EditText) v.findViewById(R.id.new_item_price);
+        mPrice.addTextChangedListener(mPriceChangedListener);
 
-            }
+        mCurrency = (TextView) v.findViewById(R.id.currency);
+        mCurrency.setText(mCurrencyList);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+        mCommentInputLayout = (TextInputLayout) v.findViewById(R.id.comment_input_layout);
+        mComment = (EditText) v.findViewById(R.id.comment);
+        mComment.addTextChangedListener(mCommentChangedListener);
 
-            }
+        mIsBought = (ToggleButton) v.findViewById(R.id.is_bought);
+    }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.length() == 0) {
-                    mName.setError(getResources().getText(R.string.error_name));
-                } else {
-                    if (mIdSelectedItem != -1 && mIsUseDefaultData) {
-                        mAmount.setText(mAddedAmount);
-                        mUnits.setSelection(mAddedUnit);
-                        mPrice.setText(mAddedPrice);
-                        mIdSelectedItem = -1;
-                    }
-                    //Cursor cursor = new ShoppingListDataSource(getActivity()).existItemInList(s.toString(), getArguments().getLong(ID_LIST));
-                    Cursor cursor = ShoppingListDataSource.getInstance(getActivity()).existItemInList(s.toString(), getArguments().getLong(ID_LIST));
-                    if (cursor != null) {
-                        mInfo.setText(R.string.info_exit_item_in_list);
-                        mInfo.setVisibility(View.VISIBLE);
-                        mIdExistItem = cursor.getLong(cursor.getColumnIndex(ItemsTable.COLUMN_ID));
-                    } else {
-                        mInfo.setVisibility(View.GONE);
-                        mIdExistItem = -1;
-                    }
-                    if (mName.getError() != null) {
-                        mName.setError(null);
-                    }
-                }
-            }
-        });
-        mName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                mIdSelectedItem = l;
-                if (mIsUseDefaultData) {
-                    Cursor c = new ItemDataSource(getActivity()).get(mIdSelectedItem);
-                    double amount = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_AMOUNT));
-                    if (amount > 0) {
-                        mAmount.setText(new DecimalFormat("#.######").format(amount));
-                        mUnits.setSelection(c.getInt(c.getColumnIndex(ItemsTable.COLUMN_ID_UNIT)));
-                    }
-                    double price = c.getDouble(c.getColumnIndex(ItemsTable.COLUMN_PRICE));
-                    if (price > 0) {
-                        mPrice.setText(String.format("%.2f", price));
-                    }
-                }
-            }
-        });
-        completeTextAdapter = new SimpleCursorAdapter(getActivity(),
+    private SimpleCursorAdapter getCompleteTextAdapter() {
+        SimpleCursorAdapter completeTextAdapter = new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_dropdown_item_1line,
                 null,
                 new String[]{ItemsTable.COLUMN_NAME},
                 new int[] {android.R.id.text1}, 0);
-        completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
-            @Override
-            public CharSequence convertToString(Cursor cursor) {
-                return cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME));
-            }
-        });
         completeTextAdapter.setFilterQueryProvider(new FilterQueryProvider() {
             @Override
             public Cursor runQuery(CharSequence charSequence) {
@@ -252,142 +377,89 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
                 return managedCursor;
             }
         });
-        mName.setAdapter(completeTextAdapter);
-
-        mAmount = (EditText) v.findViewById(R.id.new_amount_item);
-        mAmount.addTextChangedListener(new TextWatcher() {
+        completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0) {
-                    if (!Validation.isValid(mAmount.getText().toString().trim(), false)) {
-                        mAmount.setError(getResources().getText(R.string.error_value));
-                    } else {
-                        if (mIdSelectedItem == -1) {
-                            mAddedAmount = String.valueOf(s);
-                        }
-                        if (mAmount.getError() != null) {
-                            mAmount.setError(null);
-                        }
-                        if (mPrice.getText().length() > 0) {
-                            setFinishPrice();
-                        }
-                    }
-                } else {
-                    mFinishPrice.setVisibility(View.GONE);
-                }
+            public CharSequence convertToString(Cursor cursor) {
+                return ((ItemDataSource.ItemCursor) cursor).getItem().getName();
             }
         });
+        return completeTextAdapter;
+    }
 
-        mPrice = (EditText) v.findViewById(R.id.new_item_price);
-        mPrice.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s != null && s.length() > 0) {
-                    if (!Validation.isValid(mPrice.getText().toString().trim(), true)) {
-                        mPrice.setError(getResources().getText(R.string.error_value));
-                    } else {
-                        if (mIdSelectedItem == -1) {
-                            mAddedPrice = String.valueOf(s);
-                        }
-                        if (mPrice.getError() != null) {
-                            mPrice.setError(null);
-                        }
-                        if (mAmount.getText().length() > 0) {
-                            setFinishPrice();
-                        }
-                    }
-                } else {
-                    mFinishPrice.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        mFinishPrice = (TextView) v.findViewById(R.id.finishPrice);
-        if (mAmount.getText().length() > 0 && mPrice.getText().length() > 0) {
-            setFinishPrice();
-        }
-
-        mIsBought = (CheckBox) v.findViewById(R.id.is_bought);
+    private SimpleCursorAdapter getSpinnerAdapter(){
+        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
+                android.R.layout.simple_spinner_item,
+                new UnitsDataSource(getActivity()).getAll(),
+                new String[] {UnitsTable.COLUMN_NAME},
+                new int[] {android.R.id.text1}, 0);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        return spinnerAdapter;
     }
 
     private void setFinishPrice() {
         double amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
         double price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
-        mFinishPrice.setText(localValue(amount * price));
+        String finalPriceText = getString(R.string.finish_price) + localValue(amount * price) + " " + mCurrencyList;
+        mFinishPrice.setText(finalPriceText);
         mFinishPrice.setVisibility(View.VISIBLE);
+    }
+
+    private String localValue(double value) {
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setMinimumFractionDigits(2);
+        nf.setMaximumFractionDigits(2);
+        return nf.format(value);
     }
 
     private boolean saveData(boolean isUpdateData) {
         boolean isSave = false;
         String name = mName.getText().toString().trim();
-        if(name.equals("")) {
-            mName.setError(getResources().getText(R.string.error_value));
+        if (name.length() == 0) {
+            mName.setError(getString(R.string.error_value));
         }
         if (mName.getError() == null && mAmount.getError() == null && mPrice.getError() == null) {
             double amount = 0.0;
-            double price = 0.0;
             if (mAmount.getText().length() != 0) {
                 amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
             }
-            Cursor c = (Cursor) mUnits.getSelectedItem();
-            long idUnit = c.getLong(c.getColumnIndex(UnitsTable.COLUMN_ID));
+            long idUnit = ((UnitCursor) mUnits.getSelectedItem()).getUnit().getId();
+            double price = 0.0;
             if (mPrice.getText().length() != 0) {
                 price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
             }
+            String comment = mComment.getText().toString();
             Boolean isBought = mIsBought.isChecked();
 
             ItemDataSource itemDS = new ItemDataSource(getActivity());
-            if(isUpdateData) { //сохранение если выбрана настройка "кнопка" и нажата кнопка
-                if (mIdSelectedItem != -1) {
-                    //itemDS.update(name, amount, idUnit, price, mIdSelectedItem);
-                    itemDS.update(new Item(name, amount, idUnit, price));
-                } else {
-                    //mIdSelectedItem = (int) itemDS.add(name, amount, idUnit, price);
-                    mIdSelectedItem = (int) itemDS.add(new Item(name, amount, idUnit, price));
-                }
+
+
+            if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
+                //TODO updateItem(new Item(name, amount, idUnit, price, comment));
+                updateItem(new Item(name, amount, idUnit, price));
             } else {
                 long idItem;
-                if (mIsAlwaysSave) { //сохранение если выбрана настройка "сохранять всегда"
-                    if (mIdSelectedItem != -1) {
-                        idItem = mIdSelectedItem;
-                        itemDS.update(new Item(name, amount, idUnit, price));
-                    } else {
-                        idItem = (int) itemDS.add(new Item(name, amount, idUnit, price));
-                    }
-                } else { //сохранение если выбрана настройка "не сохранять"
+                if (mIsAlwaysSave) { //Always save default data
+                    //TODO updateItem(new Item(name, amount, idUnit, price, comment));
+                    updateItem(new Item(name, amount, idUnit, price));
+                    idItem = mIdSelectedItem;
+                } else { //Don`t save default data
                     if (mIdSelectedItem != -1) {
                         idItem = mIdSelectedItem;
                     } else {
                         idItem = (int) itemDS.add(new Item(name));
                     }
                 }
-                long idList = getArguments().getLong(ID_LIST);
 
+                //Save item to list
+                long idList = getArguments().getLong(ID_LIST);
                 ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance(getActivity());
+
                 long id = mIdExistItem;
-                if (mIdExistItem != -1) {
-                    itemInListDS.update(new ShoppingList(mIdExistItem, idList, isBought, amount, idUnit, price,  new Date()));
-                } else {
+                if (mIdExistItem != -1) { //If item in list, update it
+                    //TODO itemInListDS.update(new ShoppingList(mIdExistItem, idList, isBought, amount, idUnit, price, comment, new Date()));
+                    itemInListDS.update(new ShoppingList(mIdExistItem, idList, isBought, amount, idUnit, price, new Date()));
+                } else { //Add new item to list
+                    //TODO id = itemInListDS.add(new ShoppingList(idItem, idList, isBought, amount, idUnit, price, comment, new Date(System.currentTimeMillis() / 1000L)));
                     id = itemInListDS.add(new ShoppingList(idItem, idList, isBought, amount, idUnit, price, new Date(System.currentTimeMillis() / 1000L)));
                 }
                 sendResult(Activity.RESULT_OK, id);
@@ -397,17 +469,20 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
         return isSave;
     }
 
+    private void updateItem(Item item) {
+        ItemDataSource itemDS = new ItemDataSource(getActivity());
+        if (mIdSelectedItem != -1) {
+            item.setId(mIdSelectedItem);
+            itemDS.update(item);
+        } else {
+            mIdSelectedItem = (int) itemDS.add(item);
+        }
+    }
+
     private void sendResult(int resultCode, long id) {
         if (getTargetFragment() == null)
             return;
 
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, new Intent().putExtra(ID_ITEM, id));
-    }
-
-    private String localValue(double value) {
-        NumberFormat nf = NumberFormat.getInstance();
-        nf.setMinimumFractionDigits(2);
-        nf.setMaximumFractionDigits(2);
-        return nf.format(value);
     }
 }

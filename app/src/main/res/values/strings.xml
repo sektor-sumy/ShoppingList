@@ -22,12 +22,19 @@
     <string name="select_bought">Выбрать купленые</string>
     <string name="select_not_bought">Выбрать не купленые</string>
 
+    <!--fragment item-->
+    <string name="info_exit_item_in_list">Товар есть в списке и будет перезаписан</string>
+    <string name="error_name">Введите название</string>
+    <string name="error_value">Неверное значение</string>
+    <string name="error_comment">Слишком длинный коментарий</string>
+    <string name="data_is_save">Данные сохранены</string>
+    <string name="wrong_value">Проверьте ввод данных</string>
+    <string name="finish_price">Итоговая сумма: </string>
     <!--Item menu-->
     <string name="take_photo">"Сделать снимок</string>
     <string name="select_from_gallery">Выбрать из галереи</string>
     <string name="reset_image">Сбросить изображение</string>
-
-    <!--fragment_item-->
+    <!--layout-->
     <string name="item_name">Название товара</string>
     <string name="amount">Количество</string>
     <string name="price">Цена</string>
@@ -36,12 +43,8 @@
     <string name="bought">Куплено </string>
 
     <string name="empty_list">В списке нет ни одного товара</string>
-    <string name="wrong_value">Проверьте ввод данных</string>
-    <string name="error_value">Неверное значение</string>
-    <string name="error_name">Введите название</string>
     <string name="error_existing_name">Такое название уже есть</string>
     <string name="error_delete_list">Ошибка удаления</string>
-    <string name="info_exit_item_in_list">Товар есть в списке и будет перезаписан</string>
     <string name="info_exit_item_in_list_dont_save">Товар есть в списке и не будет сохранен</string>
     <string name="zero_price">0,0</string>
     <string name="one">1,0</string>
@@ -54,7 +57,6 @@
     <string name="delete_all_bought">Удалить все выбраное</string>
     <string name="ask_delete_list">Удалить список?</string>
 
-    <string name="data_is_save">Данные сохранены</string>
 
     <string name="settings">Настройки</string>
     <string name="settings_category_sort">Сортировка товаров в списке</string>

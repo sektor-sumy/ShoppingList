@@ -44,7 +44,6 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
     private static final int DATA_LOADER = 0;
     private static final String ADD_DIALOG_DATE = "addListDialog";
     private static final String UPDATE_DIALOG_DATE = "updateListDialog";
-    public final static String EXTRA_ID_LIST = "idList";
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -95,7 +94,8 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ShoppingListActivity.this, AddItemActivity.class);
-                i.putExtra(EXTRA_ID_LIST, mId);
+                i.putExtra(AddItemActivity.EXTRA_ID_LIST, mId);
+                i.putExtra(AddItemActivity.EXTRA_DATA_SAVE, mDataSave);
                 startActivity(i);
             }
         });
@@ -340,8 +340,9 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void selectItem(long id) {
+        mId = id;
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_container, ShoppingListFragment.newInstance(id, mIsBoughtFirst, mDataSave)).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragment_container, ShoppingListFragment.newInstance(mId, mIsBoughtFirst, mDataSave)).commit();
 
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mDrawerList);
