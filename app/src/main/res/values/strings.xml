@@ -52,6 +52,7 @@
     <string name="list_name">Название списка</string>
 
     <string name="new_list">Новый список</string>
+    <string name="buy">Купить:</string>
     <string name="delete_list">Удалить список</string>
     <string name="update_list">Изменить список</string>
     <string name="delete_all_bought">Удалить все выбраное</string>

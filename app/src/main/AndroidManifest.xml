@@ -18,7 +18,7 @@
         </activity>
         <activity
             android:name=".ui.activities.AddItemActivity"
-            android:label="@string/new_list"
+            android:label="@string/buy"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" >
         </activity>
         <activity
