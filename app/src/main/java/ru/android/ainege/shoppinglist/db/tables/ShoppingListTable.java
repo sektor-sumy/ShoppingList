@@ -12,6 +12,7 @@ public class ShoppingListTable {
     public static final String COLUMN_AMOUNT = "amount";
     public static final String COLUMN_ID_UNIT = "id_unit";
     public static final String COLUMN_PRICE = "price";
+    public static final String COLUMN_COMMENT = "comment";
     public static final String COLUMN_DATE = "date";
 
     private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
@@ -22,6 +23,7 @@ public class ShoppingListTable {
             + COLUMN_AMOUNT + " REAL, "
             + COLUMN_ID_UNIT + " INTEGER, "
             + COLUMN_PRICE + " REAL, "
+            + COLUMN_COMMENT + " TEXT, "
             + COLUMN_DATE + " INTEGER, "
             + "FOREIGN KEY (" + COLUMN_ID_UNIT + ") REFERENCES " + UnitsTable.TABLE_NAME + " (" + UnitsTable.COLUMN_ID + ")"
             + "FOREIGN KEY (" + COLUMN_ID_ITEM + ") REFERENCES " + ItemsTable.TABLE_NAME + " (" + ItemsTable.COLUMN_ID + "), "
@@ -46,6 +48,14 @@ public class ShoppingListTable {
         double[] amount = { 0, 1, 2, 0, 1, 1 };
         int[] amountUnit = { 0, 1, 1, 0, 2, 2 };
         double[] price = { 55.00, 19.5, 66, 87, 70, 105 };
+        String[] comment = {
+                "",
+                "",
+                "проверь дату изготовления",
+                "в гранулах",
+                "круглый",
+                "",
+        };
 
         for(int i = 0; i < item.length; i++) {
             ContentValues contentValue = new ContentValues();
@@ -55,6 +65,7 @@ public class ShoppingListTable {
             contentValue.put(COLUMN_AMOUNT, amount[i]);
             contentValue.put(COLUMN_ID_UNIT, amountUnit[i]);
             contentValue.put(COLUMN_PRICE, price[i]);
+            contentValue.put(COLUMN_COMMENT, comment[i]);
             contentValue.put(COLUMN_DATE, i);
             database.insert(TABLE_NAME, null, contentValue);
         }

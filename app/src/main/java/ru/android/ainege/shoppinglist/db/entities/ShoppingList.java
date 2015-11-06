@@ -10,30 +10,24 @@ public class ShoppingList implements Serializable {
     private double mAmount;
     private long mIdUnit;
     private double mPrice;
+    private String mComment;
     private Date mDate;
     private Item mItem;
     private Unit mUnit;
 
-    public ShoppingList(long idItem, long idList, boolean isBought, Item item) {
-        mItem = item;
-    }
-
-    public ShoppingList(long idItem, boolean isBought, double amount, double price, Date date) {
+    public ShoppingList(long idItem, boolean isBought, double amount, long idUnit, double price,  String comment, Date date) {
         mIdItem = idItem;
-        mIsBought = isBought;
-        mAmount = amount;
-        mPrice = price;
-        mDate = date;
-    }
-
-    public ShoppingList(long idItem, long idList, boolean isBought, double amount, long idUnit, double price, Date date) {
-        mIdItem = idItem;
-        mIdList = idList;
         mIsBought = isBought;
         mAmount = amount;
         mIdUnit = idUnit;
         mPrice = price;
+        mComment = comment;
         mDate = date;
+    }
+
+    public ShoppingList(long idItem, long idList, boolean isBought, double amount, long idUnit, double price, String comment, Date date) {
+        this(idItem, isBought, amount, idUnit, price, comment, date);
+        mIdList = idList;
     }
 
     public long getIdItem() {
@@ -82,6 +76,14 @@ public class ShoppingList implements Serializable {
 
     public void setPrice(double price) {
         this.mPrice = price;
+    }
+
+    public String getComment() {
+        return mComment;
+    }
+
+    public void setComment(String comment) {
+        mComment = comment;
     }
 
     public Date getDate() {

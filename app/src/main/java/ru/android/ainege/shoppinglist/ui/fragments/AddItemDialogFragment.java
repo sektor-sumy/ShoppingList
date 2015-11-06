@@ -434,13 +434,11 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
 
 
             if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
-                //TODO updateItem(new Item(name, amount, idUnit, price, comment));
-                updateItem(new Item(name, amount, idUnit, price));
+                updateItem(new Item(name, amount, idUnit, price, comment));
             } else {
                 long idItem;
                 if (mIsAlwaysSave) { //Always save default data
-                    //TODO updateItem(new Item(name, amount, idUnit, price, comment));
-                    updateItem(new Item(name, amount, idUnit, price));
+                    updateItem(new Item(name, amount, idUnit, price, comment));
                     idItem = mIdSelectedItem;
                 } else { //Don`t save default data
                     if (mIdSelectedItem != -1) {
@@ -456,11 +454,9 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
 
                 long id = mIdExistItem;
                 if (mIdExistItem != -1) { //If item in list, update it
-                    //TODO itemInListDS.update(new ShoppingList(mIdExistItem, idList, isBought, amount, idUnit, price, comment, new Date()));
-                    itemInListDS.update(new ShoppingList(mIdExistItem, idList, isBought, amount, idUnit, price, new Date()));
+                    itemInListDS.update(new ShoppingList(mIdExistItem, idList, isBought, amount, idUnit, price, comment, new Date()));
                 } else { //Add new item to list
-                    //TODO id = itemInListDS.add(new ShoppingList(idItem, idList, isBought, amount, idUnit, price, comment, new Date(System.currentTimeMillis() / 1000L)));
-                    id = itemInListDS.add(new ShoppingList(idItem, idList, isBought, amount, idUnit, price, new Date(System.currentTimeMillis() / 1000L)));
+                    id = itemInListDS.add(new ShoppingList(idItem, idList, isBought, amount, idUnit, price, comment, new Date(System.currentTimeMillis() / 1000L)));
                 }
                 sendResult(Activity.RESULT_OK, id);
             }

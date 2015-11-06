@@ -60,14 +60,9 @@ public class ShoppingListDataSource {
 
     public ShoppingListCursor getItemsInList(long id) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        String selectQuery = "SELECT " + ShoppingListTable.COLUMN_ID_ITEM + ", " +
-                ShoppingListTable.COLUMN_IS_BOUGHT + ", " +
+        String selectQuery = "SELECT " + ShoppingListTable.TABLE_NAME + ".*, " +
                 ItemsTable.COLUMN_NAME + ", " +
-                ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_AMOUNT + ", " +
-                ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_UNIT + ", " +
-                UnitsTable.COLUMN_NAME + ", " +
-                ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_PRICE + ", " +
-                ShoppingListTable.COLUMN_DATE +
+                UnitsTable.COLUMN_NAME +
                 " FROM " + ShoppingListTable.TABLE_NAME + " INNER JOIN " + ItemsTable.TABLE_NAME + " ON " +
                 ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_ITEM + " = " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID +
                 " LEFT JOIN " + UnitsTable.TABLE_NAME + " ON " +
@@ -79,9 +74,9 @@ public class ShoppingListDataSource {
     }
 
 
-    public ShoppingListCursor existItemInList(String name, long idList) { //// TODO: 20.10.2015
+    public ShoppingListCursor existItemInList(String name, long idList) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("Select * from " + ShoppingListTable.TABLE_NAME + " INNER JOIN " + ItemsTable.TABLE_NAME +
+        Cursor cursor = db.rawQuery("Select " + ShoppingListTable.TABLE_NAME + ".* from " + ShoppingListTable.TABLE_NAME + " INNER JOIN " + ItemsTable.TABLE_NAME +
                 " ON " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_ITEM + " = " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID +
                 " where " + ItemsTable.COLUMN_NAME + " like '" + name +
                 "' AND " + ShoppingListTable.COLUMN_ID_LIST + " = " + idList, null);
@@ -138,6 +133,7 @@ public class ShoppingListDataSource {
         values.put(ShoppingListTable.COLUMN_AMOUNT, shoppingList.getAmount());
         values.put(ShoppingListTable.COLUMN_ID_UNIT, shoppingList.getIdUnit());
         values.put(ShoppingListTable.COLUMN_PRICE, shoppingList.getPrice());
+        values.put(ShoppingListTable.COLUMN_COMMENT, shoppingList.getComment());
         values.put(ShoppingListTable.COLUMN_ID_ITEM, shoppingList.getIdItem());
         return values;
     }
@@ -149,20 +145,24 @@ public class ShoppingListDataSource {
 
         public ShoppingList getItem() {
             long idItem = getLong(getColumnIndex(ShoppingListTable.COLUMN_ID_ITEM));
+            long idList = getLong(getColumnIndex(ShoppingListTable.COLUMN_ID_LIST));
             boolean isBought = getInt(getColumnIndex(ShoppingListTable.COLUMN_IS_BOUGHT)) == 1;
             double amount = getDouble(getColumnIndex(ShoppingListTable.COLUMN_AMOUNT));
+            long idUnit = getLong(getColumnIndex(ShoppingListTable.COLUMN_ID_UNIT));
             double price = getDouble(getColumnIndex(ShoppingListTable.COLUMN_PRICE));
+            String comment = getString(getColumnIndex(ItemsTable.COLUMN_COMMENT));
             long date = getLong(getColumnIndex(ShoppingListTable.COLUMN_DATE));
 
-            ShoppingList shoppingList = new ShoppingList(idItem, isBought, amount, price, new Date(date));
+            ShoppingList shoppingList = new ShoppingList(idItem, idList, isBought, amount, idUnit, price, comment, new Date(date));
+
+            if (getColumnIndex(UnitsTable.COLUMN_NAME) != -1) {
+                String unitName = getString(getColumnIndex(UnitsTable.COLUMN_NAME));
+                shoppingList.setUnit(new Unit(idUnit, unitName));
+            }
 
             if (getColumnIndex(ItemsTable.COLUMN_NAME) != -1) {
                 String nameItem = getString(getColumnIndex(ItemsTable.COLUMN_NAME));
-                long idUnit = getLong(getColumnIndex(ShoppingListTable.COLUMN_ID_UNIT));
-                String nameUnit = getString(getColumnIndex(UnitsTable.COLUMN_NAME));
-
                 shoppingList.setItem(new Item(idItem, nameItem));
-                shoppingList.setUnit(new Unit(idUnit, nameUnit));
             }
 
             return shoppingList;

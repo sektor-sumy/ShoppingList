@@ -63,6 +63,7 @@ public class ItemDataSource {
         if (item.getPrice() != -1) {
             values.put(ItemsTable.COLUMN_PRICE, item.getPrice());
         }
+        values.put(ItemsTable.COLUMN_COMMENT, item.getComment());
         return values;
     }
 
@@ -77,8 +78,9 @@ public class ItemDataSource {
             double amount = getDouble(getColumnIndex(ItemsTable.COLUMN_AMOUNT));
             long idUnit = getLong(getColumnIndex(ItemsTable.COLUMN_ID_UNIT));
             double price = getDouble(getColumnIndex(ItemsTable.COLUMN_PRICE));
+            String comment = getString(getColumnIndex(ItemsTable.COLUMN_COMMENT));
 
-            return new Item(id, name, amount, idUnit, price);
+            return new Item(id, name, amount, idUnit, price, comment);
         }
     }
 }

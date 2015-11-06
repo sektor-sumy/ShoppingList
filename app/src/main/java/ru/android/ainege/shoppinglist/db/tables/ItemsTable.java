@@ -12,6 +12,7 @@ public class ItemsTable {
     public static final String COLUMN_AMOUNT = "amount";
     public static final String COLUMN_ID_UNIT = "id_unit";
     public static final String COLUMN_PRICE = "price";
+    public static final String COLUMN_COMMENT = "comment";
 
     private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
             + "("
@@ -20,6 +21,7 @@ public class ItemsTable {
             + COLUMN_AMOUNT + " REAL, "
             + COLUMN_ID_UNIT + " INTEGER, "
             + COLUMN_PRICE + " REAL, "
+            + COLUMN_COMMENT + " TEXT, "
             + "FOREIGN KEY (" + COLUMN_ID_UNIT + ") REFERENCES " + UnitsTable.TABLE_NAME + " (" + UnitsTable.COLUMN_ID + ")"
             + ");";
 
@@ -45,6 +47,14 @@ public class ItemsTable {
         double[] amount = { 10, 11, 0, 20, 13, 14 };
         int[] amountUnit = { 2, 2, 2, 1, 1, 1 };
         double[] price = { 1055.00, 0, 1066, 1087, 1070, 1005 };
+        String[] comment = {
+                "",
+                "буханка белого",
+                "проверь дату изготовления",
+                "крупнолистовой",
+                "",
+                "не жареная",
+        };
 
         for(int i = 0; i < item.length; i++) {
             ContentValues contentValue = new ContentValues();
@@ -52,6 +62,7 @@ public class ItemsTable {
             contentValue.put(COLUMN_AMOUNT, amount[i]);
             contentValue.put(COLUMN_ID_UNIT, amountUnit[i]);
             contentValue.put(COLUMN_PRICE, price[i]);
+            contentValue.put(COLUMN_COMMENT, comment[i]);
             database.insert(TABLE_NAME, null, contentValue);
         }
     }
