@@ -200,7 +200,9 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
         @Override
         public void afterTextChanged(Editable s) {
             if (s != null && s.length() > 0) {
-                mAddedComment = String.valueOf(s);
+                if (mIdSelectedItem == -1) {
+                    mAddedComment = String.valueOf(s);
+                }
             }
         }
     };
