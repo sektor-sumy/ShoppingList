@@ -98,7 +98,7 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
                     mNameInputLayout.setErrorEnabled(false);
                 }
                 //Check is the goods in the list. If there is a warning display
-                ShoppingListCursor cursor = ShoppingListDataSource.getInstance(getActivity()).existItemInList(s.toString(), mIdList);
+                ShoppingListCursor cursor = ShoppingListDataSource.getInstance(getActivity()).existItemInList(s.toString().trim(), mIdList);
                 if (cursor.moveToFirst()) {
                     mInfo.setText(R.string.info_exit_item_in_list);
                     mInfo.setVisibility(View.VISIBLE);
@@ -434,7 +434,6 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
 
             ItemDataSource itemDS = new ItemDataSource(getActivity());
 
-
             if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
                 updateItem(new Item(name, amount, idUnit, price, comment));
             } else {
@@ -443,8 +442,8 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
                     updateItem(new Item(name, amount, idUnit, price, comment));
                     idItem = mIdSelectedItem;
                 } else { //Don`t save default data
-                    if (mIdSelectedItem != -1) {
-                        idItem = mIdSelectedItem;
+                    if (mIdSelectedItem != -1 || mIdExistItem != -1) {
+                        idItem = mIdSelectedItem == -1 ? mIdExistItem : mIdSelectedItem;
                     } else {
                         idItem = (int) itemDS.add(new Item(name));
                     }
