@@ -44,7 +44,7 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
-public class AddItemDialogFragment extends Fragment implements SettingsDataItem {
+public class AddItemFragment extends Fragment implements SettingsDataItem {
     public static final String ID_LIST = "idList";
     public static final String ID_ITEM = "idItem";
     public static final String DEFAULT_SAVE_DATA = "dataSave";
@@ -257,7 +257,7 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
         args.putLong(ID_LIST, id);
         args.putString(DEFAULT_SAVE_DATA, dataSave);
 
-        AddItemDialogFragment fragment = new AddItemDialogFragment();
+        AddItemFragment fragment = new AddItemFragment();
         fragment.setArguments(args);
 
         return fragment;

@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
@@ -42,7 +41,7 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
-public class EditItemDialogFragment extends Fragment implements SettingsDataItem {
+public class EditItemFragment extends Fragment implements SettingsDataItem {
     public static final String ITEM_IN_LIST = "itemInList";
     public static final String DEFAULT_SAVE_DATA = "dataSave";
 
@@ -171,12 +170,12 @@ public class EditItemDialogFragment extends Fragment implements SettingsDataItem
         }
     };
 
-    public static EditItemDialogFragment newInstance(ShoppingList itemInList, String dataSave) {
+    public static EditItemFragment newInstance(ShoppingList itemInList, String dataSave) {
         Bundle args = new Bundle();
         args.putSerializable(ITEM_IN_LIST, itemInList);
         args.putString(DEFAULT_SAVE_DATA, dataSave);
 
-        EditItemDialogFragment fragment = new EditItemDialogFragment();
+        EditItemFragment fragment = new EditItemFragment();
         fragment.setArguments(args);
 
         return fragment;

@@ -321,7 +321,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         switch (requestCode) {
             case ADD_DIALOG_CODE:
-                mSaveItemId = data.getLongExtra(AddItemDialogFragment.ID_ITEM, -1);
+                mSaveItemId = data.getLongExtra(AddItemFragment.ID_ITEM, -1);
                 updateData();
                 break;
             case EDIT_DIALOG_CODE:
