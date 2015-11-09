@@ -26,10 +26,10 @@ public class ItemDataSource {
         return new ItemCursor(cursor);
     }
 
-    public ItemCursor getName(String name) {
+    public ItemCursor getByName(String name) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.query(ItemsTable.TABLE_NAME, new String[]{ItemsTable.COLUMN_NAME},
-                ItemsTable.COLUMN_NAME + " like ?", new String[]{name}, null, null, null);
+        Cursor cursor = db.query(ItemsTable.TABLE_NAME, null, ItemsTable.COLUMN_NAME + " like ?",
+                new String[]{name}, null, null, null);
         return new ItemCursor(cursor);
     }
 

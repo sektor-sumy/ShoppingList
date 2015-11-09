@@ -62,7 +62,6 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
     private EditText mPrice;
     private TextView mCurrency;
     private TextView mFinishPrice;
-    private TextInputLayout mCommentInputLayout;
     private EditText mComment;
     private ToggleButton mIsBought;
 
@@ -75,6 +74,8 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
     private long mIdList;
     private long mIdSelectedItem = -1;
     private long mIdExistItem = -1;
+
+    private boolean mIsProposedItem = false;
 
     private TextWatcher mNameChangedListener = new TextWatcher() {
         @Override
@@ -97,7 +98,17 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
                     mNameInputLayout.setError(null);
                     mNameInputLayout.setErrorEnabled(false);
                 }
-                //Check is the goods in the list. If there is a warning display
+                //If selected a existent item and default data are used,
+                //when changing item, fill in the data that have been previously introduced
+                if (mIsUseDefaultData && mIdSelectedItem != -1) {
+                    mAmount.setText(mAddedAmount);
+                    mUnits.setSelection(mAddedUnit);
+                    mPrice.setText(mAddedPrice);
+                    mComment.setText(mAddedComment);
+                    mIdSelectedItem = -1;
+                }
+                //Check is the item in the list. If there is a warning display
+                //If it isn`t, check is it in the catalog of items. If there is select it
                 ShoppingListCursor cursor = ShoppingListDataSource.getInstance(getActivity()).existItemInList(s.toString().trim(), mIdList);
                 if (cursor.moveToFirst()) {
                     mInfo.setText(R.string.info_exit_item_in_list);
@@ -106,15 +117,12 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
                 } else {
                     mInfo.setVisibility(View.GONE);
                     mIdExistItem = -1;
-                }
-                //If you select a existent goods and default data are used,
-                //fill in the data that have been previously introduced
-                if (mIsUseDefaultData && mIdSelectedItem != -1) {
-                    mAmount.setText(mAddedAmount);
-                    mUnits.setSelection(mAddedUnit);
-                    mPrice.setText(mAddedPrice);
-                    mComment.setText(mAddedComment);
-                    mIdSelectedItem = -1;
+                    if (mIsProposedItem && mIdSelectedItem == -1) {
+                        ItemDataSource.ItemCursor cursorItem = new ItemDataSource(getActivity()).getByName(s.toString().trim());
+                        if (cursorItem.moveToFirst()) {
+                            mIdSelectedItem = cursorItem.getItem().getId();
+                        }
+                    }
                 }
             }
         }
@@ -261,7 +269,7 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
         setHasOptionsMenu(true);
 
         mIdList = getArguments().getLong(ID_LIST);
-        mCurrencyList = "руб"; //TODO get from settings
+        mCurrencyList = "руб"; //TODO get from db
 
         if (ALWAYS_SAVE_DATA.equals(getArguments().getString(DEFAULT_SAVE_DATA))) {
             mIsAlwaysSave = true;
@@ -358,7 +366,6 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
         mCurrency = (TextView) v.findViewById(R.id.currency);
         mCurrency.setText(mCurrencyList);
 
-        mCommentInputLayout = (TextInputLayout) v.findViewById(R.id.comment_input_layout);
         mComment = (EditText) v.findViewById(R.id.comment);
         mComment.addTextChangedListener(mCommentChangedListener);
 
@@ -375,7 +382,10 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
             @Override
             public Cursor runQuery(CharSequence charSequence) {
                 mIdSelectedItem = -1;
-                Cursor managedCursor = new ItemDataSource(getActivity()).getNames((charSequence != null ? charSequence.toString() : null));
+                Cursor managedCursor = new ItemDataSource(getActivity()).getNames(charSequence != null ? charSequence.toString().trim() : null);
+                if (managedCursor.moveToFirst()) {
+                    mIsProposedItem = true;
+                }
                 return managedCursor;
             }
         });
@@ -421,12 +431,12 @@ public class AddItemDialogFragment extends Fragment implements SettingsDataItem 
         }
         if (mName.getError() == null && mAmount.getError() == null && mPrice.getError() == null) {
             double amount = 0.0;
-            if (mAmount.getText().length() != 0) {
+            if (mAmount.getText().length() > 0) {
                 amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
             }
             long idUnit = ((UnitCursor) mUnits.getSelectedItem()).getUnit().getId();
             double price = 0.0;
-            if (mPrice.getText().length() != 0) {
+            if (mPrice.getText().length() > 0) {
                 price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
             }
             String comment = mComment.getText().toString();
