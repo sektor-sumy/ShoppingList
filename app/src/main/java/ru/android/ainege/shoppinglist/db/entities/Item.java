@@ -1,6 +1,8 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-public class Item {
+import java.io.Serializable;
+
+public class Item implements Serializable{
     private long mId;
     private String mName;
     private double mAmount;

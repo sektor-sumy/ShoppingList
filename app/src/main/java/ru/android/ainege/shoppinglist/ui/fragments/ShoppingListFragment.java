@@ -36,6 +36,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
+import ru.android.ainege.shoppinglist.ui.activities.EditItemActivity;
 
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -131,20 +132,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 
-        //old version TODO: add new item to list
-       /* EditText newItem = (EditText) v.findViewById(R.id.new_item);
-        newItem.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    AddItemDialogFragment addItemDialog = AddItemDialogFragment.newInstance(mIdList, getArguments().getString(DATA_SAVE));
-                    addItemDialog.setTargetFragment(ShoppingListFragment.this, ADD_DIALOG_CODE);
-                    addItemDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
-                }
-                return false;
-            }
-        });*/
-
         mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
         mTotalMoney = (TextView) v.findViewById(R.id.total_money);
 
@@ -164,19 +151,20 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                         }
 
                         ShoppingList item = mItemsInList.get(position);
+                        ShoppingList itemInList = new ShoppingList(item.getItem(),
+                                mIdList,
+                                item.isBought(),
+                                item.getAmount(),
+                                item.getUnit(),
+                                item.getPrice(),
+                                item.getComment());
 
-                        String name = item.getItem().getName();
-                        double amount = item.getAmount();
-                        String nameUnit = item.getUnit().getName();
-                        double price = item.getPrice();
-                        boolean isBought = item.isBought();
-                        long idItem = item.getIdItem();
+                        Intent i = new Intent(getActivity(), EditItemActivity.class);
+                        i.putExtra(EditItemActivity.EXTRA_ITEM, itemInList);
+                        i.putExtra(EditItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
+                        startActivity(i);
 
-                        EditItemDialogFragment editItemDialog = EditItemDialogFragment.newInstance(name, amount, price, isBought, nameUnit, idItem, mIdList, getArguments().getString(DATA_SAVE));
-                        editItemDialog.setTargetFragment(ShoppingListFragment.this, EDIT_DIALOG_CODE);
-                        editItemDialog.show(getFragmentManager(), EDIT_DIALOG_DATE);
-
-                        mSaveItemId = idItem;
+                        mSaveItemId = item.getIdItem();
                     }
 
                     @Override

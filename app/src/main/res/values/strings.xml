@@ -24,6 +24,7 @@
 
     <!--fragment item-->
     <string name="info_exit_item_in_list">Товар есть в списке и будет перезаписан</string>
+    <string name="info_exit_item">Такой товар уже есть. Изменения не сохранятся</string>
     <string name="error_name">Введите название</string>
     <string name="error_value">Неверное значение</string>
     <string name="error_comment">Слишком длинный коментарий</string>

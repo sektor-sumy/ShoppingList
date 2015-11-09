@@ -1,6 +1,8 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-public class Unit {
+import java.io.Serializable;
+
+public class Unit implements Serializable {
     private long mId;
     private String mName;
 

@@ -22,6 +22,11 @@
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" >
         </activity>
         <activity
+            android:name=".ui.activities.EditItemActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" >
+        </activity>
+        <activity
             android:name=".ui.activities.SettingsActivity"
             android:label="@string/settings"
             android:theme="@style/AppTheme.NoActionBar" >
