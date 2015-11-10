@@ -61,11 +61,12 @@ public class ListsDataSource {
             super(cursor);
         }
 
-        public List getItem() {
-            long id = getLong(getColumnIndex(ItemsTable.COLUMN_ID));
-            String name = getString(getColumnIndex(ItemsTable.COLUMN_NAME));
+        public List getList() {
+            long id = getLong(getColumnIndex(ListsTable.COLUMN_ID));
+            String name = getString(getColumnIndex(ListsTable.COLUMN_NAME));
+            long idCurrency = getLong(getColumnIndex(ListsTable.COLUMN_ID_CURRENCY));
 
-            return new List(id, name);
+            return new List(id, name, idCurrency);
         }
     }
 }

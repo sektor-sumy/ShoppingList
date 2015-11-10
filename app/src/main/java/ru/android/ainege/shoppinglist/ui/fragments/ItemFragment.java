@@ -30,8 +30,10 @@ import java.text.NumberFormat;
 import java.util.Date;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource.CurrencyCursor;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
@@ -71,8 +73,6 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        mCurrencyList = "руб"; //TODO get from db
-
         if (ALWAYS_SAVE_DATA.equals(getArguments().getString(DEFAULT_SAVE_DATA))) {
             mIsAlwaysSave = true;
         }
@@ -81,6 +81,8 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialog_item, container, false);
+
+        getCurrency();
 
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -97,6 +99,13 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 
         setView(v);
         return v;
+    }
+
+    private void getCurrency() {
+        CurrencyCursor cursor = new CurrenciesDataSource(getActivity()).getByList(getIdList());
+        if (cursor.moveToFirst()) {
+            mCurrencyList = cursor.getCurrency().getSymbol();
+        }
     }
 
     protected void setView(View v) {

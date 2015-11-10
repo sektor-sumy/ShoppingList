@@ -32,6 +32,8 @@ import java.util.Collections;
 import java.util.List;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource.CurrencyCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
@@ -140,7 +142,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
         mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
         mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAdapterRV = new RecyclerViewAdapter();
+        mAdapterRV = new RecyclerViewAdapter(getCurrency());
         mItemsListRV.setAdapter(mAdapterRV);
         mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
@@ -244,6 +246,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         itemTouchHelper.attachToRecyclerView(mItemsListRV);
 
         return v;
+    }
+
+    private String getCurrency() {
+        CurrencyCursor cursor = new CurrenciesDataSource(getActivity()).getByList(mIdList);
+        String currency = "";
+        if (cursor.moveToFirst()) {
+            currency = cursor.getCurrency().getSymbol();
+        }
+        return currency;
     }
 
     @Override
@@ -394,6 +405,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     public static class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
         private ArrayList<ShoppingList> mItems;
         private List<Integer> mSelectedItems = new ArrayList<>();
+        private String mCurrencyList;
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public View mView;
@@ -414,7 +426,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             }
         }
 
-        public RecyclerViewAdapter() {
+        public RecyclerViewAdapter(String currency) {
+            mCurrencyList = currency;
             mItems = new ArrayList<>();
         }
 
@@ -451,7 +464,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                         + " " + itemInList.getUnit().getName();
                 holder.mAmount.setText(amount);
             }
-            holder.mPrice.setText(localValue(itemInList.getPrice()));
+            String price = localValue(itemInList.getPrice()) + " " + mCurrencyList;
+            holder.mPrice.setText(price);
             int visibility = View.GONE;
             if (itemInList.isBought()) {
                 visibility = View.VISIBLE;

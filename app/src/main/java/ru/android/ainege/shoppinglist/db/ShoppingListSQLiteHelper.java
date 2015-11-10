@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
@@ -28,6 +29,7 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        CurrencyTable.onCreate(sqLiteDatabase);
         UnitsTable.onCreate(sqLiteDatabase);
         ListsTable.onCreate(sqLiteDatabase);
         ItemsTable.onCreate(sqLiteDatabase);

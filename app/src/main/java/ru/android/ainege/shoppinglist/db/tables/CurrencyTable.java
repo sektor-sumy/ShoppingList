@@ -3,19 +3,19 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-public class ListsTable {
+public class CurrencyTable {
 
-    public static final String TABLE_NAME = "Lists";
+    public static final String TABLE_NAME = "Currencies";
 
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NAME = "list_name";
-    public static final String COLUMN_ID_CURRENCY = "id_currency";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_SYMBOL = "symbol";
 
     private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
             + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_NAME + " TEXT NOT NULL, "
-            + COLUMN_ID_CURRENCY + " INTEGER NOT NULL"
+            + COLUMN_NAME + " TEXT NOT NULL,"
+            + COLUMN_SYMBOL + " TEXT"
             + ");";
 
     public static void onCreate(SQLiteDatabase database) {
@@ -29,14 +29,25 @@ public class ListsTable {
     }
 
     private static void initialData(SQLiteDatabase database) {
-        String[] lists = {"Мой список", "Купить на ДР" };
-        int[] currency = {1, 3};
+        String[] name = {
+                "рубль",
+                "гривна",
+                "доллар",
+                "евро",
+        };
+        String[] symbol = {
+                "\u20BD",
+                "\u20B4",
+                "\u0024",
+                "\u20AC",
+        };
 
-        for (int i = 0; i < lists.length; i++) {
+        for(int i = 0; i < name.length; i++) {
             ContentValues contentValue = new ContentValues();
-            contentValue.put(COLUMN_NAME, lists[i]);
-            contentValue.put(COLUMN_ID_CURRENCY, currency[i]);
+            contentValue.put(COLUMN_NAME, name[i]);
+            contentValue.put(COLUMN_SYMBOL, symbol[i]);
             database.insert(TABLE_NAME, null, contentValue);
         }
     }
+
 }
