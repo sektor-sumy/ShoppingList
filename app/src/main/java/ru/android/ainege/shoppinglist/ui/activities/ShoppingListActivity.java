@@ -93,9 +93,9 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         addItemFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(ShoppingListActivity.this, AddItemActivity.class);
-                i.putExtra(AddItemActivity.EXTRA_ID_LIST, mId);
-                i.putExtra(AddItemActivity.EXTRA_DATA_SAVE, mDataSave);
+                Intent i = new Intent(ShoppingListActivity.this, ItemActivity.class);
+                i.putExtra(ItemActivity.EXTRA_ID_LIST, mId);
+                i.putExtra(ItemActivity.EXTRA_DATA_SAVE, mDataSave);
                 startActivity(i);
             }
         });

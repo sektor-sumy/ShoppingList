@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -46,6 +47,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
     public String mCurrencyList;
     public boolean mIsProposedItem = false;
 
+    public CollapsingToolbarLayout mCollapsingToolbarLayout;
     public TextInputLayout mNameInputLayout;
     public AutoCompleteTextView mName;
     public TextView mInfo;
@@ -98,6 +100,8 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
     }
 
     public void setView(View v) {
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.collapsing_toolbar);
+
         mInfo = (TextView) v.findViewById(R.id.info);
 
         mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);

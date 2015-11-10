@@ -17,12 +17,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.AddItemActivity"
-            android:label="@string/buy"
-            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" >
-        </activity>
-        <activity
-            android:name=".ui.activities.EditItemActivity"
+            android:name=".ui.activities.ItemActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" >
         </activity>

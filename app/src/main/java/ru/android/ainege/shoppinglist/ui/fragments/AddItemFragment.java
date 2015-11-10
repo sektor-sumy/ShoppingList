@@ -1,7 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
@@ -32,7 +31,7 @@ public class AddItemFragment extends ItemFragment {
     private long mIdSelectedItem = -1;
     private boolean mIsSelectsdItem = false;
 
-    public static Fragment newInstance(long id, String dataSave) {
+    public static AddItemFragment newInstance(long id, String dataSave) {
         Bundle args = new Bundle();
         args.putLong(ID_LIST, id);
         args.putString(DEFAULT_SAVE_DATA, dataSave);
@@ -56,6 +55,7 @@ public class AddItemFragment extends ItemFragment {
     public void setView(View v) {
         super.setView(v);
         mName.setOnItemClickListener(getOnNameClickListener());
+        mCollapsingToolbarLayout.setTitle(getString(R.string.buy));
     }
 
     @Override

@@ -36,7 +36,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
-import ru.android.ainege.shoppinglist.ui.activities.EditItemActivity;
+import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -159,9 +159,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                                 item.getPrice(),
                                 item.getComment());
 
-                        Intent i = new Intent(getActivity(), EditItemActivity.class);
-                        i.putExtra(EditItemActivity.EXTRA_ITEM, itemInList);
-                        i.putExtra(EditItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
+                        Intent i = new Intent(getActivity(), ItemActivity.class);
+                        i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
+                        i.putExtra(ItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
                         startActivity(i);
 
                         mSaveItemId = item.getIdItem();
