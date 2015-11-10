@@ -42,13 +42,13 @@ public class EditItemFragment extends ItemFragment {
     }
 
     @Override
-    public void setView(View v) {
+    protected void setView(View v) {
         super.setView(v);
         setDataToView();
     }
 
     @Override
-    public TextWatcher getNameChangedListener() {
+    protected TextWatcher getNameChangedListener() {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -88,7 +88,7 @@ public class EditItemFragment extends ItemFragment {
     }
 
     @Override
-    public SimpleCursorAdapter getCompleteTextAdapter() {
+    protected SimpleCursorAdapter getCompleteTextAdapter() {
         return super.getCompleteTextAdapter(new FilterQueryProvider() {
             @Override
             public Cursor runQuery(CharSequence charSequence) {
@@ -136,7 +136,7 @@ public class EditItemFragment extends ItemFragment {
     }
 
     @Override
-    public boolean saveData(boolean isUpdateData) {
+    protected boolean saveData(boolean isUpdateData) {
         boolean isSave = false;
 
         if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
@@ -164,12 +164,12 @@ public class EditItemFragment extends ItemFragment {
     }
 
     @Override
-    public long getIdList(){
+    protected long getIdList(){
         return mItemInList.getIdList();
     }
 
     @Override
-    public Item getItem() {
+    protected Item getItem() {
         Item item = super.getItem();
         item.setId(mItemInList.getIdItem());
         return item;

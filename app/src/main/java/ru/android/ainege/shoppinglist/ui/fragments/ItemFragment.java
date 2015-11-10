@@ -43,28 +43,28 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
     public static final String ID_ITEM = "idItem";
     public static final String DEFAULT_SAVE_DATA = "dataSave";
 
-    public boolean mIsAlwaysSave = false;
-    public String mCurrencyList;
-    public boolean mIsProposedItem = false;
+    protected boolean mIsAlwaysSave = false;
+    protected String mCurrencyList;
+    protected boolean mIsProposedItem = false;
 
-    public CollapsingToolbarLayout mCollapsingToolbarLayout;
-    public TextInputLayout mNameInputLayout;
-    public AutoCompleteTextView mName;
-    public TextView mInfo;
-    public TextInputLayout mAmountInputLayout;
-    public EditText mAmount;
-    public Spinner mUnits;
-    public TextInputLayout mPriceInputLayout;
-    public EditText mPrice;
-    public TextView mCurrency;
-    public TextView mFinishPrice;
-    public EditText mComment;
-    public ToggleButton mIsBought;
+    protected CollapsingToolbarLayout mCollapsingToolbarLayout;
+    protected TextInputLayout mNameInputLayout;
+    protected AutoCompleteTextView mName;
+    protected TextView mInfo;
+    protected TextInputLayout mAmountInputLayout;
+    protected EditText mAmount;
+    protected Spinner mUnits;
+    protected TextInputLayout mPriceInputLayout;
+    protected EditText mPrice;
+    protected TextView mCurrency;
+    protected TextView mFinishPrice;
+    protected EditText mComment;
+    protected ToggleButton mIsBought;
 
-    abstract TextWatcher getNameChangedListener();
-    abstract SimpleCursorAdapter getCompleteTextAdapter();
-    abstract boolean saveData(boolean isUpdateData);
-    abstract long getIdList();
+    protected abstract TextWatcher getNameChangedListener();
+    protected abstract SimpleCursorAdapter getCompleteTextAdapter();
+    protected abstract boolean saveData(boolean isUpdateData);
+    protected abstract long getIdList();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,7 +99,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         return v;
     }
 
-    public void setView(View v) {
+    protected void setView(View v) {
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.collapsing_toolbar);
 
         mInfo = (TextView) v.findViewById(R.id.info);
@@ -131,7 +131,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         mIsBought = (ToggleButton) v.findViewById(R.id.is_bought);
     }
 
-    public TextWatcher getAmountChangedListener() {
+    private TextWatcher getAmountChangedListener() {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -162,7 +162,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         };
     }
 
-    public TextWatcher getPriceChangedListener() {
+    private TextWatcher getPriceChangedListener() {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -193,7 +193,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         };
     }
 
-    public SimpleCursorAdapter getCompleteTextAdapter(FilterQueryProvider provider) {
+    protected SimpleCursorAdapter getCompleteTextAdapter(FilterQueryProvider provider) {
         SimpleCursorAdapter completeTextAdapter = new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_dropdown_item_1line,
                 null,
@@ -219,14 +219,14 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         return spinnerAdapter;
     }
 
-    public void disableError(TextInputLayout field){
+    protected void disableError(TextInputLayout field){
         if (field.getError() != null) {
             field.setError(null);
             field.setErrorEnabled(false);
         }
     }
 
-    public void setFinishPrice() {
+    private void setFinishPrice() {
         double amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
         double price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
         String finalPriceText = getString(R.string.finish_price) + localValue(amount * price) + " " + mCurrencyList;
@@ -234,7 +234,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         mFinishPrice.setVisibility(View.VISIBLE);
     }
 
-    private String localValue(double value) {
+    protected String localValue(double value) {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMinimumFractionDigits(2);
         nf.setMaximumFractionDigits(2);
@@ -280,11 +280,11 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         }
     }
 
-    public String getName() {
+    protected String getName() {
         return mName.getText().toString().trim();
     }
 
-    public Item getItem() {
+    protected Item getItem() {
         String name = getName();
         double amount = 0.0;
         if (mAmount.getText().length() > 0) {
@@ -300,7 +300,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         return new Item(name, amount, idUnit, price, comment);
     }
 
-    public ShoppingList getItemInList(Item item) {
+    protected ShoppingList getItemInList(Item item) {
         return new ShoppingList(item.getId(),
                 getIdList(),
                 mIsBought.isChecked(),
@@ -312,7 +312,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         );
     }
 
-    public void sendResult(int resultCode, long id) {
+    protected void sendResult(int resultCode, long id) {
         if (getTargetFragment() == null)
             return;
 

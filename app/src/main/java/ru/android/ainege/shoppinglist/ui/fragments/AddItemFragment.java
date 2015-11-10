@@ -52,14 +52,14 @@ public class AddItemFragment extends ItemFragment {
     }
 
     @Override
-    public void setView(View v) {
+    protected void setView(View v) {
         super.setView(v);
         mName.setOnItemClickListener(getOnNameClickListener());
         mCollapsingToolbarLayout.setTitle(getString(R.string.buy));
     }
 
     @Override
-    public TextWatcher getNameChangedListener() {
+    protected TextWatcher getNameChangedListener() {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -112,7 +112,7 @@ public class AddItemFragment extends ItemFragment {
     }
 
     @Override
-    public SimpleCursorAdapter getCompleteTextAdapter() {
+    protected SimpleCursorAdapter getCompleteTextAdapter() {
         return super.getCompleteTextAdapter(new FilterQueryProvider() {
             @Override
             public Cursor runQuery(CharSequence charSequence) {
@@ -158,7 +158,7 @@ public class AddItemFragment extends ItemFragment {
     }
 
     @Override
-    public boolean saveData(boolean isUpdateData) {
+    protected boolean saveData(boolean isUpdateData) {
         boolean isSave = false;
 
         String name = getName();
@@ -202,7 +202,7 @@ public class AddItemFragment extends ItemFragment {
     }
 
     @Override
-    public long getIdList(){
+    protected long getIdList(){
         return getArguments().getLong(ID_LIST);
     }
 
