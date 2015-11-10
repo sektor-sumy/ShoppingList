@@ -8,9 +8,9 @@ public class Validation {
         boolean isValid = false;
         String expression;
         if(isPrice) {
-            expression = "^[0-9]*[,|.]?[0-9]{0,2}$";
+            expression = "^[0-9]+[,|.]?[0-9]{0,2}$";
         } else {
-            expression = "^[0-9]*[,|.]?[0-9]*$";
+            expression = "^[0-9]+[,|.]?[0-9]*$";
         }
         Matcher matcher = Pattern.compile(expression).matcher(str);
         if (matcher.matches()) {
