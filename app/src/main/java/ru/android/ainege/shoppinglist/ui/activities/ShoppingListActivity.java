@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
+import android.app.ActivityOptions;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
@@ -10,6 +11,7 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -96,7 +98,12 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
                 Intent i = new Intent(ShoppingListActivity.this, ItemActivity.class);
                 i.putExtra(ItemActivity.EXTRA_ID_LIST, mId);
                 i.putExtra(ItemActivity.EXTRA_DATA_SAVE, mDataSave);
-                startActivity(i);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    startActivity(i, ActivityOptions.makeSceneTransitionAnimation(ShoppingListActivity.this).toBundle());
+                } else {
+                    startActivity(i);
+                }
             }
         });
 

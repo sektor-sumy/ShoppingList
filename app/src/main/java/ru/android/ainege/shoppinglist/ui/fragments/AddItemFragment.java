@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FilterQueryProvider;
@@ -49,6 +51,8 @@ public class AddItemFragment extends ItemFragment {
         if (!NOT_USE_DEFAULT_DATA.equals(getArguments().getString(DEFAULT_SAVE_DATA))) {
             mIsUseDefaultData = true;
         }
+
+        getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
     }
 
     @Override
