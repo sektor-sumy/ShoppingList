@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -164,7 +166,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                         Intent i = new Intent(getActivity(), ItemActivity.class);
                         i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
                         i.putExtra(ItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
-                        startActivity(i);
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+                        } else {
+                            startActivity(i);
+                        }
 
                         mSaveItemId = item.getIdItem();
                     }

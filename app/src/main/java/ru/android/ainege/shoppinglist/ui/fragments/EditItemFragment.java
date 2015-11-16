@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
@@ -39,6 +41,8 @@ public class EditItemFragment extends ItemFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mItemInList = (ShoppingList) getArguments().getSerializable(ITEM_IN_LIST);
+
+        getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
     }
 
     @Override
