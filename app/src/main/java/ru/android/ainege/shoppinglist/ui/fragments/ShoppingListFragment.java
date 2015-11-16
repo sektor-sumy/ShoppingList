@@ -281,7 +281,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
             case DATA_LOADER:
-                if (data != null) {
+                if (data.moveToFirst()) {
                     mItemsInList = ((ShoppingListCursor) data).getItemsAsList();
                     //if cross off item in list - find new it position and move
                     //else set new data to adapter
@@ -296,19 +296,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
                         mAdapterRV.setData(mItemsInList, true);       //update data in adapter
                     }
                     updateSums();
-                    //TODO: check it
-                   /* if (mListState != null) {
-                        //mItemsListRV.onRestoreInstanceState(mListState); //doesn't use in rw
-                        mListState = null;
-                    } else if (mSaveItemId != -1) {
-                        //mItemsListRV.setSelection(getPosition(mSaveItemId));
-                        mSaveItemId = -1;
-                    }
-                    mListContainer.setVisibility(View.VISIBLE);
-                    mEmptyText.setVisibility(View.GONE);*/
+                    hideEmptyStates();
                 } else {
-                    /*mListContainer.setVisibility(View.GONE);
-                    mEmptyText.setVisibility(View.VISIBLE);*/
+                    showEmptyStates();
                 }
                 break;
             default:
@@ -327,6 +317,20 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
             default:
                 break;
         }
+    }
+
+    private void showEmptyStates() {
+        mListContainer.setVisibility(View.GONE);
+        mEmptyText.setVisibility(View.VISIBLE);
+
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
+    }
+
+    private void hideEmptyStates() {
+        mListContainer.setVisibility(View.VISIBLE);
+        mEmptyText.setVisibility(View.GONE);
     }
 
     private void updateData() {
@@ -356,9 +360,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         for (int i = items.size() - 1; i >= 0; i--) {
             int position = items.get(i);
             itemInListDS.delete(mItemsInList.get(position).getIdItem(), mIdList);
-            //mListState = mList.onSaveInstanceState(); //doesn't use in rw
             mAdapterRV.removeItem(position);
-            updateSums();
+
+            if (mItemsInList.size() > 0) {
+                updateSums();
+                hideEmptyStates();
+            } else {
+                showEmptyStates();
+            }
         }
     }
 
