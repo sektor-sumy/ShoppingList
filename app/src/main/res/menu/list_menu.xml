@@ -3,11 +3,6 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".ShoppingListActivity">
     <item
-        android:id="@+id/delete_all_bought"
-        android:title="@string/delete_all_bought"
-        android:orderInCategory="100"
-        android:showAsAction="never" />
-    <item
         android:id="@+id/add_list"
         android:title="@string/new_list"
         android:orderInCategory="100"
