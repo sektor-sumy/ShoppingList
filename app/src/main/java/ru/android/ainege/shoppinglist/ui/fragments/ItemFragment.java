@@ -80,7 +80,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.dialog_item, container, false);
+        View v = inflater.inflate(R.layout.fragment_item, container, false);
 
         getCurrency();
 
