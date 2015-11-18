@@ -11,9 +11,11 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -41,6 +43,8 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.Shop
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
+import ru.android.ainege.shoppinglist.ui.activities.ListsActivity;
+import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -51,9 +55,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     private static final int DATA_LOADER = 0;
 
     private static final String ADD_DIALOG_DATE = "addItemDialog";
-    private static final String EDIT_DIALOG_DATE = "editItemDialog";
-    private static final int ADD_DIALOG_CODE = 0;
-    private static final int EDIT_DIALOG_CODE = 1;
+    private static final int ADD_ACTIVITY_CODE = 0;
+    private static final int EDIT_ACTIVITY_CODE = 1;
 
     private long mIdList;
     private RecyclerView mItemsListRV;
@@ -68,8 +71,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
     private TextView mEmptyText;
     private LinearLayout mListContainer;
-    private long mSaveItemId = -1;
-    private Parcelable mListState;
 
     private android.view.ActionMode mActionMode;
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -136,6 +137,36 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 
+	    Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+	    toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+	    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+			    Intent i = new Intent(getActivity(), ListsActivity.class);
+			    startActivity(i);
+		    }
+	    });
+
+	    ImageView appBarImage = (ImageView) v.findViewById(R.id.appbar_image);
+	    appBarImage.setImageResource(R.drawable.list);
+
+	    FloatingActionButton addItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
+	    addItemFAB.setOnClickListener(new View.OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+			    Intent i = new Intent(getActivity(), ItemActivity.class);
+			    i.putExtra(ItemActivity.EXTRA_ID_LIST, mIdList);
+			    i.putExtra(ItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
+
+			    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				    startActivityForResult(i, ADD_ACTIVITY_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+			    } else {
+				    startActivityForResult(i, ADD_ACTIVITY_CODE);
+			    }
+		    }
+	    });
+
         mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
         mTotalMoney = (TextView) v.findViewById(R.id.total_money);
 
@@ -147,95 +178,93 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         mAdapterRV = new RecyclerViewAdapter(getCurrency());
         mItemsListRV.setAdapter(mAdapterRV);
         mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        if (mActionMode != null) {
-                            mAdapterRV.toggleSelection(position);
-                            return;
-                        }
+			        @Override
+			        public void onItemClick(View view, int position) {
+				        if (mActionMode != null) {
+					        mAdapterRV.toggleSelection(position);
+					        return;
+				        }
 
-                        ShoppingList item = mItemsInList.get(position);
-                        ShoppingList itemInList = new ShoppingList(item.getItem(),
-                                mIdList,
-                                item.isBought(),
-                                item.getAmount(),
-                                item.getUnit(),
-                                item.getPrice(),
-                                item.getComment());
+				        ShoppingList item = mItemsInList.get(position);
+				        ShoppingList itemInList = new ShoppingList(item.getItem(),
+						        mIdList,
+						        item.isBought(),
+						        item.getAmount(),
+						        item.getUnit(),
+						        item.getPrice(),
+						        item.getComment());
 
-                        Intent i = new Intent(getActivity(), ItemActivity.class);
-                        i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
-                        i.putExtra(ItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
+				        Intent i = new Intent(getActivity(), ItemActivity.class);
+				        i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
+				        i.putExtra(ItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-                        } else {
-                            startActivity(i);
-                        }
+				        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					        startActivityForResult(i, EDIT_ACTIVITY_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+				        } else {
+					        startActivityForResult(i, EDIT_ACTIVITY_CODE);
+				        }
+			        }
 
-                        mSaveItemId = item.getIdItem();
-                    }
+			        @Override
+			        public void onItemLongClick(View view, int position) {
+				        if (mActionMode != null) {
+					        return;
+				        }
 
-                    @Override
-                    public void onItemLongClick(View view, int position) {
-                        if (mActionMode != null) {
-                            return;
-                        }
+				        mActionMode = getActivity().startActionMode(mActionModeCallback);
+				        mAdapterRV.toggleSelection(position);
+			        }
 
-                        mActionMode = getActivity().startActionMode(mActionModeCallback);
-                        mAdapterRV.toggleSelection(position);
-                    }
+			        @Override
+			        public void onSwipeRight(View view, int position) {
+				        if (mActionMode != null) {
+					        return;
+				        }
 
-                    @Override
-                    public void onSwipeRight(View view, int position) {
-                        if (mActionMode != null) {
-                            return;
-                        }
+				        //show is item cross off or not
+				        RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mItemsListRV.findViewHolderForAdapterPosition(position);
+				        boolean isBought;
+				        if (holder.mIsBought.getVisibility() == View.VISIBLE) {
+					        holder.mIsBought.setVisibility(View.GONE);
+					        isBought = false;
+				        } else {
+					        holder.mIsBought.setVisibility(View.VISIBLE);
+					        isBought = true;
+				        }
 
-                        //show is item cross off or not
-                        RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mItemsListRV.findViewHolderForAdapterPosition(position);
-                        boolean isBought;
-                        if (holder.mIsBought.getVisibility() == View.VISIBLE) {
-                            holder.mIsBought.setVisibility(View.GONE);
-                            isBought = false;
-                        } else {
-                            holder.mIsBought.setVisibility(View.VISIBLE);
-                            isBought = true;
-                        }
+				        //update data in db
+				        ShoppingListDataSource itemsInListDS;
+				        try {
+					        itemsInListDS = ShoppingListDataSource.getInstance();
+				        } catch (NullPointerException e) {
+					        itemsInListDS = ShoppingListDataSource.getInstance(getActivity());
+				        }
+				        ShoppingList item = mItemsInList.get(position);
+				        itemsInListDS.setIsBought(isBought, item.getIdItem(), mIdList);
 
-                        //update data in db
-                        ShoppingListDataSource itemsInListDS;
-                        try {
-                            itemsInListDS = ShoppingListDataSource.getInstance();
-                        } catch (NullPointerException e) {
-                            itemsInListDS = ShoppingListDataSource.getInstance(getActivity());
-                        }
-                        ShoppingList item = mItemsInList.get(position);
-                        itemsInListDS.setIsBought(isBought, item.getIdItem(), mIdList);
-
-                        //update recyclerview
-                        //if set bought items in the end of list - refresh list
-                        //if it isn`t - try to update only spent sum
-                        if (mIsBoughtEndInList) {
-                            mPositionCrossOffItem = position;
-                            mIdCrossOffItem = item.getIdItem();
-                            updateData();
-                        } else {
-                            mAdapterRV.getItem(position).setBought(isBought);
-                            double sum = sumOneItem(item);
-                            if (mSaveSpentMoney != 0) {
-                                if (isBought) {
-                                    mSaveSpentMoney += sum;
-                                } else {
-                                    mSaveSpentMoney -= sum;
-                                }
-                                updateSpentSum(mSaveSpentMoney);
-                            } else {
-                                updateData();
-                            }
-                        }
-                    }
-                })
+				        //update recyclerview
+				        //if set bought items in the end of list - refresh list
+				        //if it isn`t - try to update only spent sum
+				        if (mIsBoughtEndInList) {
+					        mPositionCrossOffItem = position;
+					        mIdCrossOffItem = item.getIdItem();
+					        updateData();
+				        } else {
+					        mAdapterRV.getItem(position).setBought(isBought);
+					        double sum = sumOneItem(item);
+					        if (mSaveSpentMoney != 0) {
+						        if (isBought) {
+							        mSaveSpentMoney += sum;
+						        } else {
+							        mSaveSpentMoney -= sum;
+						        }
+						        updateSpentSum(mSaveSpentMoney);
+					        } else {
+						        updateData();
+					        }
+				        }
+			        }
+		        })
         );
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -263,6 +292,37 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         }
         return currency;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.list_menu, menu);
+    }
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.add_list:
+				ListDialogFragment addListDialog = new ListDialogFragment();
+				addListDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
+				return true;
+			case R.id.delete_list:
+				QuestionDialogFragment dialogFrag = new QuestionDialogFragment();
+				dialogFrag.show(getFragmentManager(), "dialog");
+				return true;
+			case R.id.update_list:
+		       /* ListDialogFragment editListDialog = ListDialogFragment.newInstance(mId,
+                        mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME)));
+                editListDialog.show(getFragmentManager(), UPDATE_DIALOG_DATE);*/
+				return true;
+			case R.id.settings:
+				Intent i = new Intent(getActivity(), SettingsActivity.class);
+				startActivity(i);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -342,11 +402,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
         if (resultCode != Activity.RESULT_OK) return;
 
         switch (requestCode) {
-            case ADD_DIALOG_CODE:
-                mSaveItemId = data.getLongExtra(AddItemFragment.ID_ITEM, -1);
+            case ADD_ACTIVITY_CODE:
                 updateData();
                 break;
-            case EDIT_DIALOG_CODE:
+            case EDIT_ACTIVITY_CODE:
                 updateData();
                 break;
         }

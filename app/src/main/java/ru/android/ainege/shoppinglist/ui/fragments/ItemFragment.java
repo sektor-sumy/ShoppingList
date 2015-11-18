@@ -322,9 +322,6 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
     }
 
     protected void sendResult(int resultCode, long id) {
-        if (getTargetFragment() == null)
-            return;
-
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, new Intent().putExtra(ID_ITEM, id));
+        getActivity().setResult(resultCode,  new Intent().putExtra(ID_ITEM, id));
     }
 }
