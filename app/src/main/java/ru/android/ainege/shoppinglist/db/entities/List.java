@@ -3,67 +3,86 @@ package ru.android.ainege.shoppinglist.db.entities;
 import java.util.ArrayList;
 
 public class List {
-    private long mId;
-    private String mName;
-    private long mIdCurrency;
-    private ArrayList<ShoppingList> mItemsInList;
-    private Currency mCurrency;
+	private long mId;
+	private String mName;
+	private long mIdCurrency;
+	private ArrayList<ShoppingList> mItemsInList;
+	private Currency mCurrency;
 
-    public List(String name){
-        mName = name;
-    }
+	private int mAmountBoughtItems;
+	private int mAmountItems;
 
-    public List(long id, String name){
-        this(name);
-        mId = id;
-    }
+	public List(String name) {
+		mName = name;
+	}
 
-    public List(long id, String name, long idCurrency){
-        this(id, name);
-        mIdCurrency = idCurrency;
-    }
+	public List(long id, String name) {
+		this(name);
+		mId = id;
+	}
 
-    public long getId() {
-        return mId;
-    }
+	public List(long id, String name, long idCurrency) {
+		this(id, name);
+		mIdCurrency = idCurrency;
+	}
 
-    public void setId(long id) {
-        this.mId = id;
-    }
+	public long getId() {
+		return mId;
+	}
 
-    public String getName() {
-        return mName;
-    }
+	public void setId(long id) {
+		this.mId = id;
+	}
 
-    public void setName(String name) {
-        mName = name;
-    }
+	public String getName() {
+		return mName;
+	}
 
-    public long getIdCurrenty() {
-        return mIdCurrency;
-    }
+	public void setName(String name) {
+		mName = name;
+	}
 
-    public void setIdCurrenty(long id) {
-        this.mIdCurrency = id;
-    }
+	public long getIdCurrenty() {
+		return mIdCurrency;
+	}
 
-    public ArrayList<ShoppingList> getItemsInList() {
-        return mItemsInList;
-    }
+	public void setIdCurrenty(long id) {
+		this.mIdCurrency = id;
+	}
 
-    public void setItemsInList(ArrayList<ShoppingList> itemsInList) {
-        this.mItemsInList = itemsInList;
-    }
+	public ArrayList<ShoppingList> getItemsInList() {
+		return mItemsInList;
+	}
 
-    public Currency getCurrency() {
-        return mCurrency;
-    }
+	public void setItemsInList(ArrayList<ShoppingList> itemsInList) {
+		this.mItemsInList = itemsInList;
+	}
 
-    public void setCurrency(Currency currency) {
-        mCurrency = currency;
-        if (mCurrency != null) {
-            mIdCurrency = mCurrency.getId();
-        }
-    }
+	public Currency getCurrency() {
+		return mCurrency;
+	}
+
+	public void setCurrency(Currency currency) {
+		mCurrency = currency;
+		if (mCurrency != null) {
+			mIdCurrency = mCurrency.getId();
+		}
+	}
+
+	public int getAmountBoughtItems() {
+		return mAmountBoughtItems;
+	}
+
+	public void setAmountBoughtItems(int amountBoughtItems) {
+		this.mAmountBoughtItems = amountBoughtItems;
+	}
+
+	public int getAmountItems() {
+		return mAmountItems;
+	}
+
+	public void setAmountItems(int amountItems) {
+		this.mAmountItems = amountItems;
+	}
 }
 
