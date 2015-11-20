@@ -8,13 +8,18 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.activities.ShoppingListActivity"
+            android:name=".ui.activities.ListsActivity"
             android:label="@string/you_lists"
-            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" >
+            android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.activities.ShoppingListActivity"
+            android:label="@string/you_lists"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" >
         </activity>
         <activity
             android:name=".ui.activities.ItemActivity"

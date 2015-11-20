@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +33,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
+import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int DATA_LOADER = 0;
@@ -71,7 +74,13 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mListsRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mListsRV, new RecyclerItemClickListener.OnItemClickListener() {
 					@Override
 					public void onItemClick(View view, int position) {
-
+						Intent i = new Intent(getActivity(), ShoppingListActivity.class);
+						i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, mLists.get(position).getId());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+						} else {
+							startActivity(i);
+						}
 					}
 
 					@Override
