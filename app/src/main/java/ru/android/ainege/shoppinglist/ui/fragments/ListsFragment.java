@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.List;
-import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
@@ -68,32 +67,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mListsRV = (RecyclerView) v.findViewById(R.id.lists);
 		mListsRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-		mAdapterRV = new RecyclerViewAdapter();
+		mAdapterRV = new RecyclerViewAdapter(getActivity());
 		mListsRV.setAdapter(mAdapterRV);
-
-		mListsRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mListsRV, new RecyclerItemClickListener.OnItemClickListener() {
-					@Override
-					public void onItemClick(View view, int position) {
-						Intent i = new Intent(getActivity(), ShoppingListActivity.class);
-						i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, mLists.get(position).getId());
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-						} else {
-							startActivity(i);
-						}
-					}
-
-					@Override
-					public void onItemLongClick(View view, int position) {
-
-					}
-
-					@Override
-					public void onSwipeRight(View view, int position) {
-
-					}
-				})
-		);
 
 		return v;
 	}
@@ -153,11 +128,29 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
-	public static class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+	private static class ListsCursorLoader extends CursorLoader {
+		private Context mContext;
+
+		public ListsCursorLoader(Context context) {
+			super(context);
+			mContext = context;
+		}
+
+		@Override
+		public Cursor loadInBackground() {
+			ListsDataSource mListsDS = new ListsDataSource(mContext);
+
+			return mListsDS.getAllWithStatictic();
+		}
+	}
+
+	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+		private Context mContext;
 		private ArrayList<List> mLists;
 		private ArrayList<Integer> mSelectedLists = new ArrayList<>();
 
-		public RecyclerViewAdapter() {
+		public RecyclerViewAdapter(Context context) {
+			mContext = context;
 			mLists = new ArrayList<>();
 		}
 
@@ -180,8 +173,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 
 		@Override
-		public void onBindViewHolder(ViewHolder holder, int position) {
-			List list = mLists.get(position);
+		public void onBindViewHolder(ViewHolder holder, final int position) {
+			final List list = mLists.get(position);
 
 			holder.mImage.setImageResource(R.drawable.list);
 			holder.mName.setText(list.getName());
@@ -205,8 +198,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				}
 			}
 
-			holder.mStaticticShoping.setText(statisticsShopping);
-
 			holder.mEdit.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -217,9 +208,26 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			holder.mDelete.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					ListsDataSource listsDS = new ListsDataSource(mContext);
+					listsDS.delete(list.getId());
+					removeItem(position);
 
 				}
 			});
+			holder.view.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent i = new Intent(v.getContext(), ShoppingListActivity.class);
+					i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, list.getId());
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+					} else {
+						startActivity(i);
+					}
+				}
+			});
+
+			holder.mStatisticsShoping.setText(statisticsShopping);
 		}
 
 		@Override
@@ -244,37 +252,28 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			return mLists.size();
 		}
 
-		public static class ViewHolder extends RecyclerView.ViewHolder {
+		public void removeItem(int position) {
+			mLists.remove(position);
+			notifyItemRemoved(position);
+		}
+
+		public class ViewHolder extends RecyclerView.ViewHolder {
+			public View view;
 			public ImageView mImage;
 			public TextView mName;
-			public TextView mStaticticShoping;
+			public TextView mStatisticsShoping;
 			public ImageButton mEdit;
 			public ImageButton mDelete;
 
 			public ViewHolder(View v) {
 				super(v);
+				view = v;
 				mImage = (ImageView) v.findViewById(R.id.image_list);
 				mName = (TextView) v.findViewById(R.id.name_list);
-				mStaticticShoping = (TextView) v.findViewById(R.id.statistics_shopping);
+				mStatisticsShoping = (TextView) v.findViewById(R.id.statistics_shopping);
 				mEdit = (ImageButton) v.findViewById(R.id.edit_list);
 				mDelete = (ImageButton) v.findViewById(R.id.delete_list);
 			}
-		}
-	}
-
-	private static class ListsCursorLoader extends CursorLoader {
-		private Context mContext;
-
-		public ListsCursorLoader(Context context) {
-			super(context);
-			mContext = context;
-		}
-
-		@Override
-		public Cursor loadInBackground() {
-			ListsDataSource mListsDS = new ListsDataSource(mContext);
-
-			return mListsDS.getAllWithStatictic();
 		}
 	}
 }
