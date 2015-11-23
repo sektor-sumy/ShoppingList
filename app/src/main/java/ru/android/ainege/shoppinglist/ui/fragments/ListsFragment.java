@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
@@ -36,7 +37,8 @@ import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int DATA_LOADER = 0;
-	private static final String ADD_DIALOG_DATE = "addListDialog";
+	private static final String ADD_FRAGMENT_DATE = "addListDialog";
+	public static final int ADD_FRAGMENT_CODE = 1;
 
 	private RecyclerView mListsRV;
 	private RecyclerViewAdapter mAdapterRV;
@@ -62,7 +64,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			@Override
 			public void onClick(View v) {
 				ListDialogFragment addListDialog = new ListDialogFragment();
-				addListDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
+				addListDialog.setTargetFragment(ListsFragment.this, ADD_FRAGMENT_CODE);
+				addListDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);
 			}
 		});
 
@@ -112,7 +115,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			case DATA_LOADER:
 				if (data.moveToFirst()) {
 					mLists = ((ListsDataSource.ListCursor) data).getLists();
-					mAdapterRV.setData(mLists);
+					mAdapterRV.setData(mLists, true);
 				} else {
 				}
 				break;
@@ -128,6 +131,17 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	private void updateData() {
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode != Activity.RESULT_OK) return;
+
+		switch(requestCode) {
+			case ADD_FRAGMENT_CODE:
+				updateData();
+				break;
+		}
 	}
 
 	private static class ListsCursorLoader extends CursorLoader {

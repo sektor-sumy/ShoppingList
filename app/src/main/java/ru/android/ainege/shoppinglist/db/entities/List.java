@@ -1,8 +1,9 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class List {
+public class List implements Serializable {
 	private long mId;
 	private String mName;
 	private long mIdCurrency;
@@ -14,6 +15,11 @@ public class List {
 
 	public List(String name) {
 		mName = name;
+	}
+
+	public List(String name, long currency) {
+		mName = name;
+		mIdCurrency = currency;
 	}
 
 	public List(long id, String name) {

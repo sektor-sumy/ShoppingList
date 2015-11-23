@@ -52,13 +52,13 @@ public class ListsDataSource {
 
 	public int update(List list) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-		ContentValues values = createContentValues(list.getName());
+		ContentValues values = createContentValues(list);
 		return db.update(ListsTable.TABLE_NAME, values, ListsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(list.getId())});
 	}
 
-	public long add(String name) {
+	public long add(List list) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-		ContentValues values = createContentValues(name);
+		ContentValues values = createContentValues(list);
 		return db.insert(ListsTable.TABLE_NAME, null, values);
 	}
 
@@ -67,9 +67,10 @@ public class ListsDataSource {
 		db.delete(ListsTable.TABLE_NAME, ListsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 	}
 
-	private ContentValues createContentValues(String name) {
+	private ContentValues createContentValues(List list) {
 		ContentValues values = new ContentValues();
-		values.put(ListsTable.COLUMN_NAME, name);
+		values.put(ListsTable.COLUMN_NAME, list.getName());
+		values.put(ListsTable.COLUMN_ID_CURRENCY, list.getIdCurrenty());
 		return values;
 	}
 
