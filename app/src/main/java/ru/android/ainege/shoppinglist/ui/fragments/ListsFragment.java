@@ -36,6 +36,7 @@ import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int DATA_LOADER = 0;
+	private static final String ADD_DIALOG_DATE = "addListDialog";
 
 	private RecyclerView mListsRV;
 	private RecyclerViewAdapter mAdapterRV;
@@ -60,7 +61,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		addItemFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
+				ListDialogFragment addListDialog = new ListDialogFragment();
+				addListDialog.show(getFragmentManager(), ADD_DIALOG_DATE);
 			}
 		});
 
@@ -76,7 +78,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.list_menu, menu);
+		inflater.inflate(R.menu.list_of_lists_menu, menu);
 	}
 
 	@Override
