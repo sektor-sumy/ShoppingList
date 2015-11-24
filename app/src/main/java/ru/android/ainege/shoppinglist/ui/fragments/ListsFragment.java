@@ -194,8 +194,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 
 		@Override
-		public void onBindViewHolder(ViewHolder holder, final int position) {
-			final List list = mLists.get(position);
+		public void onBindViewHolder(ViewHolder holder, int position) {
+			List list = mLists.get(position);
 
 			holder.mImage.setImageResource(R.drawable.list);
 			holder.mName.setText(list.getName());
@@ -218,37 +218,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					}
 				}
 			}
-
-			holder.mEdit.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					ListDialogFragment editListDialog = ListDialogFragment.newInstance(list);
-					editListDialog.setTargetFragment(ListsFragment.this, EDIT_FRAGMENT_CODE);
-					editListDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
-				}
-			});
-
-			holder.mDelete.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					ListsDataSource listsDS = new ListsDataSource(mContext);
-					listsDS.delete(list.getId());
-					removeItem(position);
-
-				}
-			});
-			holder.view.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent i = new Intent(v.getContext(), ShoppingListActivity.class);
-					i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, list.getId());
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-					} else {
-						startActivity(i);
-					}
-				}
-			});
 
 			holder.mStatisticsShoping.setText(statisticsShopping);
 		}
@@ -296,6 +265,45 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				mStatisticsShoping = (TextView) v.findViewById(R.id.statistics_shopping);
 				mEdit = (ImageButton) v.findViewById(R.id.edit_list);
 				mDelete = (ImageButton) v.findViewById(R.id.delete_list);
+
+				mEdit.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						int itemPosition = getAdapterPosition();
+						List list = mLists.get(itemPosition);
+
+						ListDialogFragment editListDialog = ListDialogFragment.newInstance(list);
+						editListDialog.setTargetFragment(ListsFragment.this, EDIT_FRAGMENT_CODE);
+						editListDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
+					}
+				});
+
+				mDelete.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						int itemPosition = getAdapterPosition();
+						List list = mLists.get(itemPosition);
+
+						ListsDataSource listsDS = new ListsDataSource(mContext);
+						listsDS.delete(list.getId());
+						removeItem(itemPosition);
+					}
+				});
+				view.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						int itemPosition = getAdapterPosition();
+						List list = mLists.get(itemPosition);
+
+						Intent i = new Intent(v.getContext(), ShoppingListActivity.class);
+						i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, list.getId());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+						} else {
+							startActivity(i);
+						}
+					}
+				});
 			}
 		}
 	}
