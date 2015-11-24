@@ -141,10 +141,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		setHasOptionsMenu(true);
-		getLoaderManager().initLoader(DATA_LOADER, null, this);
 
 		mIdList = getArguments().getLong(ID_LIST);
 		mIsBoughtEndInList = getArguments().getBoolean(IS_BOUGHT_END_IN_LIST);
+
+		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
 
 	@Override

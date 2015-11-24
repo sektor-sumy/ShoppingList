@@ -81,6 +81,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		updateData();
+	}
+
+	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.list_of_lists_menu, menu);
