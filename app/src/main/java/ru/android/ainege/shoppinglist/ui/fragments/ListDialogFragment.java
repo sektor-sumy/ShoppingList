@@ -116,7 +116,24 @@ public class ListDialogFragment extends DialogFragment {
 	}
 
 	private void setDataToView() {
+		mEditList = (List) getArguments().getSerializable(LIST);
 
+		mName.setText(mEditList.getName());
+		mName.setSelection(mName.getText().length());
+
+		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrenty()));
+	}
+
+	private int getPosition(Spinner spinner, long idCurrency) {
+		int index = 0;
+		for (int i = 0; i < spinner.getCount(); i++) {
+			long id = ((CurrenciesDataSource.CurrencyCursor) spinner.getItemAtPosition(i)).getCurrency().getId();
+			if (id == idCurrency) {
+				index = i;
+				break;
+			}
+		}
+		return index;
 	}
 
 	protected boolean saveData() {

@@ -38,7 +38,9 @@ import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int DATA_LOADER = 0;
 	private static final String ADD_FRAGMENT_DATE = "addListDialog";
+	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
 	public static final int ADD_FRAGMENT_CODE = 1;
+	public static final int EDIT_FRAGMENT_CODE = 2;
 
 	private RecyclerView mListsRV;
 	private RecyclerViewAdapter mAdapterRV;
@@ -141,6 +143,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			case ADD_FRAGMENT_CODE:
 				updateData();
 				break;
+			case EDIT_FRAGMENT_CODE:
+				updateData();
+				break;
 		}
 	}
 
@@ -217,7 +222,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			holder.mEdit.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-
+					ListDialogFragment editListDialog = ListDialogFragment.newInstance(list);
+					editListDialog.setTargetFragment(ListsFragment.this, EDIT_FRAGMENT_CODE);
+					editListDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
 				}
 			});
 

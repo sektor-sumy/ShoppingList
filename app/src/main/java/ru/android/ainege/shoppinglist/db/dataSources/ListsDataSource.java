@@ -86,7 +86,7 @@ public class ListsDataSource {
 
 			List list = new List(id, name, idCurrency);
 
-			if (getColumnIndex(ListsTable.AMOUNT_ITEMS) != -1) {
+			if (getColumnIndex(ListsTable.AMOUNT_BOUGHT_ITEMS) != -1) {
 				int amount_bought_items = getInt(getColumnIndex(ListsTable.AMOUNT_BOUGHT_ITEMS));
 				list.setAmountBoughtItems(amount_bought_items);
 			}
