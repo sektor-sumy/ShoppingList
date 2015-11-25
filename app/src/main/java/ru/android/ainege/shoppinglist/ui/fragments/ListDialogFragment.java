@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
@@ -86,10 +87,7 @@ public class ListDialogFragment extends DialogFragment {
 				.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Boolean wantToCloseDialog = saveData();
-						if (wantToCloseDialog) {
-							dialog.dismiss();
-						}
+
 					}
 				})
 				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -136,12 +134,34 @@ public class ListDialogFragment extends DialogFragment {
 		return index;
 	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		if(getDialog() == null) {
+			return;
+		}
+
+		final AlertDialog dialog = (AlertDialog) getDialog();
+
+		Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+		positiveButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Boolean wantToCloseDialog = saveData();
+				if (wantToCloseDialog) {
+					dialog.dismiss();
+				}
+			}
+		});
+	}
+
 	protected boolean saveData() {
 		boolean isSave = false;
 		String name = mName.getText().toString().trim();
 
 		if (name.length() == 0) {
-			mNameInputLayout.setError(getString(R.string.error_value));
+			mNameInputLayout.setError(getString(R.string.error_name));
 		} else {
 			mNameInputLayout.setError(null);
 			mNameInputLayout.setErrorEnabled(false);
