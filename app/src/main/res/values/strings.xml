@@ -47,6 +47,7 @@
     <string name="list_name">Название списка</string>
     <string name="list_currency">Валюта списка</string>
 
+    <string name="no_lists">Нет списков</string>
     <string name="empty_list">В списке нет ни одного товара</string>
     <string name="error_existing_name">Такое название уже есть</string>
     <string name="error_delete_list">Ошибка удаления</string>

@@ -43,6 +43,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	public static final int EDIT_FRAGMENT_CODE = 2;
 
 	private RecyclerView mListsRV;
+	private TextView mEmptyText;
 	private RecyclerViewAdapter mAdapterRV;
 	private ArrayList<List> mLists;
 
@@ -73,6 +74,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		mListsRV = (RecyclerView) v.findViewById(R.id.lists);
 		mListsRV.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+		mEmptyText = (TextView) v.findViewById(R.id.empty_list);
 
 		mAdapterRV = new RecyclerViewAdapter(getActivity());
 		mListsRV.setAdapter(mAdapterRV);
@@ -124,7 +127,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				if (data.moveToFirst()) {
 					mLists = ((ListsDataSource.ListCursor) data).getLists();
 					mAdapterRV.setData(mLists, true);
+					hideEmptyStates();
 				} else {
+					showEmptyStates();
 				}
 				break;
 			default:
@@ -153,6 +158,16 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				updateData();
 				break;
 		}
+	}
+
+	private void showEmptyStates() {
+		mListsRV.setVisibility(View.GONE);
+		mEmptyText.setVisibility(View.VISIBLE);
+	}
+
+	private void hideEmptyStates() {
+		mListsRV.setVisibility(View.VISIBLE);
+		mEmptyText.setVisibility(View.GONE);
 	}
 
 	private static class ListsCursorLoader extends CursorLoader {
@@ -293,6 +308,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						ListsDataSource listsDS = new ListsDataSource(mContext);
 						listsDS.delete(list.getId());
 						removeItem(itemPosition);
+
+						if (mLists.size() > 0) {
+							hideEmptyStates();
+						} else {
+							showEmptyStates();
+						}
 					}
 				});
 				view.setOnClickListener(new View.OnClickListener() {
