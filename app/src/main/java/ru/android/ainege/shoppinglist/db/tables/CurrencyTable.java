@@ -8,7 +8,7 @@ public class CurrencyTable {
     public static final String TABLE_NAME = "Currencies";
 
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_NAME = "currency_name";
     public static final String COLUMN_SYMBOL = "symbol";
 
     private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME

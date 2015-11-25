@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,13 +36,12 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource.CurrencyCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
+import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
@@ -58,19 +58,18 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final int ADD_ACTIVITY_CODE = 0;
 	private static final int EDIT_ACTIVITY_CODE = 1;
 
-	private long mIdList;
 	private RecyclerView mItemsListRV;
+	private TextView mSpentMoney, mTotalMoney;
+	private TextView mEmptyText;
+	private LinearLayout mListContainer;
 	private RecyclerViewAdapter mAdapterRV;
 	private ArrayList<ShoppingList> mItemsInList;
 
-	private TextView mSpentMoney, mTotalMoney;
+	private List mList;
 	private double mSaveSpentMoney;
 	private boolean mIsBoughtEndInList;
 	private int mPositionCrossOffItem = -1;
 	private long mIdCrossOffItem;
-
-	private TextView mEmptyText;
-	private LinearLayout mListContainer;
 
 	private android.view.ActionMode mActionMode;
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -142,7 +141,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		setHasOptionsMenu(true);
 
-		mIdList = getArguments().getLong(ID_LIST);
+		long idList = getArguments().getLong(ID_LIST);
+		ListsDataSource.ListCursor cursor = new ListsDataSource(getActivity()).get(idList);
+		if (cursor.moveToFirst()) {
+			mList = cursor.getList();
+		}
+
 		mIsBoughtEndInList = getArguments().getBoolean(IS_BOUGHT_END_IN_LIST);
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
@@ -161,6 +165,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				getActivity().onBackPressed();
 			}
 		});
+		ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+		if (actionBar != null) {
+			actionBar.setTitle(mList.getName());
+		}
 
 		ImageView appBarImage = (ImageView) v.findViewById(R.id.appbar_image);
 		appBarImage.setImageResource(R.drawable.list);
@@ -170,7 +178,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getActivity(), ItemActivity.class);
-				i.putExtra(ItemActivity.EXTRA_ID_LIST, mIdList);
+				i.putExtra(ItemActivity.EXTRA_ID_LIST, mList.getId());
 				i.putExtra(ItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -189,7 +197,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-		mAdapterRV = new RecyclerViewAdapter(getCurrency());
+		mAdapterRV = new RecyclerViewAdapter(mList.getCurrency().getName());
 		mItemsListRV.setAdapter(mAdapterRV);
 		mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
 					@Override
@@ -201,7 +209,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 						ShoppingList item = mItemsInList.get(position);
 						ShoppingList itemInList = new ShoppingList(item.getItem(),
-								mIdList,
+								mList.getId(),
 								item.isBought(),
 								item.getAmount(),
 								item.getUnit(),
@@ -254,7 +262,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 							itemsInListDS = ShoppingListDataSource.getInstance(getActivity());
 						}
 						ShoppingList item = mItemsInList.get(position);
-						itemsInListDS.setIsBought(isBought, item.getIdItem(), mIdList);
+						itemsInListDS.setIsBought(isBought, item.getIdItem(), mList.getId());
 
 						//update recyclerview
 						//if set bought items in the end of list - refresh list
@@ -298,15 +306,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		return v;
 	}
 
-	private String getCurrency() {
-		CurrencyCursor cursor = new CurrenciesDataSource(getActivity()).getByList(mIdList);
-		String currency = "";
-		if (cursor.moveToFirst()) {
-			currency = cursor.getCurrency().getSymbol();
-		}
-		return currency;
-	}
-
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
@@ -339,7 +338,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		Loader<Cursor> loader = null;
 		switch (id) {
 			case DATA_LOADER:
-				loader = new ItemsInListCursorLoader(getActivity(), mIdList);
+				loader = new ItemsInListCursorLoader(getActivity(), mList.getId());
 				break;
 			default:
 				break;
@@ -422,13 +421,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void deleteSelectedItems() {
-		List<Integer> items = mAdapterRV.getSelectedItems();
+		ArrayList<Integer> items = mAdapterRV.getSelectedItems();
 		Collections.sort(items);
 
 		ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance();
 		for (int i = items.size() - 1; i >= 0; i--) {
 			int position = items.get(i);
-			itemInListDS.delete(mItemsInList.get(position).getIdItem(), mIdList);
+			itemInListDS.delete(mItemsInList.get(position).getIdItem(), mList.getId());
 			mAdapterRV.removeItem(position);
 
 			if (mItemsInList.size() > 0) {
@@ -482,7 +481,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	public static class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 		private ArrayList<ShoppingList> mItems;
-		private List<Integer> mSelectedItems = new ArrayList<>();
+		private ArrayList<Integer> mSelectedItems = new ArrayList<>();
 		private String mCurrencyList;
 
 		public RecyclerViewAdapter(String currency) {
@@ -580,7 +579,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		}
 
-		public List<Integer> getSelectedItems() {
+		public ArrayList<Integer> getSelectedItems() {
 			return mSelectedItems;
 		}
 

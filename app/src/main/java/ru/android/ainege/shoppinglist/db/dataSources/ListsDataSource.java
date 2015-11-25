@@ -9,7 +9,9 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
+import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.entities.List;
+import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 
@@ -24,8 +26,14 @@ public class ListsDataSource {
 
 	public ListCursor get(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(ListsTable.TABLE_NAME, null, ListsTable.COLUMN_ID + "=?",
-				new String[]{String.valueOf(id)}, null, null, null, null);
+		String selectQuery = "SELECT " + ListsTable.TABLE_NAME + ".*, " +
+				CurrencyTable.TABLE_NAME  + "." + CurrencyTable.COLUMN_NAME + ", " +
+				CurrencyTable.TABLE_NAME  + "." + CurrencyTable.COLUMN_SYMBOL + " " +
+				"FROM " + ListsTable.TABLE_NAME + " INNER JOIN " + CurrencyTable.TABLE_NAME + " " +
+				"ON " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID_CURRENCY + " = " +
+				CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_ID + " " +
+				"WHERE " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID + " = ?";
+		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
 		return new ListCursor(cursor);
 	}
 
@@ -85,6 +93,12 @@ public class ListsDataSource {
 			long idCurrency = getLong(getColumnIndex(ListsTable.COLUMN_ID_CURRENCY));
 
 			List list = new List(id, name, idCurrency);
+
+			if (getColumnIndex(CurrencyTable.COLUMN_NAME) != -1) {
+				String currencyName = getString(getColumnIndex(CurrencyTable.COLUMN_NAME));
+				String currencySymbol = getString(getColumnIndex(CurrencyTable.COLUMN_SYMBOL));
+				list.setCurrency(new Currency(idCurrency, currencyName, currencySymbol));
+			}
 
 			if (getColumnIndex(ListsTable.AMOUNT_BOUGHT_ITEMS) != -1) {
 				int amount_bought_items = getInt(getColumnIndex(ListsTable.AMOUNT_BOUGHT_ITEMS));
