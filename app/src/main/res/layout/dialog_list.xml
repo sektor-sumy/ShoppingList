@@ -33,7 +33,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="@dimen/padding_hint"
-            android:hint="@string/list_name"/>
+            android:hint="@string/list_name"
+            android:maxLength="20"/>
 
     </android.support.design.widget.TextInputLayout>
 
