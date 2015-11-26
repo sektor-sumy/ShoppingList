@@ -6,6 +6,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import ru.android.ainege.shoppinglist.R;
+
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
 
     public interface OnItemClickListener {
@@ -17,7 +19,7 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     private OnItemClickListener mListener;
     private GestureDetector mGestureDetector;
 
-    public RecyclerItemClickListener(Context context, final RecyclerView recyclerView, OnItemClickListener listener) {
+    public RecyclerItemClickListener(final Context context, final RecyclerView recyclerView, OnItemClickListener listener) {
         mListener = listener;
 
         //define gesture
@@ -41,10 +43,12 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
                 View childView = recyclerView.findChildViewUnder(e1.getX(), e1.getY());
 
                 if (childView != null && mListener != null) {
-                    int swipe_distance = 120;
+                    int swipe_distanceX = 120;
+                    int swipe_distanceY =  (int) context.getResources().getDimension(R.dimen.row_list_height);
                     int swipe_velocity = 200; //measure in pixels per second
 
-                    if (((e2.getX() - e1.getX()) > swipe_distance) && (Math.abs(velocityX) > swipe_velocity)) {
+                    if (((e2.getX() - e1.getX()) > swipe_distanceX) && (Math.abs(e2.getY() - e1.getY()) <= swipe_distanceY)
+                            && (Math.abs(velocityX) > swipe_velocity)) {
                         mListener.onSwipeRight(childView, recyclerView.getChildAdapterPosition(childView));
                     }
                 }
