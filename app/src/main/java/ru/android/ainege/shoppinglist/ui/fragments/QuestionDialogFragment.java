@@ -5,27 +5,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.R;
 
 public class QuestionDialogFragment extends DialogFragment {
-
-    public interface DialogListener {
-        public void onDialogPositiveClick(DialogFragment dialog);
-    }
-
-    DialogListener mListener;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (DialogListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement DialogListener");
-        }
-    }
+    public static final String OK_CLICK = "okClick";
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -34,8 +20,8 @@ public class QuestionDialogFragment extends DialogFragment {
                 .setCancelable(false)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        if (mListener != null) {
-                            mListener.onDialogPositiveClick(QuestionDialogFragment.this);
+                        if (getTargetFragment() != null) {
+                            getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, new Intent().putExtra(OK_CLICK, true));
                         }
                     }
                 })

@@ -11,8 +11,8 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -53,18 +53,24 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public static final String IS_BOUGHT_END_IN_LIST = "isBoughtEndInList";
 	public static final String DATA_SAVE = "dataSave";
 
+	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
+	public static final int EDIT_FRAGMENT_CODE = 3;
+	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
+	public static final int ANSWER_FRAGMENT_CODE = 4;
+
 	private static final int DATA_LOADER = 0;
 
 	private static final int ADD_ACTIVITY_CODE = 0;
 	private static final int EDIT_ACTIVITY_CODE = 1;
 
+	private CollapsingToolbarLayout mToolbarLayout;
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
 	private TextView mEmptyText;
 	private LinearLayout mListContainer;
 	private RecyclerViewAdapter mAdapterRV;
-	private ArrayList<ShoppingList> mItemsInList;
 
+	private ArrayList<ShoppingList> mItemsInList;
 	private List mList;
 	private double mSaveSpentMoney;
 	private boolean mIsBoughtEndInList;
@@ -141,20 +147,25 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		setHasOptionsMenu(true);
 
-		long idList = getArguments().getLong(ID_LIST);
-		ListsDataSource.ListCursor cursor = new ListsDataSource(getActivity()).get(idList);
-		if (cursor.moveToFirst()) {
-			mList = cursor.getList();
-		}
+		getList(getArguments().getLong(ID_LIST));
 
 		mIsBoughtEndInList = getArguments().getBoolean(IS_BOUGHT_END_IN_LIST);
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
 
+	private void getList(long idList) {
+		ListsDataSource.ListCursor cursor = new ListsDataSource(getActivity()).get(idList);
+		if (cursor.moveToFirst()) {
+			mList = cursor.getList();
+		}
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_shopping_list, container, false);
+
+		mToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.collapsing_toolbar);
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -165,10 +176,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				getActivity().onBackPressed();
 			}
 		});
-		ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-		if (actionBar != null) {
-			actionBar.setTitle(mList.getName());
-		}
+		setTitle();
 
 		ImageView appBarImage = (ImageView) v.findViewById(R.id.appbar_image);
 		appBarImage.setImageResource(R.drawable.list);
@@ -197,7 +205,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-		mAdapterRV = new RecyclerViewAdapter(mList.getCurrency().getName());
+		mAdapterRV = new RecyclerViewAdapter(mList.getCurrency().getSymbol());
 		mItemsListRV.setAdapter(mAdapterRV);
 		mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
 					@Override
@@ -306,6 +314,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		return v;
 	}
 
+	private void setTitle() {
+		mToolbarLayout.setTitle(mList.getName());
+	}
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
@@ -317,12 +329,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		switch (item.getItemId()) {
 			case R.id.delete_list:
 				QuestionDialogFragment dialogFrag = new QuestionDialogFragment();
-				dialogFrag.show(getFragmentManager(), "dialog");
+				dialogFrag.setTargetFragment(ShoppingListFragment.this, ANSWER_FRAGMENT_CODE);
+				dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
 				return true;
 			case R.id.update_list:
-			   /* ListDialogFragment editListDialog = ListDialogFragment.newInstance(mId,
-                        mCursor.getString(mCursor.getColumnIndex(ListsTable.COLUMN_NAME)));
-                editListDialog.show(getFragmentManager(), UPDATE_DIALOG_DATE);*/
+				ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
+				editListDialog.setTargetFragment(ShoppingListFragment.this, EDIT_FRAGMENT_CODE);
+				editListDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
 				return true;
 			case R.id.settings:
 				Intent i = new Intent(getActivity(), SettingsActivity.class);
@@ -417,6 +430,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			case EDIT_ACTIVITY_CODE:
 				updateData();
 				break;
+			case ANSWER_FRAGMENT_CODE:
+				ListsDataSource listsDS = new ListsDataSource(getActivity());
+				listsDS.delete(mList.getId());
+
+				getActivity().onBackPressed();
+				break;
+			case EDIT_FRAGMENT_CODE:
+				getList(getArguments().getLong(ID_LIST));
+				setTitle();
+				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
+				break;
 		}
 	}
 
@@ -498,6 +522,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			if (isNeedNotify) {
 				notifyDataSetChanged();
 			}
+		}
+
+		public void setCurrency(String currency) {
+			mCurrencyList = currency;
+			notifyDataSetChanged();
 		}
 
 		@Override
