@@ -29,7 +29,16 @@
         <activity
             android:name=".ui.activities.SettingsActivity"
             android:label="@string/settings"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme" >
+        </activity>
+        <activity
+            android:name=".ui.activities.SettingsDataActivity"
+            android:label=""
+            android:theme="@style/AppTheme" >
+            <intent-filter>
+                <action android:name="ru.android.ainege.shoppinglist.SettingsDataActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
     </application>
 

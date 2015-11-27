@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
@@ -72,6 +74,15 @@ public class CurrenciesDataSource {
             String symbol = getString(getColumnIndex(CurrencyTable.COLUMN_SYMBOL));
 
             return new Currency(id, name, symbol);
+        }
+
+        public ArrayList<Currency> getCurrencies() {
+            ArrayList<Currency> currency = new ArrayList<>();
+            moveToFirst();
+            do {
+                currency.add(getCurrency());
+            } while (moveToNext());
+            return currency;
         }
     }
 }

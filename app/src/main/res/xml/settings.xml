@@ -11,7 +11,7 @@
             android:key="@string/settings_key_sort_type"
             android:title="@string/settings_title_sort_type"
             android:summary="@string/settings_summary_sort_type"
-            android:defaultValue="1"
+            android:defaultValue="@string/sort_order_alphabet"
             android:entries="@array/sort_order"
             android:entryValues="@array/sort_order"
             android:dialogTitle="@string/settings_dialog_title_sort_type" />
@@ -27,10 +27,16 @@
             android:key="@string/settings_key_sort_data_item"
             android:title="@string/settings_title_sort_data_item"
             android:summary="@string/settings_summary_sort_data_item"
-            android:defaultValue="1"
+            android:defaultValue="@string/data_item_always"
             android:entries="@array/data_item"
             android:entryValues="@array/data_item"
             android:dialogTitle="@string/settings_dialog_title_sort_data_item"
             android:dependency="@string/settings_key_sort_is_default_data"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/settings_category_setData">
+        <Preference android:title="@string/setting_title_summary" >
+            <intent android:action="ru.android.ainege.shoppinglist.SettingsDataActivity" />
+        </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

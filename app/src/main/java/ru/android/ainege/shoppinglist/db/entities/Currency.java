@@ -1,6 +1,8 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-public class Currency {
+import java.io.Serializable;
+
+public class Currency implements Serializable {
     private long mId;
     private String mName;
     private String mSymbol;
