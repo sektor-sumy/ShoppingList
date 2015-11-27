@@ -6,7 +6,9 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -79,7 +81,7 @@ public class ListDialogFragment extends DialogFragment {
 		mName = (EditText) v.findViewById(R.id.name);
 		mCurrency = (Spinner) v.findViewById(R.id.currency);
 		mCurrency.setAdapter(getSpinnerAdapter());
-		mCurrency.setSelection(0);
+		mCurrency.setSelection(getPosition(mCurrency, getIdCurrency()));
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(v)
@@ -111,6 +113,11 @@ public class ListDialogFragment extends DialogFragment {
 				new int[] {R.id.currency_symbol, R.id.currency_name}, 0);
 		spinnerAdapter.setDropDownViewResource(R.layout.spinner_currency_drop);
 		return spinnerAdapter;
+	}
+
+	private long getIdCurrency() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		return prefs.getLong(getResources().getString(R.string.settings_key_dafault_currency), -1);
 	}
 
 	private void setDataToView() {

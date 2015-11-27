@@ -7,8 +7,10 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -126,10 +129,15 @@ public class SettingsDataFragment extends Fragment implements LoaderManager.Load
 	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 		private Context mContext;
 		private ArrayList<Currency> mCurrencies;
+		public long mIdOld;
+		public long mIdSelected;
 
 		public RecyclerViewAdapter(Context context) {
 			mContext = context;
 			mCurrencies = new ArrayList<>();
+
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+			mIdSelected = prefs.getLong(getResources().getString(R.string.settings_key_dafault_currency), -1);
 		}
 
 		public void setData(ArrayList<Currency> currencies) {
@@ -156,6 +164,13 @@ public class SettingsDataFragment extends Fragment implements LoaderManager.Load
 
 			String s = currency.getSymbol() + " (" + currency.getName() + ")";
 			holder.mName.setText(s);
+
+			if (mIdSelected == currency.getId()) {
+				holder.setImageSelected();
+				mIdOld = currency.getId();
+			} else {
+				holder.setImageNotSelected();
+			}
 		}
 
 		@Override
@@ -172,12 +187,15 @@ public class SettingsDataFragment extends Fragment implements LoaderManager.Load
 			public TextView mName;
 			public ImageButton mEdit;
 			public ImageButton mDelete;
+			public ImageView mImage;
 
 			public ViewHolder(View v) {
 				super(v);
+
 				mName = (TextView) v.findViewById(R.id.name);
 				mEdit = (ImageButton) v.findViewById(R.id.edit);
 				mDelete = (ImageButton) v.findViewById(R.id.delete);
+				mImage = (ImageView) v.findViewById(R.id.default_value);
 
 				mEdit.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -202,10 +220,52 @@ public class SettingsDataFragment extends Fragment implements LoaderManager.Load
 							ds.delete(currency.getId());
 							removeItem(itemPosition);
 						} else {
-							Toast.makeText(getActivity(), getResources().getString(R.string.error_one_item), Toast.LENGTH_SHORT).show();
+							Toast.makeText(getActivity(), getString(R.string.error_one_item), Toast.LENGTH_SHORT).show();
 						}
 					}
 				});
+
+				v.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						int itemPosition = getAdapterPosition();
+						Currency currency = mCurrencies.get(itemPosition);
+
+						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+						SharedPreferences.Editor editor = settings.edit();
+						editor.putLong(getString(R.string.settings_key_dafault_currency), currency.getId());
+						editor.apply();
+
+						setImageSelected();
+						mIdSelected = currency.getId();
+
+						notifyItemChanged(getPosition(mCurrencies, mIdOld));
+						mIdOld = mIdSelected;
+					}
+				});
+			}
+
+			private void setImage(int image) {
+				mImage.setImageResource(image);
+			}
+
+			private void setImageSelected() {
+				setImage(R.drawable.ic_grade_orange_24dp);
+			}
+			private void setImageNotSelected() {
+				setImage(R.drawable.ic_grade_grey_24dp);
+			}
+
+			private int getPosition(ArrayList<Currency> currencies, long idCurrency) {
+				int index = 0;
+				for (int i = 0; i < currencies.size(); i++) {
+					long id = currencies.get(i).getId();
+					if (id == idCurrency) {
+						index = i;
+						break;
+					}
+				}
+				return index;
 			}
 		}
 	}
