@@ -197,15 +197,29 @@ public class SettingsDataFragment extends Fragment implements LoaderManager.Load
 				mDelete = (ImageButton) v.findViewById(R.id.delete);
 				mImage = (ImageView) v.findViewById(R.id.default_value);
 
-				mEdit.setOnClickListener(new View.OnClickListener() {
+				mImage.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						int itemPosition = getAdapterPosition();
 						Currency currency = mCurrencies.get(itemPosition);
 
-						SettingsCurrencyDialogFragment editItemDialog = SettingsCurrencyDialogFragment.newInstance(currency);
-						editItemDialog.setTargetFragment(SettingsDataFragment.this, EDIT_FRAGMENT_CODE);
-						editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
+						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+						SharedPreferences.Editor editor = settings.edit();
+						editor.putLong(getString(R.string.settings_key_dafault_currency), currency.getId());
+						editor.apply();
+
+						setImageSelected();
+						mIdSelected = currency.getId();
+
+						notifyItemChanged(getPosition(mCurrencies, mIdOld));
+						mIdOld = mIdSelected;
+					}
+				});
+
+				mEdit.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						editCurrency();
 					}
 				});
 
@@ -228,21 +242,18 @@ public class SettingsDataFragment extends Fragment implements LoaderManager.Load
 				v.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						int itemPosition = getAdapterPosition();
-						Currency currency = mCurrencies.get(itemPosition);
-
-						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-						SharedPreferences.Editor editor = settings.edit();
-						editor.putLong(getString(R.string.settings_key_dafault_currency), currency.getId());
-						editor.apply();
-
-						setImageSelected();
-						mIdSelected = currency.getId();
-
-						notifyItemChanged(getPosition(mCurrencies, mIdOld));
-						mIdOld = mIdSelected;
+						editCurrency();
 					}
 				});
+			}
+
+			private void editCurrency() {
+				int itemPosition = getAdapterPosition();
+				Currency currency = mCurrencies.get(itemPosition);
+
+				SettingsCurrencyDialogFragment editItemDialog = SettingsCurrencyDialogFragment.newInstance(currency);
+				editItemDialog.setTargetFragment(SettingsDataFragment.this, EDIT_FRAGMENT_CODE);
+				editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
 			}
 
 			private void setImage(int image) {

@@ -50,7 +50,8 @@ public class SettingsCurrencyDialogFragment extends DialogFragment {
 		mSymbol = (EditText) v.findViewById(R.id.symbol);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setView(v)
+		builder.setTitle(getString(R.string.currency_info))
+				.setView(v)
 				.setCancelable(true)
 				.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
 					@Override
