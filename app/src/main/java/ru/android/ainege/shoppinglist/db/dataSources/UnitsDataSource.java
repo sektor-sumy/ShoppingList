@@ -20,7 +20,8 @@ public class UnitsDataSource {
 
     public UnitCursor getAll() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.query(UnitsTable.TABLE_NAME, null, null, null, null, null, null, null);
+        Cursor cursor = db.rawQuery("Select " + UnitsTable.TABLE_NAME + ".* from " + UnitsTable.TABLE_NAME +
+                " ORDER BY " + UnitsTable.TABLE_NAME + "." + UnitsTable.COLUMN_NAME, null);
         return new UnitCursor(cursor);
     }
 

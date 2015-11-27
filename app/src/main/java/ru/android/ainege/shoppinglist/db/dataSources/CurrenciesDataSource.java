@@ -24,7 +24,8 @@ public class CurrenciesDataSource {
 
     public CurrencyCursor getAll() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.query(CurrencyTable.TABLE_NAME, null, null, null, null, null, null, null);
+        Cursor cursor = db.rawQuery("Select " + CurrencyTable.TABLE_NAME + ".* from " + CurrencyTable.TABLE_NAME +
+                " ORDER BY " + CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_NAME, null);
         return new CurrencyCursor(cursor);
     }
 
