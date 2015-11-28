@@ -33,15 +33,17 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	public static final int EDIT_FRAGMENT_CODE = 2;
 	protected static final String ADD_FRAGMENT_DATE = "addItemDialog";
 	protected static final String EDIT_FRAGMENT_DATE = "editItemDialog";
-	private static final int DATA_LOADER = 0;
+	protected static final int DATA_LOADER = 0;
 	protected ArrayList<T> mDictionary = new ArrayList<>();
-	private RecyclerViewAdapter mAdapterRV;
+	protected RecyclerViewAdapter mAdapterRV;
 
 	protected abstract View.OnClickListener getAddHandler();
 
 	protected abstract DictionaryDataSource getDS();
 
 	protected abstract RecyclerViewAdapter getAdapter();
+
+	public abstract void onLoadFinished(Loader<Cursor> loader, Cursor data);
 
 	protected abstract void showEditDialog(int position);
 
@@ -79,25 +81,6 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 				break;
 		}
 		return loader;
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		switch (loader.getId()) {
-			case DATA_LOADER:
-				if (data.moveToFirst()) {
-					mDictionary = (ArrayList<T>) ((CurrenciesDataSource.CurrencyCursor) data).getEntities();
-					mAdapterRV.notifyDataSetChanged();
-
-					ActionBar appBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-					if (appBar != null) {
-						appBar.setTitle(getResources().getString(R.string.setting_currency));
-					}
-				}
-				break;
-			default:
-				break;
-		}
 	}
 
 	@Override

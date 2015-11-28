@@ -1,7 +1,11 @@
 package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +40,25 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 	@Override
 	protected RecyclerViewAdapter getAdapter() {
 		return new CurrencyViewAdapter();
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		switch (loader.getId()) {
+			case DATA_LOADER:
+				if (data.moveToFirst()) {
+					mDictionary = ((CurrenciesDataSource.CurrencyCursor) data).getEntities();
+					mAdapterRV.notifyDataSetChanged();
+
+					ActionBar appBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+					if (appBar != null) {
+						appBar.setTitle(getResources().getString(R.string.setting_currency));
+					}
+				}
+				break;
+			default:
+				break;
+		}
 	}
 
 	@Override

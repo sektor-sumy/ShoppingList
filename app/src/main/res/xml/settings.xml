@@ -1,42 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-        android:title="@string/settings_category_sort">
-        <CheckBoxPreference
-            android:key="@string/settings_key_sort_is_bought"
-            android:title="@string/settings_title_sort_is_bought"
-            android:summary="@string/settings_summary_sort_is_bought"
-            android:defaultValue="true" />
-        <ListPreference
-            android:key="@string/settings_key_sort_type"
-            android:title="@string/settings_title_sort_type"
-            android:summary="@string/settings_summary_sort_type"
-            android:defaultValue="@string/sort_order_alphabet"
-            android:entries="@array/sort_order"
-            android:entryValues="@array/sort_order"
-            android:dialogTitle="@string/settings_dialog_title_sort_type" />
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/settings_category_data_item">
-        <CheckBoxPreference
-            android:key="@string/settings_key_sort_is_default_data"
-            android:title="@string/settings_title_sort_is_default_data"
-            android:summary="@string/settings_summary_sort_is_default_data"
-            android:defaultValue="true" />
-        <ListPreference
-            android:key="@string/settings_key_sort_data_item"
-            android:title="@string/settings_title_sort_data_item"
-            android:summary="@string/settings_summary_sort_data_item"
-            android:defaultValue="@string/data_item_always"
-            android:entries="@array/data_item"
-            android:entryValues="@array/data_item"
-            android:dialogTitle="@string/settings_dialog_title_sort_data_item"
-            android:dependency="@string/settings_key_sort_is_default_data"/>
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/settings_category_setData">
-        <Preference android:title="@string/setting_title_summary" >
-            <intent android:action="ru.android.ainege.shoppinglist.SettingsDataActivity" />
-        </Preference>
-    </PreferenceCategory>
+	<PreferenceCategory
+		android:title="@string/settings_category_sort">
+		<CheckBoxPreference
+			android:defaultValue="true"
+			android:key="@string/settings_key_sort_is_bought"
+			android:summary="@string/settings_summary_sort_is_bought"
+			android:title="@string/settings_title_sort_is_bought"/>
+		<ListPreference
+			android:defaultValue="@string/sort_order_alphabet"
+			android:dialogTitle="@string/settings_dialog_title_sort_type"
+			android:entries="@array/sort_order"
+			android:entryValues="@array/sort_order"
+			android:key="@string/settings_key_sort_type"
+			android:summary="@string/settings_summary_sort_type"
+			android:title="@string/settings_title_sort_type"/>
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="@string/settings_category_data_item">
+		<CheckBoxPreference
+			android:defaultValue="true"
+			android:key="@string/settings_key_sort_is_default_data"
+			android:summary="@string/settings_summary_sort_is_default_data"
+			android:title="@string/settings_title_sort_is_default_data"/>
+		<ListPreference
+			android:defaultValue="@string/data_item_always"
+			android:dependency="@string/settings_key_sort_is_default_data"
+			android:dialogTitle="@string/settings_dialog_title_sort_data_item"
+			android:entries="@array/data_item"
+			android:entryValues="@array/data_item"
+			android:key="@string/settings_key_sort_data_item"
+			android:summary="@string/settings_summary_sort_data_item"
+			android:title="@string/settings_title_sort_data_item"/>
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="@string/settings_category_setData">
+		<Preference
+			android:key="@string/settings_key_currency"
+			android:title="@string/setting_title_currency"/>
+		<Preference
+			android:key="@string/setting_key_unit"
+			android:title="@string/setting_title_unit"/>
+	</PreferenceCategory>
 </PreferenceScreen>

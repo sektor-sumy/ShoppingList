@@ -84,8 +84,8 @@
 
     <string name="settings_category_setData">Настройки</string>
     <string name="settings_dialog_title_">Выберите способ обновления данных:</string>
-    <string name="settings_key_summary">settings_key_summary</string>
-    <string name="setting_title_summary">Настройка валют</string>
+    <string name="settings_key_currency">settings_key_summary</string>
+    <string name="setting_title_currency">Настройка валют</string>
 
     <string name="sort_order_alphabet">алфавиту</string>
     <string name="sort_order_up_price">возрастанию цены</string>
@@ -104,5 +104,8 @@
     <string name="settings_key_dafault_currency">dafault_currency</string>
     <string name="select_dafault_currency">Выбрана валютой по умолчанию</string>
     <string name="currency_info">Информация о валюте</string>
+
+    <string name="setting_title_unit">Единицы измерения</string>
+    <string name="setting_key_unit">setting_key_unit</string>
 
 </resources>
