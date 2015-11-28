@@ -104,7 +104,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
     private void getCurrency() {
         CurrencyCursor cursor = new CurrenciesDataSource(getActivity()).getByList(getIdList());
         if (cursor.moveToFirst()) {
-            mCurrencyList = cursor.getCurrency().getSymbol();
+            mCurrencyList = cursor.getEntity().getSymbol();
         }
     }
 
@@ -212,7 +212,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
             @Override
             public CharSequence convertToString(Cursor cursor) {
-                return ((ItemDataSource.ItemCursor) cursor).getItem().getName();
+                return ((ItemDataSource.ItemCursor) cursor).getEntity().getName();
             }
         });
         return completeTextAdapter;
@@ -299,7 +299,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
         if (mAmount.getText().length() > 0) {
             amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
         }
-        long idUnit = ((UnitsDataSource.UnitCursor) mUnits.getSelectedItem()).getUnit().getId();
+        long idUnit = ((UnitsDataSource.UnitCursor) mUnits.getSelectedItem()).getEntity().getId();
         double price = 0.0;
         if(mPrice.getText().length() > 0) {
             price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));

@@ -73,10 +73,10 @@ public class EditItemFragment extends ItemFragment {
                     //Check is the item in the list or catalog of items. If there is a warning display
                     ShoppingListCursor cursor = ShoppingListDataSource.getInstance(getActivity()).
                             existItemInList(s.toString().trim(), mItemInList.getIdList());
-                    showInfo(cursor.moveToFirst() && !cursor.getItem().getItem().getName().equals(mItemInList.getItem().getName()));
+                    showInfo(cursor.moveToFirst() && !cursor.getEntity().getItem().getName().equals(mItemInList.getItem().getName()));
                     if (mIsProposedItem) {
                         ItemDataSource.ItemCursor cursorItem = new ItemDataSource(getActivity()).getByName(s.toString().trim());
-                        showInfo(cursorItem.moveToFirst() && !cursorItem.getItem().getName().equals(mItemInList.getItem().getName()));
+                        showInfo(cursorItem.moveToFirst() && !cursorItem.getEntity().getName().equals(mItemInList.getItem().getName()));
                     }
                 }
             }

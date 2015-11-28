@@ -98,13 +98,13 @@ public class AddItemFragment extends ItemFragment {
                     if (cursor.moveToFirst()) {
                         mInfo.setText(R.string.info_exit_item_in_list);
                         mInfo.setVisibility(View.VISIBLE);
-                        mIdSelectedItem = cursor.getItem().getIdItem();
+                        mIdSelectedItem = cursor.getEntity().getIdItem();
                     } else {
                         mInfo.setVisibility(View.GONE);
                         if (mIsProposedItem) {
                             ItemDataSource.ItemCursor cursorItem = new ItemDataSource(getActivity()).getByName(s.toString().trim());
                             if (cursorItem.moveToFirst()) {
-                                mIdSelectedItem = cursorItem.getItem().getId();
+                                mIdSelectedItem = cursorItem.getEntity().getId();
                             }
                         } else {
                             mIdSelectedItem = -1;
@@ -144,7 +144,7 @@ public class AddItemFragment extends ItemFragment {
 
                     ItemDataSource.ItemCursor c = new ItemDataSource(getActivity()).get(mIdSelectedItem);
                     c.moveToFirst();
-                    Item item = c.getItem();
+                    Item item = c.getEntity();
 
                     double amount = item.getAmount();
                     if (amount > 0) {

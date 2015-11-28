@@ -125,7 +125,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		switch (loader.getId()) {
 			case DATA_LOADER:
 				if (data.moveToFirst()) {
-					mLists = ((ListsDataSource.ListCursor) data).getLists();
+					mLists = ((ListsDataSource.ListCursor) data).getEntities();
 					mAdapterRV.setData(mLists, true);
 					hideEmptyStates();
 				} else {
@@ -182,7 +182,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		public Cursor loadInBackground() {
 			ListsDataSource mListsDS = new ListsDataSource(mContext);
 
-			return mListsDS.getAllWithStatictic();
+			return mListsDS.getAll();
 		}
 	}
 

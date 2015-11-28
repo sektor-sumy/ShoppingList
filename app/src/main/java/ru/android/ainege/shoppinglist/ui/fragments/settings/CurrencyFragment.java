@@ -31,12 +31,11 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
 public class CurrencyFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+	public static final int ADD_FRAGMENT_CODE = 1;
+	public static final int EDIT_FRAGMENT_CODE = 2;
 	private static final int CURRENCY_LOADER = 0;
 	private static final String ADD_FRAGMENT_DATE = "addItemDialog";
 	private static final String EDIT_FRAGMENT_DATE = "editItemDialog";
-	public static final int ADD_FRAGMENT_CODE = 1;
-	public static final int EDIT_FRAGMENT_CODE = 2;
-
 	private RecyclerView mCurrencyRV;
 	private RecyclerViewAdapter mAdapterRV;
 
@@ -90,7 +89,7 @@ public class CurrencyFragment extends Fragment implements LoaderManager.LoaderCa
 		switch (loader.getId()) {
 			case CURRENCY_LOADER:
 				if (data.moveToFirst()) {
-					mCurrency = ((CurrenciesDataSource.CurrencyCursor) data).getCurrencies();
+					mCurrency = ((CurrenciesDataSource.CurrencyCursor) data).getEntities();
 					mAdapterRV.setData(mCurrency, true);
 					ActionBar appBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 					if (appBar != null) {
@@ -116,7 +115,7 @@ public class CurrencyFragment extends Fragment implements LoaderManager.LoaderCa
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) return;
 
-		switch(requestCode) {
+		switch (requestCode) {
 			case ADD_FRAGMENT_CODE:
 				updateData();
 				break;
@@ -126,11 +125,27 @@ public class CurrencyFragment extends Fragment implements LoaderManager.LoaderCa
 		}
 	}
 
-	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+	private static class CurrencyCursorLoader extends CursorLoader {
 		private Context mContext;
-		private ArrayList<Currency> mCurrencies;
+
+		public CurrencyCursorLoader(Context context) {
+			super(context);
+			mContext = context;
+		}
+
+		@Override
+		public Cursor loadInBackground() {
+			CurrenciesDataSource currenciesDS = new CurrenciesDataSource(mContext);
+
+			return currenciesDS.getAll();
+		}
+	}
+
+	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 		public long mIdOld;
 		public long mIdSelected;
+		private Context mContext;
+		private ArrayList<Currency> mCurrencies;
 
 		public RecyclerViewAdapter(Context context) {
 			mContext = context;
@@ -263,6 +278,7 @@ public class CurrencyFragment extends Fragment implements LoaderManager.LoaderCa
 			private void setImageSelected() {
 				setImage(R.drawable.ic_grade_orange_24dp);
 			}
+
 			private void setImageNotSelected() {
 				setImage(R.drawable.ic_grade_grey_24dp);
 			}
@@ -278,22 +294,6 @@ public class CurrencyFragment extends Fragment implements LoaderManager.LoaderCa
 				}
 				return index;
 			}
-		}
-	}
-
-	private static class CurrencyCursorLoader extends CursorLoader {
-		private Context mContext;
-
-		public CurrencyCursorLoader(Context context) {
-			super(context);
-			mContext = context;
-		}
-
-		@Override
-		public Cursor loadInBackground() {
-			CurrenciesDataSource currenciesDS = new CurrenciesDataSource(mContext);
-
-			return currenciesDS.getAll();
 		}
 	}
 }

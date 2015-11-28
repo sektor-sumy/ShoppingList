@@ -132,7 +132,7 @@ public class ListDialogFragment extends DialogFragment {
 	private int getPosition(Spinner spinner, long idCurrency) {
 		int index = 0;
 		for (int i = 0; i < spinner.getCount(); i++) {
-			long id = ((CurrenciesDataSource.CurrencyCursor) spinner.getItemAtPosition(i)).getCurrency().getId();
+			long id = ((CurrenciesDataSource.CurrencyCursor) spinner.getItemAtPosition(i)).getEntity().getId();
 			if (id == idCurrency) {
 				index = i;
 				break;
@@ -175,7 +175,7 @@ public class ListDialogFragment extends DialogFragment {
 		}
 
 		if (!mNameInputLayout.isErrorEnabled()) {
-			long idCurrency = ((CurrenciesDataSource.CurrencyCursor) mCurrency.getSelectedItem()).getCurrency().getId();
+			long idCurrency = ((CurrenciesDataSource.CurrencyCursor) mCurrency.getSelectedItem()).getEntity().getId();
 
 			ListsDataSource listDS = new ListsDataSource(getActivity());
 

@@ -3,87 +3,74 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
-
-import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 
-public class CurrenciesDataSource {
-    private Context mContext;
-    private ShoppingListSQLiteHelper mDbHelper;
+public class CurrenciesDataSource extends GenericDataSource<Currency> {
 
-    public CurrenciesDataSource(Context context) {
-        mContext = context;
-        mDbHelper = new ShoppingListSQLiteHelper(mContext);
-    }
+	public CurrenciesDataSource(Context context) {
+		super(context);
+	}
 
-    public CurrencyCursor getAll() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("Select " + CurrencyTable.TABLE_NAME + ".* from " + CurrencyTable.TABLE_NAME +
-                " ORDER BY " + CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_NAME, null);
-        return new CurrencyCursor(cursor);
-    }
+	public CurrencyCursor getAll() {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.rawQuery("Select " + CurrencyTable.TABLE_NAME + ".* from " + CurrencyTable.TABLE_NAME +
+				" ORDER BY " + CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_NAME, null);
+		return new CurrencyCursor(cursor);
+	}
 
-    public CurrencyCursor getByList(long idList) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("Select " + CurrencyTable.TABLE_NAME + ".* from " + CurrencyTable.TABLE_NAME +
-                " INNER JOIN " + ListsTable.TABLE_NAME + " ON " +
-                CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_ID + " = " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID_CURRENCY +
-                " where " + ListsTable.TABLE_NAME + " . " + ListsTable.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
+	public CurrencyCursor getByList(long idList) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.rawQuery("Select " + CurrencyTable.TABLE_NAME + ".* from " + CurrencyTable.TABLE_NAME +
+				" INNER JOIN " + ListsTable.TABLE_NAME + " ON " +
+				CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_ID + " = " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID_CURRENCY +
+				" where " + ListsTable.TABLE_NAME + " . " + ListsTable.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
 
-        return new CurrencyCursor(cursor);
-    }
+		return new CurrencyCursor(cursor);
+	}
 
-    public int update(Currency currency) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        ContentValues values = createContentValues(currency);
-        return db.update(CurrencyTable.TABLE_NAME, values, CurrencyTable.COLUMN_ID + " = ?",
-                new String[]{String.valueOf(currency.getId())});
-    }
+	@Override
+	public int update(Currency currency) {
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		ContentValues values = createContentValues(currency);
+		return db.update(CurrencyTable.TABLE_NAME, values, CurrencyTable.COLUMN_ID + " = ?",
+				new String[]{String.valueOf(currency.getId())});
+	}
 
-    public long add(Currency currency) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        ContentValues values = createContentValues(currency);
-        return db.insert(CurrencyTable.TABLE_NAME, null, values);
-    }
+	@Override
+	public long add(Currency currency) {
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		ContentValues values = createContentValues(currency);
+		return db.insert(CurrencyTable.TABLE_NAME, null, values);
+	}
 
-    public void delete(long id) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.delete(CurrencyTable.TABLE_NAME, CurrencyTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
-    }
+	@Override
+	public void delete(long id) {
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		db.delete(CurrencyTable.TABLE_NAME, CurrencyTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+	}
 
-    private ContentValues createContentValues(Currency currency) {
-        ContentValues values = new ContentValues();
-        values.put(CurrencyTable.COLUMN_NAME, currency.getName());
-        values.put(CurrencyTable.COLUMN_SYMBOL, currency.getSymbol());
-        return values;
-    }
+	private ContentValues createContentValues(Currency currency) {
+		ContentValues values = new ContentValues();
+		values.put(CurrencyTable.COLUMN_NAME, currency.getName());
+		values.put(CurrencyTable.COLUMN_SYMBOL, currency.getSymbol());
+		return values;
+	}
 
-    public static class CurrencyCursor extends CursorWrapper {
-        public CurrencyCursor(Cursor cursor) {
-            super(cursor);
-        }
+	public static class CurrencyCursor extends EntityCursor<Currency> {
+		public CurrencyCursor(Cursor cursor) {
+			super(cursor);
+		}
 
-        public Currency getCurrency() {
-            long id = getLong(getColumnIndex(CurrencyTable.COLUMN_ID));
-            String name = getString(getColumnIndex(CurrencyTable.COLUMN_NAME));
-            String symbol = getString(getColumnIndex(CurrencyTable.COLUMN_SYMBOL));
+		public Currency getEntity() {
+			long id = getLong(getColumnIndex(CurrencyTable.COLUMN_ID));
+			String name = getString(getColumnIndex(CurrencyTable.COLUMN_NAME));
+			String symbol = getString(getColumnIndex(CurrencyTable.COLUMN_SYMBOL));
 
-            return new Currency(id, name, symbol);
-        }
-
-        public ArrayList<Currency> getCurrencies() {
-            ArrayList<Currency> currency = new ArrayList<>();
-            moveToFirst();
-            do {
-                currency.add(getCurrency());
-            } while (moveToNext());
-            return currency;
-        }
-    }
+			return new Currency(id, name, symbol);
+		}
+	}
 }

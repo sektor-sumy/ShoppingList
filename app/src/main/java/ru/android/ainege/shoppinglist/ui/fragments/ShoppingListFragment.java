@@ -157,7 +157,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private void getList(long idList) {
 		ListsDataSource.ListCursor cursor = new ListsDataSource(getActivity()).get(idList);
 		if (cursor.moveToFirst()) {
-			mList = cursor.getList();
+			mList = cursor.getEntity();
 		}
 	}
 
@@ -364,7 +364,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		switch (loader.getId()) {
 			case DATA_LOADER:
 				if (data.moveToFirst()) {
-					mItemsInList = ((ShoppingListCursor) data).getItemsAsList();
+					mItemsInList = ((ShoppingListCursor) data).getEntities();
 					//if cross off item in list - find new it position and move
 					//else set new data to adapter
 					if (mPositionCrossOffItem != -1) {

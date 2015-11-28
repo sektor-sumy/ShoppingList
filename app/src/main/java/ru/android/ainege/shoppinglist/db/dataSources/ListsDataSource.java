@@ -3,32 +3,25 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
-
-import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 
-public class ListsDataSource {
-	private Context mContext;
-	private ShoppingListSQLiteHelper mDbHelper;
+public class ListsDataSource extends GenericDataSource<List> {
 
 	public ListsDataSource(Context context) {
-		mContext = context;
-		mDbHelper = new ShoppingListSQLiteHelper(mContext);
+		super(context);
 	}
 
 	public ListCursor get(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + ListsTable.TABLE_NAME + ".*, " +
-				CurrencyTable.TABLE_NAME  + "." + CurrencyTable.COLUMN_NAME + ", " +
-				CurrencyTable.TABLE_NAME  + "." + CurrencyTable.COLUMN_SYMBOL + " " +
+				CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_NAME + ", " +
+				CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_SYMBOL + " " +
 				"FROM " + ListsTable.TABLE_NAME + " INNER JOIN " + CurrencyTable.TABLE_NAME + " " +
 				"ON " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID_CURRENCY + " = " +
 				CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_ID + " " +
@@ -38,12 +31,6 @@ public class ListsDataSource {
 	}
 
 	public ListCursor getAll() {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(ListsTable.TABLE_NAME, null, null, null, null, null, null, null);
-		return new ListCursor(cursor);
-	}
-
-	public ListCursor getAllWithStatictic() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + ListsTable.TABLE_NAME + ".*, " +
 				"SUM(" + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_IS_BOUGHT +
@@ -58,18 +45,21 @@ public class ListsDataSource {
 		return new ListCursor(cursor);
 	}
 
+	@Override
 	public int update(List list) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(list);
 		return db.update(ListsTable.TABLE_NAME, values, ListsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(list.getId())});
 	}
 
+	@Override
 	public long add(List list) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(list);
 		return db.insert(ListsTable.TABLE_NAME, null, values);
 	}
 
+	@Override
 	public void delete(long id) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.delete(ListsTable.TABLE_NAME, ListsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
@@ -82,12 +72,12 @@ public class ListsDataSource {
 		return values;
 	}
 
-	public static class ListCursor extends CursorWrapper {
+	public static class ListCursor extends EntityCursor<List> {
 		public ListCursor(Cursor cursor) {
 			super(cursor);
 		}
 
-		public List getList() {
+		public List getEntity() {
 			long id = getLong(getColumnIndex(ListsTable.COLUMN_ID));
 			String name = getString(getColumnIndex(ListsTable.COLUMN_NAME));
 			long idCurrency = getLong(getColumnIndex(ListsTable.COLUMN_ID_CURRENCY));
@@ -110,15 +100,6 @@ public class ListsDataSource {
 				list.setAmountItems(amount_items);
 			}
 
-			return list;
-		}
-
-		public ArrayList<List> getLists() {
-			ArrayList<List> list = new ArrayList<>();
-			moveToFirst();
-			do {
-				list.add(getList());
-			} while (moveToNext());
 			return list;
 		}
 	}
