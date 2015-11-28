@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments;
+package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -30,7 +30,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
-public class SettingsDataFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CurrencyFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int CURRENCY_LOADER = 0;
 	private static final String ADD_FRAGMENT_DATE = "addItemDialog";
 	private static final String EDIT_FRAGMENT_DATE = "editItemDialog";
@@ -57,8 +57,8 @@ public class SettingsDataFragment extends Fragment implements LoaderManager.Load
 		add.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				SettingsCurrencyDialogFragment addItemDialog = new SettingsCurrencyDialogFragment();
-				addItemDialog.setTargetFragment(SettingsDataFragment.this, ADD_FRAGMENT_CODE);
+				CurrencyDialogFragment addItemDialog = new CurrencyDialogFragment();
+				addItemDialog.setTargetFragment(CurrencyFragment.this, ADD_FRAGMENT_CODE);
 				addItemDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);
 			}
 		});
@@ -251,8 +251,8 @@ public class SettingsDataFragment extends Fragment implements LoaderManager.Load
 				int itemPosition = getAdapterPosition();
 				Currency currency = mCurrencies.get(itemPosition);
 
-				SettingsCurrencyDialogFragment editItemDialog = SettingsCurrencyDialogFragment.newInstance(currency);
-				editItemDialog.setTargetFragment(SettingsDataFragment.this, EDIT_FRAGMENT_CODE);
+				CurrencyDialogFragment editItemDialog = CurrencyDialogFragment.newInstance(currency);
+				editItemDialog.setTargetFragment(CurrencyFragment.this, EDIT_FRAGMENT_CODE);
 				editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
 			}
 

@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments;
+package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,7 +17,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
-public class SettingsCurrencyDialogFragment extends DialogFragment {
+public class CurrencyDialogFragment extends DialogFragment {
 	public static final String CURRENCY = "currency";
 	public static final String ID_CURRENCY = "idCurrency";
 
@@ -28,11 +28,11 @@ public class SettingsCurrencyDialogFragment extends DialogFragment {
 
 	private Currency mEditCurrency;
 
-	public static SettingsCurrencyDialogFragment newInstance(Currency currency) {
+	public static CurrencyDialogFragment newInstance(Currency currency) {
 		Bundle args = new Bundle();
 		args.putSerializable(CURRENCY, currency);
 
-		SettingsCurrencyDialogFragment fragment = new SettingsCurrencyDialogFragment();
+		CurrencyDialogFragment fragment = new CurrencyDialogFragment();
 		fragment.setArguments(args);
 
 		return fragment;
