@@ -1,28 +1,16 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-import java.io.Serializable;
-
-public class Currency implements Serializable {
-    private long mId;
-    private String mName;
+public class Currency extends Dictionary {
     private String mSymbol;
 
     public Currency(String name, String symbol) {
-        mName = name;
+        super(name);
         mSymbol = symbol;
     }
 
     public Currency(long id, String name, String symbol) {
-        this(name, symbol);
-        this.mId = id;
-    }
-
-    public long getId() {
-        return mId;
-    }
-
-    public void setId(long id) {
-        this.mId = id;
+        super(id, name);
+        mSymbol = symbol;
     }
 
     public String getSymbol() {
@@ -31,18 +19,5 @@ public class Currency implements Serializable {
 
     public void setSymbol(String symbol) {
         mSymbol = symbol;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        mName = name;
-    }
-
-    @Override
-    public String toString() {
-        return mSymbol;
     }
 }
