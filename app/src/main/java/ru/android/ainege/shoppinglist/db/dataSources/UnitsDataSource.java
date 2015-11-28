@@ -8,12 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
-public class UnitsDataSource extends GenericDataSource<Unit> {
+public class UnitsDataSource extends DictionaryDataSource<Unit> {
 
 	public UnitsDataSource(Context context) {
 		super(context);
 	}
 
+	@Override
 	public UnitCursor getAll() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("Select " + UnitsTable.TABLE_NAME + ".* from " + UnitsTable.TABLE_NAME +

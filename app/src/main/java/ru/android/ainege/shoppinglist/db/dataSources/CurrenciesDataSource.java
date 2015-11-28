@@ -9,12 +9,13 @@ import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 
-public class CurrenciesDataSource extends GenericDataSource<Currency> {
+public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 
 	public CurrenciesDataSource(Context context) {
 		super(context);
 	}
 
+	@Override
 	public CurrencyCursor getAll() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("Select " + CurrencyTable.TABLE_NAME + ".* from " + CurrencyTable.TABLE_NAME +

@@ -21,7 +21,7 @@ public abstract class GenericDataSource<T> {
 
 	public abstract long add(T currency);
 
-	public abstract void delete(long id) throws Exception;
+	public abstract void delete(long id);
 
 	public static abstract class EntityCursor<S> extends CursorWrapper {
 		public EntityCursor(Cursor cursor) {

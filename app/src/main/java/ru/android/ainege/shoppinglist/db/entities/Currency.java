@@ -20,4 +20,9 @@ public class Currency extends Dictionary {
     public void setSymbol(String symbol) {
         mSymbol = symbol;
     }
+
+    @Override
+    public String toString() {
+        return mSymbol + " (" + super.toString() + ")";
+    }
 }
