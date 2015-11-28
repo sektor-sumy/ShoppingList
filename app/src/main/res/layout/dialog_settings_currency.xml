@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="@dimen/padding_hint"
-            android:hint="@string/currency_name"
+            android:hint="@string/name"
             android:maxLength="30"/>
 
     </android.support.design.widget.TextInputLayout>
@@ -31,7 +31,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
 
         <EditText
             android:id="@+id/symbol"

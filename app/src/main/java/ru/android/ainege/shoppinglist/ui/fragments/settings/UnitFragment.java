@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
@@ -21,9 +20,9 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				/*CurrencyDialogFragment addItemDialog = new CurrencyDialogFragment();
+				GeneralDialogFragment addItemDialog = new UnitDialogFragment();
 				addItemDialog.setTargetFragment(UnitFragment.this, ADD_FRAGMENT_CODE);
-				addItemDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);*/
+				addItemDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);
 			}
 		};
 	}
@@ -59,9 +58,9 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 
 	@Override
 	protected void showEditDialog(int position) {
-		/*CurrencyDialogFragment editItemDialog = CurrencyDialogFragment.newInstance(mDictionary.get(position));
+		GeneralDialogFragment editItemDialog = UnitDialogFragment.newInstance(mDictionary.get(position));
 		editItemDialog.setTargetFragment(UnitFragment.this, EDIT_FRAGMENT_CODE);
-		editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);*/
+		editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
 	}
 
 	public class UnitViewAdapter extends RecyclerViewAdapter<RecyclerViewAdapter.ViewHolder> {

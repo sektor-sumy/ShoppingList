@@ -25,7 +25,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				CurrencyDialogFragment addItemDialog = new CurrencyDialogFragment();
+				GeneralDialogFragment addItemDialog = new CurrencyDialogFragment();
 				addItemDialog.setTargetFragment(CurrencyFragment.this, ADD_FRAGMENT_CODE);
 				addItemDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);
 			}
@@ -63,7 +63,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 	@Override
 	protected void showEditDialog(int position) {
-		CurrencyDialogFragment editItemDialog = CurrencyDialogFragment.newInstance(mDictionary.get(position));
+		GeneralDialogFragment editItemDialog = CurrencyDialogFragment.newInstance(mDictionary.get(position));
 		editItemDialog.setTargetFragment(CurrencyFragment.this, EDIT_FRAGMENT_CODE);
 		editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
 	}
