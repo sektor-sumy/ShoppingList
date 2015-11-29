@@ -33,7 +33,7 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 		return new CurrencyCursor(cursor);
 	}
 
-	public long getRandomIdCurrency(long id) {
+	public long getRandomId(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(CurrencyTable.TABLE_NAME, null, CurrencyTable.COLUMN_ID + " != " + id,
 				null, null, null, CurrencyTable.COLUMN_NAME, "1");
@@ -59,7 +59,7 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 
 	@Override
 	public void delete(long id) {
-		new ListsDataSource(mContext).updateCurrency(id, getRandomIdCurrency(id));
+		new ListsDataSource(mContext).updateCurrency(id, getRandomId(id));
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.delete(CurrencyTable.TABLE_NAME, CurrencyTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});

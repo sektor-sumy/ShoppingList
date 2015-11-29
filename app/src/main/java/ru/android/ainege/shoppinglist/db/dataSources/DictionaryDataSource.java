@@ -11,4 +11,6 @@ public abstract class DictionaryDataSource<T extends Dictionary> extends Generic
 	}
 
 	public abstract EntityCursor<T> getAll();
+
+	public abstract long getRandomId(long id);
 }
