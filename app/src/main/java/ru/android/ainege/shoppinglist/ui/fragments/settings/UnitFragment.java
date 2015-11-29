@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
@@ -35,6 +36,17 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 	@Override
 	protected RecyclerViewAdapter getAdapter() {
 		return new UnitViewAdapter();
+	}
+
+	@Override
+	protected boolean isEntityUsed(long idUnit) {
+		ShoppingListDataSource itemsInlistDS;
+		try {
+			itemsInlistDS = ShoppingListDataSource.getInstance();
+		} catch (NullPointerException e) {
+			itemsInlistDS = ShoppingListDataSource.getInstance(getActivity());
+		}
+		return itemsInlistDS.isUnitUsed(idUnit);
 	}
 
 	@Override

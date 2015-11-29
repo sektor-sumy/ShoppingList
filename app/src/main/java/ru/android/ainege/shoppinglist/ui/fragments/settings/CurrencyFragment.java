@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
 public class CurrencyFragment extends DictionaryFragment<Currency> {
@@ -40,6 +41,11 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 	@Override
 	protected RecyclerViewAdapter getAdapter() {
 		return new CurrencyViewAdapter();
+	}
+
+	@Override
+	protected boolean isEntityUsed(long idCurrency) {
+		return new ListsDataSource(getActivity()).isCurrencyUsed(idCurrency);
 	}
 
 	@Override

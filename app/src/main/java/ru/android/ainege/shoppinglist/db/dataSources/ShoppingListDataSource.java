@@ -78,6 +78,13 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 		return new ShoppingListCursor(cursor);
 	}
 
+	public boolean isUnitUsed(long idUnit) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(ShoppingListTable.TABLE_NAME, null, ShoppingListTable.COLUMN_ID_UNIT + " = " + idUnit,
+				null, null, null, null);
+		return new ShoppingListCursor(cursor).getCount() > 0;
+	}
+
 	public int setIsBought(boolean isBought, long idItem, long idList) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(isBought);
@@ -94,6 +101,15 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 		return db.update(ShoppingListTable.TABLE_NAME, values,
 				ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
 				new String[]{String.valueOf(shoppingList.getIdItem()), String.valueOf(shoppingList.getIdList())});
+	}
+
+	public int updateUnit(long oldId, long newId) {
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(ShoppingListTable.COLUMN_ID_UNIT, newId);
+		return db.update(ShoppingListTable.TABLE_NAME, values,
+				ShoppingListTable.COLUMN_ID_UNIT + " = ?",
+				new String[]{String.valueOf(oldId)});
 	}
 
 	@Override

@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,16 +22,19 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
+import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 
 public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	public static final int ADD_FRAGMENT_CODE = 1;
 	public static final int EDIT_FRAGMENT_CODE = 2;
+	public static final int ANSWER_FRAGMENT_CODE = 3;
 	protected static final String ADD_FRAGMENT_DATE = "addItemDialog";
 	protected static final String EDIT_FRAGMENT_DATE = "editItemDialog";
+	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
 	protected static final int DATA_LOADER = 0;
+
 	protected ArrayList<T> mDictionary = new ArrayList<>();
 	protected RecyclerViewAdapter mAdapterRV;
 
@@ -42,6 +43,8 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	protected abstract DictionaryDataSource getDS();
 
 	protected abstract RecyclerViewAdapter getAdapter();
+
+	protected abstract boolean isEntityUsed(long id);
 
 	public abstract void onLoadFinished(Loader<Cursor> loader, Cursor data);
 
@@ -103,6 +106,16 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 			case EDIT_FRAGMENT_CODE:
 				updateData();
 				break;
+			case ANSWER_FRAGMENT_CODE:
+				deleteItem(data.getLongExtra(QuestionDialogFragment.ID, -1), data.getIntExtra(QuestionDialogFragment.POSITION, -1));
+				break;
+		}
+	}
+
+	private void deleteItem(long id, int position) {
+		if (id != -1 && position != -1) {
+			getDS().delete(id);
+			mAdapterRV.removeItem(position);
 		}
 	}
 
@@ -159,14 +172,19 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 				mDelete.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						int itemPosition = getAdapterPosition();
-						T d = mDictionary.get(itemPosition);
-
-						if (mDictionary.size() > 1) {
-							getDS().delete(d.getId());
-							removeItem(itemPosition);
-						} else {
+						if (mDictionary.size() == 1) {
 							Toast.makeText(getActivity(), getString(R.string.error_one_item), Toast.LENGTH_SHORT).show();
+						} else {
+							int itemPosition = getAdapterPosition();
+							T d = mDictionary.get(itemPosition);
+
+							if (isEntityUsed(d.getId())) {
+								QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_item), d.getId(), itemPosition);
+								dialogFrag.setTargetFragment(DictionaryFragment.this, ANSWER_FRAGMENT_CODE);
+								dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
+							} else {
+								deleteItem(d.getId(), itemPosition);
+							}
 						}
 					}
 				});

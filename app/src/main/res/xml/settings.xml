@@ -34,7 +34,7 @@
 			android:title="@string/settings_title_sort_data_item"/>
 	</PreferenceCategory>
 	<PreferenceCategory
-		android:title="@string/settings_category_setData">
+		android:title="@string/settings_category_other">
 		<Preference
 			android:key="@string/settings_key_currency"
 			android:title="@string/setting_title_currency"/>

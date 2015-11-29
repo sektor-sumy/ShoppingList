@@ -22,6 +22,15 @@ public class UnitsDataSource extends DictionaryDataSource<Unit> {
 		return new UnitCursor(cursor);
 	}
 
+	public long getRandomIdUnit(long id) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(UnitsTable.TABLE_NAME, null, UnitsTable.COLUMN_ID + " != " + id,
+				null, null, null, UnitsTable.COLUMN_NAME, "1");
+		UnitCursor unit = new UnitCursor(cursor);
+		unit.moveToFirst();
+		return unit.getEntity().getId();
+	}
+
 	@Override
 	public int update(Unit unit) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -39,6 +48,8 @@ public class UnitsDataSource extends DictionaryDataSource<Unit> {
 
 	@Override
 	public void delete(long id) {
+		ShoppingListDataSource.getInstance().updateUnit(id, getRandomIdUnit(id));
+
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.delete(UnitsTable.TABLE_NAME, UnitsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 	}

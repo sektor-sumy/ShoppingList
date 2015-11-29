@@ -83,10 +83,10 @@
     <string name="settings_summary_sort_data_item">Настройка обновления данных по умолчанию</string>
     <string name="settings_dialog_title_sort_data_item">Выберите способ обновления данных:</string>
 
-    <string name="settings_category_setData">Настройки</string>
+    <string name="settings_category_other">Другое</string>
     <string name="settings_dialog_title_">Выберите способ обновления данных:</string>
     <string name="settings_key_currency">settings_key_summary</string>
-    <string name="setting_title_currency">Настройка валют</string>
+    <string name="setting_title_currency">Валюты</string>
 
     <string name="sort_order_alphabet">алфавиту</string>
     <string name="sort_order_up_price">возрастанию цены</string>
@@ -109,5 +109,6 @@
     <string name="setting_title_unit">Единицы измерения</string>
     <string name="setting_key_unit">setting_key_unit</string>
     <string name="unit_info">Единица измерения</string>
+    <string name="ask_delete_item">Значение уже используется. При удалении, оно будет заменено случайным. \nУдалить?</string>
 
 </resources>

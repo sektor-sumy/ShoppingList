@@ -5,10 +5,9 @@ import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
-import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
-public class UnitDialogFragment extends GeneralDialogFragment<Currency> {
+public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 
 	public static UnitDialogFragment newInstance(Unit unit) {
 		Bundle args = new Bundle();
