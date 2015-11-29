@@ -18,6 +18,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 
@@ -114,7 +115,7 @@ public class EditItemFragment extends ItemFragment {
 
         if (mItemInList.getAmount() != 0) {
             mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getAmount()));
-            mUnits.setSelection(getPosition(mUnits, mItemInList.getUnit().getName()));
+            mUnits.setSelection(getPosition(mUnits, mItemInList.getUnit().getId()));
         } else {
             mUnits.setSelection(0);
         }
@@ -128,10 +129,10 @@ public class EditItemFragment extends ItemFragment {
         mIsBought.setChecked(mItemInList.isBought());
     }
 
-    private int getPosition(Spinner spinner, String name) {
+    private int getPosition(Spinner spinner, long id) {
         int index = 0;
         for (int i = 0; i < spinner.getCount(); i++) {
-            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(name)) {
+            if (((UnitsDataSource.UnitCursor) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
                 index = i;
                 break;
             }
