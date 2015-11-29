@@ -25,8 +25,8 @@ public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 	}
 
 	@Override
-	protected View setView() {
-		View v = super.setView();
+	protected View setupView() {
+		View v = super.setupView();
 
 		mSymbolInputLayout = (TextInputLayout) v.findViewById(R.id.symbol_input_layout);
 		mSymbolInputLayout.setVisibility(View.VISIBLE);

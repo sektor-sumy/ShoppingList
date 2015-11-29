@@ -29,7 +29,7 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		View v = setView();
+		View v = setupView();
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getTitle())
@@ -47,19 +47,19 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 					}
 				});
 
+		if (getArguments() != null) {
+			setDataToView();
+		}
+
 		return builder.create();
 	}
 
-	protected View setView() {
+	protected View setupView() {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_settings_currency, null);
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
 		mName = (EditText) v.findViewById(R.id.name);
-
-		if (getArguments() != null) {
-			setDataToView();
-		}
 
 		return v;
 	}
