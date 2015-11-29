@@ -11,55 +11,55 @@ import android.os.Bundle;
 import ru.android.ainege.shoppinglist.R;
 
 public class QuestionDialogFragment extends DialogFragment {
-    public static final String MESSAGE = "message";
-    public static final String ID = "id";
-    public static final String POSITION = "position";
-    public static final String OK_CLICK = "okClick";
+	private static final String MESSAGE = "message";
+	public static final String ID = "id";
+	public static final String POSITION = "position";
+	private static final String OK_CLICK = "okClick";
 
-    public static QuestionDialogFragment newInstance(String message) {
-        Bundle args = new Bundle();
-        args.putString(MESSAGE, message);
+	public static QuestionDialogFragment newInstance(String message) {
+		Bundle args = new Bundle();
+		args.putString(MESSAGE, message);
 
-        QuestionDialogFragment fragment = new QuestionDialogFragment();
-        fragment.setArguments(args);
+		QuestionDialogFragment fragment = new QuestionDialogFragment();
+		fragment.setArguments(args);
 
-        return fragment;
-    }
+		return fragment;
+	}
 
-    public static QuestionDialogFragment newInstance(String message, long id, int position) {
-        Bundle args = new Bundle();
-        args.putString(MESSAGE, message);
-        args.putLong(ID, id);
-        args.putInt(POSITION, position);
+	public static QuestionDialogFragment newInstance(String message, long id, int position) {
+		Bundle args = new Bundle();
+		args.putString(MESSAGE, message);
+		args.putLong(ID, id);
+		args.putInt(POSITION, position);
 
-        QuestionDialogFragment fragment = new QuestionDialogFragment();
-        fragment.setArguments(args);
+		QuestionDialogFragment fragment = new QuestionDialogFragment();
+		fragment.setArguments(args);
 
-        return fragment;
-    }
+		return fragment;
+	}
 
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(getArguments().getString(MESSAGE))
-                .setCancelable(false)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-	                    if (getTargetFragment() != null) {
-                            getTargetFragment().onActivityResult(getTargetRequestCode(),
-		                            Activity.RESULT_OK,
-		                            new Intent().putExtra(OK_CLICK, true).
-				                            putExtra(ID, getArguments().getLong(ID)).
-				                            putExtra(POSITION, getArguments().getInt(POSITION)));
-                        }
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setMessage(getArguments().getString(MESSAGE))
+				.setCancelable(false)
+				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						if (getTargetFragment() != null) {
+							getTargetFragment().onActivityResult(getTargetRequestCode(),
+									Activity.RESULT_OK,
+									new Intent().putExtra(OK_CLICK, true).
+											putExtra(ID, getArguments().getLong(ID)).
+											putExtra(POSITION, getArguments().getInt(POSITION)));
+						}
+					}
+				})
+				.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				});
 
-        return builder.create();
-    }
+		return builder.create();
+	}
 }

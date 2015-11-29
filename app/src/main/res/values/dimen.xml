@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="padding_16dp">16dp</dimen>
-    <dimen name="padding_8dp">8dp</dimen>
-    <dimen name="row_list_height">56dp</dimen>
-    <dimen name="avatar_hw">40dp</dimen>
+	<dimen name="padding_16dp">16dp</dimen>
+	<dimen name="padding_8dp">8dp</dimen>
+	<dimen name="row_list_height">56dp</dimen>
+	<dimen name="avatar_hw">40dp</dimen>
 
-    <dimen name="drawer_wight">240dp</dimen>
-    <dimen name="drawer_text_padding">16dp</dimen>
+	<dimen name="drawer_wight">240dp</dimen>
+	<dimen name="drawer_text_padding">16dp</dimen>
 
-    <dimen name="app_bar_height">180dp</dimen>
-    <dimen name="floating_button_margin">24dp</dimen>
+	<dimen name="app_bar_height">180dp</dimen>
+	<dimen name="floating_button_margin">24dp</dimen>
 
-    <dimen name="column_wight">75dp</dimen>
+	<dimen name="column_wight">75dp</dimen>
 
-    <!--fragment_item-->
-    <dimen name="column_left">100dp</dimen>
-    <dimen name="margin_top">30dp</dimen>
-    <dimen name="column_right">70dp</dimen>
-    <dimen name="padding_hint">10dp</dimen>
+	<!--fragment_item-->
+	<dimen name="column_left">100dp</dimen>
+	<dimen name="margin_top">30dp</dimen>
+	<dimen name="column_right">70dp</dimen>
+	<dimen name="padding_hint">10dp</dimen>
 
-    <dimen name="dialog_margin">10dp</dimen>
-    <dimen name="dialog_margin_top">20dp</dimen>
-    <dimen name="dialog_item_amount_weight">75dp</dimen>
-    <dimen name="dialog_item_spinner_weight">60dp</dimen>
-    <dimen name="dialog_item_price_weight">100dp</dimen>
+	<dimen name="dialog_margin">10dp</dimen>
+	<dimen name="dialog_margin_top">20dp</dimen>
+	<dimen name="dialog_item_amount_weight">75dp</dimen>
+	<dimen name="dialog_item_spinner_weight">60dp</dimen>
+	<dimen name="dialog_item_price_weight">100dp</dimen>
 </resources>

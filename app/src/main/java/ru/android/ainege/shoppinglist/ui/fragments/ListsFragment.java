@@ -36,16 +36,16 @@ import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+	private static final int ADD_FRAGMENT_CODE = 1;
+	private static final int EDIT_FRAGMENT_CODE = 2;
 	private static final int DATA_LOADER = 0;
 	private static final String ADD_FRAGMENT_DATE = "addListDialog";
 	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
-	public static final int ADD_FRAGMENT_CODE = 1;
-	public static final int EDIT_FRAGMENT_CODE = 2;
-
 	private RecyclerView mListsRV;
 	private TextView mEmptyText;
 	private RecyclerViewAdapter mAdapterRV;
-	private ArrayList<List> mLists;
+	ArrayList<List> mLists = new ArrayList<>();
+	;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -77,7 +77,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		mEmptyText = (TextView) v.findViewById(R.id.empty_list);
 
-		mAdapterRV = new RecyclerViewAdapter(getActivity());
+		mAdapterRV = new RecyclerViewAdapter();
 		mListsRV.setAdapter(mAdapterRV);
 
 		return v;
@@ -126,11 +126,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			case DATA_LOADER:
 				if (data.moveToFirst()) {
 					mLists = ((ListsDataSource.ListCursor) data).getEntities();
-					mAdapterRV.setData(mLists, true);
+					mAdapterRV.notifyDataSetChanged();
 					hideEmptyStates();
 				} else {
 					showEmptyStates();
 				}
+				data.close();
 				break;
 			default:
 				break;
@@ -150,7 +151,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) return;
 
-		switch(requestCode) {
+		switch (requestCode) {
 			case ADD_FRAGMENT_CODE:
 				updateData();
 				break;
@@ -171,7 +172,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	private static class ListsCursorLoader extends CursorLoader {
-		private Context mContext;
+		private final Context mContext;
 
 		public ListsCursorLoader(Context context) {
 			super(context);
@@ -187,31 +188,11 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-		private Context mContext;
-		private ArrayList<List> mLists;
-		private ArrayList<Integer> mSelectedLists = new ArrayList<>();
-
-		public RecyclerViewAdapter(Context context) {
-			mContext = context;
-			mLists = new ArrayList<>();
-		}
-
-		public void setData(ArrayList<List> lists) {
-			mLists = lists;
-		}
-
-		public void setData(ArrayList<List> lists, boolean isNeedNotify) {
-			setData(lists);
-			if (isNeedNotify) {
-				notifyDataSetChanged();
-			}
-		}
 
 		@Override
 		public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._list_item, parent, false);
-			ViewHolder vh = new ViewHolder(v);
-			return vh;
+			return new ViewHolder(v);
 		}
 
 		@Override
@@ -240,7 +221,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				}
 			}
 
-			holder.mStatisticsShoping.setText(statisticsShopping);
+			holder.mStatisticsShopping.setText(statisticsShopping);
 		}
 
 		@Override
@@ -271,19 +252,19 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
-			public View view;
-			public ImageView mImage;
-			public TextView mName;
-			public TextView mStatisticsShoping;
-			public ImageButton mEdit;
-			public ImageButton mDelete;
+			public final View view;
+			public final ImageView mImage;
+			public final TextView mName;
+			public final TextView mStatisticsShopping;
+			public final ImageButton mEdit;
+			public final ImageButton mDelete;
 
 			public ViewHolder(View v) {
 				super(v);
 				view = v;
 				mImage = (ImageView) v.findViewById(R.id.image_list);
 				mName = (TextView) v.findViewById(R.id.name_list);
-				mStatisticsShoping = (TextView) v.findViewById(R.id.statistics_shopping);
+				mStatisticsShopping = (TextView) v.findViewById(R.id.statistics_shopping);
 				mEdit = (ImageButton) v.findViewById(R.id.edit_list);
 				mDelete = (ImageButton) v.findViewById(R.id.delete_list);
 
@@ -305,7 +286,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						int itemPosition = getAdapterPosition();
 						List list = mLists.get(itemPosition);
 
-						ListsDataSource listsDS = new ListsDataSource(mContext);
+						ListsDataSource listsDS = new ListsDataSource(getActivity());
 						listsDS.delete(list.getId());
 						removeItem(itemPosition);
 

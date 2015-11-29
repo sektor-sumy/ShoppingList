@@ -12,34 +12,34 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "shoppingList.db";
-    private static final int DATABASE_VERSION = 1;
+	private static final String DATABASE_NAME = "shoppingList.db";
+	private static final int DATABASE_VERSION = 1;
 
-    public ShoppingListSQLiteHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
+	public ShoppingListSQLiteHelper(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+	}
 
-    @Override
-    public void onOpen(SQLiteDatabase db) {
-        super.onOpen(db);
-        if (!db.isReadOnly()) {
-            db.execSQL("PRAGMA foreign_keys = ON;");
-        }
-    }
+	@Override
+	public void onOpen(SQLiteDatabase db) {
+		super.onOpen(db);
+		if (!db.isReadOnly()) {
+			db.execSQL("PRAGMA foreign_keys = ON;");
+		}
+	}
 
-    @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        CurrencyTable.onCreate(sqLiteDatabase);
-        UnitsTable.onCreate(sqLiteDatabase);
-        ListsTable.onCreate(sqLiteDatabase);
-        ItemsTable.onCreate(sqLiteDatabase);
-        ShoppingListTable.onCreate(sqLiteDatabase);
-    }
+	@Override
+	public void onCreate(SQLiteDatabase sqLiteDatabase) {
+		CurrencyTable.onCreate(sqLiteDatabase);
+		UnitsTable.onCreate(sqLiteDatabase);
+		ListsTable.onCreate(sqLiteDatabase);
+		ItemsTable.onCreate(sqLiteDatabase);
+		ShoppingListTable.onCreate(sqLiteDatabase);
+	}
 
-    @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
+	@Override
+	public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
 
-    }
+	}
 
 
 }

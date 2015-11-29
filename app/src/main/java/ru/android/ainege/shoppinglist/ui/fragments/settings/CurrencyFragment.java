@@ -58,9 +58,10 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 					ActionBar appBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 					if (appBar != null) {
-						appBar.setTitle(getResources().getString(R.string.setting_currency));
+						appBar.setTitle(getString(R.string.setting_currency));
 					}
 				}
+				data.close();
 				break;
 			default:
 				break;
@@ -80,7 +81,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 		public CurrencyViewAdapter() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-			mIdSelected = prefs.getLong(getResources().getString(R.string.settings_key_dafault_currency), -1);
+			mIdSelected = prefs.getLong(getString(R.string.settings_key_dafault_currency), -1);
 		}
 
 		@Override
@@ -102,7 +103,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		}
 
 		public class CurrencyViewHolder extends RecyclerViewAdapter<CurrencyViewHolder>.ViewHolder {
-			public ImageView mImage;
+			public final ImageView mImage;
 
 			public CurrencyViewHolder(View v) {
 				super(v);

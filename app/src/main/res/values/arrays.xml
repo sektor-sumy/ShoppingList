@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="sort_order">
-        <item>@string/sort_order_alphabet</item>
-        <item>@string/sort_order_up_price</item>
-        <item>@string/sort_order_down_price</item>
-        <item>@string/sort_order_adding</item>
-    </string-array>
-    <string-array name="data_item">
-        <item>@string/data_item_button</item>
-        <item>@string/data_item_always</item>
-        <item>@string/data_item_never</item>
-    </string-array>
+	<string-array name="sort_order">
+		<item>@string/sort_order_alphabet</item>
+		<item>@string/sort_order_up_price</item>
+		<item>@string/sort_order_down_price</item>
+		<item>@string/sort_order_adding</item>
+	</string-array>
+	<string-array name="data_item">
+		<item>@string/data_item_button</item>
+		<item>@string/data_item_always</item>
+		<item>@string/data_item_never</item>
+	</string-array>
 </resources>

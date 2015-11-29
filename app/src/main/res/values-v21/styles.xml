@@ -1,8 +1,8 @@
 <resources>>
 
-    <style name="AppTheme.NoActionBar.TransparentStatusBar">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
+	<style name="AppTheme.NoActionBar.TransparentStatusBar">
+		<item name="android:windowDrawsSystemBarBackgrounds">true</item>
+		<item name="android:statusBarColor">@android:color/transparent</item>
+	</style>
 
 </resources>

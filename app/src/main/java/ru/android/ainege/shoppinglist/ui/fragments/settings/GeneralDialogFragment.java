@@ -16,15 +16,16 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 
 public abstract class GeneralDialogFragment<T extends Dictionary> extends DialogFragment {
-	public static final String ITEM = "item";
-	public static final String ID_ITEM = "idItem";
+	static final String ITEM = "item";
+	private static final String ID_ITEM = "idItem";
 
-	protected TextInputLayout mNameInputLayout;
-	protected EditText mName;
+	TextInputLayout mNameInputLayout;
+	EditText mName;
 
-	protected T mEditItem;
+	T mEditItem;
 
 	protected abstract String getTitle();
+
 	protected abstract boolean saveData();
 
 	@Override
@@ -54,9 +55,9 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 		return builder.create();
 	}
 
-	protected View setupView() {
+	View setupView() {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_settings_currency, null);
+		View v = inflater.inflate(R.layout.dialog_settings, null);
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
 		mName = (EditText) v.findViewById(R.id.name);
@@ -64,10 +65,10 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 		return v;
 	}
 
-	protected void setDataToView() {
+	void setDataToView() {
 		mEditItem = (T) getArguments().getSerializable(ITEM);
 
-		mName.setText(mEditItem.getName());
+		mName.setText(mEditItem != null ? mEditItem.getName() : null);
 		mName.setSelection(mName.getText().length());
 	}
 
@@ -93,10 +94,10 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 		});
 	}
 
-	protected void sendResult(int resultCode, long id) {
+	void sendResult(long id) {
 		if (getTargetFragment() == null)
 			return;
 
-		getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, new Intent().putExtra(ID_ITEM, id));
+		getTargetFragment().onActivityResult(getTargetRequestCode(), android.app.Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
 	}
 }

@@ -13,7 +13,7 @@ public class List implements Serializable {
 	private int mAmountBoughtItems;
 	private int mAmountItems;
 
-	public List(String name) {
+	private List(String name) {
 		mName = name;
 	}
 
@@ -22,7 +22,7 @@ public class List implements Serializable {
 		mIdCurrency = currency;
 	}
 
-	public List(long id, String name) {
+	private List(long id, String name) {
 		this(name);
 		mId = id;
 	}
@@ -48,11 +48,11 @@ public class List implements Serializable {
 		mName = name;
 	}
 
-	public long getIdCurrenty() {
+	public long getIdCurrency() {
 		return mIdCurrency;
 	}
 
-	public void setIdCurrenty(long id) {
+	public void setIdCurrency(long id) {
 		this.mIdCurrency = id;
 	}
 

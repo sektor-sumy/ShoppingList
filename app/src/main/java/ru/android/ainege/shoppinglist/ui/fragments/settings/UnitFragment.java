@@ -40,13 +40,13 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 
 	@Override
 	protected boolean isEntityUsed(long idUnit) {
-		ShoppingListDataSource itemsInlistDS;
+		ShoppingListDataSource itemsInListDS;
 		try {
-			itemsInlistDS = ShoppingListDataSource.getInstance();
+			itemsInListDS = ShoppingListDataSource.getInstance();
 		} catch (NullPointerException e) {
-			itemsInlistDS = ShoppingListDataSource.getInstance(getActivity());
+			itemsInListDS = ShoppingListDataSource.getInstance(getActivity());
 		}
-		return itemsInlistDS.isUnitUsed(idUnit);
+		return itemsInListDS.isUnitUsed(idUnit);
 	}
 
 	@Override
@@ -59,9 +59,10 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 
 					ActionBar appBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 					if (appBar != null) {
-						appBar.setTitle(getResources().getString(R.string.setting_title_unit));
+						appBar.setTitle(getString(R.string.setting_title_unit));
 					}
 				}
+				data.close();
 				break;
 			default:
 				break;
@@ -75,7 +76,7 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 		editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
 	}
 
-	public class UnitViewAdapter extends RecyclerViewAdapter<RecyclerViewAdapter.ViewHolder> {
+	private class UnitViewAdapter extends RecyclerViewAdapter<RecyclerViewAdapter.ViewHolder> {
 
 		@Override
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

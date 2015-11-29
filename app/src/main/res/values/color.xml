@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="drawer_color">#ff232323</color>
-    <color name="drawer_color_text">#fff</color>
+	<color name="drawer_color">#ff232323</color>
+	<color name="drawer_color_text">#fff</color>
 
-    <color name="primary">#009688</color>
-    <color name="primary_dark">#00796B</color>
-    <color name="accent">#FFC107</color>
+	<color name="primary">#009688</color>
+	<color name="primary_dark">#00796B</color>
+	<color name="accent">#FFC107</color>
 </resources>

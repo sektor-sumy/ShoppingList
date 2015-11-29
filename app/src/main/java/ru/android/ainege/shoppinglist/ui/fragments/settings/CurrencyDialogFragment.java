@@ -1,6 +1,5 @@
 package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.view.View;
@@ -11,7 +10,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
 public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
-	protected TextInputLayout mSymbolInputLayout;
+	private TextInputLayout mSymbolInputLayout;
 	private EditText mSymbol;
 
 	public static CurrencyDialogFragment newInstance(Currency currency) {
@@ -78,7 +77,7 @@ public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 				currencyDS.update(new Currency(id, name, symbol));
 			}
 
-			sendResult(Activity.RESULT_OK, id);
+			sendResult(id);
 
 			isSave = true;
 		}

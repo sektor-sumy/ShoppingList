@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 
 public abstract class GenericDataSource<T> {
-	protected Context mContext;
-	protected ShoppingListSQLiteHelper mDbHelper;
+	final Context mContext;
+	final ShoppingListSQLiteHelper mDbHelper;
 
-	public GenericDataSource(Context context) {
+	GenericDataSource(Context context) {
 		mContext = context;
 		mDbHelper = new ShoppingListSQLiteHelper(mContext);
 	}

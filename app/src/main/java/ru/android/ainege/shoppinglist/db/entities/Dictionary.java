@@ -6,11 +6,11 @@ public class Dictionary implements Serializable {
 	private long mId;
 	private String mName;
 
-	public Dictionary(String name) {
+	Dictionary(String name) {
 		mName = name;
 	}
 
-	public Dictionary(long id, String name) {
+	Dictionary(long id, String name) {
 		this(name);
 		this.mId = id;
 	}

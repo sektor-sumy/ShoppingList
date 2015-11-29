@@ -17,8 +17,8 @@ public class UnitsDataSource extends DictionaryDataSource<Unit> {
 	@Override
 	public UnitCursor getAll() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("Select " + UnitsTable.TABLE_NAME + ".* from " + UnitsTable.TABLE_NAME +
-				" ORDER BY " + UnitsTable.TABLE_NAME + "." + UnitsTable.COLUMN_NAME, null);
+		Cursor cursor = db.query(UnitsTable.TABLE_NAME, null, null,
+				null, null, null, UnitsTable.COLUMN_NAME);
 		return new UnitCursor(cursor);
 	}
 
@@ -28,7 +28,9 @@ public class UnitsDataSource extends DictionaryDataSource<Unit> {
 				null, null, null, UnitsTable.COLUMN_NAME, "1");
 		UnitCursor unit = new UnitCursor(cursor);
 		unit.moveToFirst();
-		return unit.getEntity().getId();
+		long selectedId = unit.getEntity().getId();
+		cursor.close();
+		return selectedId;
 	}
 
 	@Override

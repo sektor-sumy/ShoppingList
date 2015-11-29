@@ -49,28 +49,24 @@ import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-	public static final String ID_LIST = "idList";
-	public static final String IS_BOUGHT_END_IN_LIST = "isBoughtEndInList";
-	public static final String DATA_SAVE = "dataSave";
-
+	private static final String ID_LIST = "idList";
+	private static final String IS_BOUGHT_END_IN_LIST = "isBoughtEndInList";
+	private static final String DATA_SAVE = "dataSave";
+	private static final int EDIT_FRAGMENT_CODE = 3;
+	private static final int ANSWER_FRAGMENT_CODE = 4;
 	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
-	public static final int EDIT_FRAGMENT_CODE = 3;
 	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
-	public static final int ANSWER_FRAGMENT_CODE = 4;
-
 	private static final int DATA_LOADER = 0;
 
 	private static final int ADD_ACTIVITY_CODE = 0;
 	private static final int EDIT_ACTIVITY_CODE = 1;
-
+	private ArrayList<ShoppingList> mItemsInList = new ArrayList<>();
 	private CollapsingToolbarLayout mToolbarLayout;
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
 	private TextView mEmptyText;
 	private LinearLayout mListContainer;
 	private RecyclerViewAdapter mAdapterRV;
-
-	private ArrayList<ShoppingList> mItemsInList;
 	private List mList;
 	private double mSaveSpentMoney;
 	private boolean mIsBoughtEndInList;
@@ -78,7 +74,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private long mIdCrossOffItem;
 
 	private android.view.ActionMode mActionMode;
-	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+	private final ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -159,6 +155,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		if (cursor.moveToFirst()) {
 			mList = cursor.getEntity();
 		}
+		cursor.close();
 	}
 
 	@Override
@@ -209,7 +206,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mItemsListRV.setAdapter(mAdapterRV);
 		mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
 					@Override
-					public void onItemClick(View view, int position) {
+					public void onItemClick(int position) {
 						if (mActionMode != null) {
 							mAdapterRV.toggleSelection(position);
 							return;
@@ -236,7 +233,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					}
 
 					@Override
-					public void onItemLongClick(View view, int position) {
+					public void onItemLongClick(int position) {
 						if (mActionMode != null) {
 							return;
 						}
@@ -246,7 +243,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					}
 
 					@Override
-					public void onSwipeRight(View view, int position) {
+					public void onSwipeRight(int position) {
 						if (mActionMode != null) {
 							return;
 						}
@@ -272,7 +269,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						ShoppingList item = mItemsInList.get(position);
 						itemsInListDS.setIsBought(isBought, item.getIdItem(), mList.getId());
 
-						//update recyclerview
+						//update recyclerView
 						//if set bought items in the end of list - refresh list
 						//if it isn`t - try to update only spent sum
 						if (mIsBoughtEndInList) {
@@ -372,16 +369,16 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						if (toPosition != -1) {
 							mAdapterRV.notifyItemMoved(mPositionCrossOffItem, toPosition);
 							mItemsListRV.scrollToPosition(toPosition);
-							mAdapterRV.setData(mItemsInList);
 						}
 					} else {
-						mAdapterRV.setData(mItemsInList, true);       //update data in adapter
+						mAdapterRV.notifyDataSetChanged();     //update data in adapter
 					}
 					updateSums();
 					hideEmptyStates();
 				} else {
 					showEmptyStates();
 				}
+				data.close();
 				break;
 			default:
 				break;
@@ -392,9 +389,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public void onLoaderReset(Loader<Cursor> loader) {
 		switch (loader.getId()) {
 			case DATA_LOADER:
-				if (mAdapterRV != null) {
-					//mAdapterRV.swapCursor(null);
-				}
 				break;
 			default:
 				break;
@@ -503,25 +497,35 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mSpentMoney.setText(localValue(newSum));
 	}
 
-	public static class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-		private ArrayList<ShoppingList> mItems;
-		private ArrayList<Integer> mSelectedItems = new ArrayList<>();
+	private static class ItemsInListCursorLoader extends CursorLoader {
+		private final Context mContext;
+		private final long mIdList;
+
+		public ItemsInListCursorLoader(Context context, long idList) {
+			super(context);
+			mContext = context;
+			mIdList = idList;
+		}
+
+		@Override
+		public Cursor loadInBackground() {
+			ShoppingListDataSource mItemsInListDS;
+			try {
+				mItemsInListDS = ShoppingListDataSource.getInstance();
+			} catch (NullPointerException e) {
+				mItemsInListDS = ShoppingListDataSource.getInstance(mContext);
+			}
+
+			return mItemsInListDS.getItemsInList(mIdList);
+		}
+	}
+
+	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+		private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
 		private String mCurrencyList;
 
 		public RecyclerViewAdapter(String currency) {
 			mCurrencyList = currency;
-			mItems = new ArrayList<>();
-		}
-
-		public void setData(ArrayList<ShoppingList> items) {
-			mItems = items;
-		}
-
-		public void setData(ArrayList<ShoppingList> items, boolean isNeedNotify) {
-			setData(items);
-			if (isNeedNotify) {
-				notifyDataSetChanged();
-			}
 		}
 
 		public void setCurrency(String currency) {
@@ -532,13 +536,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		@Override
 		public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._shopping_list_item, parent, false);
-			ViewHolder vh = new ViewHolder(v);
-			return vh;
+			return new ViewHolder(v);
 		}
 
 		@Override
 		public void onBindViewHolder(ViewHolder holder, int position) {
-			ShoppingList itemInList = mItems.get(position);
+			ShoppingList itemInList = mItemsInList.get(position);
 
 			holder.mView.setSelected(mSelectedItems.contains(position));
 
@@ -562,11 +565,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		@Override
 		public int getItemCount() {
-			return mItems.size();
+			return mItemsInList.size();
 		}
 
 		public void removeItem(int position) {
-			mItems.remove(position);
+			mItemsInList.remove(position);
 			if (mSelectedItems.contains(position)) {
 				mSelectedItems.remove(mSelectedItems.indexOf(position));
 			}
@@ -574,7 +577,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		public ShoppingList getItem(int position) {
-			return mItems.get(position);
+			return mItemsInList.get(position);
 		}
 
 		public void toggleSelection(int position) {
@@ -597,9 +600,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		public void selectItems(boolean isBought) {
-			for (ShoppingList item : mItems) {
+			for (ShoppingList item : mItemsInList) {
 				if (item.isBought() == isBought) {
-					int position = mItems.indexOf(item);
+					int position = mItemsInList.indexOf(item);
 					if (!mSelectedItems.contains(position)) {
 						mSelectedItems.add(position);
 						notifyItemChanged(position);
@@ -612,13 +615,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			return mSelectedItems;
 		}
 
-		public static class ViewHolder extends RecyclerView.ViewHolder {
-			public View mView;
-			public ImageView mImage;
-			public TextView mTextView;
-			public TextView mAmount;
-			public TextView mPrice;
-			public View mIsBought;
+		public class ViewHolder extends RecyclerView.ViewHolder {
+			public final View mView;
+			public final ImageView mImage;
+			public final TextView mTextView;
+			public final TextView mAmount;
+			public final TextView mPrice;
+			public final View mIsBought;
 
 			public ViewHolder(View v) {
 				super(v);
@@ -629,29 +632,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mPrice = (TextView) v.findViewById(R.id.item_price_list);
 				mIsBought = v.findViewById(R.id.is_bought_list);
 			}
-		}
-	}
-
-	private static class ItemsInListCursorLoader extends CursorLoader {
-		private Context mContext;
-		private long mIdList;
-
-		public ItemsInListCursorLoader(Context context, long idList) {
-			super(context);
-			mContext = context;
-			mIdList = idList;
-		}
-
-		@Override
-		public Cursor loadInBackground() {
-			ShoppingListDataSource mItemsInListDS;
-			try {
-				mItemsInListDS = ShoppingListDataSource.getInstance();
-			} catch (NullPointerException e) {
-				mItemsInListDS = ShoppingListDataSource.getInstance(mContext);
-			}
-
-			return mItemsInListDS.getItemsInList(mIdList);
 		}
 	}
 }

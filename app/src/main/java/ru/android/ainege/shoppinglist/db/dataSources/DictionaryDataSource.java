@@ -4,9 +4,9 @@ import android.content.Context;
 
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 
-public abstract class DictionaryDataSource<T extends Dictionary> extends GenericDataSource<T>{
+public abstract class DictionaryDataSource<T extends Dictionary> extends GenericDataSource<T> {
 
-	public DictionaryDataSource(Context context) {
+	DictionaryDataSource(Context context) {
 		super(context);
 	}
 

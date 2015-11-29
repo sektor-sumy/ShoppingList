@@ -28,10 +28,9 @@ import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
 
 public class ListDialogFragment extends DialogFragment {
-	public static final String ID_LIST = "idList";
-	public static final String LIST = "list";
+	private static final String ID_LIST = "idList";
+	private static final String LIST = "list";
 
-	private ImageView mImageList;
 	private TextInputLayout mNameInputLayout;
 	private EditText mName;
 	private Spinner mCurrency;
@@ -74,7 +73,7 @@ public class ListDialogFragment extends DialogFragment {
 			}
 		});
 
-		mImageList = (ImageView) v.findViewById(R.id.image);
+		ImageView mImageList = (ImageView) v.findViewById(R.id.image);
 		mImageList.setImageResource(R.drawable.list);
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
@@ -105,12 +104,12 @@ public class ListDialogFragment extends DialogFragment {
 		return builder.create();
 	}
 
-	private SimpleCursorAdapter getSpinnerAdapter(){
+	private SimpleCursorAdapter getSpinnerAdapter() {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.spinner_currency,
 				new CurrenciesDataSource(getActivity()).getAll(),
-				new String[] {CurrencyTable.COLUMN_SYMBOL, CurrencyTable.COLUMN_NAME},
-				new int[] {R.id.currency_symbol, R.id.currency_name}, 0);
+				new String[]{CurrencyTable.COLUMN_SYMBOL, CurrencyTable.COLUMN_NAME},
+				new int[]{R.id.currency_symbol, R.id.currency_name}, 0);
 		spinnerAdapter.setDropDownViewResource(R.layout.spinner_currency_drop);
 		return spinnerAdapter;
 	}
@@ -123,10 +122,10 @@ public class ListDialogFragment extends DialogFragment {
 	private void setDataToView() {
 		mEditList = (List) getArguments().getSerializable(LIST);
 
-		mName.setText(mEditList.getName());
+		mName.setText(mEditList != null ? mEditList.getName() : null);
 		mName.setSelection(mName.getText().length());
 
-		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrenty()));
+		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
 	}
 
 	private int getPosition(Spinner spinner, long idCurrency) {
@@ -145,7 +144,7 @@ public class ListDialogFragment extends DialogFragment {
 	public void onStart() {
 		super.onStart();
 
-		if(getDialog() == null) {
+		if (getDialog() == null) {
 			return;
 		}
 
@@ -163,7 +162,7 @@ public class ListDialogFragment extends DialogFragment {
 		});
 	}
 
-	protected boolean saveData() {
+	private boolean saveData() {
 		boolean isSave = false;
 		String name = mName.getText().toString().trim();
 
@@ -187,7 +186,7 @@ public class ListDialogFragment extends DialogFragment {
 				listDS.update(new List(id, name, idCurrency));
 			}
 
-			sendResult(Activity.RESULT_OK, id);
+			sendResult(id);
 
 			isSave = true;
 		}
@@ -195,10 +194,10 @@ public class ListDialogFragment extends DialogFragment {
 		return isSave;
 	}
 
-	private void sendResult(int resultCode, long id) {
+	private void sendResult(long id) {
 		if (getTargetFragment() == null)
 			return;
 
-		getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, new Intent().putExtra(ID_LIST, id));
+		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, new Intent().putExtra(ID_LIST, id));
 	}
 }

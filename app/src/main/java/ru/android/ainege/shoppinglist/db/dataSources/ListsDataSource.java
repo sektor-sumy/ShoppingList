@@ -49,7 +49,10 @@ public class ListsDataSource extends GenericDataSource<List> {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(ListsTable.TABLE_NAME, null, ListsTable.COLUMN_ID_CURRENCY + " = " + idCurrency,
 				null, null, null, null);
-		return new ListCursor(cursor).getCount() > 0;
+		ListCursor listCursor = new ListCursor(cursor);
+		boolean result = listCursor.getCount() > 0;
+		cursor.close();
+		return result;
 	}
 
 	@Override
@@ -59,11 +62,11 @@ public class ListsDataSource extends GenericDataSource<List> {
 		return db.update(ListsTable.TABLE_NAME, values, ListsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(list.getId())});
 	}
 
-	public int updateCurrency(long oldId, long newId) {
+	public void updateCurrency(long oldId, long newId) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(ListsTable.COLUMN_ID_CURRENCY, newId);
-		return db.update(ListsTable.TABLE_NAME, values,
+		db.update(ListsTable.TABLE_NAME, values,
 				ListsTable.COLUMN_ID_CURRENCY + " = ?",
 				new String[]{String.valueOf(oldId)});
 	}
@@ -84,7 +87,7 @@ public class ListsDataSource extends GenericDataSource<List> {
 	private ContentValues createContentValues(List list) {
 		ContentValues values = new ContentValues();
 		values.put(ListsTable.COLUMN_NAME, list.getName());
-		values.put(ListsTable.COLUMN_ID_CURRENCY, list.getIdCurrenty());
+		values.put(ListsTable.COLUMN_ID_CURRENCY, list.getIdCurrency());
 		return values;
 	}
 

@@ -21,8 +21,8 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 	@Override
 	public CurrencyCursor getAll() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("Select " + CurrencyTable.TABLE_NAME + ".* from " + CurrencyTable.TABLE_NAME +
-				" ORDER BY " + CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_NAME, null);
+		Cursor cursor = db.query(CurrencyTable.TABLE_NAME, null, null,
+				null, null, null, CurrencyTable.COLUMN_NAME);
 		return new CurrencyCursor(cursor);
 	}
 
@@ -32,7 +32,6 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 				" INNER JOIN " + ListsTable.TABLE_NAME + " ON " +
 				CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_ID + " = " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID_CURRENCY +
 				" where " + ListsTable.TABLE_NAME + " . " + ListsTable.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
-
 		return new CurrencyCursor(cursor);
 	}
 
@@ -40,9 +39,11 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(CurrencyTable.TABLE_NAME, null, CurrencyTable.COLUMN_ID + " != " + id,
 				null, null, null, CurrencyTable.COLUMN_NAME, "1");
-		CurrencyCursor currency = new CurrencyCursor(cursor);
-		currency.moveToFirst();
-		return currency.getEntity().getId();
+		CurrencyCursor currencyCursor = new CurrencyCursor(cursor);
+		currencyCursor.moveToFirst();
+		long selectedId = currencyCursor.getEntity().getId();
+		cursor.close();
+		return selectedId;
 	}
 
 	@Override

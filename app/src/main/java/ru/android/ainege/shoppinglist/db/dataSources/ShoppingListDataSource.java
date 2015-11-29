@@ -22,8 +22,6 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 
 	private static ShoppingListDataSource instance;
 
-	public boolean mIsBoughtEndInList;
-	public String mType;
 	private String order;
 
 	private ShoppingListDataSource(Context context) {
@@ -47,9 +45,7 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 	}
 
 	public void setSortSettings(boolean isBoughtFirst, String type) {
-		mIsBoughtEndInList = isBoughtFirst;
-		mType = type;
-		order = getOrder(mIsBoughtEndInList, mType);
+		order = getOrder(isBoughtFirst, type);
 	}
 
 	public ShoppingListCursor getItemsInList(long id) {
@@ -82,13 +78,16 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(ShoppingListTable.TABLE_NAME, null, ShoppingListTable.COLUMN_ID_UNIT + " = " + idUnit,
 				null, null, null, null);
-		return new ShoppingListCursor(cursor).getCount() > 0;
+		ShoppingListCursor itemInListCursor = new ShoppingListCursor(cursor);
+		boolean result = itemInListCursor.getCount() > 0;
+		cursor.close();
+		return result;
 	}
 
-	public int setIsBought(boolean isBought, long idItem, long idList) {
+	public void setIsBought(boolean isBought, long idItem, long idList) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(isBought);
-		return db.update(ShoppingListTable.TABLE_NAME,
+		db.update(ShoppingListTable.TABLE_NAME,
 				values,
 				ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
 				new String[]{String.valueOf(idItem), String.valueOf(idList)});
@@ -103,11 +102,11 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 				new String[]{String.valueOf(shoppingList.getIdItem()), String.valueOf(shoppingList.getIdList())});
 	}
 
-	public int updateUnit(long oldId, long newId) {
+	public void updateUnit(long oldId, long newId) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(ShoppingListTable.COLUMN_ID_UNIT, newId);
-		return db.update(ShoppingListTable.TABLE_NAME, values,
+		db.update(ShoppingListTable.TABLE_NAME, values,
 				ShoppingListTable.COLUMN_ID_UNIT + " = ?",
 				new String[]{String.valueOf(oldId)});
 	}

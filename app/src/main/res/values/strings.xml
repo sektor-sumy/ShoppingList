@@ -1,114 +1,114 @@
 <resources>
-    <string name="app_name">Shopping list</string>
-    <string name="drawer_open">drawer_open</string>
-    <string name="drawer_close">drawer_close</string>
+	<string name="app_name">Shopping list</string>
+	<string name="drawer_open">drawer_open</string>
+	<string name="drawer_close">drawer_close</string>
 
-    <string name="add_item">Добавить товар</string>
-    <string name="spent_money">Потрачено</string>
-    <string name="all_money">Всего</string>
-    <string name="name">Название</string>
+	<string name="add_item">Добавить товар</string>
+	<string name="spent_money">Потрачено</string>
+	<string name="all_money">Всего</string>
+	<string name="name">Название</string>
 
-    <string name="edit">Изменить</string>
-    <string name="add">Добавить</string>
-    <string name="save">Сохранить</string>
-    <string name="cancel">Отмена</string>
-    <string name="update">Обновить</string>
-    <string name="yes">Да</string>
-    <string name="no">Нет</string>
-    <string name="is_bought">В корзине?</string>
+	<string name="edit">Изменить</string>
+	<string name="add">Добавить</string>
+	<string name="save">Сохранить</string>
+	<string name="cancel">Отмена</string>
+	<string name="update">Обновить</string>
+	<string name="yes">Да</string>
+	<string name="no">Нет</string>
+	<string name="is_bought">В корзине?</string>
 
-    <!--CAB menu-->
-    <string name="delete">Удалить</string>
-    <string name="move">Переместить</string>
-    <string name="select_bought">Выбрать купленые</string>
-    <string name="select_not_bought">Выбрать не купленые</string>
+	<!--CAB menu-->
+	<string name="delete">Удалить</string>
+	<string name="move">Переместить</string>
+	<string name="select_bought">Выбрать купленые</string>
+	<string name="select_not_bought">Выбрать не купленые</string>
 
-    <!--fragment item-->
-    <string name="info_exit_item_in_list">Товар есть в списке и будет перезаписан</string>
-    <string name="info_exit_item">Такой товар уже есть. Изменения не сохранятся</string>
-    <string name="error_name">Введите название</string>
-    <string name="error_value">Неверное значение</string>
-    <string name="error_comment">Слишком длинный коментарий</string>
-    <string name="data_is_save">Данные сохранены</string>
-    <string name="wrong_value">Проверьте ввод данных</string>
-    <string name="finish_price">Итоговая сумма: </string>
-    <!--Item menu-->
-    <string name="take_photo">"Сделать снимок</string>
-    <string name="select_from_gallery">Выбрать из галереи</string>
-    <string name="reset_image">Сбросить изображение</string>
-    <!--layout-->
-    <string name="item_name">Название товара</string>
-    <string name="amount">Количество</string>
-    <string name="price">Цена</string>
-    <string name="comment">Коментарий</string>
-    <string name="in_card">В корзину </string>
-    <string name="bought">Куплено </string>
+	<!--fragment item-->
+	<string name="info_exit_item_in_list">Товар есть в списке и будет перезаписан</string>
+	<string name="info_exit_item">Такой товар уже есть. Изменения не сохранятся</string>
+	<string name="error_name">Введите название</string>
+	<string name="error_value">Неверное значение</string>
+	<string name="error_comment">Слишком длинный коментарий</string>
+	<string name="data_is_save">Данные сохранены</string>
+	<string name="wrong_value">Проверьте ввод данных</string>
+	<string name="finish_price">Итоговая сумма: </string>
+	<!--Item menu-->
+	<string name="take_photo">"Сделать снимок</string>
+	<string name="select_from_gallery">Выбрать из галереи</string>
+	<string name="reset_image">Сбросить изображение</string>
+	<!--layout-->
+	<string name="item_name">Название товара</string>
+	<string name="amount">Количество</string>
+	<string name="price">Цена</string>
+	<string name="comment">Коментарий</string>
+	<string name="in_card">В корзину </string>
+	<string name="bought">Куплено </string>
 
-    <!--dialog list-->
-    <string name="list_name">Название списка</string>
-    <string name="list_currency">Валюта списка</string>
+	<!--dialog list-->
+	<string name="list_name">Название списка</string>
+	<string name="list_currency">Валюта списка</string>
 
-    <string name="no_lists">Нет списков</string>
-    <string name="empty_list">В списке нет ни одного товара</string>
-    <string name="error_existing_name">Такое название уже есть</string>
-    <string name="error_delete_list">Ошибка удаления</string>
-    <string name="info_exit_item_in_list_dont_save">Товар есть в списке и не будет сохранен</string>
-    <string name="zero_price">0,0</string>
-    <string name="one">1,0</string>
-    <string name="you_lists">Ваши списки:</string>
-    <string name="new_list">Новый список</string>
-    <string name="buy">Купить:</string>
-    <string name="delete_list">Удалить список</string>
-    <string name="update_list">Изменить список</string>
-    <string name="delete_all_bought">Удалить все выбраное</string>
-    <string name="ask_delete_list">Удалить список?</string>
+	<string name="no_lists">Нет списков</string>
+	<string name="empty_list">В списке нет ни одного товара</string>
+	<string name="error_existing_name">Такое название уже есть</string>
+	<string name="error_delete_list">Ошибка удаления</string>
+	<string name="info_exit_item_in_list_dont_save">Товар есть в списке и не будет сохранен</string>
+	<string name="zero_price">0,0</string>
+	<string name="one">1,0</string>
+	<string name="you_lists">Ваши списки:</string>
+	<string name="new_list">Новый список</string>
+	<string name="buy">Купить:</string>
+	<string name="delete_list">Удалить список</string>
+	<string name="update_list">Изменить список</string>
+	<string name="delete_all_bought">Удалить все выбраное</string>
+	<string name="ask_delete_list">Удалить список?</string>
 
-    <!--settings-->
-    <string name="settings">Настройки</string>
-    <string name="settings_category_sort">Сортировка товаров в списке</string>
-    <string name="settings_key_sort_is_bought">sort_is_bought</string>
-    <string name="settings_title_sort_is_bought">Сначала не купленные</string>
-    <string name="settings_summary_sort_is_bought">В списке сначала идут некупленные товары, потом купленные</string>
-    <string name="settings_key_sort_type">sort_type</string>
-    <string name="settings_title_sort_type">Порядок сортировки</string>
-    <string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
-    <string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
+	<!--settings-->
+	<string name="settings">Настройки</string>
+	<string name="settings_category_sort">Сортировка товаров в списке</string>
+	<string name="settings_key_sort_is_bought">sort_is_bought</string>
+	<string name="settings_title_sort_is_bought">Сначала не купленные</string>
+	<string name="settings_summary_sort_is_bought">В списке сначала идут некупленные товары, потом купленные</string>
+	<string name="settings_key_sort_type">sort_type</string>
+	<string name="settings_title_sort_type">Порядок сортировки</string>
+	<string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
+	<string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
 
-    <string name="settings_category_data_item">Данные о товаре по умолчанию</string>
-    <string name="settings_key_sort_is_default_data">sort_is_default_data</string>
-    <string name="settings_title_sort_is_default_data">Использовать данные по умолчанию</string>
-    <string name="settings_summary_sort_is_default_data">Автоматическое заполнение полей о товаре: количество, цена</string>
-    <string name="settings_key_sort_data_item">sort_data_item</string>
-    <string name="settings_title_sort_data_item">Способ обновление данных</string>
-    <string name="settings_summary_sort_data_item">Настройка обновления данных по умолчанию</string>
-    <string name="settings_dialog_title_sort_data_item">Выберите способ обновления данных:</string>
+	<string name="settings_category_data_item">Данные о товаре по умолчанию</string>
+	<string name="settings_key_sort_is_default_data">sort_is_default_data</string>
+	<string name="settings_title_sort_is_default_data">Использовать данные по умолчанию</string>
+	<string name="settings_summary_sort_is_default_data">Автоматическое заполнение полей о товаре: количество, цена</string>
+	<string name="settings_key_sort_data_item">sort_data_item</string>
+	<string name="settings_title_sort_data_item">Способ обновление данных</string>
+	<string name="settings_summary_sort_data_item">Настройка обновления данных по умолчанию</string>
+	<string name="settings_dialog_title_sort_data_item">Выберите способ обновления данных:</string>
 
-    <string name="settings_category_other">Другое</string>
-    <string name="settings_dialog_title_">Выберите способ обновления данных:</string>
-    <string name="settings_key_currency">settings_key_summary</string>
-    <string name="setting_title_currency">Валюты</string>
+	<string name="settings_category_other">Другое</string>
+	<string name="settings_dialog_title_">Выберите способ обновления данных:</string>
+	<string name="settings_key_currency">settings_key_summary</string>
+	<string name="setting_title_currency">Валюты</string>
 
-    <string name="sort_order_alphabet">алфавиту</string>
-    <string name="sort_order_up_price">возрастанию цены</string>
-    <string name="sort_order_down_price">убыванию цены</string>
-    <string name="sort_order_adding">порядку добавления</string>
+	<string name="sort_order_alphabet">алфавиту</string>
+	<string name="sort_order_up_price">возрастанию цены</string>
+	<string name="sort_order_down_price">убыванию цены</string>
+	<string name="sort_order_adding">порядку добавления</string>
 
-    <string name="data_item_button">показать специальную кнопку</string>
-    <string name="data_item_always">всегда при сохранении данных о товаре</string>
-    <string name="data_item_never">некогда не обновлять</string>
+	<string name="data_item_button">показать специальную кнопку</string>
+	<string name="data_item_always">всегда при сохранении данных о товаре</string>
+	<string name="data_item_never">некогда не обновлять</string>
 
-    <string name="currency_name">Название валюты</string>
-    <string name="currency_symbol">Символ или сокращение</string>
-    <string name="error_empty">Не может быть пустым</string>
-    <string name="error_one_item">Что-то должно остаться</string>
-    <string name="setting_currency">Настройка валют</string>
-    <string name="settings_key_dafault_currency">dafault_currency</string>
-    <string name="select_dafault_currency">Выбрана валютой по умолчанию</string>
-    <string name="currency_info">Информация о валюте</string>
+	<string name="currency_name">Название валюты</string>
+	<string name="currency_symbol">Символ или сокращение</string>
+	<string name="error_empty">Не может быть пустым</string>
+	<string name="error_one_item">Что-то должно остаться</string>
+	<string name="setting_currency">Настройка валют</string>
+	<string name="settings_key_dafault_currency">dafault_currency</string>
+	<string name="select_dafault_currency">Выбрана валютой по умолчанию</string>
+	<string name="currency_info">Информация о валюте</string>
 
-    <string name="setting_title_unit">Единицы измерения</string>
-    <string name="setting_key_unit">setting_key_unit</string>
-    <string name="unit_info">Единица измерения</string>
-    <string name="ask_delete_item">Значение уже используется. При удалении, оно будет заменено случайным. \nУдалить?</string>
+	<string name="setting_title_unit">Единицы измерения</string>
+	<string name="setting_key_unit">setting_key_unit</string>
+	<string name="unit_info">Единица измерения</string>
+	<string name="ask_delete_item">Значение уже используется. При удалении, оно будет заменено случайным. \nУдалить?</string>
 
 </resources>

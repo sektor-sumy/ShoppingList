@@ -27,16 +27,15 @@ import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 
 public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-	public static final int ADD_FRAGMENT_CODE = 1;
-	public static final int EDIT_FRAGMENT_CODE = 2;
-	public static final int ANSWER_FRAGMENT_CODE = 3;
-	protected static final String ADD_FRAGMENT_DATE = "addItemDialog";
-	protected static final String EDIT_FRAGMENT_DATE = "editItemDialog";
+	static final int ADD_FRAGMENT_CODE = 1;
+	static final int EDIT_FRAGMENT_CODE = 2;
+	private static final int ANSWER_FRAGMENT_CODE = 3;
+	static final String ADD_FRAGMENT_DATE = "addItemDialog";
+	static final String EDIT_FRAGMENT_DATE = "editItemDialog";
+	static final int DATA_LOADER = 0;
 	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
-	protected static final int DATA_LOADER = 0;
-
-	protected ArrayList<T> mDictionary = new ArrayList<>();
-	protected RecyclerViewAdapter mAdapterRV;
+	ArrayList<T> mDictionary = new ArrayList<>();
+	RecyclerViewAdapter mAdapterRV;
 
 	protected abstract View.OnClickListener getAddHandler();
 
@@ -120,7 +119,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	}
 
 	private static class DataCursorLoader extends CursorLoader {
-		private DictionaryDataSource mDS;
+		private final DictionaryDataSource mDS;
 
 		public DataCursorLoader(Context context, DictionaryDataSource ds) {
 			super(context);
@@ -151,9 +150,9 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
-			public TextView mName;
-			public ImageButton mEdit;
-			public ImageButton mDelete;
+			public final TextView mName;
+			public final ImageButton mEdit;
+			public final ImageButton mDelete;
 
 			public ViewHolder(View v) {
 				super(v);
