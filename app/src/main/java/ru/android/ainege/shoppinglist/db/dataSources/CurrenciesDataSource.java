@@ -2,9 +2,12 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 
+import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
@@ -59,7 +62,14 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 
 	@Override
 	public void delete(long id) {
-		new ListsDataSource(mContext).updateCurrency(id, getRandomId(id));
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		long idFavorite = prefs.getLong(mContext.getString(R.string.settings_key_dafault_currency), -1);
+
+		if (idFavorite == -1) {
+			idFavorite = getRandomId(id);
+		}
+
+		new ListsDataSource(mContext).updateCurrency(id, idFavorite);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.delete(CurrencyTable.TABLE_NAME, CurrencyTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
