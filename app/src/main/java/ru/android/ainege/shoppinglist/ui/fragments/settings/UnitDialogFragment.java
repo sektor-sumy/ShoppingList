@@ -2,6 +2,8 @@ package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.view.View;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
@@ -17,6 +19,13 @@ public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 		fragment.setArguments(args);
 
 		return fragment;
+	}
+
+	@Override
+	protected View setupView() {
+		View v = super.setupView();
+		mName.setFilters(new InputFilter[] { new InputFilter.LengthFilter(5) });
+		return v;
 	}
 
 	@Override
