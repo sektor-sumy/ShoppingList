@@ -18,7 +18,8 @@ public class ListsTable {
 			+ "("
 			+ COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COLUMN_NAME + " TEXT NOT NULL, "
-			+ COLUMN_ID_CURRENCY + " INTEGER NOT NULL"
+			+ COLUMN_ID_CURRENCY + " INTEGER, "
+			+ "FOREIGN KEY (" + COLUMN_ID_CURRENCY + ") REFERENCES " + CurrencyTable.TABLE_NAME + " (" + CurrencyTable.COLUMN_ID + ") ON DELETE SET NULL"
 			+ ");";
 
 	public static void onCreate(SQLiteDatabase database) {

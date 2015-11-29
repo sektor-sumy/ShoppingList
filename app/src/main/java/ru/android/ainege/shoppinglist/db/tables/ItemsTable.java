@@ -22,7 +22,7 @@ public class ItemsTable {
             + COLUMN_ID_UNIT + " INTEGER, "
             + COLUMN_PRICE + " REAL, "
             + COLUMN_COMMENT + " TEXT, "
-            + "FOREIGN KEY (" + COLUMN_ID_UNIT + ") REFERENCES " + UnitsTable.TABLE_NAME + " (" + UnitsTable.COLUMN_ID + ")"
+            + "FOREIGN KEY (" + COLUMN_ID_UNIT + ") REFERENCES " + UnitsTable.TABLE_NAME + " (" + UnitsTable.COLUMN_ID + ") ON DELETE SET NULL"
             + ");";
 
     public static void onCreate(SQLiteDatabase database) {
