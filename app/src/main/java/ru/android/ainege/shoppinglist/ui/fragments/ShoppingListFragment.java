@@ -176,7 +176,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		setTitle();
 
 		ImageView appBarImage = (ImageView) v.findViewById(R.id.appbar_image);
-		appBarImage.setImageResource(R.drawable.list);
+		appBarImage.setImageResource(R.drawable.random_list_1);
 
 		FloatingActionButton addItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
 		addItemFAB.setOnClickListener(new View.OnClickListener() {

@@ -7,29 +7,22 @@ public class List implements Serializable {
 	private long mId;
 	private String mName;
 	private long mIdCurrency;
+	private String mImagePath;
 	private ArrayList<ShoppingList> mItemsInList;
 	private Currency mCurrency;
 
 	private int mAmountBoughtItems;
 	private int mAmountItems;
 
-	private List(String name) {
-		mName = name;
-	}
-
-	public List(String name, long currency) {
+	public List(String name, long currency, String imagePath) {
 		mName = name;
 		mIdCurrency = currency;
+		mImagePath = imagePath;
 	}
 
-	private List(long id, String name) {
-		this(name);
+	public List(long id, String name, long idCurrency, String imagePath) {
+		this(name, idCurrency, imagePath);
 		mId = id;
-	}
-
-	public List(long id, String name, long idCurrency) {
-		this(id, name);
-		mIdCurrency = idCurrency;
 	}
 
 	public long getId() {
@@ -50,6 +43,14 @@ public class List implements Serializable {
 
 	public long getIdCurrency() {
 		return mIdCurrency;
+	}
+
+	public void setImagePath(String imagePath) {
+		mImagePath = imagePath;
+	}
+
+	public String getImagePath() {
+		return mImagePath;
 	}
 
 	public void setIdCurrency(long id) {

@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TextInputLayout;
@@ -21,6 +22,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.Random;
+
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
@@ -31,11 +34,13 @@ public class ListDialogFragment extends DialogFragment {
 	private static final String ID_LIST = "idList";
 	private static final String LIST = "list";
 
+	private ImageView mImageList;
 	private TextInputLayout mNameInputLayout;
 	private EditText mName;
 	private Spinner mCurrency;
 
 	private List mEditList;
+	private String mImagePath;
 
 	public static ListDialogFragment newInstance(List list) {
 		Bundle args = new Bundle();
@@ -73,8 +78,7 @@ public class ListDialogFragment extends DialogFragment {
 			}
 		});
 
-		ImageView mImageList = (ImageView) v.findViewById(R.id.image);
-		mImageList.setImageResource(R.drawable.list);
+		mImageList = (ImageView) v.findViewById(R.id.image);
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
 		mName = (EditText) v.findViewById(R.id.name);
@@ -98,7 +102,11 @@ public class ListDialogFragment extends DialogFragment {
 				});
 
 		if (getArguments() != null) {
+			mEditList = (List) getArguments().getSerializable(LIST);
 			setDataToView();
+		} else {
+			mImagePath = "android.resource://ru.android.ainege.shoppinglist/drawable/random_list_" + (new Random().nextInt(4) + 1);
+			mImageList.setImageURI(Uri.parse(mImagePath));
 		}
 
 		return builder.create();
@@ -120,9 +128,10 @@ public class ListDialogFragment extends DialogFragment {
 	}
 
 	private void setDataToView() {
-		mEditList = (List) getArguments().getSerializable(LIST);
+		mImagePath = mEditList.getImagePath();
+		mImageList.setImageURI(Uri.parse(mImagePath));
 
-		mName.setText(mEditList != null ? mEditList.getName() : null);
+		mName.setText(mEditList.getName());
 		mName.setSelection(mName.getText().length());
 
 		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
@@ -180,10 +189,10 @@ public class ListDialogFragment extends DialogFragment {
 
 			long id;
 			if (getArguments() == null) {
-				id = listDS.add(new List(name, idCurrency));
+				id = listDS.add(new List(name, idCurrency, mImagePath));
 			} else {
 				id = mEditList.getId();
-				listDS.update(new List(id, name, idCurrency));
+				listDS.update(new List(id, name, idCurrency, mImagePath));
 			}
 
 			sendResult(id);

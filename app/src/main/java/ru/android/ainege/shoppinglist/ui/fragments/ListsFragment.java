@@ -9,6 +9,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -22,7 +23,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,7 +45,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private TextView mEmptyText;
 	private RecyclerViewAdapter mAdapterRV;
 	ArrayList<List> mLists = new ArrayList<>();
-	;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -199,7 +198,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		public void onBindViewHolder(ViewHolder holder, int position) {
 			List list = mLists.get(position);
 
-			holder.mImage.setImageResource(R.drawable.list);
+			holder.mImage.setImageURI(Uri.parse(list.getImagePath()));
+
 			holder.mName.setText(list.getName());
 
 			int amountItem = list.getAmountItems();
@@ -222,23 +222,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			}
 
 			holder.mStatisticsShopping.setText(statisticsShopping);
-		}
-
-		@Override
-		public void onViewAttachedToWindow(final ViewHolder holder) {
-			super.onViewAttachedToWindow(holder);
-
-			holder.mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-				@Override
-				public boolean onPreDraw() {
-					int imageWidth = holder.mImage.getWidth();
-					if (imageWidth > 0) {
-						holder.mImage.getLayoutParams().height = imageWidth * 9 / 16;
-					}
-
-					return true;
-				}
-			});
 		}
 
 		@Override

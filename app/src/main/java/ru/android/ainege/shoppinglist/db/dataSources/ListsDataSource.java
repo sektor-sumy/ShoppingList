@@ -88,6 +88,7 @@ public class ListsDataSource extends GenericDataSource<List> {
 		ContentValues values = new ContentValues();
 		values.put(ListsTable.COLUMN_NAME, list.getName());
 		values.put(ListsTable.COLUMN_ID_CURRENCY, list.getIdCurrency());
+		values.put(ListsTable.COLUMN_IMAGE_PATH, list.getImagePath());
 		return values;
 	}
 
@@ -100,8 +101,9 @@ public class ListsDataSource extends GenericDataSource<List> {
 			long id = getLong(getColumnIndex(ListsTable.COLUMN_ID));
 			String name = getString(getColumnIndex(ListsTable.COLUMN_NAME));
 			long idCurrency = getLong(getColumnIndex(ListsTable.COLUMN_ID_CURRENCY));
+			String imagePath = getString(getColumnIndex(ListsTable.COLUMN_IMAGE_PATH));
 
-			List list = new List(id, name, idCurrency);
+			List list = new List(id, name, idCurrency, imagePath);
 
 			if (getColumnIndex(CurrencyTable.COLUMN_NAME) != -1) {
 				String currencyName = getString(getColumnIndex(CurrencyTable.COLUMN_NAME));
