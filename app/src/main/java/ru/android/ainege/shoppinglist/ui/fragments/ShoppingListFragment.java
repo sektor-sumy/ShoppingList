@@ -316,6 +316,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		updateData();
+	}
+
+	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.items_in_list_menu, menu);
