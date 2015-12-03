@@ -8,9 +8,12 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +56,12 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
+		} else {
+			getActivity().overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
+		}
+
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
 
@@ -70,6 +79,12 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 		mDictionaryRV.setAdapter(mAdapterRV);
 
 		return v;
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		getActivity().overridePendingTransition(R.anim.slide_in_down, R.anim.slide_out_down);
 	}
 
 	@Override

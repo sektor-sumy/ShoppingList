@@ -54,7 +54,15 @@ public class AddItemFragment extends ItemFragment {
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
+		} else {
+			getActivity().overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
 		}
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		getActivity().overridePendingTransition(R.anim.slide_in_down, R.anim.slide_out_down);
 	}
 
 	@Override

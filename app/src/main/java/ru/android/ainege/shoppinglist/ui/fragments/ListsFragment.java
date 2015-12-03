@@ -99,7 +99,11 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		switch (item.getItemId()) {
 			case R.id.settings:
 				Intent i = new Intent(getActivity(), SettingsActivity.class);
-				startActivity(i);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+				} else {
+					startActivity(i);
+				}
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

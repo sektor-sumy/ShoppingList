@@ -7,7 +7,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.CurrencyFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.UnitFragment;
 
-public class SettingsDataActivity extends SingleFragmentActivity {
+public class SettingsDictionaryActivity extends SingleFragmentActivity {
 	public final static String EXTRA_TYPE = "type";
 
 	@Override

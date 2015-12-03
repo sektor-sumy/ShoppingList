@@ -139,6 +139,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
+		} else {
+			getActivity().overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
 		}
 
 		setHasOptionsMenu(true);
@@ -322,6 +324,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	@Override
+	public void onPause() {
+		super.onPause();
+		getActivity().overridePendingTransition(R.anim.slide_in_down, R.anim.slide_out_down);
+	}
+
+	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.items_in_list_menu, menu);
@@ -342,7 +350,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				return true;
 			case R.id.settings:
 				Intent i = new Intent(getActivity(), SettingsActivity.class);
-				startActivity(i);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+				} else {
+					startActivity(i);
+				}
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
