@@ -32,53 +32,6 @@ public class Image {
 		return new Image();
 	}
 
-	public File createImageFile() {
-		if (isExternalStorageWritable()) {
-			File mediaStorageDir = getAlbumStorageDir();
-			if (mediaStorageDir == null) {
-				return null;
-			}
-
-			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-			String name = "IMG_" + timeStamp + ".jpg";
-
-			return new File(mediaStorageDir.getAbsolutePath(), name);
-		} else {
-			return null;
-		}
-	}
-
-	public boolean postProcessing(File file, int widthImageView) {
-		if (!isExternalStorageReadable()) {
-			return false;
-		}
-
-		boolean result = false;
-		Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-
-		if (isNeedCrop(bitmap)) {
-			bitmap = crop(bitmap);
-		}
-
-		if (isNeedScale(bitmap, widthImageView)) {
-			bitmap = scale(bitmap, widthImageView);
-		}
-
-		try {
-			FileOutputStream stream = new FileOutputStream(file);
-			bitmap.compress(CompressFormat.JPEG, 100, stream);
-			stream.close();
-
-			bitmap.recycle();
-
-			result = true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return result;
-	}
-
 	public Image insertImageToView(Context context, Uri path, ImageView image) {
 		Picasso.with(context)
 				.load(path)
@@ -101,6 +54,67 @@ public class Image {
 	public Image setDefaultImage(int image) {
 		mDefaultImage = image;
 		return this;
+	}
+
+	public File createImageFile() {
+		if (isExternalStorageWritable()) {
+			File mediaStorageDir = getAlbumStorageDir();
+			if (mediaStorageDir == null) {
+				return null;
+			}
+
+			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+			String name = "IMG_" + timeStamp + ".jpg";
+
+			return new File(mediaStorageDir.getAbsolutePath(), name);
+		} else {
+			return null;
+		}
+	}
+
+	public boolean postProcessingToFile(File file, int widthImageView) {
+		if (!isExternalStorageReadable()) {
+			return false;
+		}
+
+		boolean result = false;
+		Bitmap bitmap = postProcessing(BitmapFactory.decodeFile(file.getAbsolutePath()), widthImageView);
+
+		if (saveImageToFile(file, bitmap)) {
+			result = true;
+		}
+
+		return result;
+	}
+
+	public Bitmap postProcessing(Bitmap bitmap, int widthImageView) {
+		if (isNeedCrop(bitmap)) {
+			bitmap = crop(bitmap);
+		}
+
+		if (isNeedScale(bitmap, widthImageView)) {
+			bitmap = scale(bitmap, widthImageView);
+		}
+
+		return bitmap;
+	}
+
+	public boolean saveImageToFile(File file, Bitmap bitmap){
+		boolean result = false;
+
+		try {
+			FileOutputStream stream = new FileOutputStream(file);
+			bitmap.compress(CompressFormat.JPEG, 100, stream);
+			stream.close();
+
+			bitmap.recycle();
+
+			result = true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 
 	private boolean isExternalStorageWritable() {

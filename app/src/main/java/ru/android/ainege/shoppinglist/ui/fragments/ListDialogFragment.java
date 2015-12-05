@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -25,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 import ru.android.ainege.shoppinglist.R;
@@ -37,7 +39,8 @@ public class ListDialogFragment extends DialogFragment {
 	private static final String ID_LIST = "idList";
 	private static final String LIST = "list";
 
-	private static final int CAMERA_ACTIVITY_CODE = 0;
+	private static final int TAKE_PHOTO_CODE = 0;
+	private static final int LOAD_IMAGE_CODE = 1;
 
 	private ImageView mImageList;
 	private TextInputLayout mNameInputLayout;
@@ -74,16 +77,18 @@ public class ListDialogFragment extends DialogFragment {
 
 						mFile = Image.create().createImageFile();
 						if (mFile != null) {
-							mImagePath = "file:/" + mFile.getPath();
+							mImagePath = "file:/" + mFile.getAbsolutePath();
 
 							cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
-							startActivityForResult(cameraIntent, CAMERA_ACTIVITY_CODE);
+							startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
 						} else {
 							Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
 						}
 						return true;
 					case R.id.select_from_gallery:
-						Toast.makeText(getActivity(), "image from gallery", Toast.LENGTH_SHORT).show();
+						Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+								android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+						startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
 						return true;
 					case R.id.reset_image:
 						setRandomImage();
@@ -131,15 +136,41 @@ public class ListDialogFragment extends DialogFragment {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) return;
 
-		if (requestCode == CAMERA_ACTIVITY_CODE) {
-			DisplayMetrics metrics = new DisplayMetrics();
-			getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		DisplayMetrics metrics = new DisplayMetrics();
+		getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-			if (Image.create().postProcessing(mFile, metrics.widthPixels - 30)) {
-				loadImage();
-			} else {
-				Toast.makeText(getActivity(), "Ошибка чтения файла", Toast.LENGTH_SHORT).show();
-			}
+		switch (requestCode) {
+			case TAKE_PHOTO_CODE:
+				if (Image.create().postProcessingToFile(mFile, metrics.widthPixels - 30)) {
+					loadImage();
+				} else {
+					Toast.makeText(getActivity(), "Не удалось получить файл", Toast.LENGTH_SHORT).show();
+				}
+				break;
+			case LOAD_IMAGE_CODE:
+				Uri selectedImage = data.getData();
+
+				try {
+					Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
+
+					Image image = Image.create();
+					File file = image.createImageFile();
+
+					if (file != null) {
+						bitmap = image.postProcessing(bitmap, metrics.widthPixels - 30);
+						if (image.saveImageToFile(file, bitmap)) {
+							mImagePath = "file:/" + file.getAbsolutePath();
+							loadImage();
+						} else {
+							Toast.makeText(getActivity(), "Ошибка сохранения", Toast.LENGTH_SHORT).show();
+						}
+					} else {
+						Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
 		}
 	}
 
