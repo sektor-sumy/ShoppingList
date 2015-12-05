@@ -10,8 +10,10 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +24,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.Random;
 
 import ru.android.ainege.shoppinglist.R;
@@ -34,12 +37,15 @@ public class ListDialogFragment extends DialogFragment {
 	private static final String ID_LIST = "idList";
 	private static final String LIST = "list";
 
+	private static final int CAMERA_ACTIVITY_CODE = 0;
+
 	private ImageView mImageList;
 	private TextInputLayout mNameInputLayout;
 	private EditText mName;
 	private Spinner mCurrency;
 
 	private List mEditList;
+	private File mFile;
 	private String mImagePath;
 
 	public static ListDialogFragment newInstance(List list) {
@@ -64,13 +70,23 @@ public class ListDialogFragment extends DialogFragment {
 			public boolean onMenuItemClick(MenuItem item) {
 				switch (item.getItemId()) {
 					case R.id.take_photo:
-						Toast.makeText(getActivity(), "new photo", Toast.LENGTH_SHORT).show();
+						Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+						mFile = Image.create().createImageFile();
+						if (mFile != null) {
+							mImagePath = "file:/" + mFile.getPath();
+
+							cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
+							startActivityForResult(cameraIntent, CAMERA_ACTIVITY_CODE);
+						} else {
+							Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
+						}
 						return true;
 					case R.id.select_from_gallery:
 						Toast.makeText(getActivity(), "image from gallery", Toast.LENGTH_SHORT).show();
 						return true;
 					case R.id.reset_image:
-						Toast.makeText(getActivity(), "random image", Toast.LENGTH_SHORT).show();
+						setRandomImage();
 						return true;
 					default:
 						return false;
@@ -105,48 +121,26 @@ public class ListDialogFragment extends DialogFragment {
 			mEditList = (List) getArguments().getSerializable(LIST);
 			setDataToView();
 		} else {
-			mImagePath = "android.resource://ru.android.ainege.shoppinglist/drawable/random_list_" + (new Random().nextInt(4) + 1);
-			mImageList.setImageURI(Uri.parse(mImagePath));
+			setRandomImage();
 		}
 
 		return builder.create();
 	}
 
-	private SimpleCursorAdapter getSpinnerAdapter() {
-		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
-				R.layout.spinner_currency,
-				new CurrenciesDataSource(getActivity()).getAll(),
-				new String[]{CurrencyTable.COLUMN_SYMBOL, CurrencyTable.COLUMN_NAME},
-				new int[]{R.id.currency_symbol, R.id.currency_name}, 0);
-		spinnerAdapter.setDropDownViewResource(R.layout.spinner_currency_drop);
-		return spinnerAdapter;
-	}
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode != Activity.RESULT_OK) return;
 
-	private long getIdCurrency() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		return prefs.getLong(getResources().getString(R.string.settings_key_dafault_currency), -1);
-	}
+		if (requestCode == CAMERA_ACTIVITY_CODE) {
+			DisplayMetrics metrics = new DisplayMetrics();
+			getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-	private void setDataToView() {
-		mImagePath = mEditList.getImagePath();
-		mImageList.setImageURI(Uri.parse(mImagePath));
-
-		mName.setText(mEditList.getName());
-		mName.setSelection(mName.getText().length());
-
-		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
-	}
-
-	private int getPosition(Spinner spinner, long idCurrency) {
-		int index = 0;
-		for (int i = 0; i < spinner.getCount(); i++) {
-			long id = ((CurrenciesDataSource.CurrencyCursor) spinner.getItemAtPosition(i)).getEntity().getId();
-			if (id == idCurrency) {
-				index = i;
-				break;
+			if (Image.create().postProcessing(mFile, metrics.widthPixels - 30)) {
+				loadImage();
+			} else {
+				Toast.makeText(getActivity(), "Ошибка чтения файла", Toast.LENGTH_SHORT).show();
 			}
 		}
-		return index;
 	}
 
 	@Override
@@ -169,6 +163,56 @@ public class ListDialogFragment extends DialogFragment {
 				}
 			}
 		});
+	}
+
+	private SimpleCursorAdapter getSpinnerAdapter() {
+		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
+				R.layout.spinner_currency,
+				new CurrenciesDataSource(getActivity()).getAll(),
+				new String[]{CurrencyTable.COLUMN_SYMBOL, CurrencyTable.COLUMN_NAME},
+				new int[]{R.id.currency_symbol, R.id.currency_name}, 0);
+		spinnerAdapter.setDropDownViewResource(R.layout.spinner_currency_drop);
+		return spinnerAdapter;
+	}
+
+	private long getIdCurrency() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		return prefs.getLong(getResources().getString(R.string.settings_key_dafault_currency), -1);
+	}
+
+	private void setDataToView() {
+		mImagePath = mEditList.getImagePath();
+		loadImage();
+
+		mName.setText(mEditList.getName());
+		mName.setSelection(mName.getText().length());
+
+		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
+	}
+
+	private int getPosition(Spinner spinner, long idCurrency) {
+		int index = 0;
+		for (int i = 0; i < spinner.getCount(); i++) {
+			long id = ((CurrenciesDataSource.CurrencyCursor) spinner.getItemAtPosition(i)).getEntity().getId();
+			if (id == idCurrency) {
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
+
+	private void loadImage() {
+		Image.create().insertImageToView(getActivity(), mImagePath, mImageList);
+	}
+
+	private void setRandomImage() {
+		String path;
+		do {
+			path = Image.ASSETS_IMAGE_PATH + "item/random_list_" + (new Random().nextInt(4) + 1) + ".jpg";
+		} while(path.equals(mImagePath));
+		mImagePath = path;
+		loadImage();
 	}
 
 	private boolean saveData() {

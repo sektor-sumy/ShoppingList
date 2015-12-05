@@ -3,6 +3,8 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
+import ru.android.ainege.shoppinglist.ui.fragments.Image;
+
 public class ListsTable {
 
 	public static final String TABLE_NAME = "Lists";
@@ -37,8 +39,8 @@ public class ListsTable {
 	private static void initialData(SQLiteDatabase database) {
 		String[] lists = {"Мой список", "Купить на ДР"};
 		int[] currency = {1, 3};
-		String[] imagepath = {"android.resource://ru.android.ainege.shoppinglist/drawable/random_list_2",
-				"android.resource://ru.android.ainege.shoppinglist/drawable/random_list_5"};
+		String[] imagepath = {Image.ASSETS_IMAGE_PATH + "item/random_list_2.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_5.jpg"};
 
 		for (int i = 0; i < lists.length; i++) {
 			ContentValues contentValue = new ContentValues();

@@ -9,7 +9,6 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -202,7 +201,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		public void onBindViewHolder(ViewHolder holder, int position) {
 			List list = mLists.get(position);
 
-			holder.mImage.setImageURI(Uri.parse(list.getImagePath()));
+			Image.create().insertImageToView(getActivity(), list.getImagePath(), holder.mImage);
 
 			holder.mName.setText(list.getName());
 
@@ -239,7 +238,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
-			public final View view;
+			public final View mView;
 			public final ImageView mImage;
 			public final TextView mName;
 			public final TextView mStatisticsShopping;
@@ -248,7 +247,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 			public ViewHolder(View v) {
 				super(v);
-				view = v;
+				mView = v;
 				mImage = (ImageView) v.findViewById(R.id.image_list);
 				mName = (TextView) v.findViewById(R.id.name_list);
 				mStatisticsShopping = (TextView) v.findViewById(R.id.statistics_shopping);
@@ -284,7 +283,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						}
 					}
 				});
-				view.setOnClickListener(new View.OnClickListener() {
+				mView.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						int itemPosition = getAdapterPosition();

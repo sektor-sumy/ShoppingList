@@ -126,13 +126,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		return fragment;
 	}
 
-	private static String localValue(double value) {
-		NumberFormat nf = NumberFormat.getInstance();
-		nf.setMinimumFractionDigits(2);
-		nf.setMaximumFractionDigits(2);
-		return nf.format(value);
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -150,14 +143,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mIsBoughtEndInList = getArguments().getBoolean(IS_BOUGHT_END_IN_LIST);
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
-	}
-
-	private void getList(long idList) {
-		ListsDataSource.ListCursor cursor = new ListsDataSource(getActivity()).get(idList);
-		if (cursor.moveToFirst()) {
-			mList = cursor.getEntity();
-		}
-		cursor.close();
 	}
 
 	@Override
@@ -178,7 +163,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		setTitle();
 
 		ImageView appBarImage = (ImageView) v.findViewById(R.id.appbar_image);
-		appBarImage.setImageResource(R.drawable.random_list_1);
+		Image.create().insertImageToView(getActivity(),
+				mList.getImagePath(),
+				appBarImage);
 
 		FloatingActionButton addItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
 		addItemFAB.setOnClickListener(new View.OnClickListener() {
@@ -313,10 +300,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		return v;
 	}
 
-	private void setTitle() {
-		mToolbarLayout.setTitle(mList.getName());
-	}
-
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -413,24 +396,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	}
 
-	private void showEmptyStates() {
-		mListContainer.setVisibility(View.GONE);
-		mEmptyText.setVisibility(View.VISIBLE);
-
-		if (mActionMode != null) {
-			mActionMode.finish();
-		}
-	}
-
-	private void hideEmptyStates() {
-		mListContainer.setVisibility(View.VISIBLE);
-		mEmptyText.setVisibility(View.GONE);
-	}
-
-	private void updateData() {
-		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
-	}
-
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) return;
@@ -454,6 +419,43 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
 				break;
 		}
+	}
+
+	private String localValue(double value) {
+		NumberFormat nf = NumberFormat.getInstance();
+		nf.setMinimumFractionDigits(2);
+		nf.setMaximumFractionDigits(2);
+		return nf.format(value);
+	}
+
+	private void getList(long idList) {
+		ListsDataSource.ListCursor cursor = new ListsDataSource(getActivity()).get(idList);
+		if (cursor.moveToFirst()) {
+			mList = cursor.getEntity();
+		}
+		cursor.close();
+	}
+
+	private void setTitle() {
+		mToolbarLayout.setTitle(mList.getName());
+	}
+
+	private void showEmptyStates() {
+		mListContainer.setVisibility(View.GONE);
+		mEmptyText.setVisibility(View.VISIBLE);
+
+		if (mActionMode != null) {
+			mActionMode.finish();
+		}
+	}
+
+	private void hideEmptyStates() {
+		mListContainer.setVisibility(View.VISIBLE);
+		mEmptyText.setVisibility(View.GONE);
+	}
+
+	private void updateData() {
+		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
 	private void deleteSelectedItems() {
@@ -513,29 +515,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private void updateSpentSum(double newSum) {
 		mSpentMoney.setText(localValue(newSum));
-	}
-
-	private static class ItemsInListCursorLoader extends CursorLoader {
-		private final Context mContext;
-		private final long mIdList;
-
-		public ItemsInListCursorLoader(Context context, long idList) {
-			super(context);
-			mContext = context;
-			mIdList = idList;
-		}
-
-		@Override
-		public Cursor loadInBackground() {
-			ShoppingListDataSource mItemsInListDS;
-			try {
-				mItemsInListDS = ShoppingListDataSource.getInstance();
-			} catch (NullPointerException e) {
-				mItemsInListDS = ShoppingListDataSource.getInstance(mContext);
-			}
-
-			return mItemsInListDS.getItemsInList(mIdList);
-		}
 	}
 
 	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
@@ -650,6 +629,29 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mPrice = (TextView) v.findViewById(R.id.item_price_list);
 				mIsBought = v.findViewById(R.id.is_bought_list);
 			}
+		}
+	}
+
+	private static class ItemsInListCursorLoader extends CursorLoader {
+		private final Context mContext;
+		private final long mIdList;
+
+		public ItemsInListCursorLoader(Context context, long idList) {
+			super(context);
+			mContext = context;
+			mIdList = idList;
+		}
+
+		@Override
+		public Cursor loadInBackground() {
+			ShoppingListDataSource mItemsInListDS;
+			try {
+				mItemsInListDS = ShoppingListDataSource.getInstance();
+			} catch (NullPointerException e) {
+				mItemsInListDS = ShoppingListDataSource.getInstance(mContext);
+			}
+
+			return mItemsInListDS.getItemsInList(mIdList);
 		}
 	}
 }

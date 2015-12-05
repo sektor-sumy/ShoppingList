@@ -97,7 +97,9 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 		});
 
 		ImageView appBarImage = (ImageView) v.findViewById(R.id.appbar_image);
-		appBarImage.setImageResource(R.drawable.random_list_1); //TODO get image from db
+		Image.create().insertImageToView(getActivity(),  //TODO get image from db
+				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
+				appBarImage);
 
 		setView(v);
 		return v;
