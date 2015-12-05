@@ -60,8 +60,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private static final int ADD_ACTIVITY_CODE = 0;
 	private static final int EDIT_ACTIVITY_CODE = 1;
+
 	private ArrayList<ShoppingList> mItemsInList = new ArrayList<>();
 	private CollapsingToolbarLayout mToolbarLayout;
+	private FloatingActionButton mFAB;
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
 	private TextView mEmptyText;
@@ -85,7 +87,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
+			mFAB.setVisibility(View.GONE);
+			return true;
 		}
 
 		@Override
@@ -110,6 +113,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
 			mAdapterRV.clearSelections();
+			mFAB.setVisibility(View.VISIBLE);
 			mActionMode = null;
 		}
 	};
@@ -167,8 +171,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mList.getImagePath(),
 				appBarImage);
 
-		FloatingActionButton addItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
-		addItemFAB.setOnClickListener(new View.OnClickListener() {
+		mFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
+		mFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getActivity(), ItemActivity.class);
