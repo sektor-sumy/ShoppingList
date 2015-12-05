@@ -28,6 +28,8 @@
 			android:id="@+id/lists"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
+			android:paddingBottom="52dp"
+			android:clipToPadding="false"
 			android:scrollbars="vertical"/>
 
 		<TextView
