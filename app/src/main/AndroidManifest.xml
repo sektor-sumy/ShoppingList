@@ -10,7 +10,9 @@
 		<activity
 			android:name=".ui.activities.ListsActivity"
 			android:label="@string/you_lists"
-			android:theme="@style/AppTheme.NoActionBar">
+			android:theme="@style/AppTheme.NoActionBar"
+			android:screenOrientation="portrait"
+			android:configChanges="orientation|keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
@@ -19,22 +21,30 @@
 		<activity
 			android:name=".ui.activities.ShoppingListActivity"
 			android:label=""
-			android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
+			android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"
+			android:screenOrientation="portrait"
+			android:configChanges="orientation|keyboardHidden">
 		</activity>
 		<activity
 			android:name=".ui.activities.ItemActivity"
 			android:label=""
-			android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
+			android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"
+			android:screenOrientation="portrait"
+			android:configChanges="orientation|keyboardHidden">
 		</activity>
 		<activity
 			android:name=".ui.activities.SettingsActivity"
 			android:label="@string/settings"
-			android:theme="@style/AppTheme">
+			android:theme="@style/AppTheme"
+			android:screenOrientation="portrait"
+			android:configChanges="orientation|keyboardHidden">
 		</activity>
 		<activity
 			android:name=".ui.activities.SettingsDictionaryActivity"
 			android:label=""
-			android:theme="@style/AppTheme">
+			android:theme="@style/AppTheme"
+			android:screenOrientation="portrait"
+			android:configChanges="orientation|keyboardHidden">
 			<intent-filter>
 				<action android:name="ru.android.ainege.shoppinglist.SettingsDataActivity"/>
 				<category android:name="android.intent.category.DEFAULT"/>
@@ -42,4 +52,6 @@
 		</activity>
 	</application>
 
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="18" />
+	<uses-feature android:name="android.hardware.camera" android:required="true"/>
 </manifest>
