@@ -77,7 +77,7 @@ public class ListDialogFragment extends DialogFragment {
 
 						mFile = Image.create().createImageFile();
 						if (mFile != null) {
-							mImagePath = "file:/" + mFile.getAbsolutePath();
+							mImagePath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
 
 							cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
 							startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
@@ -159,7 +159,7 @@ public class ListDialogFragment extends DialogFragment {
 					if (file != null) {
 						bitmap = image.postProcessing(bitmap, metrics.widthPixels - 30);
 						if (image.saveImageToFile(file, bitmap)) {
-							mImagePath = "file:/" + file.getAbsolutePath();
+							mImagePath = Image.PATH_PROTOCOL + file.getAbsolutePath();
 							loadImage();
 						} else {
 							Toast.makeText(getActivity(), "Ошибка сохранения", Toast.LENGTH_SHORT).show();

@@ -22,7 +22,8 @@ import static android.graphics.Bitmap.createBitmap;
 import static android.graphics.Bitmap.createScaledBitmap;
 
 public class Image {
-	public static final String ASSETS_IMAGE_PATH = "file:///android_asset/images/";
+	public static final String PATH_PROTOCOL = "file://";
+	public static final String ASSETS_IMAGE_PATH = PATH_PROTOCOL + "/android_asset/images/";
 	private static final double MIN_RATIO = 1.25;
 	private static final double MAX_RATIO = 2;
 	private int mLoadingImage = R.drawable.load;
