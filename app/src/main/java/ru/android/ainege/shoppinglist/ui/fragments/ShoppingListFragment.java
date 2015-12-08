@@ -70,7 +70,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private LinearLayout mListContainer;
 	private RecyclerViewAdapter mAdapterRV;
 	private List mList;
-	private double mSaveSpentMoney;
+	private double mSaveSpentMoney = 0;
+	private double mSaveTotalMoney = 0;
 	private boolean mIsBoughtEndInList;
 	private int mPositionCrossOffItem = -1;
 	private long mIdCrossOffItem;
@@ -420,6 +421,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			case EDIT_FRAGMENT_CODE:
 				getList(getArguments().getLong(ID_LIST));
 				setTitle();
+				updateSums(mSaveSpentMoney, mSaveTotalMoney);
 				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
 				break;
 		}
@@ -501,6 +503,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 		if (onlyBought) {
 			mSaveSpentMoney = sum;
+		} else {
+			mSaveTotalMoney = sum;
 		}
 		return sum;
 	}
@@ -513,12 +517,19 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void updateSums() {
-		updateSpentSum(sumMoney(true));        //update spent money
-		mTotalMoney.setText(localValue(sumMoney(false)));       //update total money
+		updateSums(sumMoney(true), sumMoney(false));
+	}
+
+	private void updateSums(double spentMoney, double totalMoney) {
+		updateSpentSum(spentMoney);
+
+		String total = localValue(totalMoney) + " " + mList.getCurrency().getSymbol();
+		mTotalMoney.setText(total);
 	}
 
 	private void updateSpentSum(double newSum) {
-		mSpentMoney.setText(localValue(newSum));
+		String spentMoney = localValue(newSum) + " " + mList.getCurrency().getSymbol();
+		mSpentMoney.setText(spentMoney);
 	}
 
 	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
