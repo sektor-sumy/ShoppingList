@@ -6,4 +6,7 @@
 	<color name="primary">#009688</color>
 	<color name="primary_dark">#00796B</color>
 	<color name="accent">#FFC107</color>
+
+	<color name="translucent_scrim_bottom">#46000000</color>
+	<color name="translucent_scrim_bottom_center">#19000000</color>
 </resources>
