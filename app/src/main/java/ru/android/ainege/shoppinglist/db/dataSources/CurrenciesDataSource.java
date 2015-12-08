@@ -61,6 +61,14 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 				new String[]{String.valueOf(currency.getId())});
 	}
 
+	public int update(String newSymbol, String oldSymbol) {
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(CurrencyTable.COLUMN_SYMBOL, newSymbol);
+		return db.update(CurrencyTable.TABLE_NAME, values, CurrencyTable.COLUMN_SYMBOL + " = ?",
+				new String[]{oldSymbol});
+	}
+
 	@Override
 	public long add(Currency currency) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
