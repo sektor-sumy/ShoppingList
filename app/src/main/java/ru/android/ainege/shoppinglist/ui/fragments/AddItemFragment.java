@@ -88,7 +88,6 @@ public class AddItemFragment extends ItemFragment {
 			@Override
 			public void afterTextChanged(Editable s) {
 				if (s.length() == 0) {
-					mNameInputLayout.setErrorEnabled(true);
 					mNameInputLayout.setError(getString(R.string.error_name));
 				} else {
 					disableError(mNameInputLayout);
@@ -178,9 +177,10 @@ public class AddItemFragment extends ItemFragment {
 	protected boolean saveData(boolean isUpdateData) {
 		boolean isSave = false;
 
-		String name = getName();
-		if (name.length() == 0) {
+		if (mName.length() == 0) {
 			mNameInputLayout.setError(getString(R.string.error_value));
+		} else if (mName.length() < 3) {
+			mNameInputLayout.setError(getString(R.string.error_length_name));
 		}
 
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
@@ -199,7 +199,7 @@ public class AddItemFragment extends ItemFragment {
 					if (mIdSelectedItem != -1) {
 						idItem = mIdSelectedItem;
 					} else {
-						idItem = (int) itemDS.add(new Item(name));
+						idItem = (int) itemDS.add(new Item(getName()));
 					}
 				}
 				item.setId(idItem);

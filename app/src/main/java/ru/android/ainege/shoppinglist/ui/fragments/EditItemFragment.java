@@ -156,6 +156,10 @@ public class EditItemFragment extends ItemFragment {
 	protected boolean saveData(boolean isUpdateData) {
 		boolean isSave = false;
 
+		if (mName.length() < 3) {
+			mNameInputLayout.setError(getString(R.string.error_length_name));
+		}
+
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
 				!mPriceInputLayout.isErrorEnabled()) {
 			Item item = getItem();
