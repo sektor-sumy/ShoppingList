@@ -15,14 +15,7 @@ import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
-	public final static String ALPHABET = "alphabet";
-	public final static String UP_PRICE = "upPrice";
-	public final static String DOWN_PRICE = "downPrice";
-	public final static String ORDER_ADDING = "orderAdding";
-
 	private static ShoppingListDataSource instance;
-
-	private String order;
 
 	private ShoppingListDataSource(Context context) {
 		super(context);
@@ -44,10 +37,6 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 		return instance;
 	}
 
-	public void setSortSettings(boolean isBoughtFirst, String type) {
-		order = getOrder(isBoughtFirst, type);
-	}
-
 	public ShoppingListCursor getItemsInList(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + ShoppingListTable.TABLE_NAME + ".*, " +
@@ -57,8 +46,7 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 				ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_ITEM + " = " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID +
 				" LEFT JOIN " + UnitsTable.TABLE_NAME + " ON " +
 				ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_UNIT + " = " + UnitsTable.TABLE_NAME + "." + UnitsTable.COLUMN_ID +
-				" WHERE " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " = ? " +
-				" ORDER BY " + order;
+				" WHERE " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " = ? ";
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
 		return new ShoppingListCursor(cursor);
 	}
@@ -116,7 +104,7 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(shoppingList);
 		values.put(ShoppingListTable.COLUMN_ID_LIST, shoppingList.getIdList());
-		values.put(ShoppingListTable.COLUMN_DATE, String.valueOf(shoppingList.getDate()));
+		values.put(ShoppingListTable.COLUMN_DATE, System.currentTimeMillis() / 1000);
 		return db.insert(ShoppingListTable.TABLE_NAME, null, values);
 	}
 
@@ -146,28 +134,6 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 		values.put(ShoppingListTable.COLUMN_COMMENT, shoppingList.getComment());
 		values.put(ShoppingListTable.COLUMN_ID_ITEM, shoppingList.getIdItem());
 		return values;
-	}
-
-	private String getOrder(boolean isBoughtFirst, String type) {
-		String order = "";
-		if (isBoughtFirst) {
-			order += ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_IS_BOUGHT + ", ";
-		}
-		switch (type) {
-			case ALPHABET:
-				order += ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_NAME;
-				break;
-			case UP_PRICE:
-				order += ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_PRICE;
-				break;
-			case DOWN_PRICE:
-				order += ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_PRICE + " DESC";
-				break;
-			case ORDER_ADDING:
-				order += ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_DATE;
-				break;
-		}
-		return order;
 	}
 
 	public static class ShoppingListCursor extends EntityCursor<ShoppingList> {

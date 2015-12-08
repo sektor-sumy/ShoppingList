@@ -8,9 +8,11 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -50,8 +52,6 @@ import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final String ID_LIST = "idList";
-	private static final String IS_BOUGHT_END_IN_LIST = "isBoughtEndInList";
-	private static final String DATA_SAVE = "dataSave";
 	private static final int EDIT_FRAGMENT_CODE = 3;
 	private static final int ANSWER_FRAGMENT_CODE = 4;
 	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
@@ -73,8 +73,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private double mSaveSpentMoney = 0;
 	private double mSaveTotalMoney = 0;
 	private boolean mIsBoughtEndInList;
-	private int mPositionCrossOffItem = -1;
-	private long mIdCrossOffItem;
 
 	private android.view.ActionMode mActionMode;
 	private final ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -119,11 +117,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	};
 
-	public static ShoppingListFragment newInstance(long id, boolean isBoughtEndInList, String dataSave) {
+	public static ShoppingListFragment newInstance(long id) {
 		Bundle args = new Bundle();
 		args.putLong(ID_LIST, id);
-		args.putBoolean(IS_BOUGHT_END_IN_LIST, isBoughtEndInList);
-		args.putString(DATA_SAVE, dataSave);
 
 		ShoppingListFragment fragment = new ShoppingListFragment();
 		fragment.setArguments(args);
@@ -142,10 +138,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		setHasOptionsMenu(true);
-
+		getSettings();
 		getList(getArguments().getLong(ID_LIST));
-
-		mIsBoughtEndInList = getArguments().getBoolean(IS_BOUGHT_END_IN_LIST);
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
@@ -178,7 +172,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			public void onClick(View v) {
 				Intent i = new Intent(getActivity(), ItemActivity.class);
 				i.putExtra(ItemActivity.EXTRA_ID_LIST, mList.getId());
-				i.putExtra(ItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					startActivityForResult(i, ADD_ACTIVITY_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
@@ -217,7 +210,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 						Intent i = new Intent(getActivity(), ItemActivity.class);
 						i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
-						i.putExtra(ItemActivity.EXTRA_DATA_SAVE, getArguments().getString(DATA_SAVE));
 
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 							startActivityForResult(i, EDIT_ACTIVITY_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
@@ -266,23 +258,27 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						//update recyclerView
 						//if set bought items in the end of list - refresh list
 						//if it isn`t - try to update only spent sum
+						mAdapterRV.getItem(position).setBought(isBought);
+
 						if (mIsBoughtEndInList) {
-							mPositionCrossOffItem = position;
-							mIdCrossOffItem = item.getIdItem();
-							updateData();
-						} else {
-							mAdapterRV.getItem(position).setBought(isBought);
-							double sum = sumOneItem(item);
-							if (mSaveSpentMoney != 0) {
-								if (isBought) {
-									mSaveSpentMoney += sum;
-								} else {
-									mSaveSpentMoney -= sum;
-								}
-								updateSpentSum(mSaveSpentMoney);
-							} else {
-								updateData();
+							ShoppingList.sort(mItemsInList);
+							int toPosition = getPosition(item.getIdItem());
+							if (toPosition != -1) {
+								mAdapterRV.notifyItemMoved(position, toPosition);
+								mItemsListRV.scrollToPosition(toPosition);
 							}
+						}
+
+						double sum = sumOneItem(item);
+						if (mSaveSpentMoney != 0) {
+							if (isBought) {
+								mSaveSpentMoney += sum;
+							} else {
+								mSaveSpentMoney -= sum;
+							}
+							updateSpentSum(mSaveSpentMoney);
+						} else {
+							updateData();
 						}
 					}
 				})
@@ -308,6 +304,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		getSettings();
 		updateData();
 	}
 
@@ -368,17 +366,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			case DATA_LOADER:
 				if (data.moveToFirst()) {
 					mItemsInList = ((ShoppingListCursor) data).getEntities();
-					//if cross off item in list - find new it position and move
-					//else set new data to adapter
-					if (mPositionCrossOffItem != -1) {
-						int toPosition = getPosition(mIdCrossOffItem);
-						if (toPosition != -1) {
-							mAdapterRV.notifyItemMoved(mPositionCrossOffItem, toPosition);
-							mItemsListRV.scrollToPosition(toPosition);
-						}
-					} else {
-						mAdapterRV.notifyDataSetChanged();     //update data in adapter
-					}
+					ShoppingList.sort(mItemsInList);
+
+					mAdapterRV.notifyDataSetChanged();     //update data in adapter
+
 					updateSums();
 					hideEmptyStates();
 				} else {
@@ -425,6 +416,26 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
 				break;
 		}
+	}
+
+	private void getSettings() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+		mIsBoughtEndInList = prefs.getBoolean(getString(R.string.settings_key_sort_is_bought), true);
+		String sortType;
+		String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
+		if (regular.contains(getString(R.string.sort_order_alphabet))) {
+			sortType = ShoppingList.ALPHABET;
+		} else if (regular.contains(getString(R.string.sort_order_up_price))) {
+			sortType = ShoppingList.UP_PRICE;
+		} else if (regular.contains(getString(R.string.sort_order_down_price))) {
+			sortType = ShoppingList.DOWN_PRICE;
+		} else if (regular.contains(getString(R.string.sort_order_adding))) {
+			sortType = ShoppingList.ORDER_ADDING;
+		} else {
+			sortType = ShoppingList.ALPHABET;
+		}
+		ShoppingList.setSortSettings(mIsBoughtEndInList, sortType);
 	}
 
 	private String localValue(double value) {

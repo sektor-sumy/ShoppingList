@@ -26,6 +26,13 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 		return new CurrencyCursor(cursor);
 	}
 
+	public CurrencyCursor getByName(String name) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(CurrencyTable.TABLE_NAME, null, CurrencyTable.COLUMN_NAME + " = '" + name + "'",
+				null, null, null, null);
+		return new CurrencyCursor(cursor);
+	}
+
 	public CurrencyCursor getByList(long idList) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("Select " + CurrencyTable.TABLE_NAME + ".* from " + CurrencyTable.TABLE_NAME +
@@ -64,7 +71,7 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 	@Override
 	public void delete(long id) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		long idFavorite = prefs.getLong(mContext.getString(R.string.settings_key_dafault_currency), -1);
+		long idFavorite = prefs.getLong(mContext.getString(R.string.settings_key_currency), -1);
 
 		if (idFavorite == -1) {
 			idFavorite = getRandomId(id);

@@ -75,13 +75,20 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
 	}
 
+	private void saveCurrencySetting(long id) {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putLong(getString(R.string.settings_key_currency), id);
+		editor.apply();
+	}
+
 	public class CurrencyViewAdapter extends RecyclerViewAdapter<CurrencyViewAdapter.CurrencyViewHolder> {
 		public long mIdOld;
 		public long mIdSelected;
 
 		public CurrencyViewAdapter() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-			mIdSelected = prefs.getLong(getString(R.string.settings_key_dafault_currency), -1);
+			mIdSelected = prefs.getLong(getString(R.string.settings_key_currency), -1);
 		}
 
 		@Override
@@ -102,6 +109,13 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 			}
 		}
 
+		@Override
+		public void removeItem(int position) {
+			super.removeItem(position);
+
+			saveCurrencySetting(-1);
+		}
+
 		public class CurrencyViewHolder extends RecyclerViewAdapter<CurrencyViewHolder>.ViewHolder {
 			public final ImageView mImage;
 
@@ -116,10 +130,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 						int itemPosition = getAdapterPosition();
 						Currency currency = mDictionary.get(itemPosition);
 
-						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-						SharedPreferences.Editor editor = settings.edit();
-						editor.putLong(getString(R.string.settings_key_dafault_currency), currency.getId());
-						editor.apply();
+						saveCurrencySetting(currency.getId());
 
 						setImageSelected();
 						mIdSelected = currency.getId();

@@ -208,7 +208,7 @@ public class ListDialogFragment extends DialogFragment {
 
 	private long getIdCurrency() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		return prefs.getLong(getResources().getString(R.string.settings_key_dafault_currency), -1);
+		return prefs.getLong(getResources().getString(R.string.settings_key_currency), -1);
 	}
 
 	private void setDataToView() {

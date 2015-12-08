@@ -36,6 +36,7 @@
 	<PreferenceCategory
 		android:title="@string/settings_category_other">
 		<Preference
+			android:defaultValue="1"
 			android:key="@string/settings_key_currency"
 			android:title="@string/setting_title_currency"/>
 		<Preference

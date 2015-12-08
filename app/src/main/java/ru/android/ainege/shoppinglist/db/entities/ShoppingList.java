@@ -1,9 +1,20 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 public class ShoppingList implements Serializable {
+	private static String mType;
+	private static boolean mIsBoughtEndInList;
+
+	public final static String ALPHABET = "alphabet";
+	public final static String UP_PRICE = "upPrice";
+	public final static String DOWN_PRICE = "downPrice";
+	public final static String ORDER_ADDING = "orderAdding";
+
 	private long mIdItem;
 	private long mIdList;
 	private boolean mIsBought;
@@ -126,5 +137,44 @@ public class ShoppingList implements Serializable {
 		if (mUnit != null) {
 			mIdUnit = mUnit.getId();
 		}
+	}
+
+	public static void setSortSettings(boolean isBoughtEndInList, String type) {
+		mIsBoughtEndInList = isBoughtEndInList;
+		mType = type;
+	}
+
+	public static void sort(ArrayList<ShoppingList> itemsInList) {
+		Collections.sort(itemsInList, new Comparator<ShoppingList>() {
+			@Override
+			public int compare(ShoppingList lhs, ShoppingList rhs) {
+				int result = 0;
+
+				if (mIsBoughtEndInList) {
+					if (lhs.isBought() && !rhs.isBought()) {
+						return 1;
+					} else if (!lhs.isBought() && rhs.isBought()) {
+						return -1;
+					}
+				}
+
+				switch (mType) {
+					case ALPHABET:
+						result = lhs.getItem().getName().compareTo(rhs.getItem().getName());
+						break;
+					case UP_PRICE:
+						result = (int) (lhs.getPrice() - rhs.getPrice());
+						break;
+					case DOWN_PRICE:
+						result = (int) (rhs.getPrice() - lhs.getPrice());
+						break;
+					case ORDER_ADDING:
+						result = (int) (lhs.getDate().getTime() - rhs.getDate().getTime());
+						break;
+				}
+
+				return result;
+			}
+		});
 	}
 }

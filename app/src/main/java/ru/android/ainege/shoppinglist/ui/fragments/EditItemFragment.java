@@ -27,10 +27,9 @@ public class EditItemFragment extends ItemFragment {
 
 	private ShoppingList mItemInList;
 
-	public static EditItemFragment newInstance(ShoppingList itemInList, String dataSave) {
+	public static EditItemFragment newInstance(ShoppingList itemInList) {
 		Bundle args = new Bundle();
 		args.putSerializable(ITEM_IN_LIST, itemInList);
-		args.putString(DEFAULT_SAVE_DATA, dataSave);
 
 		EditItemFragment fragment = new EditItemFragment();
 		fragment.setArguments(args);

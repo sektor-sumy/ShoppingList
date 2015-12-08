@@ -103,7 +103,6 @@
 	<string name="error_empty">Не может быть пустым</string>
 	<string name="error_one_item">Что-то должно остаться</string>
 	<string name="setting_currency">Настройка валют</string>
-	<string name="settings_key_dafault_currency">dafault_currency</string>
 	<string name="select_dafault_currency">Выбрана валютой по умолчанию</string>
 	<string name="currency_info">Информация о валюте</string>
 

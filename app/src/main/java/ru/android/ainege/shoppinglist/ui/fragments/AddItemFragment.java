@@ -33,10 +33,9 @@ public class AddItemFragment extends ItemFragment {
 	private long mIdSelectedItem = -1;
 	private boolean mIsSelectedItem = false;
 
-	public static AddItemFragment newInstance(long id, String dataSave) {
+	public static AddItemFragment newInstance(long id) {
 		Bundle args = new Bundle();
 		args.putLong(ID_LIST, id);
-		args.putString(DEFAULT_SAVE_DATA, dataSave);
 
 		AddItemFragment fragment = new AddItemFragment();
 		fragment.setArguments(args);
@@ -48,7 +47,7 @@ public class AddItemFragment extends ItemFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (!NOT_USE_DEFAULT_DATA.equals(getArguments().getString(DEFAULT_SAVE_DATA))) {
+		if (!NOT_USE_DEFAULT_DATA.equals(mDataSave)) {
 			mIsUseDefaultData = true;
 		}
 
