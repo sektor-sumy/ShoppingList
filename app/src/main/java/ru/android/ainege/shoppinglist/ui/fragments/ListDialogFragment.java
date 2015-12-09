@@ -141,11 +141,7 @@ public class ListDialogFragment extends DialogFragment {
 
 		switch (requestCode) {
 			case TAKE_PHOTO_CODE:
-				if (Image.create().postProcessingToFile(mFile, metrics.widthPixels - 30)) {
-					loadImage();
-				} else {
-					Toast.makeText(getActivity(), "Не удалось получить файл", Toast.LENGTH_SHORT).show();
-				}
+				new Image.BitmapWorkerTask(mFile,  metrics.widthPixels - 30, mImageList).execute();
 				break;
 			case LOAD_IMAGE_CODE:
 				Uri selectedImage = data.getData();
@@ -157,13 +153,7 @@ public class ListDialogFragment extends DialogFragment {
 					File file = image.createImageFile();
 
 					if (file != null) {
-						bitmap = image.postProcessing(bitmap, metrics.widthPixels - 30);
-						if (image.saveImageToFile(file, bitmap)) {
-							mImagePath = Image.PATH_PROTOCOL + file.getAbsolutePath();
-							loadImage();
-						} else {
-							Toast.makeText(getActivity(), "Ошибка сохранения", Toast.LENGTH_SHORT).show();
-						}
+						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, mImageList).execute();
 					} else {
 						Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
 					}

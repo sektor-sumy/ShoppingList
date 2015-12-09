@@ -4,14 +4,17 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -26,7 +29,7 @@ public class Image {
 	public static final String ASSETS_IMAGE_PATH = PATH_PROTOCOL + "/android_asset/images/";
 	private static final double MIN_RATIO = 1.25;
 	private static final double MAX_RATIO = 2;
-	private int mLoadingImage = R.drawable.load;
+	protected int mLoadingImage = R.drawable.loader;
 	private int mDefaultImage = R.drawable.default_list;
 
 	public static Image create() {
@@ -73,22 +76,23 @@ public class Image {
 		}
 	}
 
+	public static String getFilePath(File file) {
+		return Image.PATH_PROTOCOL + file.getAbsolutePath();
+	}
+
 	public boolean postProcessingToFile(File file, int widthImageView) {
 		if (!isExternalStorageReadable()) {
 			return false;
 		}
 
-		boolean result = false;
-		Bitmap bitmap = postProcessing(BitmapFactory.decodeFile(file.getAbsolutePath()), widthImageView);
-
-		if (saveImageToFile(file, bitmap)) {
-			result = true;
-		}
-
-		return result;
+		return postProcessingToFile(file, BitmapFactory.decodeFile(file.getAbsolutePath()), widthImageView);
 	}
 
-	public Bitmap postProcessing(Bitmap bitmap, int widthImageView) {
+	public boolean postProcessingToFile(File file, Bitmap bitmap, int widthImageView) {
+		return saveImageToFile(file, postProcessing(bitmap, widthImageView));
+	}
+
+	private Bitmap postProcessing(Bitmap bitmap, int widthImageView) {
 		if (isNeedCrop(bitmap)) {
 			bitmap = crop(bitmap);
 		}
@@ -209,5 +213,49 @@ public class Image {
 		originalBmp.recycle();
 
 		return bitmap;
+	}
+
+	static class BitmapWorkerTask extends AsyncTask<Integer, Void, Boolean> {
+		private File mFile;
+		private Bitmap mBitmap;
+		private int mWidthImageView;
+		private final WeakReference<ImageView> imageViewReference;
+
+		public BitmapWorkerTask(File file, int widthImageView, ImageView imageView) {
+			mFile = file;
+			mWidthImageView = widthImageView;
+			imageViewReference = new WeakReference<>(imageView);
+		}
+
+		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, ImageView imageView) {
+			this(file, widthImageView, imageView);
+			//imageView.setImageResource(mLoadingImage);
+			mBitmap = bitmap;
+		}
+
+		@Override
+		protected Boolean doInBackground(Integer... params) {
+			boolean result;
+
+			if (mBitmap == null) {
+				result = Image.create().postProcessingToFile(mFile, mWidthImageView);
+			} else {
+				result = Image.create().postProcessingToFile(mFile, mBitmap, mWidthImageView);
+			}
+
+			return result;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean isSuccess) {
+			if (imageViewReference != null && isSuccess) {
+				final ImageView imageView = imageViewReference.get();
+				if (imageView != null) {
+					Image.create().insertImageToView(imageView.getContext(), getFilePath(mFile), imageView);
+				} else {
+					Toast.makeText(imageViewReference.get().getContext(), "Не удалось получить файл", Toast.LENGTH_SHORT).show();
+				}
+			}
+		}
 	}
 }
