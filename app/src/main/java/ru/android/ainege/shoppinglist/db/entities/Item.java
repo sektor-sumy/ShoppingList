@@ -8,11 +8,14 @@ public class Item implements Serializable {
 	private double mAmount;
 	private long mIdUnit = 1;
 	private double mPrice;
-	private Unit mUnit;
 	private String mComment;
+	private String mDefaultImagePath;
+	private String mImagePath;
+	private Unit mUnit;
 
-	public Item(String name) {
+	public Item(String name, String imagePath) {
 		mName = name;
+		mImagePath = imagePath;
 	}
 
 	public Item(long id, String name) {
@@ -20,16 +23,22 @@ public class Item implements Serializable {
 		mName = name;
 	}
 
-	public Item(String name, double amount, long idUnit, double price, String comment) {
-		this(name);
+	public Item(long id, String name, String imagePath) {
+		this(name, imagePath);
+		mId = id;
+	}
+
+	public Item(String name, double amount, long idUnit, double price, String comment, String imagePath) {
+		this(name, imagePath);
 		mAmount = amount;
 		mIdUnit = idUnit;
 		mPrice = price;
 		mComment = comment;
 	}
 
-	public Item(long id, String name, double amount, long idUnit, double price, String comment) {
-		this(name, amount, idUnit, price, comment);
+	public Item(long id, String name, double amount, long idUnit, double price, String comment, String defaultImagePath, String imagePath) {
+		this(name, amount, idUnit, price, comment, imagePath);
+		mDefaultImagePath = defaultImagePath;
 		mId = id;
 	}
 
@@ -90,5 +99,21 @@ public class Item implements Serializable {
 
 	public void setComment(String comment) {
 		mComment = comment;
+	}
+
+	public void setDefaultImagePath(String imagePath) {
+		mDefaultImagePath = imagePath;
+	}
+
+	public String getDefaultImagePath() {
+		return mDefaultImagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		mImagePath = imagePath;
+	}
+
+	public String getImagePath() {
+		return mImagePath;
 	}
 }

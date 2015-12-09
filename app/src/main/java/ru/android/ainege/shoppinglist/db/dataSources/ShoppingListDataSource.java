@@ -41,6 +41,8 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + ShoppingListTable.TABLE_NAME + ".*, " +
 				ItemsTable.COLUMN_NAME + ", " +
+				ItemsTable.COLUMN_DEFAULT_IMAGE_PATH + ", " +
+				ItemsTable.COLUMN_IMAGE_PATH + ", " +
 				UnitsTable.COLUMN_NAME +
 				" FROM " + ShoppingListTable.TABLE_NAME + " INNER JOIN " + ItemsTable.TABLE_NAME + " ON " +
 				ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_ITEM + " = " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID +
@@ -160,7 +162,15 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 
 			if (getColumnIndex(ItemsTable.COLUMN_NAME) != -1) {
 				String nameItem = getString(getColumnIndex(ItemsTable.COLUMN_NAME));
-				shoppingList.setItem(new Item(idItem, nameItem));
+				Item item = new Item(idItem, nameItem);
+				if (getColumnIndex(ItemsTable.COLUMN_IMAGE_PATH) != -1) {
+					item.setImagePath(getString(getColumnIndex(ItemsTable.COLUMN_IMAGE_PATH)));
+				}
+				if (getColumnIndex(ItemsTable.COLUMN_DEFAULT_IMAGE_PATH) != -1) {
+					item.setDefaultImagePath(getString(getColumnIndex(ItemsTable.COLUMN_DEFAULT_IMAGE_PATH)));
+				}
+
+				shoppingList.setItem(item);
 			}
 
 			return shoppingList;

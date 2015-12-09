@@ -3,6 +3,8 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
+import ru.android.ainege.shoppinglist.ui.fragments.Image;
+
 public class ItemsTable {
 
 	public static final String TABLE_NAME = "Items";
@@ -13,6 +15,8 @@ public class ItemsTable {
 	public static final String COLUMN_ID_UNIT = "id_unit";
 	public static final String COLUMN_PRICE = "price";
 	public static final String COLUMN_COMMENT = "comment";
+	public static final String COLUMN_DEFAULT_IMAGE_PATH = "item_default_image_path";
+	public static final String COLUMN_IMAGE_PATH = "image_image_path";
 
 	private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
 			+ "("
@@ -22,6 +26,8 @@ public class ItemsTable {
 			+ COLUMN_ID_UNIT + " INTEGER, "
 			+ COLUMN_PRICE + " REAL, "
 			+ COLUMN_COMMENT + " TEXT, "
+			+ COLUMN_DEFAULT_IMAGE_PATH + " TEXT, "
+			+ COLUMN_IMAGE_PATH + " TEXT, "
 			+ "FOREIGN KEY (" + COLUMN_ID_UNIT + ") REFERENCES " + UnitsTable.TABLE_NAME + " (" + UnitsTable.COLUMN_ID + ") ON DELETE SET NULL"
 			+ ");";
 
@@ -56,6 +62,13 @@ public class ItemsTable {
 				"не жареная",
 		};
 
+		String[] imagePath = {Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_4.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_4.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_3.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_4.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_3.jpg"};
+
 		for (int i = 0; i < item.length; i++) {
 			ContentValues contentValue = new ContentValues();
 			contentValue.put(COLUMN_NAME, item[i]);
@@ -63,6 +76,7 @@ public class ItemsTable {
 			contentValue.put(COLUMN_ID_UNIT, amountUnit[i]);
 			contentValue.put(COLUMN_PRICE, price[i]);
 			contentValue.put(COLUMN_COMMENT, comment[i]);
+			contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, imagePath[i]);
 			database.insert(TABLE_NAME, null, contentValue);
 		}
 	}

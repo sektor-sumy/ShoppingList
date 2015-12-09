@@ -67,6 +67,8 @@ public class ItemDataSource extends GenericDataSource<Item> {
 			values.put(ItemsTable.COLUMN_PRICE, item.getPrice());
 		}
 		values.put(ItemsTable.COLUMN_COMMENT, item.getComment());
+		values.put(ItemsTable.COLUMN_DEFAULT_IMAGE_PATH, item.getDefaultImagePath());
+		values.put(ItemsTable.COLUMN_IMAGE_PATH, item.getImagePath());
 		return values;
 	}
 
@@ -82,8 +84,10 @@ public class ItemDataSource extends GenericDataSource<Item> {
 			long idUnit = getLong(getColumnIndex(ItemsTable.COLUMN_ID_UNIT));
 			double price = getDouble(getColumnIndex(ItemsTable.COLUMN_PRICE));
 			String comment = getString(getColumnIndex(ItemsTable.COLUMN_COMMENT));
+			String defaultImagePath = getString(getColumnIndex(ItemsTable.COLUMN_DEFAULT_IMAGE_PATH));
+			String imagePath = getString(getColumnIndex(ItemsTable.COLUMN_IMAGE_PATH));
 
-			return new Item(id, name, amount, idUnit, price, comment);
+			return new Item(id, name, amount, idUnit, price, comment, defaultImagePath, imagePath);
 		}
 	}
 }
