@@ -19,6 +19,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Item;
+import ru.android.ainege.shoppinglist.ui.Image;
 
 public class AddItemFragment extends ItemFragment {
 	private static final String ID_LIST = "idList";

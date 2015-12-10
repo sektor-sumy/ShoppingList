@@ -34,6 +34,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
+import ru.android.ainege.shoppinglist.ui.Image;
 
 public class ListDialogFragment extends DialogFragment {
 	private static final String ID_LIST = "idList";

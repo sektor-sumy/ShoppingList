@@ -3,7 +3,7 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import ru.android.ainege.shoppinglist.ui.fragments.Image;
+import ru.android.ainege.shoppinglist.ui.Image;
 
 public class ListsTable {
 

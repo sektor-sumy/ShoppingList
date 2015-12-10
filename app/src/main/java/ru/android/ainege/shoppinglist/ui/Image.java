@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments;
+package ru.android.ainege.shoppinglist.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -224,7 +224,7 @@ public class Image {
 		return bitmap;
 	}
 
-	static class BitmapWorkerTask extends AsyncTask<Integer, Void, Boolean> {
+	public static class BitmapWorkerTask extends AsyncTask<Integer, Void, Boolean> {
 		private File mFile;
 		private Bitmap mBitmap;
 		private int mWidthImageView;
