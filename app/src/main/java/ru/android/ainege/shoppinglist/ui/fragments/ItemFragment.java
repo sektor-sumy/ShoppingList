@@ -1,17 +1,22 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,8 +33,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.Date;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
@@ -45,12 +51,15 @@ import ru.android.ainege.shoppinglist.ui.Validation;
 
 public abstract class ItemFragment extends Fragment implements SettingsDataItem {
 	private static final String ID_ITEM = "idItem";
+	private static final int TAKE_PHOTO_CODE = 0;
+	private static final int LOAD_IMAGE_CODE = 1;
 
 	protected String mDataSave;
 
 	boolean mIsAlwaysSave = false;
 	boolean mIsProposedItem = false;
 	private String mCurrencyList;
+	private File mFile;
 	protected String mImagePath;
 
 	ImageView mAppBarImage;
@@ -74,6 +83,8 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 	protected abstract boolean saveData(boolean isUpdateData);
 
 	protected abstract long getIdList();
+
+	protected abstract void resetImage();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -134,16 +145,61 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 				}
 				return true;
 			case R.id.take_photo:
-				Toast.makeText(getActivity(), "new photo", Toast.LENGTH_SHORT).show();
+				Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+				mFile = Image.create().createImageFile();
+				if (mFile != null) {
+					mImagePath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
+
+					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
+					startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+				} else {
+					Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
+				}
 				return true;
 			case R.id.select_from_gallery:
-				Toast.makeText(getActivity(), "image from gallery", Toast.LENGTH_SHORT).show();
+				Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+				startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
 				return true;
 			case R.id.reset_image:
-				Toast.makeText(getActivity(), "random image", Toast.LENGTH_SHORT).show();
+				resetImage();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode != Activity.RESULT_OK) return;
+
+		DisplayMetrics metrics = new DisplayMetrics();
+		getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+		switch (requestCode) {
+			case TAKE_PHOTO_CODE:
+				new Image.BitmapWorkerTask(mFile,  metrics.widthPixels - 30, mAppBarImage).execute();
+				break;
+			case LOAD_IMAGE_CODE:
+				Uri selectedImage = data.getData();
+
+				try {
+					Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
+
+					Image image = Image.create();
+					File file = image.createImageFile();
+
+					if (file != null) {
+						mImagePath = Image.PATH_PROTOCOL + file.getAbsolutePath();
+						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, mAppBarImage).execute();
+					} else {
+						Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
 		}
 	}
 

@@ -185,13 +185,13 @@ public class EditItemFragment extends ItemFragment {
 				isSave = true;
 			} else {
 				if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
-					itemDS.add(item);
+					addItem(item, itemDS);
 				} else {
 					long idItem;
 					if (mIsAlwaysSave) { //Always save default data
-						idItem = (int) itemDS.add(item);
+						idItem = (int) addItem(item, itemDS);
 					} else { //Don`t save default data
-						idItem = (int) itemDS.add(new Item(getName(), mImagePath));
+						idItem = (int) itemDS.add(new Item(getName(), mImagePath, mImagePath));
 					}
 					item.setId(idItem);
 
@@ -214,9 +214,20 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
+	protected void resetImage() {
+		mImagePath = mItemInList.getItem().getDefaultImagePath();
+		loadImage();
+	}
+
+	@Override
 	Item getItem() {
 		Item item = super.getItem();
 		item.setId(mItemInList.getIdItem());
 		return item;
+	}
+
+	private long addItem (Item item, ItemDataSource itemDS){
+	    item.setDefaultImagePath(mImagePath);
+		return itemDS.add(item);
 	}
 }

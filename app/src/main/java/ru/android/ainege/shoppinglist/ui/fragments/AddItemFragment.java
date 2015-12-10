@@ -96,7 +96,7 @@ public class AddItemFragment extends ItemFragment {
 					if (mIsUseDefaultData && mIsSelectedItem) {
 						mImagePath = mAddedImagePath;
 						if (mImagePath == null) {
-							mAppBarImage.setImageResource(android.R.color.transparent);
+							resetImage();
 						} else {
 							loadImage();
 						}
@@ -212,7 +212,7 @@ public class AddItemFragment extends ItemFragment {
 					if (mIdSelectedItem != -1) {
 						idItem = mIdSelectedItem;
 					} else {
-						idItem = (int) itemDS.add(new Item(getName(), mImagePath));
+						idItem = (int) itemDS.add(new Item(getName(), mImagePath, mImagePath));
 					}
 				}
 				item.setId(idItem);
@@ -236,6 +236,11 @@ public class AddItemFragment extends ItemFragment {
 		return getArguments().getLong(ID_LIST);
 	}
 
+	@Override
+	protected void resetImage() {
+		mAppBarImage.setImageResource(android.R.color.transparent);
+	}
+
 	private void updateItem(Item item) {
 		ItemDataSource itemDS = new ItemDataSource(getActivity());
 		if (mIdSelectedItem != -1) {
@@ -249,6 +254,7 @@ public class AddItemFragment extends ItemFragment {
 	private void setImagePath(Item item) {
 		if (mImagePath == null) { //TODO не выбрана картинка, установить буквы
 			mImagePath = Image.ASSETS_IMAGE_PATH + "item/random_list_5.jpg";
+			item.setDefaultImagePath(mImagePath);
 			item.setImagePath(mImagePath);
 		}
 	}

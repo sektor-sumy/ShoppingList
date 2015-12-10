@@ -153,6 +153,7 @@ public class ListDialogFragment extends DialogFragment {
 					File file = image.createImageFile();
 
 					if (file != null) {
+						mImagePath = Image.PATH_PROTOCOL + file.getAbsolutePath();
 						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, mImageList).execute();
 					} else {
 						Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();

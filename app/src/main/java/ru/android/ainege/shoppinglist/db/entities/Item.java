@@ -18,6 +18,12 @@ public class Item implements Serializable {
 		mImagePath = imagePath;
 	}
 
+	public Item(String name, String defaultImagePath, String imagePath) {
+		mName = name;
+		mDefaultImagePath = defaultImagePath;
+		mImagePath = imagePath;
+	}
+
 	public Item(long id, String name) {
 		mId = id;
 		mName = name;
