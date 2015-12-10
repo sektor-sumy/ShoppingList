@@ -567,7 +567,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			ShoppingList itemInList = mItemsInList.get(position);
 
 			holder.mView.setSelected(mSelectedItems.contains(position));
-			Image.create().insertImageToView(getActivity(), itemInList.getItem().getImagePath(), holder.mImage); //TODO set miniature
+			Image.create().insertImageToView(getActivity(), itemInList.getItem().getImagePath(), holder.mImage);
 			holder.mTextView.setText(itemInList.getItem().getName());
 
 			if (itemInList.getAmount() == 0) {

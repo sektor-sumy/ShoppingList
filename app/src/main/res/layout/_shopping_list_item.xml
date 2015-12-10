@@ -17,7 +17,8 @@
 		<ImageView
 			android:id="@+id/item_image_list"
 			android:layout_width="@dimen/avatar_hw"
-			android:layout_height="@dimen/avatar_hw"/>
+			android:layout_height="@dimen/avatar_hw"
+			android:scaleType="centerCrop"/>
 
 		<TextView
 			android:id="@+id/item_name_list"
