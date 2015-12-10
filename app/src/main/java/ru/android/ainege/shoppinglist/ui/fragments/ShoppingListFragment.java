@@ -29,8 +29,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,7 +69,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
 	private TextView mEmptyText;
-	private LinearLayout mListContainer;
+	private FrameLayout mListContainer;
+	private ProgressBar mProgressBar;
 	private RecyclerViewAdapter mAdapterRV;
 	private List mList;
 	private double mSaveSpentMoney = 0;
@@ -181,11 +184,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		});
 
+		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
+
 		mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
 		mTotalMoney = (TextView) v.findViewById(R.id.total_money);
 
 		mEmptyText = (TextView) v.findViewById(R.id.empty_list);
-		mListContainer = (LinearLayout) v.findViewById(R.id.list_container);
+		mListContainer = (FrameLayout) v.findViewById(R.id.list_container);
 
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -364,6 +369,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		switch (loader.getId()) {
 			case DATA_LOADER:
+				if (mProgressBar.getVisibility() == View.VISIBLE) {
+					mProgressBar.setVisibility(View.GONE);
+				}
+
 				if (data.moveToFirst()) {
 					mItemsInList = ((ShoppingListCursor) data).getEntities();
 					ShoppingList.sort(mItemsInList);

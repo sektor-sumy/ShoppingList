@@ -44,9 +44,10 @@
 	</android.support.design.widget.AppBarLayout>
 
 	<FrameLayout
-		android:id="@+id/fragment_container"
+		android:id="@+id/list_container"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:visibility="gone"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 		<LinearLayout
@@ -57,106 +58,96 @@
 			android:weightSum="1">
 
 			<LinearLayout
-				android:id="@+id/list_container"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="vertical"
-				android:visibility="visible">
+				android:orientation="horizontal"
+				android:paddingLeft="@dimen/padding_16dp"
+				android:paddingRight="@dimen/padding_16dp">
 
-				<LinearLayout
-					android:layout_width="match_parent"
+				<TextView
+					android:layout_width="75dp"
 					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:paddingLeft="@dimen/padding_16dp"
-					android:paddingRight="@dimen/padding_16dp">
+					android:layout_weight="0.5"
+					android:gravity="center"
+					android:text="@string/spent_money"
+					android:textStyle="bold"/>
 
-					<TextView
-						android:layout_width="75dp"
-						android:layout_height="wrap_content"
-						android:text="@string/spent_money"
-						android:textStyle="bold"
-						android:gravity="center"
-						android:layout_weight="0.5"/>
-
-					<TextView
-						android:layout_width="75dp"
-						android:layout_height="wrap_content"
-						android:text="@string/all_money"
-						android:textStyle="bold"
-						android:gravity="center"
-						android:layout_weight="0.5"/>
-
-				</LinearLayout>
-
-				<LinearLayout
-					android:layout_width="match_parent"
+				<TextView
+					android:layout_width="75dp"
 					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:paddingLeft="@dimen/padding_16dp"
-					android:paddingRight="@dimen/padding_16dp">
-
-					<TextView
-						android:id="@+id/spent_money"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:maxWidth="@dimen/column_wight"
-						android:textStyle="bold"
-						android:gravity="center"
-						android:layout_weight="0.5"
-						android:singleLine="true"
-						android:layout_marginRight="2dp"/>
-
-					<TextView
-						android:id="@+id/total_money"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:maxWidth="@dimen/column_wight"
-						android:textStyle="bold"
-						android:gravity="center"
-						android:layout_weight="0.5"
-						android:singleLine="true"
-						android:layout_marginLeft="2dp"/>
-
-				</LinearLayout>
-
-				<View
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:layout_gravity="end"
-					android:layout_marginBottom="2dp"
-					android:background="@android:color/black"/>
-
-				<android.support.v7.widget.RecyclerView
-					android:id="@+id/items_list"
-					android:layout_width="match_parent"
-					android:layout_height="0dp"
-					android:layout_weight="1"
-					android:paddingBottom="65dp"
-					android:clipToPadding="false"
-					android:scrollbars="vertical"/>
+					android:layout_weight="0.5"
+					android:gravity="center"
+					android:text="@string/all_money"
+					android:textStyle="bold"/>
 
 			</LinearLayout>
 
-			<TextView
-				android:id="@+id/empty_list"
-				android:layout_width="wrap_content"
-				android:layout_height="match_parent"
-				android:layout_gravity="center_horizontal"
-				android:gravity="center"
-				android:text="@string/empty_list"
-				android:visibility="gone"/>
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:paddingLeft="@dimen/padding_16dp"
+				android:paddingRight="@dimen/padding_16dp">
 
-			<!--TODO: Check it-->
-			<ProgressBar
-				android:id="@android:id/empty"
-				android:layout_width="wrap_content"
-				android:layout_height="match_parent"
-				android:layout_gravity="center_horizontal"
-				android:visibility="gone"/>
+				<TextView
+					android:id="@+id/spent_money"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginRight="2dp"
+					android:layout_weight="0.5"
+					android:gravity="center"
+					android:maxWidth="@dimen/column_wight"
+					android:singleLine="true"
+					android:textStyle="bold"/>
+
+				<TextView
+					android:id="@+id/total_money"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginLeft="2dp"
+					android:layout_weight="0.5"
+					android:gravity="center"
+					android:maxWidth="@dimen/column_wight"
+					android:singleLine="true"
+					android:textStyle="bold"/>
+
+			</LinearLayout>
+
+			<View
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:layout_gravity="end"
+				android:layout_marginBottom="2dp"
+				android:background="@android:color/black"/>
+
+			<android.support.v7.widget.RecyclerView
+				android:id="@+id/items_list"
+				android:layout_width="match_parent"
+				android:layout_height="0dp"
+				android:layout_weight="1"
+				android:clipToPadding="false"
+				android:paddingBottom="65dp"
+				android:scrollbars="vertical"/>
 
 		</LinearLayout>
-
 	</FrameLayout>
+
+	<TextView
+		android:id="@+id/empty_list"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_gravity="center_horizontal"
+		android:gravity="center"
+		android:text="@string/empty_list"
+		android:visibility="gone"/>
+
+	<ProgressBar
+		android:id="@+id/progressBar"
+		style="?android:attr/progressBarStyleLarge"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:visibility="visible"/>
 
 	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/add_fab"

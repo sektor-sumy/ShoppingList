@@ -22,8 +22,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -43,6 +45,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private RecyclerView mListsRV;
 	private TextView mEmptyText;
 	private RecyclerViewAdapter mAdapterRV;
+	private ProgressBar mProgressBar;
+	private FrameLayout mListsContainer;
 	ArrayList<List> mLists = new ArrayList<>();
 
 	@Override
@@ -69,6 +73,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				addListDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);
 			}
 		});
+
+		mListsContainer = (FrameLayout) v.findViewById(R.id.lists_container);
+		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
 
 		mListsRV = (RecyclerView) v.findViewById(R.id.lists);
 		mListsRV.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -126,6 +133,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		switch (loader.getId()) {
 			case DATA_LOADER:
+				if (mProgressBar.getVisibility() == View.VISIBLE) {
+					mProgressBar.setVisibility(View.GONE);
+				}
+
 				if (data.moveToFirst()) {
 					mLists = ((ListsDataSource.ListCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
@@ -133,6 +144,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				} else {
 					showEmptyStates();
 				}
+
 				data.close();
 				break;
 			default:
@@ -164,12 +176,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	private void showEmptyStates() {
-		mListsRV.setVisibility(View.GONE);
+		mListsContainer.setVisibility(View.GONE);
 		mEmptyText.setVisibility(View.VISIBLE);
 	}
 
 	private void hideEmptyStates() {
-		mListsRV.setVisibility(View.VISIBLE);
+		mListsContainer.setVisibility(View.VISIBLE);
 		mEmptyText.setVisibility(View.GONE);
 	}
 
