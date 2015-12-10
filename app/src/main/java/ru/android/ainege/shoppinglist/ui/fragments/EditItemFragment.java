@@ -167,21 +167,43 @@ public class EditItemFragment extends ItemFragment {
 			Item item = getItem();
 			ItemDataSource itemDS = new ItemDataSource(getActivity());
 
-			if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
-				itemDS.update(getItem());
-			} else {
-				if (mIsAlwaysSave) {  //Always save default data
+			if (getName().equals(mItemInList.getItem().getName())) { //name doesn`t change
+				if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
 					itemDS.update(getItem());
-				} else { //Don`t save default data
-					itemDS.update(new Item(mItemInList.getIdItem(), getName(), mImagePath));
-				}
+				} else {
+					if (mIsAlwaysSave) {  //Always save default data
+						itemDS.update(getItem());
+					} else { //Don`t save default data
+						itemDS.update(new Item(mItemInList.getIdItem(), getName(), mImagePath));
+					}
 
-				//Update item in list
-				ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance(getActivity());
-				itemInListDS.update(getItemInList(item));
-				sendResult(mItemInList.getIdItem());
+					//Update item in list
+					ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance(getActivity());
+					itemInListDS.update(getItemInList(item));
+					sendResult(mItemInList.getIdItem());
+				}
+				isSave = true;
+			} else {
+				if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
+					itemDS.add(item);
+				} else {
+					long idItem;
+					if (mIsAlwaysSave) { //Always save default data
+						idItem = (int) itemDS.add(item);
+					} else { //Don`t save default data
+						idItem = (int) itemDS.add(new Item(getName(), mImagePath));
+					}
+					item.setId(idItem);
+
+					//Update item in list
+					ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance(getActivity());
+					itemInListDS.update(getItemInList(item), mItemInList.getIdItem());
+					sendResult(mItemInList.getIdItem());
+				}
+				isSave = true;
 			}
-			isSave = true;
+
+
 		}
 		return isSave;
 	}
