@@ -13,13 +13,12 @@
 		android:text="@string/add"
 		android:layout_gravity="center_horizontal"
 		android:layout_marginBottom="@dimen/padding_16dp"
-		android:background="@android:color/white"
+		android:background="@drawable/button"
 		android:textColor="@color/accent"/>
 
 	<android.support.v7.widget.RecyclerView
 		android:id="@+id/list"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:scrollbars="vertical"
 		/>
 </LinearLayout>
