@@ -25,6 +25,7 @@ public class AddItemFragment extends ItemFragment {
 
 	private boolean mIsUseDefaultData = false;
 
+	private String mAddedImagePath;
 	private String mAddedAmount = "";
 	private int mAddedUnit = 0;
 	private String mAddedPrice = "";
@@ -93,6 +94,13 @@ public class AddItemFragment extends ItemFragment {
 					//If selected a existent item and default data are used,
 					//when changing item, fill in the data that have been previously introduced
 					if (mIsUseDefaultData && mIsSelectedItem) {
+						mImagePath = mAddedImagePath;
+						if (mImagePath == null) {
+							mAppBarImage.setImageResource(android.R.color.transparent);
+						} else {
+							loadImage();
+						}
+
 						mAmount.setText(mAddedAmount);
 						mUnits.setSelection(mAddedUnit);
 						mPrice.setText(mAddedPrice);
@@ -146,7 +154,9 @@ public class AddItemFragment extends ItemFragment {
 				mIsSelectedItem = true;
 				mIdSelectedItem = l;
 				//If default data are used, they fill in the fields
+				// and save previously introduced data
 				if (mIsUseDefaultData) {
+					mAddedImagePath = mImagePath;
 					mAddedAmount = mAmount.getText().toString();
 					mAddedUnit = mUnits.getSelectedItemPosition();
 					mAddedPrice = mPrice.getText().toString();
@@ -156,6 +166,9 @@ public class AddItemFragment extends ItemFragment {
 					c.moveToFirst();
 					Item item = c.getEntity();
 					c.close();
+
+					mImagePath = item.getImagePath();
+					loadImage();
 
 					double amount = item.getAmount();
 					if (amount > 0) {
@@ -185,6 +198,7 @@ public class AddItemFragment extends ItemFragment {
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
 				!mPriceInputLayout.isErrorEnabled()) {
 			Item item = getItem();
+			setImagePath(item);
 			ItemDataSource itemDS = new ItemDataSource(getActivity());
 
 			if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
@@ -198,7 +212,7 @@ public class AddItemFragment extends ItemFragment {
 					if (mIdSelectedItem != -1) {
 						idItem = mIdSelectedItem;
 					} else {
-						idItem = (int) itemDS.add(new Item(getName()));
+						idItem = (int) itemDS.add(new Item(getName(), mImagePath));
 					}
 				}
 				item.setId(idItem);
@@ -229,6 +243,13 @@ public class AddItemFragment extends ItemFragment {
 			itemDS.update(item);
 		} else {
 			mIdSelectedItem = (int) itemDS.add(item);
+		}
+	}
+
+	private void setImagePath(Item item) {
+		if (mImagePath == null) { //TODO не выбрана картинка, установить буквы
+			mImagePath = Image.ASSETS_IMAGE_PATH + "item/random_list_5.jpg";
+			item.setImagePath(mImagePath);
 		}
 	}
 }

@@ -121,6 +121,9 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	private void setDataToView() {
+		mImagePath = mItemInList.getItem().getImagePath();
+		loadImage();
+
 		mName.setText(mItemInList.getItem().getName());
 		mName.setSelection(mItemInList.getItem().getName().length());
 
@@ -170,7 +173,7 @@ public class EditItemFragment extends ItemFragment {
 				if (mIsAlwaysSave) {  //Always save default data
 					itemDS.update(getItem());
 				} else { //Don`t save default data
-					itemDS.update(new Item(mItemInList.getIdItem(), getName()));
+					itemDS.update(new Item(mItemInList.getIdItem(), getName(), mImagePath));
 				}
 
 				//Update item in list

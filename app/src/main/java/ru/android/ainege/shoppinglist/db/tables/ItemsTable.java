@@ -62,9 +62,16 @@ public class ItemsTable {
 				"не жареная",
 		};
 
-		String[] imagePath = {Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
+		String[] defaultImagePath = {Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg"};
+
+		String[] imagePath = {Image.ASSETS_IMAGE_PATH + "item/random_list_5.jpg",
 				Image.ASSETS_IMAGE_PATH + "item/random_list_4.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_4.jpg",
+				Image.ASSETS_IMAGE_PATH + "item/random_list_5.jpg",
 				Image.ASSETS_IMAGE_PATH + "item/random_list_3.jpg",
 				Image.ASSETS_IMAGE_PATH + "item/random_list_4.jpg",
 				Image.ASSETS_IMAGE_PATH + "item/random_list_3.jpg"};
@@ -76,7 +83,8 @@ public class ItemsTable {
 			contentValue.put(COLUMN_ID_UNIT, amountUnit[i]);
 			contentValue.put(COLUMN_PRICE, price[i]);
 			contentValue.put(COLUMN_COMMENT, comment[i]);
-			contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, imagePath[i]);
+			contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, defaultImagePath[i]);
+			contentValue.put(COLUMN_IMAGE_PATH, imagePath[i]);
 			database.insert(TABLE_NAME, null, contentValue);
 		}
 	}

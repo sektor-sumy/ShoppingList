@@ -567,9 +567,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			ShoppingList itemInList = mItemsInList.get(position);
 
 			holder.mView.setSelected(mSelectedItems.contains(position));
-
-			holder.mImage.setImageResource(R.drawable.food);
+			Image.create().insertImageToView(getActivity(), itemInList.getItem().getImagePath(), holder.mImage); //TODO set miniature
 			holder.mTextView.setText(itemInList.getItem().getName());
+
 			if (itemInList.getAmount() == 0) {
 				holder.mAmount.setText("-");
 			} else {
@@ -577,12 +577,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						+ " " + itemInList.getUnit().getName();
 				holder.mAmount.setText(amount);
 			}
+
 			String price = localValue(itemInList.getPrice()) + " " + mCurrencyList;
 			holder.mPrice.setText(price);
 			int visibility = View.GONE;
+
 			if (itemInList.isBought()) {
 				visibility = View.VISIBLE;
 			}
+
 			holder.mIsBought.setVisibility(visibility);
 		}
 

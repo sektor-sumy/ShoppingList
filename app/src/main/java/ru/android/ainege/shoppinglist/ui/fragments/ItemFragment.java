@@ -49,9 +49,11 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 	protected String mDataSave;
 
 	boolean mIsAlwaysSave = false;
-	private String mCurrencyList;
 	boolean mIsProposedItem = false;
+	private String mCurrencyList;
+	protected String mImagePath;
 
+	ImageView mAppBarImage;
 	CollapsingToolbarLayout mCollapsingToolbarLayout;
 	TextInputLayout mNameInputLayout;
 	AutoCompleteTextView mName;
@@ -61,9 +63,9 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 	Spinner mUnits;
 	TextInputLayout mPriceInputLayout;
 	EditText mPrice;
-	private TextView mFinishPrice;
 	EditText mComment;
 	ToggleButton mIsBought;
+	private TextView mFinishPrice;
 
 	protected abstract TextWatcher getNameChangedListener();
 
@@ -100,10 +102,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 			}
 		});
 
-		ImageView appBarImage = (ImageView) v.findViewById(R.id.appbar_image);
-		Image.create().insertImageToView(getActivity(),  //TODO get image from db
-				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
-				appBarImage);
+		mAppBarImage = (ImageView) v.findViewById(R.id.appbar_image);
 
 		setView(v);
 		return v;
@@ -227,7 +226,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 		}
 		String comment = mComment.getText().toString();
 
-		return new Item(name, amount, idUnit, price, comment);
+		return new Item(name, amount, idUnit, price, comment, mImagePath);
 	}
 
 	ShoppingList getItemInList(Item item) {
@@ -356,5 +355,9 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 		nf.setMinimumFractionDigits(2);
 		nf.setMaximumFractionDigits(2);
 		return nf.format(value);
+	}
+
+	protected void loadImage() {
+		Image.create().insertImageToView(getActivity(), mImagePath, mAppBarImage);
 	}
 }

@@ -85,11 +85,15 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 
 	@Override
 	public int update(ShoppingList shoppingList) {
+		return update(shoppingList, shoppingList.getIdItem());
+	}
+
+	public int update(ShoppingList shoppingList, long idOldItem) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(shoppingList);
 		return db.update(ShoppingListTable.TABLE_NAME, values,
 				ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
-				new String[]{String.valueOf(shoppingList.getIdItem()), String.valueOf(shoppingList.getIdList())});
+				new String[]{String.valueOf(idOldItem), String.valueOf(shoppingList.getIdList())});
 	}
 
 	public void updateUnit(long oldId, long newId) {
