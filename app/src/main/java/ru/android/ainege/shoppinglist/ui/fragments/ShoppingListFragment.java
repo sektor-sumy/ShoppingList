@@ -406,6 +406,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			case ANSWER_FRAGMENT_CODE:
 				ListsDataSource listsDS = new ListsDataSource(getActivity());
 				listsDS.delete(mList.getId());
+				Image.deleteFile(mList.getImagePath());
 
 				getActivity().onBackPressed();
 				break;

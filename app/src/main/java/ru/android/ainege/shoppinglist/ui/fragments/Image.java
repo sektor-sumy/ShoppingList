@@ -80,6 +80,15 @@ public class Image {
 		return Image.PATH_PROTOCOL + file.getAbsolutePath();
 	}
 
+	public static boolean deleteFile(String path){
+		boolean result = false;
+		if (!path.contains(Image.ASSETS_IMAGE_PATH)) {
+			File f = new File(Uri.parse(path).getPath());
+			result = f.delete();
+		}
+		return result;
+	}
+
 	public boolean postProcessingToFile(File file, int widthImageView) {
 		if (!isExternalStorageReadable()) {
 			return false;

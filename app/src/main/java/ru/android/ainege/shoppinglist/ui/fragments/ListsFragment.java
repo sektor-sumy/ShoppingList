@@ -276,6 +276,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						listsDS.delete(list.getId());
 						removeItem(itemPosition);
 
+						Image.deleteFile(list.getImagePath());
+
 						if (mLists.size() > 0) {
 							hideEmptyStates();
 						} else {
