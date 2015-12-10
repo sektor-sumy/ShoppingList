@@ -209,17 +209,17 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			String statisticsShopping;
 
 			if (amountItem == 0) {
-				statisticsShopping = "Список пуст";
+				statisticsShopping = getString(R.string.list_empty);
 			} else {
 				int amountBoughtItems = list.getAmountBoughtItems();
 
 				if (amountBoughtItems == 0) {
-					statisticsShopping = "Ничего не куплено. Всего " + amountItem;
+					statisticsShopping = getString(R.string.nothing_bought) + amountItem;
 				} else {
 					if (amountItem == amountBoughtItems) {
-						statisticsShopping = "Все куплено";
+						statisticsShopping = getString(R.string.all_bought);
 					} else {
-						statisticsShopping = "Куплено " + amountBoughtItems + " из " + amountItem;
+						statisticsShopping = getString(R.string.bought) + amountBoughtItems + getString(R.string.of) + amountItem;
 					}
 				}
 			}

@@ -262,7 +262,7 @@ public class Image {
 				if (imageView != null) {
 					Image.create().insertImageToView(imageView.getContext(), getFilePath(mFile), imageView);
 				} else {
-					Toast.makeText(imageViewReference.get().getContext(), "Не удалось получить файл", Toast.LENGTH_SHORT).show();
+					Toast.makeText(imageViewReference.get().getContext(), imageViewReference.get().getContext().getString(R.string.error_failed_get_file), Toast.LENGTH_SHORT).show();
 				}
 			}
 		}

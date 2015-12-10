@@ -68,7 +68,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:paddingLeft="@dimen/padding_hint"
-					android:hint="@string/item_name"
+					android:hint="@string/name"
 					android:maxLength="35"/>
 
 			</android.support.design.widget.TextInputLayout>

@@ -133,7 +133,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 		switch (item.getItemId()) {
 			case R.id.update_item:
 				if (saveData(true)) {
-					Toast.makeText(getActivity(), R.string.data_is_save, Toast.LENGTH_LONG).show();
+					Toast.makeText(getActivity(), R.string.info_data_is_save, Toast.LENGTH_LONG).show();
 				}
 				return true;
 			case R.id.save_item:
@@ -141,7 +141,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 				if (wantToCloseDialog) {
 					getActivity().onBackPressed();
 				} else {
-					Toast.makeText(getActivity(), R.string.wrong_value, Toast.LENGTH_LONG).show();
+					Toast.makeText(getActivity(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
 				}
 				return true;
 			case R.id.take_photo:
@@ -154,7 +154,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
 					startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
 				} else {
-					Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 				}
 				return true;
 			case R.id.select_from_gallery:
@@ -162,7 +162,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
 				return true;
-			case R.id.reset_image:
+			case R.id.default_image:
 				resetImage();
 				return true;
 			default:
@@ -194,7 +194,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 						mImagePath = Image.PATH_PROTOCOL + file.getAbsolutePath();
 						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, mAppBarImage).execute();
 					} else {
-						Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

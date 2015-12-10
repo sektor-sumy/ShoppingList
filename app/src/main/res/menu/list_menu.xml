@@ -10,7 +10,7 @@
 		android:title="@string/select_from_gallery"
 		app:showAsAction="never"/>
 	<item
-		android:id="@+id/reset_image"
-		android:title="@string/reset_image"
+		android:id="@+id/random_image"
+		android:title="@string/random_image"
 		app:showAsAction="never"/>
 </menu>

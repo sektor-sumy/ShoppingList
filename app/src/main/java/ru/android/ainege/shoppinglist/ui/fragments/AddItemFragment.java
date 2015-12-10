@@ -69,7 +69,7 @@ public class AddItemFragment extends ItemFragment {
 	protected void setView(View v) {
 		super.setView(v);
 		mName.setOnItemClickListener(getOnNameClickListener());
-		mCollapsingToolbarLayout.setTitle(getString(R.string.buy));
+		mCollapsingToolbarLayout.setTitle(getString(R.string.add));
 	}
 
 	@Override

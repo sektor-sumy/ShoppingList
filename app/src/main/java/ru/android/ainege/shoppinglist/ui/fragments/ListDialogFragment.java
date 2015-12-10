@@ -82,7 +82,7 @@ public class ListDialogFragment extends DialogFragment {
 							cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
 							startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
 						} else {
-							Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 						}
 						return true;
 					case R.id.select_from_gallery:
@@ -90,7 +90,7 @@ public class ListDialogFragment extends DialogFragment {
 								android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 						startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
 						return true;
-					case R.id.reset_image:
+					case R.id.random_image:
 						setRandomImage();
 						return true;
 					default:
@@ -156,7 +156,7 @@ public class ListDialogFragment extends DialogFragment {
 						mImagePath = Image.PATH_PROTOCOL + file.getAbsolutePath();
 						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, mImageList).execute();
 					} else {
-						Toast.makeText(getActivity(), "Не удалось создать файл", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
