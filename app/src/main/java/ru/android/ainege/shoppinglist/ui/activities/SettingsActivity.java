@@ -34,7 +34,7 @@ public class SettingsActivity extends SingleFragmentActivity {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
 			} else {
-				getActivity().overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
+				getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 			}
 
 			Preference currencySettings = findPreference(getString(R.string.settings_key_currency));
@@ -72,7 +72,7 @@ public class SettingsActivity extends SingleFragmentActivity {
 		@Override
 		public void onPause() {
 			super.onPause();
-			getActivity().overridePendingTransition(R.anim.slide_in_down, R.anim.slide_out_down);
+			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}
 	}
 }

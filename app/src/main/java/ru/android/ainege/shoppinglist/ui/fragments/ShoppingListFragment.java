@@ -137,7 +137,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
 		} else {
-			getActivity().overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
+			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}
 
 		setHasOptionsMenu(true);
@@ -317,7 +317,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	@Override
 	public void onPause() {
 		super.onPause();
-		getActivity().overridePendingTransition(R.anim.slide_in_down, R.anim.slide_out_down);
+		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 	}
 
 	@Override
