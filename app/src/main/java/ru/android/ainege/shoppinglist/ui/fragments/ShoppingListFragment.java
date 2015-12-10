@@ -19,7 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.transition.Slide;
 import android.view.ActionMode;
 import android.view.Gravity;
@@ -31,10 +30,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -98,8 +95,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			switch (item.getItemId()) {
 				case R.id.delete:
 					deleteSelectedItems();
-					return true;
-				case R.id.move:
 					return true;
 				case R.id.select_bought:
 					mAdapterRV.selectItems(true);
@@ -288,20 +283,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					}
 				})
 		);
-
-		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-			@Override
-			public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-				return false;
-			}
-
-			@Override
-			public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-				Toast.makeText(getActivity(), swipeDir + " swipe for delete", Toast.LENGTH_SHORT).show();
-			}
-
-		});
-		itemTouchHelper.attachToRecyclerView(mItemsListRV);
 
 		return v;
 	}
