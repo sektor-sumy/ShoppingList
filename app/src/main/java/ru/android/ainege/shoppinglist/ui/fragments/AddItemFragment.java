@@ -253,8 +253,8 @@ public class AddItemFragment extends ItemFragment {
 	}
 
 	private void setImagePath(Item item) {
-		if (mImagePath == null) { //TODO не выбрана картинка, установить буквы
-			mImagePath = Image.ASSETS_IMAGE_PATH + "item/random_list_5.jpg";
+		if (mImagePath == null) {
+			mImagePath = Image.CHARACTER_IMAGE_PATH + item.getName().toUpperCase().charAt(0) + ".png";
 			item.setDefaultImagePath(mImagePath);
 			item.setImagePath(mImagePath);
 		}
