@@ -28,8 +28,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -66,8 +66,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private FloatingActionButton mFAB;
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
-	private TextView mEmptyText;
-	private FrameLayout mListContainer;
+	private ImageView mEmptyImage;
+	private LinearLayout mListContainer;
 	private ProgressBar mProgressBar;
 	private RecyclerViewAdapter mAdapterRV;
 	private List mList;
@@ -185,8 +185,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
 		mTotalMoney = (TextView) v.findViewById(R.id.total_money);
 
-		mEmptyText = (TextView) v.findViewById(R.id.empty_list);
-		mListContainer = (FrameLayout) v.findViewById(R.id.list_container);
+		mEmptyImage = (ImageView) v.findViewById(R.id.empty_list);
+		mListContainer = (LinearLayout) v.findViewById(R.id.list_container);
 
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -451,7 +451,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private void showEmptyStates() {
 		mListContainer.setVisibility(View.GONE);
-		mEmptyText.setVisibility(View.VISIBLE);
+		mEmptyImage.setVisibility(View.VISIBLE);
 
 		if (mActionMode != null) {
 			mActionMode.finish();
@@ -460,7 +460,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private void hideEmptyStates() {
 		mListContainer.setVisibility(View.VISIBLE);
-		mEmptyText.setVisibility(View.GONE);
+		mEmptyImage.setVisibility(View.GONE);
 	}
 
 	private void updateData() {

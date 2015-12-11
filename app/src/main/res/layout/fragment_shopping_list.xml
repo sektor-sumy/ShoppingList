@@ -44,18 +44,18 @@
 	</android.support.design.widget.AppBarLayout>
 
 	<FrameLayout
-		android:id="@+id/list_container"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:visibility="gone"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 		<LinearLayout
+			android:id="@+id/list_container"
 			xmlns:android="http://schemas.android.com/apk/res/android"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:orientation="vertical"
-			android:weightSum="1">
+			android:weightSum="1"
+			android:visibility="gone">
 
 			<LinearLayout
 				android:layout_width="match_parent"
@@ -130,16 +130,17 @@
 				android:scrollbars="vertical"/>
 
 		</LinearLayout>
-	</FrameLayout>
 
-	<TextView
-		android:id="@+id/empty_list"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:layout_gravity="center_horizontal"
-		android:gravity="center"
-		android:text="@string/empty_list"
-		android:visibility="gone"/>
+		<ImageView
+			android:id="@+id/empty_list"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="top"
+			android:src="@drawable/empty_list"
+			android:background="#c6c6c6"
+			android:visibility="visible"
+			/>
+	</FrameLayout>
 
 	<ProgressBar
 		android:id="@+id/progressBar"

@@ -22,8 +22,7 @@
 		android:id="@+id/lists_container"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		app:layout_behavior="@string/appbar_scrolling_view_behavior"
-		android:visibility="gone">
+		app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 		<android.support.v7.widget.RecyclerView
 			android:id="@+id/lists"
@@ -31,18 +30,18 @@
 			android:layout_height="match_parent"
 			android:paddingBottom="52dp"
 			android:clipToPadding="false"
-			android:scrollbars="vertical"/>
-	</FrameLayout>
+			android:scrollbars="vertical"
+			android:visibility="gone"/>
 
-	<ImageView
-		android:id="@+id/empty_list"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_gravity="center_horizontal"
-		android:gravity="center"
-		android:src="@drawable/empty_lists"
-		android:background="#c6c6c6"
-		android:visibility="visible"/>
+		<ImageView
+			android:id="@+id/empty_lists"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="center"
+			android:src="@drawable/empty_lists"
+			android:background="#c6c6c6"
+			android:visibility="visible"/>
+	</FrameLayout>
 
 	<ProgressBar
 		android:id="@+id/progressBar"

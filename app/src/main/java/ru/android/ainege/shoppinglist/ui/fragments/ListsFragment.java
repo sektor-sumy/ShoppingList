@@ -47,7 +47,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ImageView mEmptyImage;
 	private RecyclerViewAdapter mAdapterRV;
 	private ProgressBar mProgressBar;
-	private FrameLayout mListsContainer;
 	ArrayList<List> mLists = new ArrayList<>();
 
 	@Override
@@ -75,13 +74,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			}
 		});
 
-		mListsContainer = (FrameLayout) v.findViewById(R.id.lists_container);
 		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
 
 		mListsRV = (RecyclerView) v.findViewById(R.id.lists);
 		mListsRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-		mEmptyImage = (ImageView) v.findViewById(R.id.empty_list);
+		mEmptyImage = (ImageView) v.findViewById(R.id.empty_lists);
 
 		mAdapterRV = new RecyclerViewAdapter();
 		mListsRV.setAdapter(mAdapterRV);
@@ -177,12 +175,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	private void showEmptyStates() {
-		mListsContainer.setVisibility(View.GONE);
+		mListsRV.setVisibility(View.GONE);
 		mEmptyImage.setVisibility(View.VISIBLE);
 	}
 
 	private void hideEmptyStates() {
-		mListsContainer.setVisibility(View.VISIBLE);
+		mListsRV.setVisibility(View.VISIBLE);
 		mEmptyImage.setVisibility(View.GONE);
 	}
 
