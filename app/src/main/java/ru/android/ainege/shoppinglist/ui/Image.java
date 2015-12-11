@@ -28,10 +28,11 @@ public class Image {
 	public static final String PATH_PROTOCOL = "file://";
 	public static final String ASSETS_IMAGE_PATH = PATH_PROTOCOL + "/android_asset/images/";
 	public static final String CHARACTER_IMAGE_PATH = ASSETS_IMAGE_PATH + "character/";
+	public static final String LIST_IMAGE_PATH = ASSETS_IMAGE_PATH + "list/";
 	private static final double MIN_RATIO = 1.25;
 	private static final double MAX_RATIO = 2;
 	protected int mLoadingImage = R.drawable.loader;
-	private int mDefaultImage = R.drawable.default_list;
+	private int mDefaultImage = R.drawable.load_error;
 
 	public static Image create() {
 		return new Image();

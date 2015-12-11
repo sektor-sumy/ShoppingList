@@ -40,7 +40,7 @@
 			android:gravity="center"
 			android:src="@drawable/empty_lists"
 			android:background="#c6c6c6"
-			android:visibility="visible"/>
+			android:visibility="gone"/>
 	</FrameLayout>
 
 	<ProgressBar

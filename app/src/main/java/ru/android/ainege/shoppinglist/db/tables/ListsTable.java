@@ -39,8 +39,8 @@ public class ListsTable {
 	private static void initialData(SQLiteDatabase database) {
 		String[] lists = {"Мой список", "Купить на ДР"};
 		int[] currency = {1, 3};
-		String[] imagepath = {Image.ASSETS_IMAGE_PATH + "item/random_list_2.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_5.jpg"};
+		String[] imagepath = {Image.LIST_IMAGE_PATH + "random_list_2.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_5.jpg"};
 
 		for (int i = 0; i < lists.length; i++) {
 			ContentValues contentValue = new ContentValues();

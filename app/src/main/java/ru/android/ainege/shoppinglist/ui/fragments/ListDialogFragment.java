@@ -232,7 +232,7 @@ public class ListDialogFragment extends DialogFragment {
 	private void setRandomImage() {
 		String path;
 		do {
-			path = Image.ASSETS_IMAGE_PATH + "item/random_list_" + (new Random().nextInt(4) + 1) + ".jpg";
+			path = Image.LIST_IMAGE_PATH + "random_list_" + (new Random().nextInt(4) + 1) + ".jpg";
 		} while(path.equals(mImagePath));
 		mImagePath = path;
 		loadImage();

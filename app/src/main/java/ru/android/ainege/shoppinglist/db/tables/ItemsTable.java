@@ -62,19 +62,19 @@ public class ItemsTable {
 				"не жареная",
 		};
 
-		String[] defaultImagePath = {Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_1.jpg"};
+		String[] defaultImagePath = {Image.LIST_IMAGE_PATH + "random_list_1.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_1.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_1.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_1.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_1.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_1.jpg"};
 
-		String[] imagePath = {Image.ASSETS_IMAGE_PATH + "item/random_list_5.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_4.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_5.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_3.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_4.jpg",
-				Image.ASSETS_IMAGE_PATH + "item/random_list_3.jpg"};
+		String[] imagePath = {Image.LIST_IMAGE_PATH + "random_list_5.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_4.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_5.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_3.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_4.jpg",
+				Image.LIST_IMAGE_PATH + "random_list_3.jpg"};
 
 		for (int i = 0; i < item.length; i++) {
 			ContentValues contentValue = new ContentValues();

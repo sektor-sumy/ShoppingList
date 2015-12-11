@@ -138,8 +138,7 @@
 			android:gravity="top"
 			android:src="@drawable/empty_list"
 			android:background="#c6c6c6"
-			android:visibility="visible"
-			/>
+			android:visibility="gone"/>
 	</FrameLayout>
 
 	<ProgressBar
@@ -147,8 +146,7 @@
 		style="?android:attr/progressBarStyleLarge"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:visibility="visible"/>
+		android:layout_gravity="center"/>
 
 	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/add_fab"
