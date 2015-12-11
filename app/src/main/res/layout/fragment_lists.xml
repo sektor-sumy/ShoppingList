@@ -34,14 +34,15 @@
 			android:scrollbars="vertical"/>
 	</FrameLayout>
 
-	<TextView
+	<ImageView
 		android:id="@+id/empty_list"
-		android:layout_width="wrap_content"
+		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_gravity="center_horizontal"
 		android:gravity="center"
-		android:text="@string/no_lists"
-		android:visibility="gone"/>
+		android:src="@drawable/empty_lists"
+		android:background="#c6c6c6"
+		android:visibility="visible"/>
 
 	<ProgressBar
 		android:id="@+id/progressBar"

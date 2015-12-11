@@ -44,7 +44,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final String ADD_FRAGMENT_DATE = "addListDialog";
 	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
 	private RecyclerView mListsRV;
-	private TextView mEmptyText;
+	private ImageView mEmptyImage;
 	private RecyclerViewAdapter mAdapterRV;
 	private ProgressBar mProgressBar;
 	private FrameLayout mListsContainer;
@@ -81,7 +81,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mListsRV = (RecyclerView) v.findViewById(R.id.lists);
 		mListsRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-		mEmptyText = (TextView) v.findViewById(R.id.empty_list);
+		mEmptyImage = (ImageView) v.findViewById(R.id.empty_list);
 
 		mAdapterRV = new RecyclerViewAdapter();
 		mListsRV.setAdapter(mAdapterRV);
@@ -178,12 +178,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	private void showEmptyStates() {
 		mListsContainer.setVisibility(View.GONE);
-		mEmptyText.setVisibility(View.VISIBLE);
+		mEmptyImage.setVisibility(View.VISIBLE);
 	}
 
 	private void hideEmptyStates() {
 		mListsContainer.setVisibility(View.VISIBLE);
-		mEmptyText.setVisibility(View.GONE);
+		mEmptyImage.setVisibility(View.GONE);
 	}
 
 	private static class ListsCursorLoader extends CursorLoader {
