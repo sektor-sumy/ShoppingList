@@ -63,6 +63,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private ArrayList<ShoppingList> mItemsInList = new ArrayList<>();
 	private CollapsingToolbarLayout mToolbarLayout;
+	private ImageView mAppBarImage;
 	private FloatingActionButton mFAB;
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
@@ -160,10 +161,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		});
 		setTitle();
 
-		ImageView appBarImage = (ImageView) v.findViewById(R.id.appbar_image);
-		Image.create().insertImageToView(getActivity(),
-				mList.getImagePath(),
-				appBarImage);
+		mAppBarImage = (ImageView) v.findViewById(R.id.appbar_image);
+		loadImage();
 
 		mFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
 		mFAB.setOnClickListener(new View.OnClickListener() {
@@ -257,8 +256,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						itemsInListDS.setIsBought(isBought, item.getIdItem(), mList.getId());
 
 						//update recyclerView
-						//if set bought items in the end of list - refresh list
-						//if it isn`t - try to update only spent sum
+						//try to update spent sum
+						//if set bought items in the end of list - refresh position
 						mAdapterRV.getItem(position).setBought(isBought);
 
 						if (mIsBoughtEndInList) {
@@ -405,6 +404,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				break;
 			case EDIT_FRAGMENT_CODE:
 				getList(getArguments().getLong(ID_LIST));
+				loadImage();
 				setTitle();
 				updateSums(mSaveSpentMoney, mSaveTotalMoney);
 				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
@@ -449,6 +449,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private void setTitle() {
 		mToolbarLayout.setTitle(mList.getName());
+	}
+
+	private void loadImage() {
+		Image.create().insertImageToView(getActivity(),
+				mList.getImagePath(),
+				mAppBarImage);
 	}
 
 	private void showEmptyStates() {
