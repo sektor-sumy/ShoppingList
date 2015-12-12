@@ -117,14 +117,14 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		}
 
 		public class CurrencyViewHolder extends RecyclerViewAdapter<CurrencyViewHolder>.ViewHolder {
-			public final ImageView mImage;
+			public final ImageView mDefaultCurrency;
 
 			public CurrencyViewHolder(View v) {
 				super(v);
 
-				mImage = (ImageView) v.findViewById(R.id.default_value);
+				mDefaultCurrency = (ImageView) v.findViewById(R.id.default_value);
 
-				mImage.setOnClickListener(new View.OnClickListener() {
+				mDefaultCurrency.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						int itemPosition = getAdapterPosition();
@@ -143,7 +143,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 			}
 
 			private void setImage(int image) {
-				mImage.setImageResource(image);
+				mDefaultCurrency.setImageResource(image);
 			}
 
 			private void setImageSelected() {

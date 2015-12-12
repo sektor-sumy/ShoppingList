@@ -292,6 +292,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public void onResume() {
 		super.onResume();
 
+		getList(getArguments().getLong(ID_LIST));
+
 		getSettings();
 		updateData();
 	}
@@ -359,7 +361,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					mItemsInList = ((ShoppingListCursor) data).getEntities();
 					ShoppingList.sort(mItemsInList);
 
-					mAdapterRV.notifyDataSetChanged();     //update data in adapter
+					mAdapterRV.setCurrency(mList.getCurrency().getSymbol());     //update data in adapter
 
 					updateSums();
 					hideEmptyStates();

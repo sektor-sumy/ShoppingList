@@ -79,13 +79,13 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 	@Override
 	public void delete(long id) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		long idFavorite = prefs.getLong(mContext.getString(R.string.settings_key_currency), -1);
+		long idDefaultCurrency = prefs.getLong(mContext.getString(R.string.settings_key_currency), -1);
 
-		if (idFavorite == -1) {
-			idFavorite = getRandomId(id);
+		if (id == idDefaultCurrency) {
+			idDefaultCurrency = getRandomId(id);
 		}
 
-		new ListsDataSource(mContext).updateCurrency(id, idFavorite);
+		new ListsDataSource(mContext).updateCurrency(id, idDefaultCurrency);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.delete(CurrencyTable.TABLE_NAME, CurrencyTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
