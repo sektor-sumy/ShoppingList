@@ -50,7 +50,7 @@ import ru.android.ainege.shoppinglist.ui.Image;
 import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
-public abstract class ItemFragment extends Fragment implements SettingsDataItem {
+public abstract class ItemFragment extends Fragment implements SettingsDataItem, ImageFragmentInterface {
 	private static final String ID_ITEM = "idItem";
 	private static final int TAKE_PHOTO_CODE = 0;
 	private static final int LOAD_IMAGE_CODE = 1;
@@ -180,7 +180,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 
 		switch (requestCode) {
 			case TAKE_PHOTO_CODE:
-				new Image.BitmapWorkerTask(mFile,  metrics.widthPixels - 30, mAppBarImage).execute();
+				new Image.BitmapWorkerTask(mFile,  metrics.widthPixels - 30, this).execute();
 				break;
 			case LOAD_IMAGE_CODE:
 				Uri selectedImage = data.getData();
@@ -193,7 +193,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 
 					if (file != null) {
 						mImagePath = Image.PATH_PROTOCOL + file.getAbsolutePath();
-						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, mAppBarImage).execute();
+						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, this).execute();
 					} else {
 						Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
@@ -209,6 +209,11 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem 
 		super.onResume();
 
 		getSettings();
+	}
+
+	@Override
+	public void updateImage() {
+		loadImage();
 	}
 
 	void setView(View v) {

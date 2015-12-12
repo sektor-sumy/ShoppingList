@@ -7,18 +7,17 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.ui.fragments.ImageFragmentInterface;
 
 import static android.graphics.Bitmap.CompressFormat;
 import static android.graphics.Bitmap.createBitmap;
@@ -230,17 +229,16 @@ public class Image {
 		private File mFile;
 		private Bitmap mBitmap;
 		private int mWidthImageView;
-		private final WeakReference<ImageView> imageViewReference;
+		private ImageFragmentInterface mFragment;
 
-		public BitmapWorkerTask(File file, int widthImageView, ImageView imageView) {
+		public BitmapWorkerTask(File file, int widthImageView, ImageFragmentInterface fragment) {
 			mFile = file;
 			mWidthImageView = widthImageView;
-			imageViewReference = new WeakReference<>(imageView);
+			mFragment = fragment;
 		}
 
-		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, ImageView imageView) {
-			this(file, widthImageView, imageView);
-			//imageView.setImageResource(mLoadingImage);
+		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, ImageFragmentInterface fragment) {
+			this(file, widthImageView, fragment);
 			mBitmap = bitmap;
 		}
 
@@ -259,13 +257,8 @@ public class Image {
 
 		@Override
 		protected void onPostExecute(Boolean isSuccess) {
-			if (imageViewReference != null && isSuccess) {
-				final ImageView imageView = imageViewReference.get();
-				if (imageView != null) {
-					Image.create().insertImageToView(imageView.getContext(), getFilePath(mFile), imageView);
-				} else {
-					Toast.makeText(imageViewReference.get().getContext(), imageViewReference.get().getContext().getString(R.string.error_failed_get_file), Toast.LENGTH_SHORT).show();
-				}
+			if (isSuccess) {
+				mFragment.updateImage();
 			}
 		}
 	}

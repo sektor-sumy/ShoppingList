@@ -39,7 +39,7 @@ import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
 import ru.android.ainege.shoppinglist.ui.Image;
 
-public class ListDialogFragment extends DialogFragment {
+public class ListDialogFragment extends DialogFragment implements ImageFragmentInterface{
 	private static final String ID_LIST = "idList";
 	private static final String LIST = "list";
 
@@ -146,7 +146,7 @@ public class ListDialogFragment extends DialogFragment {
 		switch (requestCode) {
 			case TAKE_PHOTO_CODE:
 				deletePhotoFromGallery();
-				new Image.BitmapWorkerTask(mFile, metrics.widthPixels - 30, mImageList).execute();
+				new Image.BitmapWorkerTask(mFile, metrics.widthPixels - 30, this).execute();
 				break;
 			case LOAD_IMAGE_CODE:
 				Uri selectedImage = data.getData();
@@ -159,7 +159,7 @@ public class ListDialogFragment extends DialogFragment {
 
 					if (file != null) {
 						mImagePath = Image.PATH_PROTOCOL + file.getAbsolutePath();
-						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, mImageList).execute();
+						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, this).execute();
 					} else {
 						Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
@@ -190,6 +190,14 @@ public class ListDialogFragment extends DialogFragment {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void updateImage() {
+		loadImage();
+		if (getTargetFragment() != null) {
+			((ShoppingListFragment) getTargetFragment()).loadImage();
+		}
 	}
 
 	private SimpleCursorAdapter getSpinnerAdapter() {
@@ -231,7 +239,7 @@ public class ListDialogFragment extends DialogFragment {
 
 	private void loadImage() {
 		Image.create().insertImageToView(getActivity(), mImagePath, mImageList);
-	}
+ 	}
 
 	private void setRandomImage() {
 		String path;
