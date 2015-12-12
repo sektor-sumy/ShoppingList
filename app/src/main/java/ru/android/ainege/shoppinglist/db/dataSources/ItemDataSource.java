@@ -31,7 +31,7 @@ public class ItemDataSource extends GenericDataSource<Item> {
 	public ItemCursor getNames(String substring) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("Select * from " + ItemsTable.TABLE_NAME + " where " +
-				ItemsTable.COLUMN_NAME + " like '" + substring + "%';", null);
+				ItemsTable.COLUMN_NAME + " like '%" + substring + "%';", null);
 		return new ItemCursor(cursor);
 	}
 
