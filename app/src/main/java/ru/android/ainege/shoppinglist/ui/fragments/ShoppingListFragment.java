@@ -601,11 +601,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		public void toggleSelection(int position) {
+			toggleSelection(position, true);
+		}
+
+		public void toggleSelection(int position, boolean removeIfExist) {
 			if (mSelectedItems.contains(position)) {
-				for (int i = 0; i < mSelectedItems.size(); i++) {
-					if (mSelectedItems.get(i) == position) {
-						mSelectedItems.remove(i);
-						break;
+				if (removeIfExist) {
+					for (int i = 0; i < mSelectedItems.size(); i++) {
+						if (mSelectedItems.get(i) == position) {
+							mSelectedItems.remove(i);
+							break;
+						}
 					}
 				}
 			} else {
@@ -620,15 +626,23 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		public void selectItems(boolean isBought) {
-			for (ShoppingList item : mItemsInList) {
-				if (item.isBought() == isBought) {
-					int position = mItemsInList.indexOf(item);
+			boolean isAllSelected = checkAllSelected(isBought);
+			for (int position = 0; position < mItemsInList.size(); position++) {
+				if (mItemsInList.get(position).isBought() == isBought) {
+					toggleSelection(position, isAllSelected);
+				}
+			}
+		}
+
+		private boolean checkAllSelected(boolean isBought){
+			for (int position = 0; position < mItemsInList.size(); position++) {
+				if (mItemsInList.get(position).isBought() == isBought) {
 					if (!mSelectedItems.contains(position)) {
-						mSelectedItems.add(position);
-						notifyItemChanged(position);
+						return false;
 					}
 				}
 			}
+			return true;
 		}
 
 		public ArrayList<Integer> getSelectedItems() {
