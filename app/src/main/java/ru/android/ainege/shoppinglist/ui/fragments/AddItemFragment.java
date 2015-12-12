@@ -174,8 +174,8 @@ public class AddItemFragment extends ItemFragment {
 					double amount = item.getAmount();
 					if (amount > 0) {
 						mAmount.setText(new DecimalFormat("#.######").format(amount));
-						mUnits.setSelection((int) item.getIdUnit());
 					}
+					mUnits.setSelection((int) item.getIdUnit());
 					double price = item.getPrice();
 					if (price > 0) {
 						mPrice.setText(String.format("%.2f", price));

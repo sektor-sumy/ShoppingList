@@ -129,10 +129,8 @@ public class EditItemFragment extends ItemFragment {
 
 		if (mItemInList.getAmount() != 0) {
 			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getAmount()));
-			mUnits.setSelection(getPosition(mUnits, mItemInList.getUnit().getId()));
-		} else {
-			mUnits.setSelection(0);
 		}
+		mUnits.setSelection(getPosition(mUnits, mItemInList.getUnit().getId()));
 
 		if (mItemInList.getPrice() != 0) {
 			mPrice.setText(String.format("%.2f", mItemInList.getPrice()));
