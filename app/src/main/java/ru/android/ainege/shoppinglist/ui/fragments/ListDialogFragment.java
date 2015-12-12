@@ -4,13 +4,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.Toolbar;
@@ -142,7 +145,8 @@ public class ListDialogFragment extends DialogFragment {
 
 		switch (requestCode) {
 			case TAKE_PHOTO_CODE:
-				new Image.BitmapWorkerTask(mFile,  metrics.widthPixels - 30, mImageList).execute();
+				deletePhotoFromGallery();
+				new Image.BitmapWorkerTask(mFile, metrics.widthPixels - 30, mImageList).execute();
 				break;
 			case LOAD_IMAGE_CODE:
 				Uri selectedImage = data.getData();
@@ -233,7 +237,7 @@ public class ListDialogFragment extends DialogFragment {
 		String path;
 		do {
 			path = Image.LIST_IMAGE_PATH + "random_list_" + (new Random().nextInt(4) + 1) + ".jpg";
-		} while(path.equals(mImagePath));
+		} while (path.equals(mImagePath));
 		mImagePath = path;
 		loadImage();
 	}
@@ -275,5 +279,23 @@ public class ListDialogFragment extends DialogFragment {
 			return;
 
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, new Intent().putExtra(ID_LIST, id));
+	}
+
+	private void deletePhotoFromGallery() {
+		String[] projection = { BaseColumns._ID, MediaStore.Images.ImageColumns.DATE_TAKEN };
+
+		Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+
+		if ((cursor != null) && (cursor.moveToFirst())) {
+			String id = cursor.getString(cursor.getColumnIndex(BaseColumns._ID));
+			long date = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN));
+
+			if (Math.abs(date - mFile.lastModified()) < 5000) {
+				ContentResolver cr = getActivity().getContentResolver();
+				cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, BaseColumns._ID + "=" + id, null);
+			}
+			cursor.close();
+		}
 	}
 }
