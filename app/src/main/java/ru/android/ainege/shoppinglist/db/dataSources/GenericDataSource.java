@@ -14,7 +14,7 @@ public abstract class GenericDataSource<T> {
 
 	GenericDataSource(Context context) {
 		mContext = context;
-		mDbHelper = new ShoppingListSQLiteHelper(mContext);
+		mDbHelper = ShoppingListSQLiteHelper.getInstance(context);
 	}
 
 	public abstract int update(T currency);

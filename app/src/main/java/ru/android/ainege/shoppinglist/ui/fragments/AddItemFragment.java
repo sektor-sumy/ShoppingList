@@ -15,8 +15,7 @@ import android.widget.SimpleCursorAdapter;
 import java.text.DecimalFormat;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.ui.Image;
@@ -110,8 +109,7 @@ public class AddItemFragment extends ItemFragment {
 					}
 					//Check is the item in the list. If there is a warning display
 					//If it isn`t, check is it in the catalog of items. If there is select it
-					ShoppingListCursor cursor = ShoppingListDataSource.getInstance(getActivity()).
-							existItemInList(s.toString().trim(), getIdList());
+					ShoppingListCursor cursor = mItemsInListDS.existItemInList(s.toString().trim(), getIdList());
 					if (cursor.moveToFirst()) {
 						mInfo.setText(R.string.info_exit_item_in_list);
 						mInfo.setVisibility(View.VISIBLE);
@@ -119,7 +117,7 @@ public class AddItemFragment extends ItemFragment {
 					} else {
 						mInfo.setVisibility(View.GONE);
 						if (mIsProposedItem) {
-							ItemDataSource.ItemCursor cursorItem = new ItemDataSource(getActivity()).getByName(s.toString().trim());
+							ItemCursor cursorItem = mItemDS.getByName(s.toString().trim());
 							if (cursorItem.moveToFirst()) {
 								mIdSelectedItem = cursorItem.getEntity().getId();
 							}
@@ -139,7 +137,7 @@ public class AddItemFragment extends ItemFragment {
 		return super.getCompleteTextAdapter(new FilterQueryProvider() {
 			@Override
 			public Cursor runQuery(CharSequence charSequence) {
-				Cursor managedCursor = new ItemDataSource(getActivity()).getNames(charSequence != null ? charSequence.toString().trim() : null);
+				Cursor managedCursor = mItemDS.getNames(charSequence != null ? charSequence.toString().trim() : null);
 				if (managedCursor.moveToFirst()) {
 					mIsProposedItem = true;
 				}
@@ -163,7 +161,7 @@ public class AddItemFragment extends ItemFragment {
 					mAddedPrice = mPrice.getText().toString();
 					mAddedComment = mComment.getText().toString();
 
-					ItemDataSource.ItemCursor c = new ItemDataSource(getActivity()).get(mIdSelectedItem);
+					ItemCursor c = mItemDS.get(mIdSelectedItem);
 					c.moveToFirst();
 					Item item = c.getEntity();
 					c.close();
@@ -200,7 +198,6 @@ public class AddItemFragment extends ItemFragment {
 				!mPriceInputLayout.isErrorEnabled()) {
 			Item item = getItem();
 			setImagePath(item);
-			ItemDataSource itemDS = new ItemDataSource(getActivity());
 
 			if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
 				updateItem(item);
@@ -213,17 +210,16 @@ public class AddItemFragment extends ItemFragment {
 					if (mIdSelectedItem != -1) {
 						idItem = mIdSelectedItem;
 					} else {
-						idItem = (int) itemDS.add(new Item(getName(), mImagePath, mImagePath));
+						idItem = (int) mItemDS.add(new Item(getName(), mImagePath, mImagePath));
 					}
 				}
 				item.setId(idItem);
 
 				//Save item to list
-				ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance(getActivity());
 				if (mInfo.getVisibility() == View.VISIBLE) { //If item in list, update it
-					itemInListDS.update(getItemInList(item));
+					mItemsInListDS.update(getItemInList(item));
 				} else { //Add new item to list
-					idItem = itemInListDS.add(getItemInList(item));
+					idItem = mItemsInListDS.add(getItemInList(item));
 				}
 				sendResult(idItem);
 			}
@@ -243,12 +239,11 @@ public class AddItemFragment extends ItemFragment {
 	}
 
 	private void updateItem(Item item) {
-		ItemDataSource itemDS = new ItemDataSource(getActivity());
 		if (mIdSelectedItem != -1) {
 			item.setId(mIdSelectedItem);
-			itemDS.update(item);
+			mItemDS.update(item);
 		} else {
-			mIdSelectedItem = (int) itemDS.add(item);
+			mIdSelectedItem = (int) mItemDS.add(item);
 		}
 	}
 

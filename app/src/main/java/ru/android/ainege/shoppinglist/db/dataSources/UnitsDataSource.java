@@ -50,7 +50,7 @@ public class UnitsDataSource extends DictionaryDataSource<Unit> {
 
 	@Override
 	public void delete(long id) {
-		ShoppingListDataSource.getInstance().updateUnit(id, getRandomId(id));
+		new ShoppingListDataSource(mContext).updateUnit(id, getRandomId(id));
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.delete(UnitsTable.TABLE_NAME, UnitsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});

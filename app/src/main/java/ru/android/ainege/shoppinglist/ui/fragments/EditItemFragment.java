@@ -15,12 +15,12 @@ import android.widget.Spinner;
 import java.text.DecimalFormat;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
-import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+
+import static ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource.*;
 
 public class EditItemFragment extends ItemFragment {
 	private static final String ITEM_IN_LIST = "itemInList";
@@ -81,12 +81,11 @@ public class EditItemFragment extends ItemFragment {
 				} else {
 					disableError(mNameInputLayout);
 					//Check is the item in the list or catalog of items. If there is a warning display
-					ShoppingListCursor cursor = ShoppingListDataSource.getInstance(getActivity()).
-							existItemInList(s.toString().trim(), mItemInList.getIdList());
+					ShoppingListCursor cursor = mItemsInListDS.existItemInList(s.toString().trim(), mItemInList.getIdList());
 					showInfo(cursor.moveToFirst() && !cursor.getEntity().getItem().getName().equals(mItemInList.getItem().getName()));
 					cursor.close();
 					if (mIsProposedItem) {
-						ItemDataSource.ItemCursor cursorItem = new ItemDataSource(getActivity()).getByName(s.toString().trim());
+						ItemCursor cursorItem = mItemDS.getByName(s.toString().trim());
 						showInfo(cursorItem.moveToFirst() && !cursorItem.getEntity().getName().equals(mItemInList.getItem().getName()));
 						cursorItem.close();
 					}
@@ -110,7 +109,7 @@ public class EditItemFragment extends ItemFragment {
 			public Cursor runQuery(CharSequence charSequence) {
 				Cursor managedCursor = null;
 				if (!charSequence.equals(mItemInList.getItem().getName())) {
-					managedCursor = new ItemDataSource(getActivity()).getNames(charSequence.toString().trim());
+					managedCursor = mItemDS.getNames(charSequence.toString().trim());
 					if (managedCursor.moveToFirst()) {
 						mIsProposedItem = true;
 					}
@@ -144,7 +143,7 @@ public class EditItemFragment extends ItemFragment {
 	private int getPosition(Spinner spinner, long id) {
 		int index = 0;
 		for (int i = 0; i < spinner.getCount(); i++) {
-			if (((UnitsDataSource.UnitCursor) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
+			if (((UnitCursor) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
 				index = i;
 				break;
 			}
@@ -163,39 +162,36 @@ public class EditItemFragment extends ItemFragment {
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
 				!mPriceInputLayout.isErrorEnabled()) {
 			Item item = getItem();
-			ItemDataSource itemDS = new ItemDataSource(getActivity());
 
 			if (getName().equals(mItemInList.getItem().getName())) { //name doesn`t change
 				if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
-					itemDS.update(getItem());
+					mItemDS.update(getItem());
 				} else {
 					if (mIsAlwaysSave) {  //Always save default data
-						itemDS.update(getItem());
+						mItemDS.update(getItem());
 					} else { //Don`t save default data
-						itemDS.update(new Item(mItemInList.getIdItem(), getName(), mImagePath));
+						mItemDS.update(new Item(mItemInList.getIdItem(), getName(), mImagePath));
 					}
 
 					//Update item in list
-					ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance(getActivity());
-					itemInListDS.update(getItemInList(item));
+					mItemsInListDS.update(getItemInList(item));
 					sendResult(mItemInList.getIdItem());
 				}
 				isSave = true;
 			} else {
 				if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
-					addItem(item, itemDS);
+					addItem(item);
 				} else {
 					long idItem;
 					if (mIsAlwaysSave) { //Always save default data
-						idItem = (int) addItem(item, itemDS);
+						idItem = (int) addItem(item);
 					} else { //Don`t save default data
-						idItem = (int) itemDS.add(new Item(getName(), mImagePath, mImagePath));
+						idItem = (int) mItemDS.add(new Item(getName(), mImagePath, mImagePath));
 					}
 					item.setId(idItem);
 
 					//Update item in list
-					ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance(getActivity());
-					itemInListDS.update(getItemInList(item), mItemInList.getIdItem());
+					mItemsInListDS.update(getItemInList(item), mItemInList.getIdItem());
 					sendResult(mItemInList.getIdItem());
 				}
 				isSave = true;
@@ -224,8 +220,8 @@ public class EditItemFragment extends ItemFragment {
 		return item;
 	}
 
-	private long addItem (Item item, ItemDataSource itemDS){
+	private long addItem (Item item){
 	    item.setDefaultImagePath(mImagePath);
-		return itemDS.add(item);
+		return mItemDS.add(item);
 	}
 }

@@ -41,6 +41,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource.CurrencyCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
@@ -50,10 +51,16 @@ import ru.android.ainege.shoppinglist.ui.Image;
 import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
+import static ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.*;
+import static ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource.*;
+
 public abstract class ItemFragment extends Fragment implements SettingsDataItem, ImageFragmentInterface {
 	private static final String ID_ITEM = "idItem";
 	private static final int TAKE_PHOTO_CODE = 0;
 	private static final int LOAD_IMAGE_CODE = 1;
+
+	ItemDataSource mItemDS;
+	ShoppingListDataSource mItemsInListDS;
 
 	protected String mDataSave;
 
@@ -92,6 +99,9 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 		getSettings();
+
+		mItemDS = new ItemDataSource(getActivity());
+		mItemsInListDS = new ShoppingListDataSource(getActivity());
 
 		if (ALWAYS_SAVE_DATA.equals(mDataSave)) {
 			mIsAlwaysSave = true;
@@ -258,7 +268,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 		completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
 			@Override
 			public CharSequence convertToString(Cursor cursor) {
-				return ((ItemDataSource.ItemCursor) cursor).getEntity().getName();
+				return ((ItemCursor) cursor).getEntity().getName();
 			}
 		});
 		return completeTextAdapter;
@@ -281,7 +291,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 		if (mAmount.getText().length() > 0) {
 			amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
 		}
-		long idUnit = ((UnitsDataSource.UnitCursor) mUnits.getSelectedItem()).getEntity().getId();
+		long idUnit = ((UnitCursor) mUnits.getSelectedItem()).getEntity().getId();
 		double price = 0.0;
 		if (mPrice.getText().length() > 0) {
 			price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));

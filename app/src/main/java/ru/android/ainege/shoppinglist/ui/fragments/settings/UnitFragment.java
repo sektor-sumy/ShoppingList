@@ -40,13 +40,7 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 
 	@Override
 	protected boolean isEntityUsed(long idUnit) {
-		ShoppingListDataSource itemsInListDS;
-		try {
-			itemsInListDS = ShoppingListDataSource.getInstance();
-		} catch (NullPointerException e) {
-			itemsInListDS = ShoppingListDataSource.getInstance(getActivity());
-		}
-		return itemsInListDS.isUnitUsed(idUnit);
+		return new ShoppingListDataSource(getActivity()).isUnitUsed(idUnit);
 	}
 
 	@Override

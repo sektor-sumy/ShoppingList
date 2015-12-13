@@ -39,6 +39,8 @@ import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
 import ru.android.ainege.shoppinglist.ui.Image;
 
+import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource.*;
+
 public class ListDialogFragment extends DialogFragment implements ImageFragmentInterface{
 	private static final String ID_LIST = "idList";
 	private static final String LIST = "list";
@@ -228,7 +230,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	private int getPosition(Spinner spinner, long idCurrency) {
 		int index = 0;
 		for (int i = 0; i < spinner.getCount(); i++) {
-			long id = ((CurrenciesDataSource.CurrencyCursor) spinner.getItemAtPosition(i)).getEntity().getId();
+			long id = ((CurrencyCursor) spinner.getItemAtPosition(i)).getEntity().getId();
 			if (id == idCurrency) {
 				index = i;
 				break;
@@ -262,7 +264,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		}
 
 		if (!mNameInputLayout.isErrorEnabled()) {
-			long idCurrency = ((CurrenciesDataSource.CurrencyCursor) mCurrency.getSelectedItem()).getEntity().getId();
+			long idCurrency = ((CurrencyCursor) mCurrency.getSelectedItem()).getEntity().getId();
 
 			ListsDataSource listDS = new ListsDataSource(getActivity());
 

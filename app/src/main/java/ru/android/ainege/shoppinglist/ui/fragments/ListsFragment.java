@@ -22,7 +22,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -37,12 +36,15 @@ import ru.android.ainege.shoppinglist.ui.Image;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
+import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.*;
+
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int ADD_FRAGMENT_CODE = 1;
 	private static final int EDIT_FRAGMENT_CODE = 2;
 	private static final int DATA_LOADER = 0;
 	private static final String ADD_FRAGMENT_DATE = "addListDialog";
 	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
+	private ListsDataSource mListsDS;
 	private RecyclerView mListsRV;
 	private ImageView mEmptyImage;
 	private RecyclerViewAdapter mAdapterRV;
@@ -54,6 +56,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		super.onCreate(savedInstanceState);
 
 		setHasOptionsMenu(true);
+
+		mListsDS = new ListsDataSource(getActivity());
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
 
@@ -137,7 +141,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				}
 
 				if (data.moveToFirst()) {
-					mLists = ((ListsDataSource.ListCursor) data).getEntities();
+					mLists = ((ListCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
 					hideEmptyStates();
 				} else {
@@ -194,9 +198,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		@Override
 		public Cursor loadInBackground() {
-			ListsDataSource mListsDS = new ListsDataSource(mContext);
-
-			return mListsDS.getAll();
+			return new ListsDataSource(mContext).getAll();
 		}
 	}
 
@@ -283,8 +285,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						int itemPosition = getAdapterPosition();
 						List list = mLists.get(itemPosition);
 
-						ListsDataSource listsDS = new ListsDataSource(getActivity());
-						listsDS.delete(list.getId());
+						mListsDS.delete(list.getId());
 						removeItem(itemPosition);
 
 						Image.deleteFile(list.getImagePath());

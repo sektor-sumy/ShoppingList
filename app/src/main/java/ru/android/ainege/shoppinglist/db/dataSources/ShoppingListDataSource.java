@@ -15,26 +15,9 @@ import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
-	private static ShoppingListDataSource instance;
 
-	private ShoppingListDataSource(Context context) {
+	public ShoppingListDataSource(Context context) {
 		super(context);
-	}
-
-	public static ShoppingListDataSource getInstance(Context context) {
-		if (instance == null) {
-			instance = new ShoppingListDataSource(context);
-		}
-
-		return instance;
-	}
-
-	public static ShoppingListDataSource getInstance() {
-		if (instance == null) {
-			throw new NullPointerException();
-		}
-
-		return instance;
 	}
 
 	public ShoppingListCursor getItemsInList(long id) {

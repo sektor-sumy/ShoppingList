@@ -49,6 +49,8 @@ import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 
+import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.*;
+
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final String ID_LIST = "idList";
@@ -60,6 +62,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private static final int ADD_ACTIVITY_CODE = 0;
 	private static final int EDIT_ACTIVITY_CODE = 1;
+
+	private ShoppingListDataSource mItemsInListDS;
+	private ListsDataSource mListsDS;
 
 	private ArrayList<ShoppingList> mItemsInList = new ArrayList<>();
 	private CollapsingToolbarLayout mToolbarLayout;
@@ -139,6 +144,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		setHasOptionsMenu(true);
 		getSettings();
+
+		mItemsInListDS = new ShoppingListDataSource(getActivity());
+		mListsDS = new ListsDataSource(getActivity());
 		getList(getArguments().getLong(ID_LIST));
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
@@ -246,14 +254,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						}
 
 						//update data in db
-						ShoppingListDataSource itemsInListDS;
-						try {
-							itemsInListDS = ShoppingListDataSource.getInstance();
-						} catch (NullPointerException e) {
-							itemsInListDS = ShoppingListDataSource.getInstance(getActivity());
-						}
 						ShoppingList item = mItemsInList.get(position);
-						itemsInListDS.setIsBought(isBought, item.getIdItem(), mList.getId());
+						mItemsInListDS.setIsBought(isBought, item.getIdItem(), mList.getId());
 
 						//update recyclerView
 						//try to update spent sum
@@ -396,8 +398,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				updateData();
 				break;
 			case ANSWER_FRAGMENT_CODE:
-				ListsDataSource listsDS = new ListsDataSource(getActivity());
-				listsDS.delete(mList.getId());
+				mListsDS.delete(mList.getId());
 				Image.deleteFile(mList.getImagePath());
 
 				getActivity().onBackPressed();
@@ -439,7 +440,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void getList(long idList) {
-		ListsDataSource.ListCursor cursor = new ListsDataSource(getActivity()).get(idList);
+		ListCursor cursor = mListsDS.get(idList);
 		if (cursor.moveToFirst()) {
 			mList = cursor.getEntity();
 		}
@@ -478,10 +479,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		ArrayList<Integer> items = mAdapterRV.getSelectedItems();
 		Collections.sort(items);
 
-		ShoppingListDataSource itemInListDS = ShoppingListDataSource.getInstance();
 		for (int i = items.size() - 1; i >= 0; i--) {
 			int position = items.get(i);
-			itemInListDS.delete(mItemsInList.get(position).getIdItem(), mList.getId());
+			mItemsInListDS.delete(mItemsInList.get(position).getIdItem(), mList.getId());
 			mAdapterRV.removeItem(position);
 
 			if (mItemsInList.size() > 0) {
@@ -686,14 +686,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		@Override
 		public Cursor loadInBackground() {
-			ShoppingListDataSource mItemsInListDS;
-			try {
-				mItemsInListDS = ShoppingListDataSource.getInstance();
-			} catch (NullPointerException e) {
-				mItemsInListDS = ShoppingListDataSource.getInstance(mContext);
-			}
-
-			return mItemsInListDS.getItemsInList(mIdList);
+			return new ShoppingListDataSource(mContext).getItemsInList(mIdList);
 		}
 	}
 }

@@ -11,12 +11,21 @@ import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
-
 	private static final String DATABASE_NAME = "shoppingList.db";
 	private static final int DATABASE_VERSION = 1;
 
-	public ShoppingListSQLiteHelper(Context context) {
+	private static ShoppingListSQLiteHelper instance;
+
+	private ShoppingListSQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+	}
+
+	public static ShoppingListSQLiteHelper getInstance(Context context) {
+		if (instance == null) {
+			instance = new ShoppingListSQLiteHelper(context.getApplicationContext());
+		}
+
+		return instance;
 	}
 
 	@Override
@@ -25,6 +34,13 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 		if (!db.isReadOnly()) {
 			db.execSQL("PRAGMA foreign_keys = ON;");
 		}
+	}
+
+	@Override
+	public synchronized void close() {
+		super.close();
+
+		instance = null;
 	}
 
 	@Override
