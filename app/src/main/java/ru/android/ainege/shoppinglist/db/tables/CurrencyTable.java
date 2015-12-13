@@ -1,7 +1,11 @@
 package ru.android.ainege.shoppinglist.db.tables;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+
+import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 
 public class CurrencyTable {
 
@@ -11,6 +15,9 @@ public class CurrencyTable {
 	public static final String COLUMN_NAME = "currency_name";
 	public static final String COLUMN_SYMBOL = "symbol";
 
+	private static final int INIT_DATA_NAME = 0;
+	private static final int INIT_DATA_SYMBOL = 1;
+
 	private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
 			+ "("
 			+ COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -18,34 +25,17 @@ public class CurrencyTable {
 			+ COLUMN_SYMBOL + " TEXT"
 			+ ");";
 
-	public static void onCreate(SQLiteDatabase database) {
+	public static void onCreate(SQLiteDatabase database, Context ctx) {
 		database.execSQL(TABLE_CREATE);
-		initialData(database);
+
+		initialData(database, ShoppingListSQLiteHelper.parseInitData(ctx.getResources().getStringArray(R.array.currency)));
 	}
 
-	public static void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-		database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-		onCreate(database);
-	}
-
-	private static void initialData(SQLiteDatabase database) {
-		String[] name = {
-				"рубль",
-				"гривна",
-				"доллар",
-				"евро",
-		};
-		String[] symbol = {
-				"\u20BD",
-				"\u20B4",
-				"\u0024",
-				"\u20AC",
-		};
-
-		for (int i = 0; i < name.length; i++) {
+	private static void initialData(SQLiteDatabase database, String[][] initData) {
+		for (String[] currencyData : initData) {
 			ContentValues contentValue = new ContentValues();
-			contentValue.put(COLUMN_NAME, name[i]);
-			contentValue.put(COLUMN_SYMBOL, symbol[i]);
+			contentValue.put(COLUMN_NAME, currencyData[INIT_DATA_NAME]);
+			contentValue.put(COLUMN_SYMBOL, currencyData[INIT_DATA_SYMBOL]);
 			database.insert(TABLE_NAME, null, contentValue);
 		}
 	}

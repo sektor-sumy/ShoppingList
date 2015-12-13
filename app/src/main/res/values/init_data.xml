@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="items">
+		<!--Хлебо-булочные-->
+		<item>Хлеб—шт—bread.jpg</item>
+		<item>Батон—шт—baton.jpg</item>
+		<item>Пирожное—шт—cake.jpg</item>
+		<item>Торт—шт—big cake.jpg</item>
+		<!--Кондитерская-->
+		<item>Конфеты—уп—candies.jpg</item>
+		<item>Шоколадка—шт—chocolate.jpg</item>
+		<item>Вафли—уп—wafer.jpg</item>
+		<item>Зефир—уп—zephyr.jpg</item>
+		<!--Чай/кофе-->
+		<item>Черный чай—уп—tea.jpg</item>
+		<item>Зеленый чай—уп—green tea.jpg</item>
+		<item>Кофе—уп—coffee.jpg</item>
+		<!--Замороженная продукция-->
+		<item>Рыба—кг—fish.jpg</item>
+		<item>Креветки—кг—shrimp.jpg</item>
+		<!--Мясо-->
+		<item>Колбаса—кг—sausage.jpg</item>
+		<item>Сосиски—кг—frankfurters.jpg</item>
+		<item>Мясо—кг—meat.jpg</item>
+		<item>Курица—кг—chicken.jpg</item>
+		<!--Молочное-->
+		<item>Сыр—кг—cheese.jpg</item>
+		<item>Молоко—уп—milk.jpg</item>
+		<item>Творог—уп—cottage cheese.jpg</item>
+		<item>Сметана—уп—sour cream.jpg</item>
+		<item>Кефир—уп—kefir.jpg</item>
+		<item>Сливочное масло—уп—butter.jpg</item>
+		<item>Сгущенка—шт—condensed milk.jpg</item>
+		<item>Мороженое—шт—ice cream.jpg</item>
+		<item>Яйца—уп—eggs.jpg</item>
+		<!--Овощи-->
+		<item>Картофель—кг—potato.jpg</item>
+		<item>Капуста—кг—cabbage.jpg</item>
+		<item>Морковка—кг—carrot.jpg</item>
+		<item>Помидор—кг—tomato.jpg</item>
+		<item>Огурец—кг—cucumber.jpg</item>
+		<item>Чеснок—кг—garlic.jpg</item>
+		<item>Лук—кг—onion.jpg</item>
+		<item>Грибы—кг—mushrooms.jpg</item>
+		<item>Кукуруза—кг—corn.jpg</item>
+		<!--Фрукты-->
+		<item>Виноград—кг—grapes.jpg</item>
+		<item>Яблоки—кг—typo.jpg</item>
+		<item>Апельсины—кг—orange.jpg</item>
+		<item>Мандарины—кг—mandarin.jpg</item>
+		<item>Ананас—кг—pineapple.jpg</item>
+		<item>Бананы—кг—banana.jpg</item>
+		<item>Лимон—кг—lemon.jpg</item>
+		<!--Зелень-->
+		<item>Укроп—уп—dill.jpg</item>
+		<item>Салат—уп—salad.jpg</item>
+		<!--Алкоголь-->
+		<item>Вино—бут—wine.jpg</item>
+		<item>Пиво—бут—beer.jpg</item>
+		<item>Водка—бут—vodka.jpg</item>
+		<item>Коньяк—бут—cognac.jpg</item>
+		<item>Шампанское—бут—champagne.jpg</item>
+		<item>Минеральная вода—бут—water.jpg</item>
+		<item>Сок—бут—juice.jpg</item>
+		<!--Специи и соусы-->
+		<item>Майонез—шт—mayonnaise.jpg</item>
+		<item>Кетчуп—шт—ketchup.jpg</item>
+		<item>Соль—шт—salt.jpg</item>
+		<item>Сахар—кг—sugar.jpg</item>
+		<item>Растительное масло—бут—vegetable oil.jpg</item>
+		<!--Круппы/маакроны-->
+		<item>Макароны—уп—pasta.jpg</item>
+		<item>Гречка—уп—buckwheat.jpg</item>
+		<item>Рис—уп—rice.jpg</item>
+		<item>Чечевица—уп—lentil.jpg</item>
+		<item>Пшено—уп—millet.jpg</item>
+		<item>Мука—уп—flour.jpg</item>
+		<item>Горох—уп—peas.jpg</item>
+		<item>Фасоль—уп—beans.jpg</item>
+		<!--Химия-->
+		<item>Стиральный порошок—уп—powder.jpg</item>
+		<item>Зубная паста—уп—toothpaste.jpg</item>
+		<item>Шампунь—шт—shampoo.jpg</item>
+		<item>Мыло—уп—soap.jpg</item>
+		<item>Гель для душа—шт—shower gel.jpg</item>
+		<item>Моющее средство—шт—cleanser.jpg</item>
+		<!--Разное-->
+		<item>Спички—уп—matches.jpg</item>
+		<item>Мешки для мусора—уп—garbage bags.jpg</item>
+		<item>Салфетки—уп—napkins.jpg</item>
+		<item>Туалетная бумага—уп—toilet paper.jpg</item>
+	</string-array>
+
+	<string-array name="units">
+		<item>шт</item>
+		<item>уп</item>
+		<item>бут</item>
+		<item>кг</item>
+		<item>л</item>
+	</string-array>
+
+	<string-array name="currency">
+		<item>Рубль—\u20BD</item>
+		<item>Белорусский рубль—Br</item>
+		<item>Доллар—\u0024</item>
+		<item>Евро—\u20AC</item>
+		<item>Гривна—\u20B4</item>
+		<item>Тенге—\u20B8</item>
+		<item>Лари—Lari</item>
+		<item>Манат—\u20BC</item>
+		<item>Драм—դր</item>
+	</string-array>
+</resources>

@@ -1,8 +1,13 @@
 package ru.android.ainege.shoppinglist.db.tables;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.List;
+
+import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 import ru.android.ainege.shoppinglist.ui.Image;
 
 public class ItemsTable {
@@ -18,6 +23,10 @@ public class ItemsTable {
 	public static final String COLUMN_DEFAULT_IMAGE_PATH = "item_default_image_path";
 	public static final String COLUMN_IMAGE_PATH = "image_image_path";
 
+	private static final int INIT_DATA_NAME = 0;
+	private static final int INIT_DATA_UNIT = 1;
+	private static final int INIT_DATA_IMAGE = 2;
+
 	private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
 			+ "("
 			+ COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -31,60 +40,24 @@ public class ItemsTable {
 			+ "FOREIGN KEY (" + COLUMN_ID_UNIT + ") REFERENCES " + UnitsTable.TABLE_NAME + " (" + UnitsTable.COLUMN_ID + ") ON DELETE SET NULL"
 			+ ");";
 
-	public static void onCreate(SQLiteDatabase database) {
+	public static void onCreate(SQLiteDatabase database, Context ctx) {
 		database.execSQL(TABLE_CREATE);
-		initialData(database);
+		String[] units = ctx.getResources().getStringArray(R.array.units);
+		String[][] initData = ShoppingListSQLiteHelper.parseInitData(ctx.getResources().getStringArray(R.array.items));
+
+		initialData(database, initData, java.util.Arrays.asList(units));
 	}
 
-	public static void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-		database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-		onCreate(database);
-	}
 
-	private static void initialData(SQLiteDatabase database) {
-		String[] item = {
-				"молоко",
-				"хлеб",
-				"масло сливочное",
-				"черный чай",
-				"рис",
-				"гречка",
-		};
-		double[] amount = {10, 11, 0, 20, 13, 14};
-		int[] amountUnit = {2, 2, 2, 1, 1, 1};
-		double[] price = {1055.00, 0, 1066, 1087, 1070, 1005};
-		String[] comment = {
-				"",
-				"буханка белого",
-				"проверь дату изготовления",
-				"крупнолистовой",
-				"",
-				"не жареная",
-		};
-
-		String[] defaultImagePath = {Image.LIST_IMAGE_PATH + "random_list_1.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_1.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_1.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_1.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_1.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_1.jpg"};
-
-		String[] imagePath = {Image.LIST_IMAGE_PATH + "random_list_5.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_4.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_5.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_3.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_4.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_3.jpg"};
-
-		for (int i = 0; i < item.length; i++) {
+	private static void initialData(SQLiteDatabase database, String[][] initData, List<String> units) {
+		for (String[] itemData : initData) {
 			ContentValues contentValue = new ContentValues();
-			contentValue.put(COLUMN_NAME, item[i]);
-			contentValue.put(COLUMN_AMOUNT, amount[i]);
-			contentValue.put(COLUMN_ID_UNIT, amountUnit[i]);
-			contentValue.put(COLUMN_PRICE, price[i]);
-			contentValue.put(COLUMN_COMMENT, comment[i]);
-			contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, defaultImagePath[i]);
-			contentValue.put(COLUMN_IMAGE_PATH, imagePath[i]);
+
+			contentValue.put(COLUMN_NAME, itemData[INIT_DATA_NAME]);
+			contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
+			contentValue.put(COLUMN_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
+			contentValue.put(COLUMN_ID_UNIT, units.indexOf(itemData[INIT_DATA_UNIT]) + 1);
+
 			database.insert(TABLE_NAME, null, contentValue);
 		}
 	}

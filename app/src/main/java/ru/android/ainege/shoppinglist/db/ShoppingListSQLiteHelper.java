@@ -13,11 +13,12 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "shoppingList.db";
 	private static final int DATABASE_VERSION = 1;
-
 	private static ShoppingListSQLiteHelper instance;
+	private final Context mCtx;
 
 	private ShoppingListSQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		mCtx = context;
 	}
 
 	public static ShoppingListSQLiteHelper getInstance(Context context) {
@@ -26,6 +27,15 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 		}
 
 		return instance;
+	}
+
+	public static String[][] parseInitData(String[] data) {
+		String[][] response = new String[data.length][];
+		for (int i = 0; i < data.length; i++) {
+			response[i] = data[i].split("—");
+		}
+
+		return response;
 	}
 
 	@Override
@@ -45,10 +55,10 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase sqLiteDatabase) {
-		CurrencyTable.onCreate(sqLiteDatabase);
-		UnitsTable.onCreate(sqLiteDatabase);
+		CurrencyTable.onCreate(sqLiteDatabase, mCtx);
+		UnitsTable.onCreate(sqLiteDatabase, mCtx);
+		ItemsTable.onCreate(sqLiteDatabase, mCtx);
 		ListsTable.onCreate(sqLiteDatabase);
-		ItemsTable.onCreate(sqLiteDatabase);
 		ShoppingListTable.onCreate(sqLiteDatabase);
 	}
 
@@ -56,6 +66,5 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
 
 	}
-
 
 }

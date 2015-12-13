@@ -28,6 +28,7 @@ public class Image {
 	public static final String ASSETS_IMAGE_PATH = PATH_PROTOCOL + "/android_asset/images/";
 	public static final String CHARACTER_IMAGE_PATH = ASSETS_IMAGE_PATH + "character/";
 	public static final String LIST_IMAGE_PATH = ASSETS_IMAGE_PATH + "list/";
+	public static final String ITEM_IMAGE_PATH = ASSETS_IMAGE_PATH + "item/";
 	private static final double MIN_RATIO = 1.25;
 	private static final double MAX_RATIO = 2;
 	protected int mLoadingImage = R.drawable.loader;
@@ -114,7 +115,7 @@ public class Image {
 		return bitmap;
 	}
 
-	public boolean saveImageToFile(File file, Bitmap bitmap){
+	public boolean saveImageToFile(File file, Bitmap bitmap) {
 		boolean result = false;
 
 		try {

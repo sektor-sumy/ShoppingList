@@ -1,7 +1,10 @@
 package ru.android.ainege.shoppinglist.db.tables;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+
+import ru.android.ainege.shoppinglist.R;
 
 public class UnitsTable {
 
@@ -16,28 +19,16 @@ public class UnitsTable {
 			+ COLUMN_NAME + " TEXT NOT NULL"
 			+ ");";
 
-	public static void onCreate(SQLiteDatabase database) {
+	public static void onCreate(SQLiteDatabase database, Context ctx) {
 		database.execSQL(TABLE_CREATE);
-		initialData(database);
+		initialData(database, ctx.getResources().getStringArray(R.array.units));
 	}
 
-	public static void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-		database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-		onCreate(database);
-	}
-
-	private static void initialData(SQLiteDatabase database) {
-		String[] units = {
-				"шт",
-				"кг",
-				"л",
-		};
-
+	private static void initialData(SQLiteDatabase database, String[] units) {
 		for (String unit : units) {
 			ContentValues contentValue = new ContentValues();
 			contentValue.put(COLUMN_NAME, unit);
 			database.insert(TABLE_NAME, null, contentValue);
 		}
 	}
-
 }
