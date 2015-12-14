@@ -10,7 +10,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 
@@ -19,8 +19,6 @@ import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-
-import static ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource.*;
 
 public class EditItemFragment extends ItemFragment {
 	private static final String ITEM_IN_LIST = "itemInList";
@@ -120,8 +118,9 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	private void setDataToView() {
+		mImageDefaultPath = mItemInList.getItem().getDefaultImagePath();
 		mImagePath = mItemInList.getItem().getImagePath();
-		loadImage();
+		loadImage(false);
 
 		mName.setText(mItemInList.getItem().getName());
 		mName.setSelection(mItemInList.getItem().getName().length());
@@ -140,17 +139,6 @@ public class EditItemFragment extends ItemFragment {
 		mIsBought.setChecked(mItemInList.isBought());
 	}
 
-	private int getPosition(Spinner spinner, long id) {
-		int index = 0;
-		for (int i = 0; i < spinner.getCount(); i++) {
-			if (((UnitCursor) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
-				index = i;
-				break;
-			}
-		}
-		return index;
-	}
-
 	@Override
 	protected boolean saveData(boolean isUpdateData) {
 		boolean isSave = false;
@@ -159,18 +147,23 @@ public class EditItemFragment extends ItemFragment {
 			mNameInputLayout.setError(getString(R.string.error_length_name));
 		}
 
+		if (!mIsImageLoad) {
+			Toast.makeText(getActivity(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
+			return false;
+		}
+
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
 				!mPriceInputLayout.isErrorEnabled()) {
 			Item item = getItem();
 
 			if (getName().equals(mItemInList.getItem().getName())) { //name doesn`t change
 				if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
-					mItemDS.update(getItem());
+					mItemDS.update(item);
 				} else {
 					if (mIsAlwaysSave) {  //Always save default data
-						mItemDS.update(getItem());
+						mItemDS.update(item);
 					} else { //Don`t save default data
-						mItemDS.update(new Item(mItemInList.getIdItem(), getName(), mImagePath));
+						mItemDS.update(new Item(mItemInList.getIdItem(), getName(), mImageDefaultPath, mImagePath));
 					}
 
 					//Update item in list
@@ -186,7 +179,7 @@ public class EditItemFragment extends ItemFragment {
 					if (mIsAlwaysSave) { //Always save default data
 						idItem = (int) addItem(item);
 					} else { //Don`t save default data
-						idItem = (int) mItemDS.add(new Item(getName(), mImagePath, mImagePath));
+						idItem = (int) mItemDS.add(new Item(getName(), mImageDefaultPath, mImagePath));
 					}
 					item.setId(idItem);
 
@@ -209,14 +202,15 @@ public class EditItemFragment extends ItemFragment {
 
 	@Override
 	protected void resetImage() {
-		mImagePath = mItemInList.getItem().getDefaultImagePath();
-		loadImage();
+		loadImage(true);
 	}
 
 	@Override
 	Item getItem() {
 		Item item = super.getItem();
 		item.setId(mItemInList.getIdItem());
+		item.setImagePath(mImagePath);
+		item.setDefaultImagePath(mImageDefaultPath);
 		return item;
 	}
 

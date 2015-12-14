@@ -308,7 +308,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 			String id = cursor.getString(cursor.getColumnIndex(BaseColumns._ID));
 			long date = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN));
 
-			if (Math.abs(date - mFile.lastModified()) < 5000) {
+			if (Math.abs(date - mFile.lastModified()) < 30000) {
 				ContentResolver cr = getActivity().getContentResolver();
 				cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, BaseColumns._ID + "=" + id, null);
 			}

@@ -71,6 +71,8 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 	private String mCurrencyList;
 	private File mFile;
 	protected String mImagePath;
+	protected String mImageDefaultPath;
+	protected boolean mIsImageLoad = true;
 
 	ImageView mAppBarImage;
 	CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -100,14 +102,9 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
-		getSettings();
 
 		mItemDS = new ItemDataSource(getActivity());
 		mItemsInListDS = new ShoppingListDataSource(getActivity());
-
-		if (ALWAYS_SAVE_DATA.equals(mDataSave)) {
-			mIsAlwaysSave = true;
-		}
 	}
 
 	@Override
@@ -158,6 +155,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 				}
 				return true;
 			case R.id.take_photo:
+				mIsImageLoad = false;
 				Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
 				mFile = Image.create().createImageFile();
@@ -171,6 +169,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 				}
 				return true;
 			case R.id.select_from_gallery:
+				mIsImageLoad = false;
 				Intent galleryIntent = new Intent(Intent.ACTION_PICK,
 						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
@@ -226,7 +225,8 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 
 	@Override
 	public void updateImage() {
-		loadImage();
+		mIsImageLoad = true;
+		loadImage(false);
 	}
 
 	void setView(View v) {
@@ -334,6 +334,10 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 				mDataSave = SettingsDataItem.NEVER_SAVE_DAT;
 			}
 		}
+
+		if (ALWAYS_SAVE_DATA.equals(mDataSave)) {
+			mIsAlwaysSave = true;
+		}
 	}
 
 	private void getCurrency() {
@@ -431,8 +435,24 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 		return nf.format(value);
 	}
 
-	protected void loadImage() {
-		Image.create().insertImageToView(getActivity(), mImagePath, mAppBarImage);
+	protected void loadImage(boolean isDefaultImage) {
+		if (isDefaultImage) {
+			mImagePath = mImageDefaultPath;
+			Image.create().insertImageToView(getActivity(), mImageDefaultPath, mAppBarImage);
+		} else {
+			Image.create().insertImageToView(getActivity(), mImagePath, mAppBarImage);
+		}
+	}
+
+	protected int getPosition(Spinner spinner, long id) {
+		int index = 0;
+		for (int i = 0; i < spinner.getCount(); i++) {
+			if (((UnitCursor) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
+				index = i;
+				break;
+			}
+		}
+		return index;
 	}
 
 	private void deletePhotoFromGallery() {
@@ -445,7 +465,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 			String id = cursor.getString(cursor.getColumnIndex(BaseColumns._ID));
 			long date = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN));
 
-			if (Math.abs(date - mFile.lastModified()) < 5000) {
+			if (Math.abs(date - mFile.lastModified()) < 30000) {
 				ContentResolver cr = getActivity().getContentResolver();
 				cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, BaseColumns._ID + "=" + id, null);
 			}

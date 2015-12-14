@@ -39,7 +39,9 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 	public ShoppingListCursor existItemInList(String name, long idList) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("Select " + ShoppingListTable.TABLE_NAME + ".*, " +
-				ItemsTable.COLUMN_NAME +
+				ItemsTable.COLUMN_NAME + ", " +
+				ItemsTable.COLUMN_DEFAULT_IMAGE_PATH + ", " +
+				ItemsTable.COLUMN_IMAGE_PATH +
 				" from " + ShoppingListTable.TABLE_NAME + " INNER JOIN " + ItemsTable.TABLE_NAME +
 				" ON " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_ITEM + " = " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID +
 				" where " + ItemsTable.COLUMN_NAME + " like '" + name +

@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 
@@ -27,7 +28,7 @@ public class AddItemFragment extends ItemFragment {
 
 	private boolean mIsUseDefaultData = false;
 
-	private String mAddedImagePath;
+	private String mItemName = "";
 	private String mAddedAmount = "";
 	private int mAddedUnit = 0;
 	private String mAddedPrice = "";
@@ -50,14 +51,19 @@ public class AddItemFragment extends ItemFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (!NOT_USE_DEFAULT_DATA.equals(mDataSave)) {
-			mIsUseDefaultData = true;
-		}
-
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
 		} else {
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		if (!NOT_USE_DEFAULT_DATA.equals(mDataSave)) {
+			mIsUseDefaultData = true;
 		}
 	}
 
@@ -99,19 +105,13 @@ public class AddItemFragment extends ItemFragment {
 					disableError(mNameInputLayout);
 					//If selected a existent item and default data are used,
 					//when changing item, fill in the data that have been previously introduced
-					if (mIsUseDefaultData && mIsSelectedItem) {
-						mImagePath = mAddedImagePath;
-						if (mImagePath == null) {
-							resetImage();
-						} else {
-							loadImage();
-						}
-
+					if (mIsUseDefaultData && mIsSelectedItem && !mItemName.equals(s.toString().trim())) {
 						mAmount.setText(mAddedAmount);
 						mUnits.setSelection(mAddedUnit);
 						mPrice.setText(mAddedPrice);
 						mComment.setText(mAddedComment);
 						mIdSelectedItem = -1;
+						mIsSelectedItem = false;
 					}
 					//Check is the item in the list. If there is a warning display
 					//If it isn`t, check is it in the catalog of items. If there is select it
@@ -119,13 +119,14 @@ public class AddItemFragment extends ItemFragment {
 					if (cursor.moveToFirst()) {
 						mInfo.setText(R.string.info_exit_item_in_list);
 						mInfo.setVisibility(View.VISIBLE);
-						mIdSelectedItem = cursor.getEntity().getIdItem();
+
+						setImage(cursor.getEntity().getItem());
 					} else {
 						mInfo.setVisibility(View.GONE);
 						if (mIsProposedItem) {
 							ItemCursor cursorItem = mItemDS.getByName(s.toString().trim());
 							if (cursorItem.moveToFirst()) {
-								mIdSelectedItem = cursorItem.getEntity().getId();
+								setImage(cursorItem.getEntity());
 							}
 							cursorItem.close();
 						} else {
@@ -134,6 +135,14 @@ public class AddItemFragment extends ItemFragment {
 					}
 					cursor.close();
 				}
+			}
+
+			private void setImage(Item item) {
+				mIdSelectedItem = item.getId();
+
+				mImagePath = item.getImagePath();
+				mImageDefaultPath = item.getDefaultImagePath();
+				loadImage(false);
 			}
 		};
 	}
@@ -156,12 +165,11 @@ public class AddItemFragment extends ItemFragment {
 		return new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				mIsSelectedItem = true;
 				mIdSelectedItem = l;
+				mIsSelectedItem = true;
 				//If default data are used, they fill in the fields
 				// and save previously introduced data
 				if (mIsUseDefaultData) {
-					mAddedImagePath = mImagePath;
 					mAddedAmount = mAmount.getText().toString();
 					mAddedUnit = mUnits.getSelectedItemPosition();
 					mAddedPrice = mPrice.getText().toString();
@@ -172,14 +180,17 @@ public class AddItemFragment extends ItemFragment {
 					Item item = c.getEntity();
 					c.close();
 
+					mItemName = item.getName();
+
 					mImagePath = item.getImagePath();
-					loadImage();
+					mImageDefaultPath = item.getDefaultImagePath();
+					loadImage(false);
 
 					double amount = item.getAmount();
 					if (amount > 0) {
 						mAmount.setText(new DecimalFormat("#.######").format(amount));
 					}
-					mUnits.setSelection((int) item.getIdUnit());
+					mUnits.setSelection(getPosition(mUnits, item.getIdUnit()));
 					double price = item.getPrice();
 					if (price > 0) {
 						mPrice.setText(String.format("%.2f", price));
@@ -198,6 +209,11 @@ public class AddItemFragment extends ItemFragment {
 			mNameInputLayout.setError(getString(R.string.error_value));
 		} else if (mName.length() < 3) {
 			mNameInputLayout.setError(getString(R.string.error_length_name));
+		}
+
+		if (!mIsImageLoad) {
+			Toast.makeText(getActivity(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
+			return false;
 		}
 
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
@@ -241,7 +257,11 @@ public class AddItemFragment extends ItemFragment {
 
 	@Override
 	protected void resetImage() {
-		mAppBarImage.setImageResource(android.R.color.transparent);
+		if (mIdSelectedItem != -1 && mImageDefaultPath != null) {
+			loadImage(true);
+		} else {
+			mAppBarImage.setImageResource(android.R.color.transparent);
+		}
 	}
 
 	private void updateItem(Item item) {
@@ -258,6 +278,11 @@ public class AddItemFragment extends ItemFragment {
 			mImagePath = Image.CHARACTER_IMAGE_PATH + (int) item.getName().toUpperCase().charAt(0) + ".png";
 			item.setDefaultImagePath(mImagePath);
 			item.setImagePath(mImagePath);
+		} else {
+			if (mImageDefaultPath == null) {
+				mImageDefaultPath = mImagePath;
+			}
+			item.setDefaultImagePath(mImageDefaultPath);
 		}
 	}
 

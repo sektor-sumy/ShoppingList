@@ -29,8 +29,8 @@ public class Item implements Serializable {
 		mName = name;
 	}
 
-	public Item(long id, String name, String imagePath) {
-		this(name, imagePath);
+	public Item(long id, String name,  String defaultImagePath, String imagePath) {
+		this(name, defaultImagePath, imagePath);
 		mId = id;
 	}
 
