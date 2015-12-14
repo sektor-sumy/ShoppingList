@@ -30,6 +30,13 @@
 			<View
 				android:layout_width="match_parent"
 				android:layout_height="@dimen/scrim_height"
+				android:layout_gravity="top"
+				android:background="@drawable/scrim_top"
+				android:fitsSystemWindows="true"/>
+
+			<View
+				android:layout_width="match_parent"
+				android:layout_height="@dimen/scrim_height"
 				android:layout_gravity="bottom"
 				android:background="@drawable/scrim_bottom"/>
 
