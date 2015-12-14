@@ -68,7 +68,7 @@
 	<string name="settings_key_sort_is_bought">sort_is_bought</string>
 	<string name="settings_category_sort">Сортировка товаров в списке</string>
 	<string name="settings_title_sort_is_bought">Купленые в конец списка</string>
-	<string name="settings_summary_sort_is_bought">Перемещает купленые товары в конец списка</string>
+	<string name="settings_summary_sort_is_bought">Перенести купленные товары в конец списка</string>
 	<string name="settings_key_sort_type">sort_type</string>
 	<string name="settings_title_sort_type">Порядок сортировки</string>
 	<string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
@@ -90,7 +90,7 @@
 
 	<string name="settings_key_open_last_list">open_last_list</string>
 	<string name="settings_title_open_last_list">Открывать последний список</string>
-	<string name="settings_summary_open_last_list">Открывать приложение на последнем активном списке</string>
+	<string name="settings_summary_open_last_list">Запускать приложение на последнем активном списке</string>
 
 	<string name="sort_order_alphabet">алфавиту</string>
 	<string name="sort_order_up_price">возрастанию цены</string>
@@ -98,7 +98,7 @@
 	<string name="sort_order_adding">порядку добавления</string>
 
 	<string name="data_item_button">показать специальную кнопку</string>
-	<string name="data_item_always">всегда при сохранении данных о товаре</string>
+	<string name="data_item_always">всегда при сохранении товара</string>
 	<string name="data_item_never">некогда не обновлять</string>
 
 	<string name="name">Название</string>

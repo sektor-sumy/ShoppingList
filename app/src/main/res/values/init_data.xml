@@ -93,7 +93,7 @@
 
 	<string-array name="units">
 		<item>шт</item>
-		<item>уп</item>
+		<item>упак</item>
 		<item>бут</item>
 		<item>кг</item>
 		<item>л</item>

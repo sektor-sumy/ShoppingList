@@ -64,8 +64,9 @@ public class ListsActivity extends SingleFragmentActivity {
 		e.putBoolean("isFirst", true);
 		e.apply();
 
-		//set currency - ruble
-		CurrenciesDataSource.CurrencyCursor c = new CurrenciesDataSource(this).getByName("рубль");
+		//set currency
+		CurrenciesDataSource currenciesDS =  new CurrenciesDataSource(this);
+		CurrenciesDataSource.CurrencyCursor c = currenciesDS.getByName("Рубль");
 		if (c.moveToFirst()) {
 			long id = c.getEntity().getId();
 
@@ -77,7 +78,9 @@ public class ListsActivity extends SingleFragmentActivity {
 
 		//update ruble symbol on old device
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-			new CurrenciesDataSource(this).update("руб.", "\u20BD");
+			currenciesDS.update("руб.", "\u20BD");
+			currenciesDS.update("ман.", "\u20BC");
+			currenciesDS.update("тг", "\u20B8");
 		}
 	}
 }
