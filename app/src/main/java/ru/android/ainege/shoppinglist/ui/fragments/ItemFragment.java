@@ -247,7 +247,6 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 
 		mUnits = (Spinner) v.findViewById(R.id.new_amount_units);
 		mUnits.setAdapter(getSpinnerAdapter());
-		mUnits.setSelection(0);
 
 		mPriceInputLayout = (TextInputLayout) v.findViewById(R.id.price_input_layout);
 		mPrice = (EditText) v.findViewById(R.id.new_item_price);

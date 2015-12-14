@@ -11,12 +11,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 
 import java.text.DecimalFormat;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.ui.Image;
 
@@ -68,6 +70,10 @@ public class AddItemFragment extends ItemFragment {
 	@Override
 	protected void setView(View v) {
 		super.setView(v);
+
+		String defaultName = getActivity().getResources().getStringArray(R.array.units) [0];
+		mUnits.setSelection(getPosition(mUnits, defaultName));
+
 		mName.setOnItemClickListener(getOnNameClickListener());
 		mCollapsingToolbarLayout.setTitle(getString(R.string.add));
 	}
@@ -253,5 +259,16 @@ public class AddItemFragment extends ItemFragment {
 			item.setDefaultImagePath(mImagePath);
 			item.setImagePath(mImagePath);
 		}
+	}
+
+	private int getPosition(Spinner spinner, String name) {
+		int index = 0;
+		for (int i = 0; i < spinner.getCount(); i++) {
+			if (((UnitsDataSource.UnitCursor) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
+				index = i;
+				break;
+			}
+		}
+		return index;
 	}
 }
