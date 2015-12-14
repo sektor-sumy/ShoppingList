@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,11 +40,15 @@ import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.*;
 
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+	private static final String APP_PREFERENCES = "shopping_list_settings";
+	private static final String APP_PREFERENCES_ID = "idList";
+
 	private static final int ADD_FRAGMENT_CODE = 1;
 	private static final int EDIT_FRAGMENT_CODE = 2;
 	private static final int DATA_LOADER = 0;
 	private static final String ADD_FRAGMENT_DATE = "addListDialog";
 	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
+
 	private ListsDataSource mListsDS;
 	private RecyclerView mListsRV;
 	private ImageView mEmptyImage;
@@ -310,8 +315,17 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						} else {
 							startActivity(i);
 						}
+
+						saveId(list.getId());
 					}
 				});
+			}
+
+			private void saveId(long id) {
+				SharedPreferences mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+				SharedPreferences.Editor editor = mSettings.edit();
+				editor.putLong(APP_PREFERENCES_ID, id);
+				editor.apply();
 			}
 		}
 	}

@@ -88,6 +88,10 @@
 	<string name="settings_key_currency">settings_key_summary</string>
 	<string name="setting_title_currency">Валюты</string>
 
+	<string name="settings_key_open_last_list">open_last_list</string>
+	<string name="settings_title_open_last_list">Открывать последний список</string>
+	<string name="settings_summary_open_last_list">Открывать приложение на последнем активном списке</string>
+
 	<string name="sort_order_alphabet">алфавиту</string>
 	<string name="sort_order_up_price">возрастанию цены</string>
 	<string name="sort_order_down_price">убыванию цены</string>
