@@ -41,7 +41,6 @@
 			android:summary="@string/settings_summary_open_last_list"
 			android:title="@string/settings_title_open_last_list"/>
 		<Preference
-			android:defaultValue="1"
 			android:key="@string/settings_key_currency"
 			android:title="@string/setting_title_currency"/>
 		<Preference

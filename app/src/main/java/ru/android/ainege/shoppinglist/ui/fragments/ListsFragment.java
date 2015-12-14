@@ -101,6 +101,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		mAdapterRV.notifyItemChanged(0); //update adapter or crash app
 		updateData();
 	}
 
