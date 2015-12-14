@@ -57,6 +57,8 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	private File mFile;
 	private String mImagePath;
 
+	private boolean mIsImageLoad = true;
+
 	public static ListDialogFragment newInstance(List list) {
 		Bundle args = new Bundle();
 		args.putSerializable(LIST, list);
@@ -79,6 +81,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 			public boolean onMenuItemClick(MenuItem item) {
 				switch (item.getItemId()) {
 					case R.id.take_photo:
+						mIsImageLoad = false;
 						Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
 						mFile = Image.create().createImageFile();
@@ -92,6 +95,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 						}
 						return true;
 					case R.id.select_from_gallery:
+						mIsImageLoad = false;
 						Intent galleryIntent = new Intent(Intent.ACTION_PICK,
 								android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 						startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
@@ -196,10 +200,8 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 
 	@Override
 	public void updateImage() {
+		mIsImageLoad = true;
 		loadImage();
-		if (getTargetFragment() != null) {
-			((ShoppingListFragment) getTargetFragment()).loadImage();
-		}
 	}
 
 	private SimpleCursorAdapter getSpinnerAdapter() {
@@ -261,6 +263,11 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		} else {
 			mNameInputLayout.setError(null);
 			mNameInputLayout.setErrorEnabled(false);
+		}
+
+		if (!mIsImageLoad) {
+			Toast.makeText(getActivity(), "Подождите загрузке картинки", Toast.LENGTH_SHORT).show();
+			return false;
 		}
 
 		if (!mNameInputLayout.isErrorEnabled()) {

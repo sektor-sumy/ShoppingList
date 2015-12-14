@@ -37,7 +37,7 @@ import ru.android.ainege.shoppinglist.ui.Image;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
-import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.*;
+import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.ListCursor;
 
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
@@ -45,16 +45,18 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	private static final int ADD_FRAGMENT_CODE = 1;
 	private static final int EDIT_FRAGMENT_CODE = 2;
+	private static final int ANSWER_FRAGMENT_CODE = 3;
 	private static final int DATA_LOADER = 0;
 	private static final String ADD_FRAGMENT_DATE = "addListDialog";
 	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
-
+	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
+	ArrayList<List> mLists = new ArrayList<>();
+	private int mPositionForDelete;
 	private ListsDataSource mListsDS;
 	private RecyclerView mListsRV;
 	private ImageView mEmptyImage;
 	private RecyclerViewAdapter mAdapterRV;
 	private ProgressBar mProgressBar;
-	ArrayList<List> mLists = new ArrayList<>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -180,6 +182,20 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			case EDIT_FRAGMENT_CODE:
 				updateData();
 				break;
+			case ANSWER_FRAGMENT_CODE:
+				List list = mLists.get(mPositionForDelete);
+
+				mListsDS.delete(list.getId());
+				mAdapterRV.removeItem(mPositionForDelete);
+
+				Image.deleteFile(list.getImagePath());
+
+				if (mLists.size() > 0) {
+					hideEmptyStates();
+				} else {
+					showEmptyStates();
+				}
+				break;
 		}
 	}
 
@@ -287,19 +303,11 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				mDelete.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						int itemPosition = getAdapterPosition();
-						List list = mLists.get(itemPosition);
+						mPositionForDelete = getAdapterPosition();
 
-						mListsDS.delete(list.getId());
-						removeItem(itemPosition);
-
-						Image.deleteFile(list.getImagePath());
-
-						if (mLists.size() > 0) {
-							hideEmptyStates();
-						} else {
-							showEmptyStates();
-						}
+						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list));
+						dialogFrag.setTargetFragment(ListsFragment.this, ANSWER_FRAGMENT_CODE);
+						dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
 					}
 				});
 				mView.setOnClickListener(new View.OnClickListener() {
