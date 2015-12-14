@@ -33,7 +33,7 @@ public class ShoppingListTable {
 
 	public static void onCreate(SQLiteDatabase database) {
 		database.execSQL(TABLE_CREATE);
-		initialData(database);
+		//initialData(database);
 	}
 
 	public static void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {

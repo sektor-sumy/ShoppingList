@@ -33,7 +33,7 @@ public class ListsActivity extends SingleFragmentActivity {
 
 	private void openLastList() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean isOpenLastList = prefs.getBoolean(getString(R.string.settings_key_open_last_list), true);
+		boolean isOpenLastList = prefs.getBoolean(getString(R.string.settings_key_open_last_list), false);
 
 		if (isOpenLastList) {
 			SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
