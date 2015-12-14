@@ -20,7 +20,8 @@
 			android:layout_height="wrap_content"
 			android:paddingLeft="@dimen/padding_hint"
 			android:hint="@string/name"
-			android:maxLength="30"/>
+			android:maxLength="30"
+			android:singleLine="true"/>
 
 	</android.support.design.widget.TextInputLayout>
 
@@ -40,7 +41,8 @@
 			android:layout_height="wrap_content"
 			android:paddingLeft="@dimen/padding_hint"
 			android:hint="@string/currency_symbol"
-			android:maxLength="5"/>
+			android:maxLength="5"
+			android:singleLine="true"/>
 
 	</android.support.design.widget.TextInputLayout>
 

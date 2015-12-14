@@ -35,7 +35,9 @@
 			android:layout_height="wrap_content"
 			android:paddingLeft="@dimen/padding_hint"
 			android:hint="@string/list_name"
-			android:maxLength="20"/>
+			android:maxLength="20"
+			android:singleLine="true"
+			android:inputType="textCapSentences"/>
 
 	</android.support.design.widget.TextInputLayout>
 

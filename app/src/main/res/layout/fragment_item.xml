@@ -76,7 +76,9 @@
 					android:layout_height="wrap_content"
 					android:paddingLeft="@dimen/padding_hint"
 					android:hint="@string/name"
-					android:maxLength="35"/>
+					android:maxLength="35"
+					android:inputType="textCapSentences"
+					android:singleLine="true"/>
 
 			</android.support.design.widget.TextInputLayout>
 
