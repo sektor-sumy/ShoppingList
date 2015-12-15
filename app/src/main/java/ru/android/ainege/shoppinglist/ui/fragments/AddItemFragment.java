@@ -260,6 +260,7 @@ public class AddItemFragment extends ItemFragment {
 		if (mIdSelectedItem != -1 && mImageDefaultPath != null) {
 			loadImage(true);
 		} else {
+			mImagePath = null;
 			mAppBarImage.setImageResource(android.R.color.transparent);
 		}
 	}

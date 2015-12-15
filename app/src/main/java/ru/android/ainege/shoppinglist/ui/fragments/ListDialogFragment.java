@@ -56,6 +56,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	private List mEditList;
 	private File mFile;
 	private String mImagePath;
+	private String mPhotoPath;
 
 	private boolean mIsImageLoad = true;
 
@@ -86,7 +87,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 
 						mFile = Image.create().createImageFile();
 						if (mFile != null) {
-							mImagePath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
+							mPhotoPath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
 
 							cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
 							startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
@@ -144,13 +145,18 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode != Activity.RESULT_OK) return;
+		if (resultCode != Activity.RESULT_OK) {
+			mIsImageLoad = true;
+
+			return;
+		}
 
 		DisplayMetrics metrics = new DisplayMetrics();
 		getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
 		switch (requestCode) {
 			case TAKE_PHOTO_CODE:
+				mImagePath = mPhotoPath;
 				deletePhotoFromGallery();
 				new Image.BitmapWorkerTask(mFile, metrics.widthPixels - 30, this).execute();
 				break;
@@ -164,8 +170,10 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 					File file = image.createImageFile();
 
 					if (file != null) {
-						mImagePath = Image.PATH_PROTOCOL + file.getAbsolutePath();
+						mPhotoPath = Image.PATH_PROTOCOL + file.getAbsolutePath();
 						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, this).execute();
+
+						mImagePath = mPhotoPath;
 					} else {
 						Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}

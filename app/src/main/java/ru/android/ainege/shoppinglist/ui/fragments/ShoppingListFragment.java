@@ -405,6 +405,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				break;
 			case EDIT_FRAGMENT_CODE:
 				getList(getArguments().getLong(ID_LIST));
+				loadImage();
 				setTitle();
 				updateSums(mSaveSpentMoney, mSaveTotalMoney);
 				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
