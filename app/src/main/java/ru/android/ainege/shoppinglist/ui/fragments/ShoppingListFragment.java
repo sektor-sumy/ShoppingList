@@ -49,7 +49,7 @@ import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 
-import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.*;
+import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.ListCursor;
 
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -275,16 +275,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						}
 
 						double sum = sumOneItem(item);
-						if (mSaveSpentMoney != 0) {
-							if (isBought) {
-								mSaveSpentMoney += sum;
-							} else {
-								mSaveSpentMoney -= sum;
-							}
-							updateSpentSum(mSaveSpentMoney);
+						if (isBought) {
+							mSaveSpentMoney += sum;
 						} else {
-							updateData();
+							mSaveSpentMoney -= sum;
 						}
+						updateSpentSum(mSaveSpentMoney);
+
 					}
 				})
 		);
@@ -657,7 +654,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		}
 
-		private boolean checkAllSelected(boolean isBought){
+		private boolean checkAllSelected(boolean isBought) {
 			for (int position = 0; position < mItemsInList.size(); position++) {
 				if (mItemsInList.get(position).isBought() == isBought) {
 					if (!mSelectedItems.contains(position)) {

@@ -81,7 +81,7 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		long idDefaultCurrency = prefs.getLong(mContext.getString(R.string.settings_key_currency), -1);
 
-		if (id == idDefaultCurrency) {
+		if (id == idDefaultCurrency || idDefaultCurrency == -1) {
 			idDefaultCurrency = getRandomId(id);
 		}
 
