@@ -197,8 +197,17 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				} else {
 					showEmptyStates();
 				}
+
+				deleteSettings();
 				break;
 		}
+	}
+
+	private void deleteSettings() {
+		SharedPreferences mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = mSettings.edit();
+		editor.remove(APP_PREFERENCES_ID);
+		editor.apply();
 	}
 
 	private void showEmptyStates() {
@@ -325,17 +334,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						} else {
 							startActivity(i);
 						}
-
-						saveId(list.getId());
 					}
 				});
-			}
-
-			private void saveId(long id) {
-				SharedPreferences mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-				SharedPreferences.Editor editor = mSettings.edit();
-				editor.putLong(APP_PREFERENCES_ID, id);
-				editor.apply();
 			}
 		}
 	}

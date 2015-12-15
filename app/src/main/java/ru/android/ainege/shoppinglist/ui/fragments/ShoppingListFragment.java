@@ -53,6 +53,9 @@ import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.*;
 
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+	private static final String APP_PREFERENCES = "shopping_list_settings";
+	private static final String APP_PREFERENCES_ID = "idList";
+
 	private static final String ID_LIST = "idList";
 	private static final int EDIT_FRAGMENT_CODE = 3;
 	private static final int ANSWER_FRAGMENT_CODE = 4;
@@ -143,11 +146,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		setHasOptionsMenu(true);
-		getSettings();
 
 		mItemsInListDS = new ShoppingListDataSource(getActivity());
 		mListsDS = new ListsDataSource(getActivity());
 		getList(getArguments().getLong(ID_LIST));
+		getSettings();
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
@@ -318,6 +321,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list));
 				dialogFrag.setTargetFragment(ShoppingListFragment.this, ANSWER_FRAGMENT_CODE);
 				dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
+				saveId(-1);
 				return true;
 			case R.id.update_list:
 				ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
@@ -431,6 +435,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			sortType = ShoppingList.ALPHABET;
 		}
 		ShoppingList.setSortSettings(mIsBoughtEndInList, sortType);
+
+		saveId(mList.getId());
 	}
 
 	private String localValue(double value) {
@@ -446,6 +452,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			mList = cursor.getEntity();
 		}
 		cursor.close();
+	}
+
+	private void saveId(long id) {
+		SharedPreferences mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = mSettings.edit();
+		if (id != -1) {
+			editor.putLong(APP_PREFERENCES_ID, id);
+		} else {
+			editor.remove(APP_PREFERENCES_ID);
+		}
+		editor.apply();
 	}
 
 	private void setTitle() {
