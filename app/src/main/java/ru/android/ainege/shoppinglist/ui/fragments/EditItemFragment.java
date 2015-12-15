@@ -160,10 +160,10 @@ public class EditItemFragment extends ItemFragment {
 				if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
 					mItemDS.update(item);
 				} else {
-					if (mIsAlwaysSave) {  //Always save default data
+					if (mIsSaveButton) { //Don`t save default data
+						mItemDS.update(new Item(mItemInList.getIdItem(), getName(), -1, -1, null, mImageDefaultPath, mImagePath));
+					} else { //Always save default data
 						mItemDS.update(item);
-					} else { //Don`t save default data
-						mItemDS.update(new Item(mItemInList.getIdItem(), getName(), mImageDefaultPath, mImagePath));
 					}
 
 					//Update item in list
@@ -176,10 +176,10 @@ public class EditItemFragment extends ItemFragment {
 					addItem(item);
 				} else {
 					long idItem;
-					if (mIsAlwaysSave) { //Always save default data
+					if (mIsSaveButton) { //Don`t save default data
+						idItem = (int) mItemDS.add(new Item(getName(), item.getIdUnit(), mImageDefaultPath, mImagePath));
+					} else { //Always save default data
 						idItem = (int) addItem(item);
-					} else { //Don`t save default data
-						idItem = (int) mItemDS.add(new Item(getName(), mImageDefaultPath, mImagePath));
 					}
 					item.setId(idItem);
 

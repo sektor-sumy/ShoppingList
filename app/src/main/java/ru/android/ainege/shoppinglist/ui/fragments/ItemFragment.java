@@ -66,7 +66,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 
 	protected String mDataSave;
 
-	boolean mIsAlwaysSave = false;
+	boolean mIsSaveButton = false;
 	boolean mIsProposedItem = false;
 	private String mCurrencyList;
 	private File mFile;
@@ -106,6 +106,11 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 
 		mItemDS = new ItemDataSource(getActivity());
 		mItemsInListDS = new ShoppingListDataSource(getActivity());
+
+		getSettings();
+		if (SAVE_DATA_BUTTON.equals(mDataSave)) {
+			mIsSaveButton = true;
+		}
 	}
 
 	@Override
@@ -134,7 +139,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.item_menu, menu);
-		if (SAVE_DATA_BUTTON.equals(mDataSave)) {
+		if (mIsSaveButton) {
 			menu.findItem(R.id.update_item).setVisible(true);
 		}
 	}
@@ -222,13 +227,6 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 				}
 				break;
 		}
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		getSettings();
 	}
 
 	@Override
@@ -338,13 +336,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 				mDataSave = SettingsDataItem.SAVE_DATA_BUTTON;
 			} else if (save.contains(getString(R.string.data_item_always))) {
 				mDataSave = SettingsDataItem.ALWAYS_SAVE_DATA;
-			} else if (save.contains(getString(R.string.data_item_never))) {
-				mDataSave = SettingsDataItem.NEVER_SAVE_DAT;
 			}
-		}
-
-		if (ALWAYS_SAVE_DATA.equals(mDataSave)) {
-			mIsAlwaysSave = true;
 		}
 	}
 

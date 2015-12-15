@@ -18,6 +18,13 @@ public class Item implements Serializable {
 		mImagePath = imagePath;
 	}
 
+	public Item(String name, long idUnit, String defaultImagePath, String imagePath) {
+		mName = name;
+		mIdUnit = idUnit;
+		mDefaultImagePath = defaultImagePath;
+		mImagePath = imagePath;
+	}
+
 	public Item(String name, String defaultImagePath, String imagePath) {
 		mName = name;
 		mDefaultImagePath = defaultImagePath;
@@ -46,6 +53,13 @@ public class Item implements Serializable {
 		this(name, amount, idUnit, price, comment, imagePath);
 		mDefaultImagePath = defaultImagePath;
 		mId = id;
+	}
+
+	public Item(long id, String name, double amount, double price, String comment, String defaultImagePath, String imagePath) {
+		this(id, name, defaultImagePath, imagePath);
+		mAmount = amount;
+		mPrice = price;
+		mComment = comment;
 	}
 
 	public long getId() {

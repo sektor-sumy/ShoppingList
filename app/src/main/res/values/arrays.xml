@@ -9,6 +9,5 @@
 	<string-array name="data_item">
 		<item>@string/data_item_button</item>
 		<item>@string/data_item_always</item>
-		<item>@string/data_item_never</item>
 	</string-array>
 </resources>

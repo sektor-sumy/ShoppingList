@@ -77,7 +77,7 @@ public class AddItemFragment extends ItemFragment {
 	protected void setView(View v) {
 		super.setView(v);
 
-		String defaultName = getActivity().getResources().getStringArray(R.array.units) [0];
+		String defaultName = getActivity().getResources().getStringArray(R.array.units)[0];
 		mUnits.setSelection(getPosition(mUnits, defaultName));
 
 		mName.setOnItemClickListener(getOnNameClickListener());
@@ -225,15 +225,16 @@ public class AddItemFragment extends ItemFragment {
 				updateItem(item);
 			} else {
 				long idItem;
-				if (mIsAlwaysSave) { //Always save default data
-					updateItem(item);
-					idItem = mIdSelectedItem;
-				} else { //Don`t save default data
+				if (mIsSaveButton) { //Don`t save default data
 					if (mIdSelectedItem != -1) {
 						idItem = mIdSelectedItem;
+						mItemDS.update(new Item(idItem, getName(), -1, -1, null, mImageDefaultPath, mImagePath));
 					} else {
-						idItem = (int) mItemDS.add(new Item(getName(), mImagePath, mImagePath));
+						idItem = (int) mItemDS.add(new Item(getName(), item.getIdUnit(), mImageDefaultPath, mImagePath));
 					}
+				} else {  //Always save default data
+					updateItem(item);
+					idItem = mIdSelectedItem;
 				}
 				item.setId(idItem);
 
@@ -277,6 +278,8 @@ public class AddItemFragment extends ItemFragment {
 	private void setImagePath(Item item) {
 		if (mImagePath == null) {
 			mImagePath = Image.CHARACTER_IMAGE_PATH + (int) item.getName().toUpperCase().charAt(0) + ".png";
+			mImageDefaultPath = mImagePath;
+
 			item.setDefaultImagePath(mImagePath);
 			item.setImagePath(mImagePath);
 		} else {
