@@ -160,7 +160,7 @@ public class ShoppingList implements Serializable {
 
 				switch (mType) {
 					case ALPHABET:
-						result = lhs.getItem().getName().compareTo(rhs.getItem().getName());
+						result = lhs.getItem().getName().compareToIgnoreCase(rhs.getItem().getName());
 						break;
 					case UP_PRICE:
 						result = (int) (lhs.getPrice() - rhs.getPrice());
