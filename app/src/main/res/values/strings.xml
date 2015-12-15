@@ -1,11 +1,11 @@
 <resources>
-	<string name="app_name">Shopping list</string>
+	<string name="app_name">За покупками</string>
 
 	<string name="error_file_not_create">Не удалось создать файл</string>
 	<string name="error_name">Введите название</string>
 
 	<!--Lists-->
-	<string name="you_lists">Ваши списки:</string>
+	<string name="you_lists">Ваши списки покупок</string>
 	<string name="list_empty">Список пуст</string>
 	<string name="nothing_bought">Ничего не куплено. Всего&#160;</string>
 	<string name="all_bought">Все куплено</string>

@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -74,6 +75,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+		ActionBar bar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+		if (bar != null) {
+			bar.setTitle(R.string.you_lists);
+		}
 
 		FloatingActionButton addItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
 		addItemFAB.setOnClickListener(new View.OnClickListener() {

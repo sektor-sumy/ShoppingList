@@ -19,7 +19,6 @@
 		<activity
 			android:name=".ui.activities.ListsActivity"
 			android:configChanges="orientation|keyboardHidden"
-			android:label="@string/you_lists"
 			android:screenOrientation="portrait"
 			android:theme="@style/AppTheme.NoActionBar">
 			<intent-filter>
