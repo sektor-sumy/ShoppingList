@@ -50,10 +50,19 @@ public class UnitsDataSource extends DictionaryDataSource<Unit> {
 
 	@Override
 	public void delete(long id) {
-		new ShoppingListDataSource(mContext).updateUnit(id, getRandomId(id));
+		long newId = getRandomId(id);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-		db.delete(UnitsTable.TABLE_NAME, UnitsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+		db.beginTransaction();
+		try {
+			new ShoppingListDataSource(mContext).updateUnit(id, newId);
+			new ItemDataSource(mContext).updateUnit(id, newId);
+
+			db.delete(UnitsTable.TABLE_NAME, UnitsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
 	}
 
 	private ContentValues createContentValues(Unit unit) {

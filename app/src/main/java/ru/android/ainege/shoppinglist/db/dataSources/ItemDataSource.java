@@ -43,6 +43,14 @@ public class ItemDataSource extends GenericDataSource<Item> {
 				new String[]{String.valueOf(item.getId())});
 	}
 
+	public void updateUnit(long oldId, long newId) {
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(ItemsTable.COLUMN_ID_UNIT, newId);
+		db.update(ItemsTable.TABLE_NAME, values,
+				ItemsTable.COLUMN_ID_UNIT + " = ?",
+				new String[]{String.valueOf(oldId)});
+	}
 	@Override
 	public long add(Item item) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -66,7 +74,9 @@ public class ItemDataSource extends GenericDataSource<Item> {
 		if (item.getPrice() != -1) {
 			values.put(ItemsTable.COLUMN_PRICE, item.getPrice());
 		}
-		values.put(ItemsTable.COLUMN_COMMENT, item.getComment());
+		if (item.getComment() != null) {
+			values.put(ItemsTable.COLUMN_COMMENT, item.getComment());
+		}
 		values.put(ItemsTable.COLUMN_DEFAULT_IMAGE_PATH, item.getDefaultImagePath());
 		values.put(ItemsTable.COLUMN_IMAGE_PATH, item.getImagePath());
 		return values;
