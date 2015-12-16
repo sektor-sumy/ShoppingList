@@ -28,26 +28,14 @@ public class ListsTable {
 
 	public static void onCreate(SQLiteDatabase database) {
 		database.execSQL(TABLE_CREATE);
-		//initialData(database);
-	}
-
-	public static void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-		database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-		onCreate(database);
+		initialData(database);
 	}
 
 	private static void initialData(SQLiteDatabase database) {
-		String[] lists = {"Мой список", "Купить на ДР"};
-		int[] currency = {1, 3};
-		String[] imagepath = {Image.LIST_IMAGE_PATH + "random_list_2.jpg",
-				Image.LIST_IMAGE_PATH + "random_list_5.jpg"};
-
-		for (int i = 0; i < lists.length; i++) {
 			ContentValues contentValue = new ContentValues();
-			contentValue.put(COLUMN_NAME, lists[i]);
-			contentValue.put(COLUMN_ID_CURRENCY, currency[i]);
-			contentValue.put(COLUMN_IMAGE_PATH, imagepath[i]);
+			contentValue.put(COLUMN_NAME, "Ваш список");
+			contentValue.put(COLUMN_ID_CURRENCY, 1);
+			contentValue.put(COLUMN_IMAGE_PATH, Image.LIST_IMAGE_PATH + "random_list_0.png");
 			database.insert(TABLE_NAME, null, contentValue);
-		}
 	}
 }

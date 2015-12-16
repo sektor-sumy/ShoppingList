@@ -33,41 +33,5 @@ public class ShoppingListTable {
 
 	public static void onCreate(SQLiteDatabase database) {
 		database.execSQL(TABLE_CREATE);
-		//initialData(database);
-	}
-
-	public static void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-		database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-		onCreate(database);
-	}
-
-	private static void initialData(SQLiteDatabase database) {
-		int list = 1;
-		int[] item = {1, 2, 3, 4, 5, 6};
-		boolean[] isBought = {false, false, true, false, false, true};
-		double[] amount = {0, 1, 2, 0, 1, 1};
-		int[] amountUnit = {0, 1, 1, 0, 2, 2};
-		double[] price = {55.00, 19.5, 66, 87, 70, 105};
-		String[] comment = {
-				"",
-				"",
-				"проверь дату изготовления",
-				"в гранулах",
-				"круглый",
-				"",
-		};
-
-		for (int i = 0; i < item.length; i++) {
-			ContentValues contentValue = new ContentValues();
-			contentValue.put(COLUMN_ID_ITEM, item[i]);
-			contentValue.put(COLUMN_ID_LIST, list);
-			contentValue.put(COLUMN_IS_BOUGHT, isBought[i]);
-			contentValue.put(COLUMN_AMOUNT, amount[i]);
-			contentValue.put(COLUMN_ID_UNIT, amountUnit[i]);
-			contentValue.put(COLUMN_PRICE, price[i]);
-			contentValue.put(COLUMN_COMMENT, comment[i]);
-			contentValue.put(COLUMN_DATE, i);
-			database.insert(TABLE_NAME, null, contentValue);
-		}
 	}
 }
