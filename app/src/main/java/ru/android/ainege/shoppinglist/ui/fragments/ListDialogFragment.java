@@ -144,6 +144,13 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+
+		mName.setSelection(mName.getText().length());
+	}
+
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) {
 			mIsImageLoad = true;
@@ -256,7 +263,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	private void setRandomImage() {
 		String path;
 		do {
-			path = Image.LIST_IMAGE_PATH + "random_list_" + (new Random().nextInt(4) + 1) + ".jpg";
+			path = Image.LIST_IMAGE_PATH + "random_list_" + new Random().nextInt(9) + ".png";
 		} while (path.equals(mImagePath));
 		mImagePath = path;
 		loadImage();

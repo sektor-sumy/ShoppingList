@@ -136,6 +136,16 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+
+		mName.setSelection(mName.getText().length());
+		mAmount.setSelection(mAmount.getText().length());
+		mPrice.setSelection(mPrice.getText().length());
+		mComment.setSelection(mComment.getText().length());
+	}
+
+	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.item_menu, menu);
