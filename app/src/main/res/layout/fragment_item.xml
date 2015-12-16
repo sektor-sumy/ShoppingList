@@ -194,7 +194,7 @@
 					android:id="@+id/comment"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:inputType="textMultiLine"
+					android:inputType="textCapSentences|textMultiLine"
 					android:maxLength="210"
 					android:maxLines="5"
 					android:hint="@string/comment"/>
