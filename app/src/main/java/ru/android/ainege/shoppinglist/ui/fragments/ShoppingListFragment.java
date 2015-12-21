@@ -318,7 +318,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list));
 				dialogFrag.setTargetFragment(ShoppingListFragment.this, ANSWER_FRAGMENT_CODE);
 				dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
-				saveId(-1);
 				return true;
 			case R.id.update_list:
 				ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
@@ -402,6 +401,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mListsDS.delete(mList.getId());
 				Image.deleteFile(mList.getImagePath());
 
+				saveId(-1);
 				getActivity().onBackPressed();
 				break;
 			case EDIT_FRAGMENT_CODE:
