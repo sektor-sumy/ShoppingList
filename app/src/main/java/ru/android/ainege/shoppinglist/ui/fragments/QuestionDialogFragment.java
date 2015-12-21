@@ -56,7 +56,11 @@ public class QuestionDialogFragment extends DialogFragment {
 				})
 				.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
+						if (getTargetFragment() != null) {
+							getTargetFragment().onActivityResult(getTargetRequestCode(),
+									Activity.RESULT_CANCELED,
+									null);
+						}
 					}
 				});
 

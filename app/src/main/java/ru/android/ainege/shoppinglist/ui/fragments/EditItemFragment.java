@@ -214,6 +214,16 @@ public class EditItemFragment extends ItemFragment {
 		return item;
 	}
 
+	@Override
+	public void onBackPressed() {
+		if (!mItemInList.equals(getItemInList(getItem()))) {
+			super.onBackPressed();
+		} else {
+			getActivity().finish();
+		}
+
+	}
+
 	private long addItem (Item item){
 	    item.setDefaultImagePath(mImagePath);
 		return mItemDS.add(item);

@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.fragments.AddItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.EditItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ItemFragment;
@@ -11,6 +12,8 @@ import ru.android.ainege.shoppinglist.ui.fragments.ItemFragment;
 public class ItemActivity extends SingleFragmentActivity {
 	public final static String EXTRA_ID_LIST = "idList";
 	public final static String EXTRA_ITEM = "item";
+
+	OnBackPressedListener mOnBackPressedListener;
 
 	@Override
 	protected Fragment getFragment() {
@@ -29,6 +32,18 @@ public class ItemActivity extends SingleFragmentActivity {
 		} else { //edit item in list
 			fragment = EditItemFragment.newInstance(itemInList);
 		}
+
+		mOnBackPressedListener = fragment;
+		
 		return fragment;
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (mOnBackPressedListener != null) {
+			mOnBackPressedListener.onBackPressed();
+		} else {
+			super.onBackPressed();
+		}
 	}
 }

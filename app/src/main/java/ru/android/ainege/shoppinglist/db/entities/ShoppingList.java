@@ -129,6 +129,14 @@ public class ShoppingList implements Serializable {
 		}
 	}
 
+	public boolean equals(ShoppingList item) {
+		return !(!mItem.getName().equals(item.getItem().getName()) ||
+				!mItem.getImagePath().equals(item.getItem().getImagePath()) ||
+				mIsBought != item.isBought() || mAmount != item.getAmount() ||
+				mIdUnit != item.getIdUnit() || mPrice != item.getPrice() ||
+				!mComment.equals(item.getComment()));
+	}
+
 	public static void setSortSettings(boolean isBoughtEndInList, String type) {
 		mIsBoughtEndInList = isBoughtEndInList;
 		mType = type;

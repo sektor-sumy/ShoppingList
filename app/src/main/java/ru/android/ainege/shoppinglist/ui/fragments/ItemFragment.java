@@ -50,16 +50,20 @@ import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.Image;
+import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.*;
 import static ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource.*;
 
-public abstract class ItemFragment extends Fragment implements SettingsDataItem, ImageFragmentInterface {
+public abstract class ItemFragment extends Fragment implements SettingsDataItem, ImageFragmentInterface, OnBackPressedListener {
 	private static final String ID_ITEM = "idItem";
 	private static final int TAKE_PHOTO_CODE = 0;
 	private static final int LOAD_IMAGE_CODE = 1;
+
+	private static final int ANSWER_FRAGMENT_CODE = 2;
+	private static final String ANSWER_FRAGMENT_DATE = "answerDialog";
 
 	ItemDataSource mItemDS;
 	ShoppingListDataSource mItemsInListDS;
@@ -125,7 +129,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				getActivity().onBackPressed();
+				getActivity().finish();
 			}
 		});
 
@@ -163,12 +167,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 				}
 				return true;
 			case R.id.save_item:
-				Boolean wantToCloseDialog = saveData(false);
-				if (wantToCloseDialog) {
-					getActivity().onBackPressed();
-				} else {
-					Toast.makeText(getActivity(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
-				}
+				saveItem();
 				return true;
 			case R.id.take_photo:
 				mIsImageLoad = false;
@@ -203,6 +202,10 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 		if (resultCode != Activity.RESULT_OK) {
 			mIsImageLoad = true;
 
+			if (requestCode ==  ANSWER_FRAGMENT_CODE) {
+				getActivity().finish();
+			}
+
 			return;
 		}
 
@@ -236,6 +239,9 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 					e.printStackTrace();
 				}
 				break;
+			case ANSWER_FRAGMENT_CODE:
+				saveItem();
+				break;
 		}
 	}
 
@@ -243,6 +249,21 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 	public void updateImage() {
 		mIsImageLoad = true;
 		loadImage(false);
+	}
+
+	@Override
+	public void onBackPressed() {
+		QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_save_item));
+		dialogFrag.setTargetFragment(ItemFragment.this, ANSWER_FRAGMENT_CODE);
+		dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
+	}
+
+	private void saveItem() {
+		if (saveData(false)) {
+			getActivity().finish();
+		} else {
+			Toast.makeText(getActivity(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
+		}
 	}
 
 	void setView(View v) {
