@@ -17,6 +17,11 @@ import ru.android.ainege.shoppinglist.db.entities.Unit;
 public class UnitFragment extends DictionaryFragment<Unit> {
 
 	@Override
+	protected String getTitle() {
+		return getString(R.string.setting_title_unit);
+	}
+
+	@Override
 	protected View.OnClickListener getAddHandler() {
 		return new View.OnClickListener() {
 			@Override
@@ -50,11 +55,6 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 				if (data.moveToFirst()) {
 					mDictionary = ((UnitsDataSource.UnitCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
-
-					ActionBar appBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-					if (appBar != null) {
-						appBar.setTitle(getString(R.string.setting_title_unit));
-					}
 				}
 				data.close();
 				break;

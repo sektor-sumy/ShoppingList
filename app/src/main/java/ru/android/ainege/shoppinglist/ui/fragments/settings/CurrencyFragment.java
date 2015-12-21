@@ -4,8 +4,6 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +18,11 @@ import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
 public class CurrencyFragment extends DictionaryFragment<Currency> {
+
+	@Override
+	protected String getTitle() {
+		return getString(R.string.setting_currency);
+	}
 
 	@Override
 	protected View.OnClickListener getAddHandler() {
@@ -55,11 +58,6 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 				if (data.moveToFirst()) {
 					mDictionary = ((CurrenciesDataSource.CurrencyCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
-
-					ActionBar appBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-					if (appBar != null) {
-						appBar.setTitle(getString(R.string.setting_currency));
-					}
 				}
 				data.close();
 				break;

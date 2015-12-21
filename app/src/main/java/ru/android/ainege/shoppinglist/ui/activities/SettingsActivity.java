@@ -7,8 +7,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.support.v7.app.ActionBar;
 import android.transition.Slide;
 import android.view.Gravity;
+import android.view.MenuItem;
 
 import ru.android.ainege.shoppinglist.R;
 
@@ -24,7 +26,7 @@ public class SettingsActivity extends SingleFragmentActivity {
 		return new MyPreferenceFragment();
 	}
 
-	public static class MyPreferenceFragment extends PreferenceFragment {
+	class MyPreferenceFragment extends PreferenceFragment {
 
 		@Override
 		public void onCreate(final Bundle savedInstanceState) {
@@ -35,6 +37,14 @@ public class SettingsActivity extends SingleFragmentActivity {
 				getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
 			} else {
 				getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+			}
+
+			setHasOptionsMenu(true);
+			ActionBar actionBar = getSupportActionBar();
+
+			if (actionBar != null) {
+				actionBar.setHomeButtonEnabled(true);
+				actionBar.setDisplayHomeAsUpEnabled(true);
 			}
 
 			Preference currencySettings = findPreference(getString(R.string.settings_key_currency));
@@ -73,6 +83,17 @@ public class SettingsActivity extends SingleFragmentActivity {
 		public void onPause() {
 			super.onPause();
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			switch (item.getItemId()) {
+				case android.R.id.home:
+					getActivity().finish();
+					return true;
+				default:
+					return super.onOptionsItemSelected(item);
+			}
 		}
 	}
 }

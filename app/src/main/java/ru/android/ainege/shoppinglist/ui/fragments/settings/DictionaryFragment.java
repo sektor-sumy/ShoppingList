@@ -10,11 +10,14 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -40,6 +43,8 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	ArrayList<T> mDictionary = new ArrayList<>();
 	RecyclerViewAdapter mAdapterRV;
 
+	protected abstract String getTitle();
+
 	protected abstract View.OnClickListener getAddHandler();
 
 	protected abstract DictionaryDataSource getDS();
@@ -60,6 +65,15 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
 		} else {
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+		}
+
+		setHasOptionsMenu(true);
+		ActionBar appBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+
+		if (appBar != null) {
+			appBar.setTitle(getTitle());
+			appBar.setHomeButtonEnabled(true);
+			appBar.setDisplayHomeAsUpEnabled(true);
 		}
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
@@ -85,6 +99,17 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	public void onPause() {
 		super.onPause();
 		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				getActivity().finish();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override
