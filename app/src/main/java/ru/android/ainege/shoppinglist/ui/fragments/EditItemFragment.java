@@ -161,7 +161,7 @@ public class EditItemFragment extends ItemFragment {
 					mItemDS.update(item);
 				} else {
 					if (mIsSaveButton) { //Don`t save default data
-						mItemDS.update(new Item(mItemInList.getIdItem(), getName(), -1, -1, null, mImageDefaultPath, mImagePath));
+						mItemDS.update(new Item(mItemInList.getIdItem(), getName(), mImageDefaultPath, mImagePath));
 					} else { //Always save default data
 						mItemDS.update(item);
 					}

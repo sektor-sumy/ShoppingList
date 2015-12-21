@@ -309,25 +309,23 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 		if (mAmount.getText().length() > 0) {
 			amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
 		}
-		long idUnit = ((UnitCursor) mUnits.getSelectedItem()).getEntity().getId();
 		double price = 0.0;
 		if (mPrice.getText().length() > 0) {
 			price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
 		}
 		String comment = mComment.getText().toString();
 
-		return new Item(name, amount, idUnit, price, comment, mImagePath);
+		return new Item(name, amount, ((UnitCursor) mUnits.getSelectedItem()).getEntity(), price, comment, mImagePath);
 	}
 
 	ShoppingList getItemInList(Item item) {
-		return new ShoppingList(item.getId(),
+		return new ShoppingList(item,
 				getIdList(),
 				mIsBought.isChecked(),
 				item.getAmount(),
-				item.getIdUnit(),
+				item.getUnit(),
 				item.getPrice(),
-				item.getComment(),
-				null
+				item.getComment()
 		);
 	}
 

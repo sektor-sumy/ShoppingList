@@ -26,30 +26,20 @@ public class ShoppingList implements Serializable {
 	private Item mItem;
 	private Unit mUnit;
 
-	private ShoppingList(boolean isBought, double amount, double price, String comment) {
+	public ShoppingList(long idItem, long idList, boolean isBought, double amount, long idUnit, double price, String comment, Date date) {
+		mIdItem = idItem;
+		mIdList = idList;
 		mIsBought = isBought;
 		mAmount = amount;
+		mIdUnit = idUnit;
 		mPrice = price;
 		mComment = comment;
-	}
-
-	private ShoppingList(long idItem, boolean isBought, double amount, long idUnit, double price, String comment, Date date) {
-		this(isBought, amount, price, comment);
-		mIdItem = idItem;
-		mIdUnit = idUnit;
 		mDate = date;
 	}
 
-	public ShoppingList(long idItem, long idList, boolean isBought, double amount, long idUnit, double price, String comment, Date date) {
-		this(idItem, isBought, amount, idUnit, price, comment, date);
-		mIdList = idList;
-	}
-
 	public ShoppingList(Item item, long idList, boolean isBought, double amount, Unit unit, double price, String comment) {
-		this(isBought, amount, price, comment);
+		this(item.getId(), idList, isBought, amount, unit.getId(), price, comment, null);
 		mItem = item;
-		mIdItem = mItem.getId();
-		mIdList = idList;
 		mUnit = unit;
 	}
 

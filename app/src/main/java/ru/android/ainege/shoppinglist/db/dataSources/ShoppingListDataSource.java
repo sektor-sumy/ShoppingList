@@ -151,7 +151,7 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 
 			if (getColumnIndex(ItemsTable.COLUMN_NAME) != -1) {
 				String nameItem = getString(getColumnIndex(ItemsTable.COLUMN_NAME));
-				Item item = new Item(idItem, nameItem);
+				Item item = new Item(idItem, nameItem, null, null);
 				if (getColumnIndex(ItemsTable.COLUMN_IMAGE_PATH) != -1) {
 					item.setImagePath(getString(getColumnIndex(ItemsTable.COLUMN_IMAGE_PATH)));
 				}

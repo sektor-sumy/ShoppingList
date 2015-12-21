@@ -13,11 +13,6 @@ public class Item implements Serializable {
 	private String mImagePath;
 	private Unit mUnit;
 
-	public Item(String name, String imagePath) {
-		mName = name;
-		mImagePath = imagePath;
-	}
-
 	public Item(String name, long idUnit, String defaultImagePath, String imagePath) {
 		mName = name;
 		mIdUnit = idUnit;
@@ -25,41 +20,21 @@ public class Item implements Serializable {
 		mImagePath = imagePath;
 	}
 
-	public Item(String name, String defaultImagePath, String imagePath) {
-		mName = name;
-		mDefaultImagePath = defaultImagePath;
-		mImagePath = imagePath;
-	}
-
-	public Item(long id, String name) {
-		mId = id;
-		mName = name;
-	}
-
-	public Item(long id, String name,  String defaultImagePath, String imagePath) {
-		this(name, defaultImagePath, imagePath);
-		mId = id;
-	}
-
-	public Item(String name, double amount, long idUnit, double price, String comment, String imagePath) {
-		this(name, imagePath);
-		mAmount = amount;
-		mIdUnit = idUnit;
-		mPrice = price;
-		mComment = comment;
-	}
-
 	public Item(long id, String name, double amount, long idUnit, double price, String comment, String defaultImagePath, String imagePath) {
-		this(name, amount, idUnit, price, comment, imagePath);
-		mDefaultImagePath = defaultImagePath;
+		this(name, idUnit, defaultImagePath, imagePath);
 		mId = id;
-	}
-
-	public Item(long id, String name, double amount, double price, String comment, String defaultImagePath, String imagePath) {
-		this(id, name, defaultImagePath, imagePath);
 		mAmount = amount;
 		mPrice = price;
 		mComment = comment;
+	}
+
+	public Item(String name, double amount, Unit unit, double price, String comment, String imagePath) {
+		this(0, name, amount, unit.getId(), price, comment, null, imagePath);
+		mUnit = unit;
+	}
+
+	public Item(long id, String name, String defaultImagePath, String imagePath) {
+		this(id, name, -1, 1, -1, null, defaultImagePath, imagePath);
 	}
 
 	public long getId() {

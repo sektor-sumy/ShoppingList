@@ -228,7 +228,7 @@ public class AddItemFragment extends ItemFragment {
 				if (mIsSaveButton) { //Don`t save default data
 					if (mIdSelectedItem != -1) {
 						idItem = mIdSelectedItem;
-						mItemDS.update(new Item(idItem, getName(), -1, -1, null, mImageDefaultPath, mImagePath));
+						mItemDS.update(new Item(idItem, getName(), mImageDefaultPath, mImagePath));
 					} else {
 						idItem = (int) mItemDS.add(new Item(getName(), item.getIdUnit(), mImageDefaultPath, mImagePath));
 					}
