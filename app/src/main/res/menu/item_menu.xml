@@ -12,16 +12,4 @@
 		android:title="@string/save"
 		android:icon="@drawable/ic_done_white_24dp"
 		app:showAsAction="always|withText"/>
-	<item
-		android:id="@+id/take_photo"
-		android:title="@string/take_photo"
-		app:showAsAction="never"/>
-	<item
-		android:id="@+id/select_from_gallery"
-		android:title="@string/select_from_gallery"
-		app:showAsAction="never"/>
-	<item
-		android:id="@+id/default_image"
-		android:title="@string/default_image"
-		app:showAsAction="never"/>
 </menu>

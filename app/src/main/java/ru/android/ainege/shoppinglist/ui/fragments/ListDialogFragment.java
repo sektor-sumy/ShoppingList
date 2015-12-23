@@ -16,8 +16,8 @@ import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -75,42 +75,14 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_list, null);
 
-		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-		toolbar.inflateMenu(R.menu.list_menu);
-		toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+		mImageList = (ImageView) v.findViewById(R.id.image);
+		registerForContextMenu(mImageList);
+		mImageList.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				switch (item.getItemId()) {
-					case R.id.take_photo:
-						mIsImageLoad = false;
-						Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-						mFile = Image.create().createImageFile();
-						if (mFile != null) {
-							mPhotoPath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
-
-							cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
-							startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
-						} else {
-							Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
-						}
-						return true;
-					case R.id.select_from_gallery:
-						mIsImageLoad = false;
-						Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-								android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-						startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
-						return true;
-					case R.id.random_image:
-						setRandomImage();
-						return true;
-					default:
-						return false;
-				}
+			public void onClick(View v) {
+				v.showContextMenu();
 			}
 		});
-
-		mImageList = (ImageView) v.findViewById(R.id.image);
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
 		mName = (EditText) v.findViewById(R.id.name);
@@ -141,6 +113,58 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		}
 
 		return builder.create();
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+
+		getActivity().getMenuInflater().inflate(R.menu.image_menu, menu);
+		menu.findItem(R.id.random_image).setVisible(true);
+		menu.setHeaderTitle(getString(R.string.list_image));
+
+		MenuItem.OnMenuItemClickListener listener = new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				onContextItemSelected(item);
+				return true;
+			}
+		};
+
+		for (int i = 0, n = menu.size(); i < n; i++)
+			menu.getItem(i).setOnMenuItemClickListener(listener);
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.take_photo:
+				mIsImageLoad = false;
+				Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+				mFile = Image.create().createImageFile();
+				if (mFile != null) {
+					mPhotoPath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
+
+					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
+					startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+				} else {
+					Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+				}
+				break;
+			case R.id.select_from_gallery:
+				mIsImageLoad = false;
+				Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+				startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
+				break;
+			case R.id.random_image:
+				setRandomImage();
+				break;
+			default:
+				return super.onContextItemSelected(item);
+		}
+		return true;
 	}
 
 	@Override

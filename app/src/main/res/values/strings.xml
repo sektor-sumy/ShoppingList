@@ -11,6 +11,7 @@
 	<string name="all_bought">Все куплено</string>
 	<string name="bought">Куплено&#160;</string>
 	<string name="of">&#160;из&#160;</string>
+	<string name="list_image">Изображение списка</string>
 	<!--menu-->
 	<string name="take_photo">"Сделать снимок</string>
 	<string name="select_from_gallery">Выбрать из галереи</string>
@@ -38,6 +39,7 @@
 	<string name="add">Добавить:</string>
 	<string name="wait_load_image">Подождите загрузки картинки</string>
 	<string name="ask_save_item">Сохранить изменения?</string>
+	<string name="item_image">Изображение товара</string>
 	<!--item menu-->
 	<string name="delete_list">Удалить список</string>
 	<string name="update_list">Изменить список</string>

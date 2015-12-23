@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -134,6 +135,13 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 		});
 
 		mAppBarImage = (ImageView) v.findViewById(R.id.appbar_image);
+		registerForContextMenu(mAppBarImage);
+		mAppBarImage.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				v.showContextMenu();
+			}
+		});
 
 		setView(v);
 		return v;
@@ -169,6 +177,23 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 			case R.id.save_item:
 				saveItem();
 				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+
+		getActivity().getMenuInflater().inflate(R.menu.image_menu, menu);
+		menu.findItem(R.id.default_image).setVisible(true);
+		menu.setHeaderTitle(getString(R.string.item_image));
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
 			case R.id.take_photo:
 				mIsImageLoad = false;
 				Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
