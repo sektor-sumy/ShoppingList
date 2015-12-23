@@ -82,10 +82,10 @@
 	<string name="settings_key_sort_is_default_data">sort_is_default_data</string>
 	<string name="settings_title_sort_is_default_data">Использовать данные по умолчанию</string>
 	<string name="settings_summary_sort_is_default_data">Автоматическое заполнение полей о товаре: количество, цена и тд.</string>
-	<string name="settings_key_sort_data_item">sort_data_item</string>
+	<!--<string name="settings_key_sort_data_item">sort_data_item</string>
 	<string name="settings_title_sort_data_item">Способ обновление данных</string>
 	<string name="settings_summary_sort_data_item">Настройка обновления данных по умолчанию</string>
-	<string name="settings_dialog_title_sort_data_item">Выберите способ обновления данных:</string>
+	<string name="settings_dialog_title_sort_data_item">Выберите способ обновления данных:</string>-->
 
 	<string name="settings_category_other">Другое</string>
 	<string name="settings_dialog_title_">Выберите способ обновления данных:</string>
@@ -101,9 +101,9 @@
 	<string name="sort_order_down_price">убыванию цены</string>
 	<string name="sort_order_adding">порядку добавления</string>
 
-	<string name="data_item_button">показать специальную кнопку</string>
+	<!--<string name="data_item_button">показать специальную кнопку</string>
 	<string name="data_item_always">всегда при сохранении товара</string>
-	<string name="data_item_never">некогда не обновлять</string>
+	<string name="data_item_never">некогда не обновлять</string>-->
 
 	<string name="name">Название</string>
 	<string name="currency_symbol">Символ или сокращение</string>

@@ -52,13 +52,12 @@ import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.Image;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
-import ru.android.ainege.shoppinglist.ui.SettingsDataItem;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.*;
 import static ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource.*;
 
-public abstract class ItemFragment extends Fragment implements SettingsDataItem, ImageFragmentInterface, OnBackPressedListener {
+public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, OnBackPressedListener {
 	private static final String ID_ITEM = "idItem";
 	private static final int TAKE_PHOTO_CODE = 0;
 	private static final int LOAD_IMAGE_CODE = 1;
@@ -69,9 +68,6 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 	ItemDataSource mItemDS;
 	ShoppingListDataSource mItemsInListDS;
 
-	protected String mDataSave;
-
-	boolean mIsSaveButton = false;
 	boolean mIsProposedItem = false;
 	private String mCurrencyList;
 	private File mFile;
@@ -98,7 +94,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 
 	protected abstract SimpleCursorAdapter getCompleteTextAdapter();
 
-	protected abstract boolean saveData(boolean isUpdateData);
+	protected abstract boolean saveData();
 
 	protected abstract long getIdList();
 
@@ -111,11 +107,6 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 
 		mItemDS = new ItemDataSource(getActivity());
 		mItemsInListDS = new ShoppingListDataSource(getActivity());
-
-		getSettings();
-		if (SAVE_DATA_BUTTON.equals(mDataSave)) {
-			mIsSaveButton = true;
-		}
 	}
 
 	@Override
@@ -161,19 +152,11 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.item_menu, menu);
-		if (mIsSaveButton) {
-			menu.findItem(R.id.update_item).setVisible(true);
-		}
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.update_item:
-				if (saveData(true)) {
-					Toast.makeText(getActivity(), R.string.info_data_is_save, Toast.LENGTH_LONG).show();
-				}
-				return true;
 			case R.id.save_item:
 				saveItem();
 				return true;
@@ -284,7 +267,7 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 	}
 
 	private void saveItem() {
-		if (saveData(false)) {
+		if (saveData()) {
 			getActivity().finish();
 		} else {
 			Toast.makeText(getActivity(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
@@ -377,21 +360,6 @@ public abstract class ItemFragment extends Fragment implements SettingsDataItem,
 
 	void sendResult(long id) {
 		getActivity().setResult(android.app.Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
-	}
-
-	private void getSettings() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-		if (!prefs.getBoolean(getString(R.string.settings_key_sort_is_default_data), true)) {
-			mDataSave = SettingsDataItem.NOT_USE_DEFAULT_DATA;
-		} else {
-			String save = prefs.getString(getString(R.string.settings_key_sort_data_item), "");
-			if (save.contains(getString(R.string.data_item_button))) {
-				mDataSave = SettingsDataItem.SAVE_DATA_BUTTON;
-			} else if (save.contains(getString(R.string.data_item_always))) {
-				mDataSave = SettingsDataItem.ALWAYS_SAVE_DATA;
-			}
-		}
 	}
 
 	private void getCurrency() {

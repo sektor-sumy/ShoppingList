@@ -1,8 +1,10 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Slide;
@@ -62,7 +64,9 @@ public class AddItemFragment extends ItemFragment {
 	public void onResume() {
 		super.onResume();
 
-		if (!NOT_USE_DEFAULT_DATA.equals(mDataSave)) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+		if (prefs.getBoolean(getString(R.string.settings_key_sort_is_default_data), true)) {
 			mIsUseDefaultData = true;
 		}
 	}
@@ -202,7 +206,7 @@ public class AddItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected boolean saveData(boolean isUpdateData) {
+	protected boolean saveData() {
 		boolean isSave = false;
 
 		if (mName.length() == 0) {
@@ -221,31 +225,18 @@ public class AddItemFragment extends ItemFragment {
 			Item item = getItem();
 			setImagePath(item);
 
-			if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
-				updateItem(item);
-			} else {
-				long idItem;
-				if (mIsSaveButton) { //Don`t save default data
-					if (mIdSelectedItem != -1) {
-						idItem = mIdSelectedItem;
-						mItemDS.update(new Item(idItem, getName(), mImageDefaultPath, mImagePath));
-					} else {
-						idItem = (int) mItemDS.add(new Item(getName(), item.getIdUnit(), mImageDefaultPath, mImagePath));
-					}
-				} else {  //Always save default data
-					updateItem(item);
-					idItem = mIdSelectedItem;
-				}
-				item.setId(idItem);
+			addItem(item);
+			long idItem = mIdSelectedItem;
+			item.setId(idItem);
 
-				//Save item to list
-				if (mInfo.getVisibility() == View.VISIBLE) { //If item in list, update it
-					mItemsInListDS.update(getItemInList(item));
-				} else { //Add new item to list
-					idItem = mItemsInListDS.add(getItemInList(item));
-				}
-				sendResult(idItem);
+			//Save item to list
+			if (mInfo.getVisibility() == View.VISIBLE) { //If item in list, update it
+				mItemsInListDS.update(getItemInList(item));
+			} else { //Add new item to list
+				idItem = mItemsInListDS.add(getItemInList(item));
 			}
+
+			sendResult(idItem);
 			isSave = true;
 		}
 		return isSave;
@@ -266,7 +257,7 @@ public class AddItemFragment extends ItemFragment {
 		}
 	}
 
-	private void updateItem(Item item) {
+	private void addItem(Item item) {
 		if (mIdSelectedItem != -1) {
 			item.setId(mIdSelectedItem);
 			mItemDS.update(item);

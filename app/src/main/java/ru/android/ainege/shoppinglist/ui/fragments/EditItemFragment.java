@@ -140,7 +140,7 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected boolean saveData(boolean isUpdateData) {
+	protected boolean saveData() {
 		boolean isSave = false;
 
 		if (mName.length() < 3) {
@@ -157,38 +157,20 @@ public class EditItemFragment extends ItemFragment {
 			Item item = getItem();
 
 			if (getName().equals(mItemInList.getItem().getName())) { //name doesn`t change
-				if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
-					mItemDS.update(item);
-				} else {
-					if (mIsSaveButton) { //Don`t save default data
-						mItemDS.update(new Item(mItemInList.getIdItem(), getName(), mImageDefaultPath, mImagePath));
-					} else { //Always save default data
-						mItemDS.update(item);
-					}
+				mItemDS.update(item);
 
-					//Update item in list
-					mItemsInListDS.update(getItemInList(item));
-					sendResult(mItemInList.getIdItem());
-				}
-				isSave = true;
+				//Update item in list
+				mItemsInListDS.update(getItemInList(item));
 			} else {
-				if (isUpdateData) { //Updating in the catalog if the item is selected or create a new
-					addItem(item);
-				} else {
-					long idItem;
-					if (mIsSaveButton) { //Don`t save default data
-						idItem = (int) mItemDS.add(new Item(getName(), item.getIdUnit(), mImageDefaultPath, mImagePath));
-					} else { //Always save default data
-						idItem = (int) addItem(item);
-					}
-					item.setId(idItem);
+				long idItem = (int) addItem(item);
+				item.setId(idItem);
 
-					//Update item in list
-					mItemsInListDS.update(getItemInList(item), mItemInList.getIdItem());
-					sendResult(mItemInList.getIdItem());
-				}
-				isSave = true;
+				//Update item in list
+				mItemsInListDS.update(getItemInList(item), mItemInList.getIdItem());
 			}
+
+			sendResult(mItemInList.getIdItem());
+			isSave = true;
 
 
 		}
@@ -224,8 +206,8 @@ public class EditItemFragment extends ItemFragment {
 
 	}
 
-	private long addItem (Item item){
-	    item.setDefaultImagePath(mImagePath);
+	private long addItem(Item item) {
+		item.setDefaultImagePath(mImagePath);
 		return mItemDS.add(item);
 	}
 }
