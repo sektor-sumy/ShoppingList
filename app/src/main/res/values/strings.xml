@@ -93,7 +93,7 @@
 	<!--settings-->
 	<string name="settings">Настройки</string>
 	<string name="settings_key_sort_is_bought">sort_is_bought</string>
-	<string name="settings_category_sort">Сортировка товаров в списке</string>
+	<string name="settings_list">Настройки списков</string>
 	<string name="settings_title_sort_is_bought">Купленые в конец списка</string>
 	<string name="settings_summary_sort_is_bought">Перенести купленные товары в конец списка</string>
 	<string name="settings_key_sort_type">sort_type</string>
@@ -101,10 +101,10 @@
 	<string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
 	<string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
 
-	<string name="settings_category_data_item">Данные о товаре по умолчанию</string>
+	<string name="settings_category_data_item">Настройка данных по умолчанию</string>
 	<string name="settings_key_sort_is_default_data">sort_is_default_data</string>
-	<string name="settings_title_sort_is_default_data">Использовать данные по умолчанию</string>
-	<string name="settings_summary_sort_is_default_data">Автоматическое заполнение полей о товаре: количество, цена и тд.</string>
+	<string name="settings_title_sort_is_default_data">Автозаполнение</string>
+	<string name="settings_summary_sort_is_default_data">Заполнение полей, используя последние данные о товаре: количество, цена и тд.</string>
 
 	<string name="settings_category_other">Другое</string>
 	<string name="settings_key_currency">settings_key_summary</string>

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory
-		android:title="@string/settings_category_sort">
+		android:title="@string/settings_list">
+		<CheckBoxPreference
+			android:defaultValue="false"
+			android:key="@string/settings_key_open_last_list"
+			android:summary="@string/settings_summary_open_last_list"
+			android:title="@string/settings_title_open_last_list"/>
 		<CheckBoxPreference
 			android:defaultValue="true"
 			android:key="@string/settings_key_sort_is_bought"
@@ -23,23 +28,9 @@
 			android:key="@string/settings_key_sort_is_default_data"
 			android:summary="@string/settings_summary_sort_is_default_data"
 			android:title="@string/settings_title_sort_is_default_data"/>
-	<!--	<ListPreference
-			android:defaultValue="@string/data_item_always"
-			android:dependency="@string/settings_key_sort_is_default_data"
-			android:dialogTitle="@string/settings_dialog_title_sort_data_item"
-			android:entries="@array/data_item"
-			android:entryValues="@array/data_item"
-			android:key="@string/settings_key_sort_data_item"
-			android:summary="@string/settings_summary_sort_data_item"
-			android:title="@string/settings_title_sort_data_item"/>-->
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/settings_category_other">
-		<CheckBoxPreference
-			android:defaultValue="false"
-			android:key="@string/settings_key_open_last_list"
-			android:summary="@string/settings_summary_open_last_list"
-			android:title="@string/settings_title_open_last_list"/>
 		<Preference
 			android:key="@string/settings_key_currency"
 			android:title="@string/setting_title_currency"/>
