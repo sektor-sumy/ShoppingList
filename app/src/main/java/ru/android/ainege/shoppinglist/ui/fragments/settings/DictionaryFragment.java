@@ -42,6 +42,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
 	ArrayList<T> mDictionary = new ArrayList<>();
 	RecyclerViewAdapter mAdapterRV;
+	RecyclerView mDictionaryRV;
 
 	protected abstract String getTitle();
 
@@ -86,7 +87,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 		Button add = (Button) v.findViewById(R.id.add);
 		add.setOnClickListener(getAddHandler());
 
-		RecyclerView mDictionaryRV = (RecyclerView) v.findViewById(R.id.list);
+		mDictionaryRV = (RecyclerView) v.findViewById(R.id.list);
 		mDictionaryRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 
 		mAdapterRV = getAdapter();

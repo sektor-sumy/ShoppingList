@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
+import android.content.Context;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -9,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
+
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
@@ -16,8 +20,26 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
+import ru.android.ainege.shoppinglist.ui.Showcase;
 
 public class CurrencyFragment extends DictionaryFragment<Currency> {
+	private static final String PREFS_SHOWCASE_INTERNAL = "showcase_internal";
+	private boolean mFlag = true;
+
+	private void showCaseView() {
+		if (!getActivity().getSharedPreferences(PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE)
+				.getBoolean("hasShot" + Showcase.SHOT_CURRENCY, false)) {
+			mDictionaryRV.scrollToPosition(7);
+		}
+		CurrencyViewAdapter.CurrencyViewHolder holder = (CurrencyViewAdapter.CurrencyViewHolder) mDictionaryRV.findViewHolderForLayoutPosition(7);
+		new ShowcaseView.Builder(getActivity())
+				.setTarget(new ViewTarget(holder.mDefaultCurrency))
+				.setContentTitle(getString(R.string.showcase_default_currency))
+				.setContentText(getString(R.string.showcase_default_currency_desc))
+				.setStyle(R.style.Showcase)
+				.singleShot(Showcase.SHOT_CURRENCY)
+				.build();
+	}
 
 	@Override
 	protected String getTitle() {
@@ -112,6 +134,21 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 			super.removeItem(position);
 
 			saveCurrencySetting(-1);
+		}
+
+		@Override
+		public void onViewAttachedToWindow(CurrencyViewHolder holder) {
+			super.onViewAttachedToWindow(holder);
+
+			holder.mDefaultCurrency.post(new Runnable() {
+				@Override
+				public void run() {
+					if (mFlag) {
+						showCaseView();
+						mFlag = false;
+					}
+				}
+			});
 		}
 
 		public class CurrencyViewHolder extends RecyclerViewAdapter<CurrencyViewHolder>.ViewHolder {

@@ -33,6 +33,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
+
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -46,13 +49,14 @@ import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.Image;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
+import ru.android.ainege.shoppinglist.ui.Showcase;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.ListCursor;
 
 
-public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
 
@@ -124,6 +128,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			mActionMode = null;
 		}
 	};
+
+	private ShowcaseView showcaseView;
+	private int counter = 1;
+	private View mView;
 
 	public static ShoppingListFragment newInstance(long id) {
 		Bundle args = new Bundle();
@@ -286,7 +294,66 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				})
 		);
 
+		showCaseView();
+
 		return v;
+	}
+
+	private void showCaseView() {
+		ShowcaseView showcaseView = new ShowcaseView.Builder(getActivity())
+				.setTarget(new ViewTarget(mFAB))
+				.setContentTitle(getString(R.string.showcase_create_item))
+				.setContentText(getString(R.string.showcase_create_item_desc))
+				.setStyle(R.style.Showcase)
+				.singleShot(Showcase.SHOT_ADD_ITEM)
+				.build();
+
+		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.ok), false);
+	}
+
+	private void showCaseViews() {
+		RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
+		mView = holder.mTextView;
+		showcaseView = new ShowcaseView.Builder(getActivity())
+				.setTarget(new ViewTarget(mView))
+				.setContentTitle(getString(R.string.showcase_edit_item))
+				.setContentText(getString(R.string.showcase_edit_item_desc))
+				.setOnClickListener(this)
+				.setStyle(R.style.Showcase)
+				.singleShot(Showcase.SHOT_ITEM_IN_LIST)
+				.build();
+
+		showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
+		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
+	}
+
+	@Override
+	public void onClick(View v) {
+		RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
+		switch (counter) {
+			case 1:
+				showcaseView.setShowcase(new ViewTarget(mView), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_swipe_item));
+				showcaseView.setContentText(getString(R.string.showcase_swipe_item_desc));
+				break;
+			case 2:
+				holder.mIsBought.setVisibility(View.VISIBLE);
+				showcaseView.setShowcase(new ViewTarget(mView), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_unswipe_item));
+				showcaseView.setContentText(getString(R.string.showcase_unswipe_item_desc));
+				break;
+			case 3:
+				holder.mIsBought.setVisibility(View.GONE);
+				showcaseView.setShowcase(new ViewTarget(mView), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_delete_item));
+				showcaseView.setContentText(getString(R.string.showcase_delete_item_desc));
+				showcaseView.setButtonText(getString(R.string.close));
+				break;
+			case 4:
+				showcaseView.hide();
+				break;
+		}
+		counter++;
 	}
 
 	@Override
@@ -606,6 +673,18 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		@Override
 		public int getItemCount() {
 			return mItemsInList.size();
+		}
+
+		@Override
+		public void onViewAttachedToWindow(ViewHolder holder) {
+			super.onViewAttachedToWindow(holder);
+
+			holder.mTextView.post(new Runnable() {
+				@Override
+				public void run() {
+					showCaseViews();
+				}
+			});
 		}
 
 		public void removeItem(int position) {

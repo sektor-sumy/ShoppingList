@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -36,6 +34,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -52,12 +53,13 @@ import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.Image;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
+import ru.android.ainege.shoppinglist.ui.Showcase;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.*;
 import static ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource.*;
 
-public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, OnBackPressedListener {
+public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, OnBackPressedListener, View.OnClickListener {
 	private static final String ID_ITEM = "idItem";
 	private static final int TAKE_PHOTO_CODE = 0;
 	private static final int LOAD_IMAGE_CODE = 1;
@@ -89,6 +91,9 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	EditText mComment;
 	ToggleButton mIsBought;
 	private TextView mFinishPrice;
+
+	private ShowcaseView showcaseView;
+	private int counter = 1;
 
 	protected abstract TextWatcher getNameChangedListener();
 
@@ -135,7 +140,40 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		});
 
 		setView(v);
+		showCaseViews();
+
 		return v;
+	}
+
+	private void showCaseViews() {
+		showcaseView = new ShowcaseView.Builder(getActivity())
+				.setTarget(new ViewTarget(mAppBarImage))
+				.setContentTitle(getString(R.string.showcase_update_image_item))
+				.setContentText(getString(R.string.showcase_update_image_item_desc))
+				.setOnClickListener(this)
+				.setStyle(R.style.Showcase)
+				.singleShot(Showcase.SHOT_ITEM)
+				.build();
+
+		showcaseView.forceTextPosition(ShowcaseView.BELOW_SHOWCASE);
+		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (counter) {
+			case 1:
+				showcaseView.setShowcase(new ViewTarget(mIsBought), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_bought_item));
+				showcaseView.setContentText(getString(R.string.showcase_bought_item_desc));
+				showcaseView.setButtonText(getString(R.string.close));
+				showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
+				break;
+			case 2:
+				showcaseView.hide();
+				break;
+		}
+		counter++;
 	}
 
 	@Override

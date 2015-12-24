@@ -19,4 +19,13 @@
 
 	<style name="AppTheme.NoActionBar.TransparentStatusBar"/>
 
+	<style name="ShowcaseText" parent="TextAppearance.ShowcaseView.Title">
+		<item name="android:textColor">#06b8f9</item>
+	</style>
+
+	<style name="Showcase" parent="ShowcaseView">
+		<item name="sv_backgroundColor">#c323414e</item>
+		<item name="sv_titleTextAppearance">@style/ShowcaseText</item>
+	</style>
+
 </resources>

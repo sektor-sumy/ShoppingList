@@ -3,6 +3,9 @@
 
 	<string name="error_file_not_create">Не удалось создать файл</string>
 	<string name="error_name">Введите название</string>
+	<string name="next">Далее</string>
+	<string name="close">Закрыть</string>
+	<string name="ok">OK</string>
 
 	<!--Lists-->
 	<string name="you_lists">Ваши списки покупок</string>
@@ -12,6 +15,12 @@
 	<string name="bought">Куплено&#160;</string>
 	<string name="of">&#160;из&#160;</string>
 	<string name="list_image">Изображение списка</string>
+	<string name="showcase_create_list">Создание списка</string>
+	<string name="showcase_create_list_desc">Нажмите на \"плюсик\", чтобы создать новый список</string>
+	<string name="showcase_manage_list">Управление списком</string>
+	<string name="showcase_manage_list_desc">Нажмите на \"карандаш\" для изменения списка, а на \"корзину\" - для его удаления</string>
+	<string name="showcase_open_list">Просмотр списка</string>
+	<string name="showcase_open_list_desc">Нажмите на список для его просмотра</string>
 	<!--menu-->
 	<string name="take_photo">"Сделать снимок</string>
 	<string name="select_from_gallery">Выбрать из галереи</string>
@@ -24,6 +33,16 @@
 
 	<!--ShoppingListFragment-->
 	<string name="ask_delete_list">Удалить список?</string>
+	<string name="showcase_create_item">Добавление товара в список</string>
+	<string name="showcase_create_item_desc">Нажмите на \"плюсик\", чтобы добавить новый товар</string>
+	<string name="showcase_edit_item">Просмотр и изменение товара</string>
+	<string name="showcase_edit_item_desc">Нажмите на товар, чтобы открыть детали</string>
+	<string name="showcase_swipe_item">Отметить товар купленым</string>
+	<string name="showcase_swipe_item_desc">Вычеркните товар, проведя по нему слева направо</string>
+	<string name="showcase_unswipe_item">Отметить вычеркивание товара</string>
+	<string name="showcase_unswipe_item_desc">Для отмены, вычеркните товар повторно</string>
+	<string name="showcase_delete_item">Удаление товара</string>
+	<string name="showcase_delete_item_desc">Зажмите строку товара для перехода в режим удаления</string>
 	<!--layout-->
 	<string name="spent_money">Потрачено</string>
 	<string name="all_money">Всего</string>
@@ -40,6 +59,10 @@
 	<string name="wait_load_image">Подождите загрузки картинки</string>
 	<string name="ask_save_item">Сохранить изменения?</string>
 	<string name="item_image">Изображение товара</string>
+	<string name="showcase_update_image_item">Изображение товара</string>
+	<string name="showcase_update_image_item_desc">Нажмите на картинку для смены изображения</string>
+	<string name="showcase_bought_item">Уже купили товар?</string>
+	<string name="showcase_bought_item_desc">Отметьте это при создании или изменении товара</string>
 	<!--item menu-->
 	<string name="delete_list">Удалить список</string>
 	<string name="update_list">Изменить список</string>
@@ -82,13 +105,8 @@
 	<string name="settings_key_sort_is_default_data">sort_is_default_data</string>
 	<string name="settings_title_sort_is_default_data">Использовать данные по умолчанию</string>
 	<string name="settings_summary_sort_is_default_data">Автоматическое заполнение полей о товаре: количество, цена и тд.</string>
-	<!--<string name="settings_key_sort_data_item">sort_data_item</string>
-	<string name="settings_title_sort_data_item">Способ обновление данных</string>
-	<string name="settings_summary_sort_data_item">Настройка обновления данных по умолчанию</string>
-	<string name="settings_dialog_title_sort_data_item">Выберите способ обновления данных:</string>-->
 
 	<string name="settings_category_other">Другое</string>
-	<string name="settings_dialog_title_">Выберите способ обновления данных:</string>
 	<string name="settings_key_currency">settings_key_summary</string>
 	<string name="setting_title_currency">Валюты</string>
 
@@ -101,12 +119,10 @@
 	<string name="sort_order_down_price">убыванию цены</string>
 	<string name="sort_order_adding">порядку добавления</string>
 
-	<!--<string name="data_item_button">показать специальную кнопку</string>
-	<string name="data_item_always">всегда при сохранении товара</string>
-	<string name="data_item_never">некогда не обновлять</string>-->
-
 	<string name="name">Название</string>
 	<string name="currency_symbol">Символ или сокращение</string>
+	<string name="showcase_default_currency">Валюта по умолчанию</string>
+	<string name="showcase_default_currency_desc">Текущая валюта по умолчанию отмечена цветом, для ее изменения нажмите на \"звездочку\" нужной валюты</string>
 
 	<string name="error_empty">Не может быть пустым</string>
 	<string name="error_one_item">Что-то должно остаться</string>

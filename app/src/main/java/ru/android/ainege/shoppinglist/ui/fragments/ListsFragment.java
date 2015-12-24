@@ -29,18 +29,22 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
+
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.ui.Image;
+import ru.android.ainege.shoppinglist.ui.Showcase;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.ListCursor;
 
-public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
 
@@ -58,6 +62,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ImageView mEmptyImage;
 	private RecyclerViewAdapter mAdapterRV;
 	private ProgressBar mProgressBar;
+	private FloatingActionButton mAddItemFAB;
+
+	private ShowcaseView showcaseView;
+	private int counter = 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -80,8 +88,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			bar.setTitle(R.string.you_lists);
 		}
 
-		FloatingActionButton addItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
-		addItemFAB.setOnClickListener(new View.OnClickListener() {
+		mAddItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
+		mAddItemFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				ListDialogFragment addListDialog = new ListDialogFragment();
@@ -100,7 +108,45 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mAdapterRV = new RecyclerViewAdapter();
 		mListsRV.setAdapter(mAdapterRV);
 
+		showCaseView();
 		return v;
+	}
+
+	private void showCaseView() {
+		showcaseView = new ShowcaseView.Builder(getActivity())
+				.setTarget(new ViewTarget(mAddItemFAB))
+				.setContentTitle(getString(R.string.showcase_create_list))
+				.setContentText(getString(R.string.showcase_create_list_desc))
+				.setOnClickListener(this)
+				.setStyle(R.style.Showcase)
+				.singleShot(Showcase.SHOT_LIST)
+				.build();
+
+		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
+	}
+
+	@Override
+	public void onClick(View v) {
+		RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mListsRV.findViewHolderForLayoutPosition(0);
+		switch (counter) {
+			case 1:
+				showcaseView.setShowcase(new ViewTarget(holder.mDelete), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_manage_list));
+				showcaseView.setContentText(getString(R.string.showcase_manage_list_desc));
+				showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
+				break;
+			case 2:
+				showcaseView.setShowcase(new ViewTarget(holder.mImage), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_open_list));
+				showcaseView.setContentText(getString(R.string.showcase_open_list_desc));
+				showcaseView.forceTextPosition(ShowcaseView.BELOW_SHOWCASE);
+				Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.close), true);
+				break;
+			case 3:
+				showcaseView.hide();
+				break;
+		}
+		counter++;
 	}
 
 	@Override
@@ -326,6 +372,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
 					}
 				});
+
 				mView.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
