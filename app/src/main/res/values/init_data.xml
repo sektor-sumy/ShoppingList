@@ -11,6 +11,13 @@
 		<item>Шоколадка—шт—chocolate.jpg</item>
 		<item>Вафли—кг—wafer.jpg</item>
 		<item>Зефир—кг—zephyr.jpg</item>
+		<!--Сладости-->
+		<item>Мёд—банка—honey.jpg</item>
+		<item>Варенье—банка—jam.jpg</item>
+		<item>Джем—банка—jam.jpg</item>
+		<item>Халва—кг—halva.jpg</item>
+		<item>Печенье—кг—biscuit.jpg</item>
+		<item>Желе—упак—jelly.jpg</item>
 		<!--Чай/кофе-->
 		<item>Черный чай—упак—tea.jpg</item>
 		<item>Зеленый чай—упак—green tea.jpg</item>
@@ -18,10 +25,28 @@
 		<!--Замороженная продукция-->
 		<item>Рыба—кг—fish.jpg</item>
 		<item>Креветки—кг—shrimp.jpg</item>
+		<item>Тесто—упак—dough.jpg</item>
+		<item>Слоеное тесто—упак—puff pastry.jpg</item>
+		<item>Пельмени—кг—dumplings.jpg</item>
+		<item>Вареники—кг—vareniki.jpg</item>
+		<!--Рыбное-->
+		<item>Лосось—кг—fish.jpg</item>
+		<item>Форель—кг—fish.jpg</item>
+		<item>Горбуша—кг—fish.jpg</item>
+		<item>Нерка—кг—fish.jpg</item>
+		<item>Мидии—кг—mussels.jpg</item>
+		<item>Кальмары—кг—squids.jpg</item>
+		<item>Красная Икра—банка—red caviar.jpg</item>
+		<item>Черная Икра—банка—black caviar.jpg</item>
+		<item>Крабовые палочки—кг—crab sticks.jpg</item>
+		<item>Крабовое мясо—кг—crab meat.jpg</item>
+		<item>Селедка—кг—herring.jpg</item>
 		<!--Мясо-->
 		<item>Колбаса—кг—sausage.jpg</item>
 		<item>Сосиски—кг—frankfurters.jpg</item>
 		<item>Мясо—кг—meat.jpg</item>
+		<item>Свинина—кг—meat.jpg</item>
+		<item>Говядина—кг—meat.jpg</item>
 		<item>Курица—кг—chicken.jpg</item>
 		<!--Молочное-->
 		<item>Сыр—кг—cheese.jpg</item>
@@ -32,6 +57,7 @@
 		<item>Сливочное масло—упак—butter.jpg</item>
 		<item>Сгущенка—шт—condensed milk.jpg</item>
 		<item>Мороженое—шт—ice cream.jpg</item>
+		<item>Йогурт—упак—yogurt.jpg</item>
 		<item>Яйца—упак—eggs.jpg</item>
 		<!--Овощи-->
 		<item>Картофель—кг—potato.jpg</item>
@@ -43,6 +69,12 @@
 		<item>Лук—кг—onion.jpg</item>
 		<item>Грибы—кг—mushrooms.jpg</item>
 		<item>Кукуруза—кг—corn.jpg</item>
+		<item>Стручковый горошек—кг—pea pods.jpg</item>
+		<item>Баклажаны—кг—eggplant.jpg</item>
+		<item>Кабачки—кг—courgettes.jpg</item>
+		<item>Свекла—кг—beet.jpg</item>
+		<item>Хрен—кг—horseradish.jpg</item>
+		<item>Авокадо—шт—avocado.jpg</item>
 		<!--Фрукты-->
 		<item>Виноград—кг—grapes.jpg</item>
 		<item>Яблоки—кг—typo.jpg</item>
@@ -51,9 +83,19 @@
 		<item>Ананас—кг—pineapple.jpg</item>
 		<item>Бананы—кг—banana.jpg</item>
 		<item>Лимон—кг—lemon.jpg</item>
+		<item>Персики—кг—peaches.jpg</item>
+		<item>Нектарин—кг—nectarine.jpg</item>
+		<item>Малина—кг—raspberries.jpg</item>
+		<item>Арбуз—кг—watermelon.jpg</item>
+		<item>Дыня—кг—melon.jpg</item>
+		<item>Груши—кг—pears.jpg</item>
+		<item>Грейпфрут—кг—grapefruit.jpg</item>
+		<item>Киви—кг—kiwi.jpg</item>
 		<!--Зелень-->
 		<item>Укроп—упак—dill.jpg</item>
 		<item>Салат—упак—salad.jpg</item>
+		<item>Мята—упак—mint.jpg</item>
+		<item>Базилик—упак—basil.jpg</item>
 		<!--Алкоголь-->
 		<item>Вино—бут—wine.jpg</item>
 		<item>Пиво—бут—beer.jpg</item>
@@ -65,9 +107,29 @@
 		<!--Специи и соусы-->
 		<item>Майонез—шт—mayonnaise.jpg</item>
 		<item>Кетчуп—шт—ketchup.jpg</item>
+		<item>Горчица—шт—mustard.jpg</item>
 		<item>Соль—кг—salt.jpg</item>
 		<item>Сахар—кг—sugar.jpg</item>
 		<item>Растительное масло—бут—vegetable oil.jpg</item>
+		<item>Оливковое масло—бут—olive oil.jpg</item>
+		<item>Уксус—бут—vinegar.jpg</item>
+		<item>Черный перец—упак—black pepper.jpg</item>
+		<item>Красный перец—упак—paprika.jpg</item>
+		<item>Гвоздика—упак—cloves.jpg</item>
+		<item>Корица—упак—koritza.jpg</item>
+		<item>Лавровый лист—упак—bay leaf.jpg</item>
+		<!--Консервы-->
+		<item>Зеленый горошек—банка—pea pods.jpg</item>
+		<item>Оливки—банка—olives.jpg</item>
+		<item>Маслины—банка—black olives.jpg</item>
+		<item>Рыбные консервы—банка—canned fish.jpg</item>
+		<item>Шпроты—банка—sprat.jpg</item>
+		<item>Соленые помидоры—банка—canned tomatoes.jpg</item>
+		<item>Маринованные помидоры—банка—canned tomatoes.jpg</item>
+		<item>Консервированные помидоры—банка—canned tomatoes.jpg</item>
+		<item>Соленые огурцы—банка—canned cucumbers.jpg</item>
+		<item>Маринованные огурцы—банка—canned cucumbers.jpg</item>
+		<item>Консервированные огурцы—банка—canned cucumbers.jpg</item>
 		<!--Круппы/маакроны-->
 		<item>Макароны—кг—pasta.jpg</item>
 		<item>Гречка—кг—buckwheat.jpg</item>
@@ -77,6 +139,28 @@
 		<item>Мука—кг—flour.jpg</item>
 		<item>Горох—кг—peas.jpg</item>
 		<item>Фасоль—кг—beans.jpg</item>
+		<item>Мюсли—упак—muesli.jpg</item>
+		<item>Овсяные хлопья—упак—oat flakes.jpg</item>
+		<!--Орешки-->
+		<item>Миндаль—кг—almond.jpg</item>
+		<item>Гредский орех—кг—gredsky nut.jpg</item>
+		<item>Арахис—кг—peanut.jpg</item>
+		<item>Кешью—кг—cashew.jpg</item>
+		<item>Фундук—кг—hazelnut.jpg</item>
+		<item>Изюм—кг—raisins.jpg</item>
+		<item>Курога—кг—gurogu.jpg</item>
+		<item>Чернослив—кг—prune.jpg</item>
+		<!--Сушное-->
+		<item>Угорь—упак—acne.jpg</item>
+		<item>Нори—упак—nori.jpg</item>
+		<item>Сливочный сыр—шт—slivochii chiiz.jpg</item>
+		<item>Соевый соус—бут—soy sauce.jpg</item>
+		<item>Имбирь—упак—ginger.jpg</item>
+		<item>Васаби—упак—wasabi.jpg</item>
+		<!--всякое-->
+		<item>Дрожжи—упак—yeast.jpg</item>
+		<item>Разрыхлитель теста—упак—baking powder.jpg</item>
+		<item>Чипсы—упак—chips.jpg</item>
 		<!--Химия-->
 		<item>Стиральный порошок—кг—powder.jpg</item>
 		<item>Зубная паста—шт—toothpaste.jpg</item>
@@ -84,11 +168,42 @@
 		<item>Мыло—шт—soap.jpg</item>
 		<item>Гель для душа—шт—shower gel.jpg</item>
 		<item>Моющее средство—шт—cleanser.jpg</item>
+		<item>Дезодорант—шт—deodorant.jpg</item>
+		<item>Гель для бритья—шт—shaving gel.jpg</item>
+		<item>Пенка для бритья—шт—shaving gel.jpg</item>
+		<item>Лосьон после бритья—шт—shaving lotion.jpg</item>
+		<item>Крем после бритья—шт—shaving lotion.jpg</item>
+		<item>Прокладки—упак—gaskets.jpg</item>
+		<item>Ежедневные прокладки—упак—gaskets.jpg</item>
+		<item>Тампоны—упак—tampons.jpg</item>
+		<item>Презервативы—упак—condoms.jpg</item>
+		<item>Лак для волос—шт—heir lac.jpg</item>
+		<item>Мусс для волос—шт—heir lac.jpg</item>
+		<item>Бальзам для волос—шт—heir lotion.jpg</item>
+		<item>Кондиционер для волос—шт—heir lotion.jpg</item>
+		<item>Краска для волос—упак—hair color.jpg</item>
+		<item>Крем для лица—шт—cream.jpg</item>
+		<item>Крем для тела—шт—cream.jpg</item>
+		<item>Крем для глаз—шт—cream.jpg</item>
+		<item>Крем для рук—шт—cream.jpg</item>
+		<item>Ватные палочки—упак—cotton buds.jpg</item>
+		<item>Ватные диски—упак—cotton pads.jpg</item>
+		<item>Освежитель воздуха—шт—air freshener.jpg</item>
+		<item>Чистящие средства—шт—cleaners.jpg</item>
+		<item>Губки для мытья—упак—sponges.jpg</item>
+		<item>Перчатки—упак—gloves.jpg</item>
 		<!--Разное-->
 		<item>Спички—упак—matches.jpg</item>
 		<item>Мешки для мусора—упак—garbage bags.jpg</item>
 		<item>Салфетки—упак—napkins.jpg</item>
 		<item>Туалетная бумага—шт—toilet paper.jpg</item>
+		<item>Пленка пищевая—шт—film food.jpg</item>
+		<item>Фольга—шт—foil.jpg</item>
+		<!--Детское-->
+		<item>Подгузники—упак—diapers.jpg</item>
+		<item>Детское пюре—шт— baby puree.jpg</item>
+		<item>Детская смесь—упак—fusion kids .jpg</item>
+
 	</string-array>
 
 	<string-array name="units">
@@ -97,6 +212,7 @@
 		<item>бут</item>
 		<item>кг</item>
 		<item>л</item>
+		<item>банка</item>
 	</string-array>
 
 	<string-array name="currency">

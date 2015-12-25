@@ -16,7 +16,10 @@ public class UnitsDataSource extends DictionaryDataSource<Unit> {
 
 	@Override
 	public UnitCursor getAll() {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		return getAll(mDbHelper.getReadableDatabase());
+	}
+
+	public static UnitCursor getAll(SQLiteDatabase db) {
 		Cursor cursor = db.query(UnitsTable.TABLE_NAME, null, null,
 				null, null, null, UnitsTable.COLUMN_NAME);
 		return new UnitCursor(cursor);

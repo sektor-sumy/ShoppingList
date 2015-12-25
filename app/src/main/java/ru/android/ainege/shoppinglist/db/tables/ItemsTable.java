@@ -4,10 +4,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
+import ru.android.ainege.shoppinglist.db.entities.Item;
+import ru.android.ainege.shoppinglist.db.entities.Unit;
 import ru.android.ainege.shoppinglist.ui.Image;
 
 public class ItemsTable {
@@ -42,23 +46,65 @@ public class ItemsTable {
 
 	public static void onCreate(SQLiteDatabase database, Context ctx) {
 		database.execSQL(TABLE_CREATE);
-		String[] units = ctx.getResources().getStringArray(R.array.units);
 		String[][] initData = ShoppingListSQLiteHelper.parseInitData(ctx.getResources().getStringArray(R.array.items));
 
-		initialData(database, initData, java.util.Arrays.asList(units));
+		initialData(database, initData);
+	}
+
+	public static void onUpgrade(SQLiteDatabase db, Context ctx, int oldVersion, int newVersion) {
+		switch (oldVersion) {
+			case 1:
+				HashMap<String, Unit> unitHM = UnitsTable.getUnit(db);
+
+				ArrayList<Item> itemsDB = ItemDataSource.getAll(db).getEntities();
+				HashMap<String, Item> itemHM = new HashMap<>();
+				for (Item i : itemsDB) {
+					itemHM.put(i.getName().toLowerCase(), i);
+				}
+
+				String[][] initData = ShoppingListSQLiteHelper.parseInitData(ctx.getResources().getStringArray(R.array.items));
+				for (String[] itemData : initData) {
+					String name = itemData[INIT_DATA_NAME].toLowerCase();
+					String image = Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE];
+
+					if (itemHM.containsKey(name)) {
+						Item item = itemHM.get(name);
+
+						if (!item.getDefaultImagePath().equals(image)) {
+							ContentValues contentValue = new ContentValues();
+							contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, image);
+
+							if (item.getImagePath().startsWith(Image.CHARACTER_IMAGE_PATH)) {
+								contentValue.put(COLUMN_IMAGE_PATH, image);
+							}
+
+							db.update(ItemsTable.TABLE_NAME, contentValue, ItemsTable.COLUMN_ID + " = ?",
+									new String[]{String.valueOf(item.getId())});
+						}
+					} else {
+						add(db, itemData, unitHM.get(itemData[INIT_DATA_UNIT]));
+					}
+				}
+		}
 	}
 
 
-	private static void initialData(SQLiteDatabase database, String[][] initData, List<String> units) {
+	private static void initialData(SQLiteDatabase db, String[][] initData) {
+		HashMap<String, Unit> unit = UnitsTable.getUnit(db);
+
 		for (String[] itemData : initData) {
-			ContentValues contentValue = new ContentValues();
-
-			contentValue.put(COLUMN_NAME, itemData[INIT_DATA_NAME]);
-			contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
-			contentValue.put(COLUMN_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
-			contentValue.put(COLUMN_ID_UNIT, units.indexOf(itemData[INIT_DATA_UNIT]) + 1);
-
-			database.insert(TABLE_NAME, null, contentValue);
+			add(db, itemData, unit.get(itemData[INIT_DATA_UNIT]));
 		}
+	}
+
+	private static void add(SQLiteDatabase db, String[] itemData, Unit unit) {
+		ContentValues contentValue = new ContentValues();
+
+		contentValue.put(COLUMN_NAME, itemData[INIT_DATA_NAME]);
+		contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
+		contentValue.put(COLUMN_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
+		contentValue.put(COLUMN_ID_UNIT, unit.getId());
+
+		db.insert(TABLE_NAME, null, contentValue);
 	}
 }

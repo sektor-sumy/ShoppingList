@@ -12,7 +12,7 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "shoppingList.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	private static ShoppingListSQLiteHelper instance;
 	private final Context mCtx;
 
@@ -63,8 +63,13 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	}
 
 	@Override
-	public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		switch(oldVersion) {
+			case 1:
+				UnitsTable.onUpgrade(db, mCtx, oldVersion, newVersion);
+				ItemsTable.onUpgrade(db, mCtx, oldVersion, newVersion);
 
+		}
 	}
 
 }

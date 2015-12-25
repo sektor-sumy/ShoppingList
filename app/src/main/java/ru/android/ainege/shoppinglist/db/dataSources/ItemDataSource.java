@@ -21,6 +21,11 @@ public class ItemDataSource extends GenericDataSource<Item> {
 		return new ItemCursor(cursor);
 	}
 
+	public static ItemCursor getAll(SQLiteDatabase db) {
+		return  new ItemDataSource.ItemCursor(db.query(ItemsTable.TABLE_NAME, null, null,
+				null, null, null, null));
+	}
+
 	public ItemCursor getByName(String name) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(ItemsTable.TABLE_NAME, null, ItemsTable.COLUMN_NAME + " like ?",
