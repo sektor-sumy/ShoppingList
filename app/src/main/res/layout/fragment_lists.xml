@@ -37,7 +37,7 @@
 			android:id="@+id/empty_lists"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:gravity="center"
+			android:scaleType="centerInside"
 			android:src="@drawable/empty_lists"
 			android:background="#c6c6c6"
 			android:visibility="gone"/>

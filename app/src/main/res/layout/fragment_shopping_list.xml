@@ -138,15 +138,17 @@
 
 		</LinearLayout>
 
-		<ImageView
-			android:id="@+id/empty_list"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:gravity="top"
-			android:src="@drawable/empty_list"
-			android:background="#c6c6c6"
-			android:visibility="gone"/>
 	</FrameLayout>
+
+	<ImageView
+		android:id="@+id/empty_list"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_marginTop="@dimen/app_bar_height"
+		android:scaleType="centerInside"
+		android:src="@drawable/empty_list"
+		android:background="#c6c6c6"
+		android:visibility="gone"/>
 
 	<ProgressBar
 		android:id="@+id/progressBar"
