@@ -40,7 +40,8 @@ public class ListsDataSource extends GenericDataSource<List> {
 				"FROM " + ListsTable.TABLE_NAME + " left join " + ShoppingListTable.TABLE_NAME + " " +
 				"ON " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID + " = " +
 				ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " " +
-				"GROUP BY " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID;
+				"GROUP BY " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID +
+				" ORDER BY " + ListsTable.COLUMN_ID + " DESC";
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		return new ListCursor(cursor);
 	}
