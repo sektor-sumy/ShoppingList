@@ -15,6 +15,7 @@ public class ListsDataSource extends GenericDataSource<List> {
 
 	public ListsDataSource(Context context) {
 		super(context);
+		mDbHelper.getReadableDatabase();
 	}
 
 	public ListCursor get(long id) {

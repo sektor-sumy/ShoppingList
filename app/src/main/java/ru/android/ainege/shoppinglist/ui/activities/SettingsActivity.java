@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -26,7 +27,7 @@ public class SettingsActivity extends SingleFragmentActivity {
 		return new MyPreferenceFragment();
 	}
 
-	class MyPreferenceFragment extends PreferenceFragment {
+	public static class MyPreferenceFragment extends PreferenceFragment {
 
 		@Override
 		public void onCreate(final Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class SettingsActivity extends SingleFragmentActivity {
 			}
 
 			setHasOptionsMenu(true);
-			ActionBar actionBar = getSupportActionBar();
+			ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
 			if (actionBar != null) {
 				actionBar.setHomeButtonEnabled(true);

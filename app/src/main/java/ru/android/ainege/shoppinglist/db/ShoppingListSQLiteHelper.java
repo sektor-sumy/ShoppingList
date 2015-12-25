@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.db;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -9,6 +10,7 @@ import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
+import ru.android.ainege.shoppinglist.ui.Showcase;
 
 public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "shoppingList.db";
@@ -66,6 +68,16 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		switch(oldVersion) {
 			case 1:
+				SharedPreferences sp = mCtx.getSharedPreferences("showcase_internal", Context.MODE_PRIVATE);
+
+				SharedPreferences.Editor e = sp.edit();
+				e.putBoolean("hasShot" + Showcase.SHOT_LIST, true);
+				e.putBoolean("hasShot" + Showcase.SHOT_ADD_ITEM, true);
+				e.putBoolean("hasShot" + Showcase.SHOT_ITEM_IN_LIST, true);
+				e.putBoolean("hasShot" + Showcase.SHOT_ITEM, true);
+				e.putBoolean("hasShot" + Showcase.SHOT_CURRENCY, true);
+				e.apply();
+
 				UnitsTable.onUpgrade(db, mCtx, oldVersion, newVersion);
 				ItemsTable.onUpgrade(db, mCtx, oldVersion, newVersion);
 

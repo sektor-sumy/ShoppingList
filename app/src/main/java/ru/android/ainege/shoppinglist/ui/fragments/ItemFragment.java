@@ -63,8 +63,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private static final int TAKE_PHOTO_CODE = 0;
 	private static final int LOAD_IMAGE_CODE = 1;
 
-	private static final int ANSWER_FRAGMENT_CODE = 2;
-	private static final String ANSWER_FRAGMENT_DATE = "answerDialog";
+	protected static final int ANSWER_FRAGMENT_CODE = 2;
+	protected static final String ANSWER_FRAGMENT_DATE = "answerDialog";
 
 	ItemDataSource mItemDS;
 	ShoppingListDataSource mItemsInListDS;
@@ -289,9 +289,13 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 	@Override
 	public void onBackPressed() {
-		QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_save_item));
-		dialogFrag.setTargetFragment(ItemFragment.this, ANSWER_FRAGMENT_CODE);
-		dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
+		if (mName.length() != 0) {
+			QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_save_item));
+			dialogFrag.setTargetFragment(ItemFragment.this, ANSWER_FRAGMENT_CODE);
+			dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
+		} else {
+			getActivity().finish();
+		}
 	}
 
 	private void saveItem() {
