@@ -19,12 +19,11 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ImageView;
@@ -130,6 +129,14 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			}
 		});
 
+		Button save = (Button) v.findViewById(R.id.save_item);
+		save.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				saveItem();
+			}
+		});
+
 		mAppBarImage = (ImageView) v.findViewById(R.id.appbar_image);
 		registerForContextMenu(mAppBarImage);
 		mAppBarImage.setOnClickListener(new View.OnClickListener() {
@@ -184,23 +191,6 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		mAmount.setSelection(mAmount.getText().length());
 		mPrice.setSelection(mPrice.getText().length());
 		mComment.setSelection(mComment.getText().length());
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.item_menu, menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.save_item:
-				saveItem();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
 	}
 
 	@Override
