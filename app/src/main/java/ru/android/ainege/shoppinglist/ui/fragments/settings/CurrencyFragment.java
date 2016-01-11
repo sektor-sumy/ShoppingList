@@ -1,6 +1,5 @@
 package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
-import android.content.Context;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -23,14 +22,13 @@ import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.ui.Showcase;
 
 public class CurrencyFragment extends DictionaryFragment<Currency> {
-	private static final String PREFS_SHOWCASE_INTERNAL = "showcase_internal";
 	private boolean mFlag = true;
 
 	private void showCaseView() {
-		if (!getActivity().getSharedPreferences(PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE)
-				.getBoolean("hasShot" + Showcase.SHOT_CURRENCY, false)) {
+		if (Showcase.shouldBeShown(getActivity(), Showcase.SHOT_CURRENCY)) {
 			mDictionaryRV.scrollToPosition(7);
 		}
+
 		CurrencyViewAdapter.CurrencyViewHolder holder = (CurrencyViewAdapter.CurrencyViewHolder) mDictionaryRV.findViewHolderForLayoutPosition(7);
 		new ShowcaseView.Builder(getActivity())
 				.setTarget(new ViewTarget(holder.mDefaultCurrency))

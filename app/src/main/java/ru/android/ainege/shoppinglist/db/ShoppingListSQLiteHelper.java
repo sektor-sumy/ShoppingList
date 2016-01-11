@@ -68,7 +68,7 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		switch(oldVersion) {
 			case 1:
-				SharedPreferences sp = mCtx.getSharedPreferences("showcase_internal", Context.MODE_PRIVATE);
+				SharedPreferences sp = mCtx.getSharedPreferences(Showcase.PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE);
 
 				SharedPreferences.Editor e = sp.edit();
 				e.putBoolean("hasShot" + Showcase.SHOT_LIST, true);

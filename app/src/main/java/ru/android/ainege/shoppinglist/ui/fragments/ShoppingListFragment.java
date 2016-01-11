@@ -682,7 +682,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			holder.mTextView.post(new Runnable() {
 				@Override
 				public void run() {
-					showCaseViews();
+					if (Showcase.shouldBeShown(getActivity(), Showcase.SHOT_ITEM_IN_LIST)) {
+						showCaseViews();
+					}
 				}
 			});
 		}

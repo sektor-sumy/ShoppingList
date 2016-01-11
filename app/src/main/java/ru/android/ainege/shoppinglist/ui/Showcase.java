@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.widget.RelativeLayout;
 
 import com.github.amlcurran.showcaseview.ShowcaseView;
@@ -8,6 +9,8 @@ import com.github.amlcurran.showcaseview.ShowcaseView;
 import ru.android.ainege.shoppinglist.R;
 
 public class Showcase {
+	public static final String PREFS_SHOWCASE_INTERNAL = "showcase_internal";
+
 	private static int shot = 0;
 	public static final int SHOT_LIST = shot++;
 	public static final int SHOT_ADD_ITEM = shot++;
@@ -38,5 +41,10 @@ public class Showcase {
 
 		mShowcaseView.setButtonPosition(lp);
 		mShowcaseView.setButtonText(text);
+	}
+
+	public static boolean shouldBeShown(Context context, int type) {
+		return !context.getSharedPreferences(PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE)
+				.getBoolean("hasShot" + type, false);
 	}
 }
