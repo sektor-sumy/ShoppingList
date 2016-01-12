@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.entities.List;
-import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
+import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 
@@ -21,11 +21,11 @@ public class ListsDataSource extends GenericDataSource<List> {
 	public ListCursor get(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + ListsTable.TABLE_NAME + ".*, " +
-				CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_NAME + ", " +
-				CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_SYMBOL + " " +
-				"FROM " + ListsTable.TABLE_NAME + " INNER JOIN " + CurrencyTable.TABLE_NAME + " " +
+				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_NAME + ", " +
+				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_SYMBOL + " " +
+				"FROM " + ListsTable.TABLE_NAME + " INNER JOIN " + CurrenciesTable.TABLE_NAME + " " +
 				"ON " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID_CURRENCY + " = " +
-				CurrencyTable.TABLE_NAME + "." + CurrencyTable.COLUMN_ID + " " +
+				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_ID + " " +
 				"WHERE " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID + " = ?";
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
 		return new ListCursor(cursor);
@@ -107,9 +107,9 @@ public class ListsDataSource extends GenericDataSource<List> {
 
 			List list = new List(id, name, idCurrency, imagePath);
 
-			if (getColumnIndex(CurrencyTable.COLUMN_NAME) != -1) {
-				String currencyName = getString(getColumnIndex(CurrencyTable.COLUMN_NAME));
-				String currencySymbol = getString(getColumnIndex(CurrencyTable.COLUMN_SYMBOL));
+			if (getColumnIndex(CurrenciesTable.COLUMN_NAME) != -1) {
+				String currencyName = getString(getColumnIndex(CurrenciesTable.COLUMN_NAME));
+				String currencySymbol = getString(getColumnIndex(CurrenciesTable.COLUMN_SYMBOL));
 				list.setCurrency(new Currency(idCurrency, currencyName, currencySymbol));
 			}
 

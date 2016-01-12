@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
+import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
+import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
+import ru.android.ainege.shoppinglist.db.tables.ItemDataTable;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
@@ -57,8 +59,10 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase sqLiteDatabase) {
-		CurrencyTable.onCreate(sqLiteDatabase, mCtx);
+		CurrenciesTable.onCreate(sqLiteDatabase, mCtx);
 		UnitsTable.onCreate(sqLiteDatabase, mCtx);
+		CategoriesTable.onCreate(sqLiteDatabase, mCtx);
+		ItemDataTable.onCreate(sqLiteDatabase);
 		ItemsTable.onCreate(sqLiteDatabase, mCtx);
 		ListsTable.onCreate(sqLiteDatabase);
 		ShoppingListTable.onCreate(sqLiteDatabase);
@@ -83,5 +87,4 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 
 		}
 	}
-
 }

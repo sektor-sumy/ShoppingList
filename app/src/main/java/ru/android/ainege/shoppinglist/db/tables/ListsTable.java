@@ -21,21 +21,21 @@ public class ListsTable {
 			+ "("
 			+ COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COLUMN_NAME + " TEXT NOT NULL, "
-			+ COLUMN_ID_CURRENCY + " INTEGER, "
-			+ COLUMN_IMAGE_PATH + " TEXT, "
-			+ "FOREIGN KEY (" + COLUMN_ID_CURRENCY + ") REFERENCES " + CurrencyTable.TABLE_NAME + " (" + CurrencyTable.COLUMN_ID + ") ON DELETE SET NULL"
+			+ COLUMN_ID_CURRENCY + " INTEGER NOT NULL, "
+			+ COLUMN_IMAGE_PATH + " TEXT NOT NULL, "
+			+ "FOREIGN KEY (" + COLUMN_ID_CURRENCY + ") REFERENCES " + CurrenciesTable.TABLE_NAME + " (" + CurrenciesTable.COLUMN_ID + ")"
 			+ ");";
 
-	public static void onCreate(SQLiteDatabase database) {
-		database.execSQL(TABLE_CREATE);
-		initialData(database);
+	public static void onCreate(SQLiteDatabase db) {
+		db.execSQL(TABLE_CREATE);
+		initialData(db);
 	}
 
-	private static void initialData(SQLiteDatabase database) {
+	private static void initialData(SQLiteDatabase db) {
 			ContentValues contentValue = new ContentValues();
 			contentValue.put(COLUMN_NAME, "Ваш список");
 			contentValue.put(COLUMN_ID_CURRENCY, 1);
 			contentValue.put(COLUMN_IMAGE_PATH, Image.LIST_IMAGE_PATH + "random_list_0.png");
-			database.insert(TABLE_NAME, null, contentValue);
+			db.insert(TABLE_NAME, null, contentValue);
 	}
 }

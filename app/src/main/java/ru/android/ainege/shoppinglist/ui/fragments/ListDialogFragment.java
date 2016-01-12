@@ -36,7 +36,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.List;
-import ru.android.ainege.shoppinglist.db.tables.CurrencyTable;
+import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
 import ru.android.ainege.shoppinglist.ui.Image;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource.*;
@@ -247,7 +247,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.spinner_currency,
 				new CurrenciesDataSource(getActivity()).getAll(),
-				new String[]{CurrencyTable.COLUMN_SYMBOL, CurrencyTable.COLUMN_NAME},
+				new String[]{CurrenciesTable.COLUMN_SYMBOL, CurrenciesTable.COLUMN_NAME},
 				new int[]{R.id.currency_symbol, R.id.currency_name}, 0);
 		spinnerAdapter.setDropDownViewResource(R.layout.spinner_currency_drop);
 		return spinnerAdapter;

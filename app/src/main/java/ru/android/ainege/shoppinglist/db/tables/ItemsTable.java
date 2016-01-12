@@ -10,6 +10,7 @@ import java.util.HashMap;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
+import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 import ru.android.ainege.shoppinglist.ui.Image;
@@ -18,37 +19,38 @@ public class ItemsTable {
 
 	public static final String TABLE_NAME = "Items";
 
-	public static final String COLUMN_ID = "_id";
-	public static final String COLUMN_NAME = "item_name";
 	public static final String COLUMN_AMOUNT = "amount";
 	public static final String COLUMN_ID_UNIT = "id_unit";
 	public static final String COLUMN_PRICE = "price";
 	public static final String COLUMN_COMMENT = "comment";
-	public static final String COLUMN_DEFAULT_IMAGE_PATH = "item_default_image_path";
-	public static final String COLUMN_IMAGE_PATH = "image_image_path";
+
+
+	public static final String COLUMN_ID = "_id";
+	public static final String COLUMN_NAME = "item_name";
+	public static final String COLUMN_IMAGE_PATH = "item_image_path";
+	public static final String COLUMN_DEFAULT_IMAGE_PATH = "default_image_path";
+	public static final String COLUMN_ID_DATA = "id_data";
 
 	private static final int INIT_DATA_NAME = 0;
 	private static final int INIT_DATA_UNIT = 1;
 	private static final int INIT_DATA_IMAGE = 2;
+	private static final int INIT_DATA_CATEGORY = 3;
 
 	private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME
 			+ "("
 			+ COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COLUMN_NAME + " TEXT NOT NULL, "
-			+ COLUMN_AMOUNT + " REAL, "
-			+ COLUMN_ID_UNIT + " INTEGER NOT NULL, "
-			+ COLUMN_PRICE + " REAL, "
-			+ COLUMN_COMMENT + " TEXT, "
 			+ COLUMN_DEFAULT_IMAGE_PATH + " TEXT NOT NULL, "
 			+ COLUMN_IMAGE_PATH + " TEXT NOT NULL, "
-			+ "FOREIGN KEY (" + COLUMN_ID_UNIT + ") REFERENCES " + UnitsTable.TABLE_NAME + " (" + UnitsTable.COLUMN_ID + ") ON DELETE SET NULL"
+			+ COLUMN_ID_DATA + " INTEGER NOT NULL, "
+			+ "FOREIGN KEY (" + COLUMN_ID_DATA + ") REFERENCES " + ItemDataTable.TABLE_NAME + " (" + ItemDataTable.COLUMN_ID + ")"
 			+ ");";
 
-	public static void onCreate(SQLiteDatabase database, Context ctx) {
-		database.execSQL(TABLE_CREATE);
-		String[][] initData = ShoppingListSQLiteHelper.parseInitData(ctx.getResources().getStringArray(R.array.items));
+	public static void onCreate(SQLiteDatabase db, Context ctx) {
+		db.execSQL(TABLE_CREATE);
 
-		initialData(database, initData);
+		String[][] initData = ShoppingListSQLiteHelper.parseInitData(ctx.getResources().getStringArray(R.array.items));
+		initialData(db, initData);
 	}
 
 	public static void onUpgrade(SQLiteDatabase db, Context ctx, int oldVersion, int newVersion) {
@@ -82,28 +84,45 @@ public class ItemsTable {
 									new String[]{String.valueOf(item.getId())});
 						}
 					} else {
-						add(db, itemData, unitHM.get(itemData[INIT_DATA_UNIT]));
+						ContentValues contentValue = new ContentValues();
+
+						contentValue.put(COLUMN_NAME, itemData[INIT_DATA_NAME]);
+						contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
+						contentValue.put(COLUMN_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
+						contentValue.put(COLUMN_ID_UNIT, unitHM.get(itemData[INIT_DATA_UNIT]).getId());
+
+						db.insert(TABLE_NAME, null, contentValue);
 					}
 				}
 		}
 	}
 
-
 	private static void initialData(SQLiteDatabase db, String[][] initData) {
 		HashMap<String, Unit> unit = UnitsTable.getUnit(db);
+		HashMap<String, Category> category = CategoriesTable.getCategories(db);
 
 		for (String[] itemData : initData) {
-			add(db, itemData, unit.get(itemData[INIT_DATA_UNIT]));
+			long idData = addData(db, unit.get(itemData[INIT_DATA_UNIT]), category.get(itemData[INIT_DATA_CATEGORY]));
+			addItem(db, itemData, idData);
 		}
 	}
 
-	private static void add(SQLiteDatabase db, String[] itemData, Unit unit) {
+	private static long addData(SQLiteDatabase db, Unit unit, Category category) {
+		ContentValues data = new ContentValues();
+
+		data.put(ItemDataTable.COLUMN_ID_UNIT, unit.getId());
+		data.put(ItemDataTable.COLUMN_ID_CATEGORY, category.getId());
+
+		return db.insert(ItemDataTable.TABLE_NAME, null, data);
+	}
+
+	private static void addItem(SQLiteDatabase db, String[] itemData, long idData) {
 		ContentValues contentValue = new ContentValues();
 
 		contentValue.put(COLUMN_NAME, itemData[INIT_DATA_NAME]);
-		contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
 		contentValue.put(COLUMN_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
-		contentValue.put(COLUMN_ID_UNIT, unit.getId());
+		contentValue.put(COLUMN_DEFAULT_IMAGE_PATH, Image.ITEM_IMAGE_PATH + itemData[INIT_DATA_IMAGE]);
+		contentValue.put(COLUMN_ID_DATA, idData);
 
 		db.insert(TABLE_NAME, null, contentValue);
 	}
