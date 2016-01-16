@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
-public class UnitsDataSource extends DictionaryDataSource<Unit> {
+public class UnitsDS extends DictionaryDS<Unit> {
 
-	public UnitsDataSource(Context context) {
+	public UnitsDS(Context context) {
 		super(context);
 	}
 
@@ -58,7 +58,7 @@ public class UnitsDataSource extends DictionaryDataSource<Unit> {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.beginTransaction();
 		try {
-			new ItemDataDataSource(mContext).updateUnit(id, newId);
+			new ItemDataDS(mContext).updateUnit(id, newId);
 
 			db.delete(UnitsTable.TABLE_NAME, UnitsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 			db.setTransactionSuccessful();

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
 public class UnitsTable {
@@ -44,7 +44,7 @@ public class UnitsTable {
 	}
 
 	public static HashMap<String, Unit> getUnit (SQLiteDatabase db){
-		ArrayList<Unit> unitsDB = UnitsDataSource.getAll(db).getEntities();
+		ArrayList<Unit> unitsDB = UnitsDS.getAll(db).getEntities();
 		HashMap<String, Unit> unit = new HashMap<>();
 
 		for (Unit u : unitsDB) {

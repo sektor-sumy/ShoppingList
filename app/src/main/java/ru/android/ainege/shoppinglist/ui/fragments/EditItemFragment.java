@@ -15,8 +15,8 @@ import android.widget.Toast;
 import java.text.DecimalFormat;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.ItemCursor;
-import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDS.ItemCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 

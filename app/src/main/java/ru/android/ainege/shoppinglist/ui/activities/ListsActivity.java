@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 
 public class ListsActivity extends SingleFragmentActivity {
@@ -65,8 +65,8 @@ public class ListsActivity extends SingleFragmentActivity {
 		e.apply();
 
 		//set currency
-		CurrenciesDataSource currenciesDS =  new CurrenciesDataSource(this);
-		CurrenciesDataSource.CurrencyCursor c = currenciesDS.getByName("Рубль");
+		CurrenciesDS currenciesDS =  new CurrenciesDS(this);
+		CurrenciesDS.CurrencyCursor c = currenciesDS.getByName("Рубль");
 		if (c.moveToFirst()) {
 			long id = c.getEntity().getId();
 

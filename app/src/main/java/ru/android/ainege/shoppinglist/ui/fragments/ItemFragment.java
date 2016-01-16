@@ -41,11 +41,11 @@ import java.io.IOException;
 import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource.CurrencyCursor;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
+import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
@@ -57,8 +57,8 @@ import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.Showcase;
 import ru.android.ainege.shoppinglist.ui.Validation;
 
-import static ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.*;
-import static ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource.*;
+import static ru.android.ainege.shoppinglist.db.dataSources.ItemDS.*;
+import static ru.android.ainege.shoppinglist.db.dataSources.UnitsDS.*;
 
 public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, OnBackPressedListener, View.OnClickListener {
 	private static final String ID_ITEM = "idItem";
@@ -68,8 +68,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	protected static final int ANSWER_FRAGMENT_CODE = 2;
 	protected static final String ANSWER_FRAGMENT_DATE = "answerDialog";
 
-	ItemDataSource mItemDS;
-	ShoppingListDataSource mItemsInListDS;
+	ItemDS mItemDS;
+	ShoppingListDS mItemsInListDS;
 
 	boolean mIsProposedItem = false;
 	private String mCurrencyList;
@@ -111,8 +111,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 
-		mItemDS = new ItemDataSource(getActivity());
-		mItemsInListDS = new ShoppingListDataSource(getActivity());
+		mItemDS = new ItemDS(getActivity());
+		mItemsInListDS = new ShoppingListDS(getActivity());
 	}
 
 	@Override
@@ -395,7 +395,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	private void getCurrency() {
-		CurrencyCursor cursor = new CurrenciesDataSource(getActivity()).getByList(getIdList());
+		CurrencyCursor cursor = new CurrenciesDS(getActivity()).getByList(getIdList());
 		if (cursor.moveToFirst()) {
 			mCurrencyList = cursor.getEntity().getSymbol();
 		}
@@ -467,7 +467,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private SimpleCursorAdapter getSpinnerAdapter() {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				android.R.layout.simple_spinner_item,
-				new UnitsDataSource(getActivity()).getAll(),
+				new UnitsDS(getActivity()).getAll(),
 				new String[]{UnitsTable.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

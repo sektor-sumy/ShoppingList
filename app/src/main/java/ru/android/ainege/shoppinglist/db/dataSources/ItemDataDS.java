@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
 import ru.android.ainege.shoppinglist.db.tables.ItemDataTable;
 
-public class ItemDataDataSource extends GenericDataSource<ItemData>{
+public class ItemDataDS extends GenericDS<ItemData> {
 
-	public ItemDataDataSource(Context context) {
+	public ItemDataDS(Context context) {
 		super(context);
 	}
 
@@ -77,7 +77,7 @@ public class ItemDataDataSource extends GenericDataSource<ItemData>{
 		return values;
 	}
 
-	public static class ItemDataCursor extends GenericDataSource.EntityCursor<ItemData> {
+	public static class ItemDataCursor extends GenericDS.EntityCursor<ItemData> {
 		public ItemDataCursor(Cursor cursor) {
 			super(cursor);
 		}

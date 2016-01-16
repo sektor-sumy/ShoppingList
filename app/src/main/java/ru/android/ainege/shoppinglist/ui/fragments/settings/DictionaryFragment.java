@@ -28,7 +28,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 
@@ -48,7 +48,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 	protected abstract View.OnClickListener getAddHandler();
 
-	protected abstract DictionaryDataSource getDS();
+	protected abstract DictionaryDS getDS();
 
 	protected abstract RecyclerViewAdapter getAdapter();
 
@@ -160,9 +160,9 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	}
 
 	private static class DataCursorLoader extends CursorLoader {
-		private final DictionaryDataSource mDS;
+		private final DictionaryDS mDS;
 
-		public DataCursorLoader(Context context, DictionaryDataSource ds) {
+		public DataCursorLoader(Context context, DictionaryDS ds) {
 			super(context);
 			mDS = ds;
 		}

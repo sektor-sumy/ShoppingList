@@ -19,9 +19,9 @@ import android.widget.Toast;
 import java.text.DecimalFormat;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource.ItemCursor;
-import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
-import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDS.ItemCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.ui.Image;
 
@@ -285,7 +285,7 @@ public class AddItemFragment extends ItemFragment {
 	private int getPosition(Spinner spinner, String name) {
 		int index = 0;
 		for (int i = 0; i < spinner.getCount(); i++) {
-			if (((UnitsDataSource.UnitCursor) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
+			if (((UnitsDS.UnitCursor) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
 				index = i;
 				break;
 			}

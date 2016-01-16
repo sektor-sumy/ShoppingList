@@ -15,9 +15,9 @@ import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
+import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
+import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.ui.Showcase;
 
@@ -57,8 +57,8 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 	}
 
 	@Override
-	protected DictionaryDataSource getDS() {
-		return new CurrenciesDataSource(getActivity());
+	protected DictionaryDS getDS() {
+		return new CurrenciesDS(getActivity());
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 	@Override
 	protected boolean isEntityUsed(long idCurrency) {
-		return new ListsDataSource(getActivity()).isCurrencyUsed(idCurrency);
+		return new ListsDS(getActivity()).isCurrencyUsed(idCurrency);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		switch (loader.getId()) {
 			case DATA_LOADER:
 				if (data.moveToFirst()) {
-					mDictionary = ((CurrenciesDataSource.CurrencyCursor) data).getEntities();
+					mDictionary = ((CurrenciesDS.CurrencyCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
 				}
 				data.close();

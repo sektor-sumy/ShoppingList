@@ -42,10 +42,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDS;
+import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.Image;
@@ -54,7 +54,7 @@ import ru.android.ainege.shoppinglist.ui.Showcase;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 
-import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.ListCursor;
+import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 
 
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
@@ -71,8 +71,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final int ADD_ACTIVITY_CODE = 0;
 	private static final int EDIT_ACTIVITY_CODE = 1;
 
-	private ShoppingListDataSource mItemsInListDS;
-	private ListsDataSource mListsDS;
+	private ShoppingListDS mItemsInListDS;
+	private ListsDS mListsDS;
 
 	private ArrayList<ShoppingList> mItemsInList = new ArrayList<>();
 	private CollapsingToolbarLayout mToolbarLayout;
@@ -156,8 +156,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		setHasOptionsMenu(true);
 
-		mItemsInListDS = new ShoppingListDataSource(getActivity());
-		mListsDS = new ListsDataSource(getActivity());
+		mItemsInListDS = new ShoppingListDS(getActivity());
+		mListsDS = new ListsDS(getActivity());
 		getList(getArguments().getLong(ID_LIST));
 		getSettings();
 
@@ -561,7 +561,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		for (int i = items.size() - 1; i >= 0; i--) {
 			int position = items.get(i);
-			new ItemDataDataSource(getActivity()).delete(mItemsInList.get(position).getIdItemData());
+			new ItemDataDS(getActivity()).delete(mItemsInList.get(position).getIdItemData());
 			mAdapterRV.removeItem(position);
 
 			if (mItemsInList.size() > 0) {
@@ -780,7 +780,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		@Override
 		public Cursor loadInBackground() {
-			return new ShoppingListDataSource(mContext).getItemsInList(mIdList);
+			return new ShoppingListDS(mContext).getItemsInList(mIdList);
 		}
 	}
 }

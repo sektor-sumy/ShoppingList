@@ -35,14 +35,14 @@ import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.ui.Image;
 import ru.android.ainege.shoppinglist.ui.Showcase;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
-import static ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource.ListCursor;
+import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
@@ -57,7 +57,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
 	ArrayList<List> mLists = new ArrayList<>();
 	private int mPositionForDelete;
-	private ListsDataSource mListsDS;
+	private ListsDS mListsDS;
 	private RecyclerView mListsRV;
 	private ImageView mEmptyImage;
 	private RecyclerViewAdapter mAdapterRV;
@@ -73,7 +73,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		setHasOptionsMenu(true);
 
-		mListsDS = new ListsDataSource(getActivity());
+		mListsDS = new ListsDS(getActivity());
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
 
@@ -281,7 +281,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		@Override
 		public Cursor loadInBackground() {
-			return new ListsDataSource(mContext).getAll();
+			return new ListsDS(mContext).getAll();
 		}
 	}
 

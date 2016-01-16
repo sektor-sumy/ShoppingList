@@ -7,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDS;
+import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
 public class UnitFragment extends DictionaryFragment<Unit> {
@@ -32,8 +32,8 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 	}
 
 	@Override
-	protected DictionaryDataSource getDS() {
-		return new UnitsDataSource(getActivity());
+	protected DictionaryDS getDS() {
+		return new UnitsDS(getActivity());
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 
 	@Override
 	protected boolean isEntityUsed(long idUnit) {
-		return new ItemDataDataSource(getActivity()).isUnitUsed(idUnit);
+		return new ItemDataDS(getActivity()).isUnitUsed(idUnit);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 		switch (loader.getId()) {
 			case DATA_LOADER:
 				if (data.moveToFirst()) {
-					mDictionary = ((UnitsDataSource.UnitCursor) data).getEntities();
+					mDictionary = ((UnitsDS.UnitCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
 				}
 				data.close();

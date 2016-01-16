@@ -33,13 +33,13 @@ import java.io.IOException;
 import java.util.Random;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
+import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
 import ru.android.ainege.shoppinglist.ui.Image;
 
-import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource.*;
+import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.*;
 
 public class ListDialogFragment extends DialogFragment implements ImageFragmentInterface{
 	private static final String ID_LIST = "idList";
@@ -246,7 +246,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	private SimpleCursorAdapter getSpinnerAdapter() {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.spinner_currency,
-				new CurrenciesDataSource(getActivity()).getAll(),
+				new CurrenciesDS(getActivity()).getAll(),
 				new String[]{CurrenciesTable.COLUMN_SYMBOL, CurrenciesTable.COLUMN_NAME},
 				new int[]{R.id.currency_symbol, R.id.currency_name}, 0);
 		spinnerAdapter.setDropDownViewResource(R.layout.spinner_currency_drop);
@@ -312,7 +312,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		if (!mNameInputLayout.isErrorEnabled()) {
 			long idCurrency = ((CurrencyCursor) mCurrency.getSelectedItem()).getEntity().getId();
 
-			ListsDataSource listDS = new ListsDataSource(getActivity());
+			ListsDS listDS = new ListsDS(getActivity());
 
 			long id;
 			if (getArguments() == null) {

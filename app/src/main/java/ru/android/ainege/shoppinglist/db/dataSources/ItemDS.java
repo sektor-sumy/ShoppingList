@@ -10,9 +10,9 @@ import ru.android.ainege.shoppinglist.db.entities.ItemData;
 import ru.android.ainege.shoppinglist.db.tables.ItemDataTable;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 
-public class ItemDataSource extends GenericDataSource<Item> {
+public class ItemDS extends GenericDS<Item> {
 
-	public ItemDataSource(Context context) {
+	public ItemDS(Context context) {
 		super(context);
 	}
 
@@ -33,7 +33,7 @@ public class ItemDataSource extends GenericDataSource<Item> {
 
 	//for db v1
 	public static ItemCursor getAll(SQLiteDatabase db) {
-		return  new ItemDataSource.ItemCursor(db.query(ItemsTable.TABLE_NAME, null, null,
+		return  new ItemDS.ItemCursor(db.query(ItemsTable.TABLE_NAME, null, null,
 				null, null, null, null));
 	}
 
@@ -63,7 +63,7 @@ public class ItemDataSource extends GenericDataSource<Item> {
 
 	@Override
 	public int update(Item item) {
-		new ItemDataDataSource(mContext).update(item.getItemData());
+		new ItemDataDS(mContext).update(item.getItemData());
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(item);
@@ -73,7 +73,7 @@ public class ItemDataSource extends GenericDataSource<Item> {
 
 	@Override
 	public long add(Item item) {
-		long idData = new ItemDataDataSource(mContext).add(item.getItemData());
+		long idData = new ItemDataDS(mContext).add(item.getItemData());
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(item, idData);

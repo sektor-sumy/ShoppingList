@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
@@ -54,7 +54,7 @@ public class ItemsTable {
 			case 1:
 				HashMap<String, Unit> unitHM = UnitsTable.getUnit(db);
 
-				ArrayList<Item> itemsDB = ItemDataSource.getAll(db).getEntities();
+				ArrayList<Item> itemsDB = ItemDS.getAll(db).getEntities();
 				HashMap<String, Item> itemHM = new HashMap<>();
 				for (Item i : itemsDB) {
 					itemHM.put(i.getName().toLowerCase(), i);

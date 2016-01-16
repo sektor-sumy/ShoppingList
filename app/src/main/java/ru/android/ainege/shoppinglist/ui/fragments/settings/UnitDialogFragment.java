@@ -5,7 +5,7 @@ import android.text.InputFilter;
 import android.view.View;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
 public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
@@ -45,7 +45,7 @@ public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 		}
 
 		if (!mNameInputLayout.isErrorEnabled()) {
-			UnitsDataSource unitDS = new UnitsDataSource(getActivity());
+			UnitsDS unitDS = new UnitsDS(getActivity());
 
 			long id;
 			if (getArguments() == null) {

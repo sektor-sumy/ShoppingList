@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 
 public class CategoriesTable {
@@ -31,7 +31,7 @@ public class CategoriesTable {
 	}
 
 	public static HashMap<String, Category> getCategories (SQLiteDatabase db){
-		ArrayList<Category> categoriesDB = CategoriesDataSource.getAll(db).getEntities();
+		ArrayList<Category> categoriesDB = CategoriesDS.getAll(db).getEntities();
 		HashMap<String, Category> unit = new HashMap<>();
 
 		for (Category c : categoriesDB) {

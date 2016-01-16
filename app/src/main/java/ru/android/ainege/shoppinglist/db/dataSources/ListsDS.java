@@ -11,9 +11,9 @@ import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 
-public class ListsDataSource extends GenericDataSource<List> {
+public class ListsDS extends GenericDS<List> {
 
-	public ListsDataSource(Context context) {
+	public ListsDS(Context context) {
 		super(context);
 		mDbHelper.getReadableDatabase();
 	}

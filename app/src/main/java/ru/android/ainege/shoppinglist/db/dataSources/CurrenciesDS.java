@@ -12,9 +12,9 @@ import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 
-public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
+public class CurrenciesDS extends DictionaryDS<Currency> {
 
-	public CurrenciesDataSource(Context context) {
+	public CurrenciesDS(Context context) {
 		super(context);
 	}
 
@@ -85,7 +85,7 @@ public class CurrenciesDataSource extends DictionaryDataSource<Currency> {
 			idDefaultCurrency = getRandomId(id);
 		}
 
-		new ListsDataSource(mContext).updateCurrency(id, idDefaultCurrency);
+		new ListsDS(mContext).updateCurrency(id, idDefaultCurrency);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.delete(CurrenciesTable.TABLE_NAME, CurrenciesTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});

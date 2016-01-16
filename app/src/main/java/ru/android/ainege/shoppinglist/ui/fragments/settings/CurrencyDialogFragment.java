@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
 public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
@@ -67,7 +67,7 @@ public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 		}
 
 		if (!mNameInputLayout.isErrorEnabled() && !mSymbolInputLayout.isErrorEnabled()) {
-			CurrenciesDataSource currencyDS = new CurrenciesDataSource(getActivity());
+			CurrenciesDS currencyDS = new CurrenciesDS(getActivity());
 
 			long id;
 			if (getArguments() == null) {

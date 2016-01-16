@@ -8,11 +8,11 @@ import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 
-public abstract class GenericDataSource<T> {
+public abstract class GenericDS<T> {
 	final Context mContext;
 	final ShoppingListSQLiteHelper mDbHelper;
 
-	GenericDataSource(Context context) {
+	GenericDS(Context context) {
 		mContext = context;
 		mDbHelper = ShoppingListSQLiteHelper.getInstance(context);
 	}

@@ -18,9 +18,9 @@ import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
-public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
+public class ShoppingListDS extends GenericDS<ShoppingList> {
 
-	public ShoppingListDataSource(Context context) {
+	public ShoppingListDS(Context context) {
 		super(context);
 	}
 
@@ -72,7 +72,7 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 	}
 
 	public int update(ShoppingList shoppingList, long idOldItem) {
-		new ItemDataDataSource(mContext).update(shoppingList.getItemData());
+		new ItemDataDS(mContext).update(shoppingList.getItemData());
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(shoppingList.isBought());
@@ -83,7 +83,7 @@ public class ShoppingListDataSource extends GenericDataSource<ShoppingList> {
 
 	@Override
 	public long add(ShoppingList shoppingList) {
-		long idData = new ItemDataDataSource(mContext).add(shoppingList.getItemData());
+		long idData = new ItemDataDS(mContext).add(shoppingList.getItemData());
 		shoppingList.setIdItemData(idData);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();

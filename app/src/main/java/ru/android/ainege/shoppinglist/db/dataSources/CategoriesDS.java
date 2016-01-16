@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
 
-public class CategoriesDataSource extends DictionaryDataSource<Category> {
+public class CategoriesDS extends DictionaryDS<Category> {
 
-	public CategoriesDataSource(Context context) {
+	public CategoriesDS(Context context) {
 		super(context);
 	}
 
@@ -59,7 +59,7 @@ public class CategoriesDataSource extends DictionaryDataSource<Category> {
 		db.beginTransaction();
 		try {
 			//TODO update category
-			//new ListsDataSource(mContext).updateCategory(id, newId);
+			//new ListsDS(mContext).updateCategory(id, newId);
 
 			db.delete(CategoriesTable.TABLE_NAME, CategoriesTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 			db.setTransactionSuccessful();
