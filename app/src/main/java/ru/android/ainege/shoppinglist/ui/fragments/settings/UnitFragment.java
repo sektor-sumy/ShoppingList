@@ -2,15 +2,13 @@ package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
 import android.content.Loader;
 import android.database.Cursor;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDataSource;
-import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
@@ -45,7 +43,7 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 
 	@Override
 	protected boolean isEntityUsed(long idUnit) {
-		return new ShoppingListDataSource(getActivity()).isUnitUsed(idUnit);
+		return new ItemDataDataSource(getActivity()).isUnitUsed(idUnit);
 	}
 
 	@Override

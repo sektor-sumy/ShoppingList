@@ -18,29 +18,23 @@ public class ShoppingList implements Serializable {
 	private long mIdItem;
 	private long mIdList;
 	private boolean mIsBought;
-	private double mAmount;
-	private long mIdUnit;
-	private double mPrice;
-	private String mComment;
+	private long mIdItemData;
 	private Date mDate;
 	private Item mItem;
-	private Unit mUnit;
+	private ItemData mItemData;
 
-	public ShoppingList(long idItem, long idList, boolean isBought, double amount, long idUnit, double price, String comment, Date date) {
+	public ShoppingList(long idItem, long idList, boolean isBought, long idData, Date date) {
 		mIdItem = idItem;
 		mIdList = idList;
 		mIsBought = isBought;
-		mAmount = amount;
-		mIdUnit = idUnit;
-		mPrice = price;
-		mComment = comment;
+		mIdItemData = idData;
 		mDate = date;
 	}
 
-	public ShoppingList(Item item, long idList, boolean isBought, double amount, Unit unit, double price, String comment) {
-		this(item.getId(), idList, isBought, amount, unit.getId(), price, comment, null);
+	public ShoppingList(Item item, long idList, boolean isBought, ItemData itemData) {
+		this(item.getId(), idList, isBought, itemData.getId(), null);
 		mItem = item;
-		mUnit = unit;
+		mItemData = itemData;
 	}
 
 	public long getIdItem() {
@@ -67,36 +61,12 @@ public class ShoppingList implements Serializable {
 		mIsBought = bought;
 	}
 
-	public double getAmount() {
-		return mAmount;
+	public long getIdItemData() {
+		return mIdItemData;
 	}
 
-	public void setAmount(double amount) {
-		mAmount = amount;
-	}
-
-	public long getIdUnit() {
-		return mIdUnit;
-	}
-
-	public void setIdUnit(long idUnit) {
-		mIdUnit = idUnit;
-	}
-
-	public double getPrice() {
-		return mPrice;
-	}
-
-	public void setPrice(double price) {
-		this.mPrice = price;
-	}
-
-	public String getComment() {
-		return mComment;
-	}
-
-	public void setComment(String comment) {
-		mComment = comment;
+	public void setIdItemData(long id) {
+		mIdItemData = id;
 	}
 
 	public Date getDate() {
@@ -118,23 +88,20 @@ public class ShoppingList implements Serializable {
 		}
 	}
 
-	public Unit getUnit() {
-		return mUnit;
+	public ItemData getItemData() {
+		return mItemData;
 	}
 
-	public void setUnit(Unit unit) {
-		mUnit = unit;
-		if (mUnit != null) {
-			mIdUnit = mUnit.getId();
-		}
+	public void setItemData(ItemData itemData) {
+		mItemData = itemData;
 	}
 
 	public boolean equals(ShoppingList item) {
 		return !(!mItem.getName().equals(item.getItem().getName()) ||
 				!mItem.getImagePath().equals(item.getItem().getImagePath()) ||
-				mIsBought != item.isBought() || mAmount != item.getAmount() ||
-				mIdUnit != item.getIdUnit() || mPrice != item.getPrice() ||
-				!mComment.equals(item.getComment()));
+				mIsBought != item.isBought() || getItemData().getAmount() != item.getItemData().getAmount() ||
+				getItemData().getIdUnit() != item.getItemData().getIdUnit() || getItemData().getPrice() != item.getItemData().getPrice() ||
+				!getItemData().getComment().equals(item.getItemData().getComment()));
 	}
 
 	public static void setSortSettings(boolean isBoughtEndInList, String type) {
@@ -161,10 +128,10 @@ public class ShoppingList implements Serializable {
 						result = lhs.getItem().getName().compareToIgnoreCase(rhs.getItem().getName());
 						break;
 					case UP_PRICE:
-						result = (int) (lhs.getPrice() - rhs.getPrice());
+						result = (int) (lhs.getItemData().getPrice() - rhs.getItemData().getPrice());
 						break;
 					case DOWN_PRICE:
-						result = (int) (rhs.getPrice() - lhs.getPrice());
+						result = (int) (rhs.getItemData().getPrice() - lhs.getItemData().getPrice());
 						break;
 					case ORDER_ADDING:
 						result = (int) (lhs.getDate().getTime() - rhs.getDate().getTime());

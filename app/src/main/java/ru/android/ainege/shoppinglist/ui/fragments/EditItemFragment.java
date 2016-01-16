@@ -125,16 +125,16 @@ public class EditItemFragment extends ItemFragment {
 		mName.setText(mItemInList.getItem().getName());
 		mName.setSelection(mItemInList.getItem().getName().length());
 
-		if (mItemInList.getAmount() != 0) {
-			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getAmount()));
+		if (mItemInList.getItemData().getAmount() != 0) {
+			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getItemData().getAmount()));
 		}
-		mUnits.setSelection(getPosition(mUnits, mItemInList.getUnit().getId()));
+		mUnits.setSelection(getPosition(mUnits, mItemInList.getItemData().getUnit().getId()));
 
-		if (mItemInList.getPrice() != 0) {
-			mPrice.setText(String.format("%.2f", mItemInList.getPrice()));
+		if (mItemInList.getItemData().getPrice() != 0) {
+			mPrice.setText(String.format("%.2f", mItemInList.getItemData().getPrice()));
 		}
 
-		mComment.setText(mItemInList.getComment());
+		mComment.setText(mItemInList.getItemData().getComment());
 
 		mIsBought.setChecked(mItemInList.isBought());
 	}
@@ -156,10 +156,12 @@ public class EditItemFragment extends ItemFragment {
 				!mPriceInputLayout.isErrorEnabled()) {
 			Item item = getItem();
 
-			if (getName().equals(mItemInList.getItem().getName())) { //name doesn`t change
+			if (getName().equals(mItemInList.getItem().getName())) { //name didn't change
+				item.getItemData().setId(mItemDS.getIdData(item.getId()));
 				mItemDS.update(item);
 
 				//Update item in list
+				item.getItemData().setId(mItemInList.getIdItemData());
 				mItemsInListDS.update(getItemInList(item));
 			} else {
 				long idItem = (int) addItem(item);

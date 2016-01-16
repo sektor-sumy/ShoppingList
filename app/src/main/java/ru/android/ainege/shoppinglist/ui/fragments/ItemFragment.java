@@ -46,7 +46,9 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDataSource.Curren
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDataSource;
+import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Item;
+import ru.android.ainege.shoppinglist.db.entities.ItemData;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
@@ -376,17 +378,15 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		}
 		String comment = mComment.getText().toString();
 
-		return new Item(name, amount, ((UnitCursor) mUnits.getSelectedItem()).getEntity(), price, comment, mImagePath);
+		//TODO set category
+		return new Item(name, mImagePath, new ItemData(amount, ((UnitCursor) mUnits.getSelectedItem()).getEntity(), price, new Category(1, "null"), comment));
 	}
 
 	ShoppingList getItemInList(Item item) {
 		return new ShoppingList(item,
 				getIdList(),
 				mIsBought.isChecked(),
-				item.getAmount(),
-				item.getUnit(),
-				item.getPrice(),
-				item.getComment()
+				item.getItemData()
 		);
 	}
 

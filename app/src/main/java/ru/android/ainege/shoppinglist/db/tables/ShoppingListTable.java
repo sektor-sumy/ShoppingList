@@ -5,12 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 public class ShoppingListTable {
 	public static final String TABLE_NAME = "ShoppingList";
 
-	public static final String COLUMN_AMOUNT = "amount";
-	public static final String COLUMN_ID_UNIT = "id_unit";
-	public static final String COLUMN_PRICE = "price";
-	public static final String COLUMN_COMMENT = "comment";
-
-
 	public static final String COLUMN_ID_ITEM = "id_item";
 	public static final String COLUMN_ID_LIST = "id_list";
 	public static final String COLUMN_ID_DATA = "id_data";

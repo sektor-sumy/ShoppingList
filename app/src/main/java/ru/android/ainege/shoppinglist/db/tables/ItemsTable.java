@@ -19,11 +19,7 @@ public class ItemsTable {
 
 	public static final String TABLE_NAME = "Items";
 
-	public static final String COLUMN_AMOUNT = "amount";
-	public static final String COLUMN_ID_UNIT = "id_unit";
-	public static final String COLUMN_PRICE = "price";
-	public static final String COLUMN_COMMENT = "comment";
-
+	private static final String COLUMN_ID_UNIT = "id_unit";
 
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_NAME = "item_name";

@@ -58,8 +58,7 @@ public class UnitsDataSource extends DictionaryDataSource<Unit> {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.beginTransaction();
 		try {
-			new ShoppingListDataSource(mContext).updateUnit(id, newId);
-			new ItemDataSource(mContext).updateUnit(id, newId);
+			new ItemDataDataSource(mContext).updateUnit(id, newId);
 
 			db.delete(UnitsTable.TABLE_NAME, UnitsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 			db.setTransactionSuccessful();

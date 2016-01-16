@@ -179,7 +179,7 @@ public class AddItemFragment extends ItemFragment {
 					mAddedPrice = mPrice.getText().toString();
 					mAddedComment = mComment.getText().toString();
 
-					ItemCursor c = mItemDS.get(mIdSelectedItem);
+					ItemCursor c = mItemDS.getWithData(mIdSelectedItem);
 					c.moveToFirst();
 					Item item = c.getEntity();
 					c.close();
@@ -190,16 +190,16 @@ public class AddItemFragment extends ItemFragment {
 					mImageDefaultPath = item.getDefaultImagePath();
 					loadImage(false);
 
-					double amount = item.getAmount();
+					double amount = item.getItemData().getAmount();
 					if (amount > 0) {
 						mAmount.setText(new DecimalFormat("#.######").format(amount));
 					}
-					mUnits.setSelection(getPosition(mUnits, item.getIdUnit()));
-					double price = item.getPrice();
+					mUnits.setSelection(getPosition(mUnits, item.getItemData().getIdUnit()));
+					double price = item.getItemData().getPrice();
 					if (price > 0) {
 						mPrice.setText(String.format("%.2f", price));
 					}
-					mComment.setText(item.getComment());
+					mComment.setText(item.getItemData().getComment());
 				}
 			}
 		};
@@ -227,7 +227,6 @@ public class AddItemFragment extends ItemFragment {
 
 			addItem(item);
 			long idItem = mIdSelectedItem;
-			item.setId(idItem);
 
 			//Save item to list
 			if (mInfo.getVisibility() == View.VISIBLE) { //If item in list, update it
@@ -260,9 +259,11 @@ public class AddItemFragment extends ItemFragment {
 	private void addItem(Item item) {
 		if (mIdSelectedItem != -1) {
 			item.setId(mIdSelectedItem);
+			item.getItemData().setId(mItemDS.getIdData(mIdSelectedItem));
 			mItemDS.update(item);
 		} else {
 			mIdSelectedItem = (int) mItemDS.add(item);
+			item.setId(mIdSelectedItem);
 		}
 	}
 

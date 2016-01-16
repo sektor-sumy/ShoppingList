@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDataSource.ShoppingListCursor;
@@ -222,10 +223,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						ShoppingList itemInList = new ShoppingList(item.getItem(),
 								mList.getId(),
 								item.isBought(),
-								item.getAmount(),
-								item.getUnit(),
-								item.getPrice(),
-								item.getComment());
+								item.getItemData());
 
 						Intent i = new Intent(getActivity(), ItemActivity.class);
 						i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
@@ -563,7 +561,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		for (int i = items.size() - 1; i >= 0; i--) {
 			int position = items.get(i);
-			mItemsInListDS.delete(mItemsInList.get(position).getIdItem(), mList.getId());
+			new ItemDataDataSource(getActivity()).delete(mItemsInList.get(position).getIdItemData());
 			mAdapterRV.removeItem(position);
 
 			if (mItemsInList.size() > 0) {
@@ -602,8 +600,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private double sumOneItem(ShoppingList item) {
-		double price = item.getPrice();
-		double amount = item.getAmount();
+		double price = item.getItemData().getPrice();
+		double amount = item.getItemData().getAmount();
 		double sum = price * (amount == 0 ? 1 : amount);
 		return new BigDecimal(sum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
@@ -651,15 +649,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			Image.create().insertImageToView(getActivity(), itemInList.getItem().getImagePath(), holder.mImage);
 			holder.mTextView.setText(itemInList.getItem().getName());
 
-			if (itemInList.getAmount() == 0) {
+			if (itemInList.getItemData().getAmount() == 0) {
 				holder.mAmount.setText("-");
 			} else {
-				String amount = NumberFormat.getInstance().format(itemInList.getAmount())
-						+ " " + itemInList.getUnit().getName();
+				String amount = NumberFormat.getInstance().format(itemInList.getItemData().getAmount())
+						+ " " + itemInList.getItemData().getUnit().getName();
 				holder.mAmount.setText(amount);
 			}
 
-			String price = localValue(itemInList.getPrice()) + " " + mCurrencyList;
+			String price = localValue(itemInList.getItemData().getPrice()) + " " + mCurrencyList;
 			holder.mPrice.setText(price);
 			int visibility = View.GONE;
 
