@@ -76,6 +76,7 @@
 	<!--Layout-->
 	<string name="amount">Количество</string>
 	<string name="price">Цена</string>
+	<string name="category">Категория</string>
 	<string name="comment">Коментарий</string>
 	<string name="in_card">В корзину</string>
 

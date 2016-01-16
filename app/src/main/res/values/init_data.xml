@@ -228,6 +228,7 @@
 	</string-array>
 
 	<string-array name="categories">
+		<item>другое</item>
 		<item>алкоголь</item>
 		<item>молочное</item>
 		<item>бакалея</item>
@@ -241,6 +242,5 @@
 		<item>мясо</item>
 		<item>суши</item>
 		<item>бытовая химия</item>
-		<item>другое</item>
 	</string-array>
 </resources>

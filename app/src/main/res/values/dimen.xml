@@ -16,8 +16,8 @@
 
 	<!--fragment_item-->
 	<dimen name="column_left">100dp</dimen>
-	<dimen name="margin_top">30dp</dimen>
-	<dimen name="column_right">70dp</dimen>
+	<dimen name="margin_bottom">6dp</dimen>
+	<dimen name="column_right">75dp</dimen>
 	<dimen name="padding_hint">10dp</dimen>
 
 	<dimen name="dialog_margin">10dp</dimen>

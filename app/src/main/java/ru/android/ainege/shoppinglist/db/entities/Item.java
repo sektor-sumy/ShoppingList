@@ -71,6 +71,10 @@ public class Item implements Serializable {
 
 	public void setIdItemData(long id) {
 		mIdItemData = id;
+
+		if (mItemData != null) {
+			mItemData.setId(mIdItemData);
+		}
 	}
 
 	public ItemData getItemData() {

@@ -128,14 +128,14 @@ public class EditItemFragment extends ItemFragment {
 		if (mItemInList.getItemData().getAmount() != 0) {
 			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getItemData().getAmount()));
 		}
-		mUnits.setSelection(getPosition(mUnits, mItemInList.getItemData().getUnit().getId()));
+		mUnit.setSelection(getPosition(mUnit, mItemInList.getItemData().getUnit().getId()));
 
 		if (mItemInList.getItemData().getPrice() != 0) {
 			mPrice.setText(String.format("%.2f", mItemInList.getItemData().getPrice()));
 		}
 
+		mCategory.setSelection(getPosition(mCategory, mItemInList.getItemData().getCategory().getId()));
 		mComment.setText(mItemInList.getItemData().getComment());
-
 		mIsBought.setChecked(mItemInList.isBought());
 	}
 
@@ -161,13 +161,14 @@ public class EditItemFragment extends ItemFragment {
 				mItemDS.update(item);
 
 				//Update item in list
-				item.getItemData().setId(mItemInList.getIdItemData());
+				item.setIdItemData(mItemInList.getIdItemData());
 				mItemsInListDS.update(getItemInList(item));
 			} else {
 				long idItem = (int) addItem(item);
 				item.setId(idItem);
 
 				//Update item in list
+				item.setIdItemData(mItemInList.getIdItemData());
 				mItemsInListDS.update(getItemInList(item), mItemInList.getIdItem());
 			}
 

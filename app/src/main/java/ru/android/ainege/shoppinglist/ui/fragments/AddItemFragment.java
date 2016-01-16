@@ -34,6 +34,7 @@ public class AddItemFragment extends ItemFragment {
 	private String mAddedAmount = "";
 	private int mAddedUnit = 0;
 	private String mAddedPrice = "";
+	private int mAddedCategory = 0;
 	private String mAddedComment = "";
 
 	private long mIdSelectedItem = -1;
@@ -81,8 +82,8 @@ public class AddItemFragment extends ItemFragment {
 	protected void setView(View v) {
 		super.setView(v);
 
-		String defaultName = getActivity().getResources().getStringArray(R.array.units)[0];
-		mUnits.setSelection(getPosition(mUnits, defaultName));
+		mUnit.setSelection(getPosition(mUnit, getActivity().getResources().getStringArray(R.array.units)[0]));
+		mCategory.setSelection(getPosition(mUnit, getActivity().getResources().getStringArray(R.array.categories)[0]));
 
 		mName.setOnItemClickListener(getOnNameClickListener());
 		mCollapsingToolbarLayout.setTitle(getString(R.string.add));
@@ -111,8 +112,9 @@ public class AddItemFragment extends ItemFragment {
 					//when changing item, fill in the data that have been previously introduced
 					if (mIsUseDefaultData && mIsSelectedItem && !mItemName.equals(s.toString().trim())) {
 						mAmount.setText(mAddedAmount);
-						mUnits.setSelection(mAddedUnit);
+						mUnit.setSelection(mAddedUnit);
 						mPrice.setText(mAddedPrice);
+						mCategory.setSelection(mAddedCategory);
 						mComment.setText(mAddedComment);
 						mIdSelectedItem = -1;
 						mIsSelectedItem = false;
@@ -175,8 +177,9 @@ public class AddItemFragment extends ItemFragment {
 				// and save previously introduced data
 				if (mIsUseDefaultData) {
 					mAddedAmount = mAmount.getText().toString();
-					mAddedUnit = mUnits.getSelectedItemPosition();
+					mAddedUnit = mUnit.getSelectedItemPosition();
 					mAddedPrice = mPrice.getText().toString();
+					mAddedCategory = mCategory.getSelectedItemPosition();
 					mAddedComment = mComment.getText().toString();
 
 					ItemCursor c = mItemDS.getWithData(mIdSelectedItem);
@@ -194,11 +197,12 @@ public class AddItemFragment extends ItemFragment {
 					if (amount > 0) {
 						mAmount.setText(new DecimalFormat("#.######").format(amount));
 					}
-					mUnits.setSelection(getPosition(mUnits, item.getItemData().getIdUnit()));
+					mUnit.setSelection(getPosition(mUnit, item.getItemData().getIdUnit()));
 					double price = item.getItemData().getPrice();
 					if (price > 0) {
 						mPrice.setText(String.format("%.2f", price));
 					}
+					mCategory.setSelection(getPosition(mCategory, item.getItemData().getIdCategory()));
 					mComment.setText(item.getItemData().getComment());
 				}
 			}

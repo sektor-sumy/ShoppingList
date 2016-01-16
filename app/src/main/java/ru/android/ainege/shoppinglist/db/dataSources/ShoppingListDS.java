@@ -76,6 +76,7 @@ public class ShoppingListDS extends GenericDS<ShoppingList> {
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(shoppingList.isBought());
+		values.put(ShoppingListTable.COLUMN_ID_ITEM, shoppingList.getIdItem());
 		return db.update(ShoppingListTable.TABLE_NAME, values,
 				ShoppingListTable.COLUMN_ID_ITEM + " = ? AND " + ShoppingListTable.COLUMN_ID_LIST + " = ?",
 				new String[]{String.valueOf(idOldItem), String.valueOf(shoppingList.getIdList())});

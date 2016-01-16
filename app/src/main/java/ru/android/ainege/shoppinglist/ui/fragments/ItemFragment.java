@@ -41,15 +41,17 @@ import java.io.IOException;
 import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
-import ru.android.ainege.shoppinglist.db.entities.Category;
+import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.Image;
@@ -86,9 +88,10 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	TextView mInfo;
 	TextInputLayout mAmountInputLayout;
 	EditText mAmount;
-	Spinner mUnits;
+	Spinner mUnit;
 	TextInputLayout mPriceInputLayout;
 	EditText mPrice;
+	Spinner mCategory;
 	EditText mComment;
 	ToggleButton mIsBought;
 	private TextView mFinishPrice;
@@ -324,8 +327,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		mAmount = (EditText) v.findViewById(R.id.new_amount_item);
 		mAmount.addTextChangedListener(getAmountChangedListener());
 
-		mUnits = (Spinner) v.findViewById(R.id.new_amount_units);
-		mUnits.setAdapter(getSpinnerAdapter());
+		mUnit = (Spinner) v.findViewById(R.id.amount_unit);
+		mUnit.setAdapter(getUnitsAdapter());
 
 		mPriceInputLayout = (TextInputLayout) v.findViewById(R.id.price_input_layout);
 		mPrice = (EditText) v.findViewById(R.id.new_item_price);
@@ -333,6 +336,9 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 		TextView mCurrency = (TextView) v.findViewById(R.id.currency);
 		mCurrency.setText(mCurrencyList);
+
+		mCategory = (Spinner) v.findViewById(R.id.category);
+		mCategory.setAdapter(getCategoriesAdapter());
 
 		mComment = (EditText) v.findViewById(R.id.comment);
 
@@ -378,8 +384,11 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		}
 		String comment = mComment.getText().toString();
 
-		//TODO set category
-		return new Item(name, mImagePath, new ItemData(amount, ((UnitCursor) mUnits.getSelectedItem()).getEntity(), price, new Category(1, "null"), comment));
+		return new Item(name, mImagePath, new ItemData(amount,
+				((UnitCursor) mUnit.getSelectedItem()).getEntity(),
+				price,
+				((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity(),
+				comment));
 	}
 
 	ShoppingList getItemInList(Item item) {
@@ -464,11 +473,21 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		};
 	}
 
-	private SimpleCursorAdapter getSpinnerAdapter() {
+	private SimpleCursorAdapter getUnitsAdapter() {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				android.R.layout.simple_spinner_item,
 				new UnitsDS(getActivity()).getAll(),
 				new String[]{UnitsTable.COLUMN_NAME},
+				new int[]{android.R.id.text1}, 0);
+		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		return spinnerAdapter;
+	}
+
+	private SimpleCursorAdapter getCategoriesAdapter() {
+		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
+				android.R.layout.simple_spinner_item,
+				new CategoriesDS(getActivity()).getAll(),
+				new String[]{CategoriesTable.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		return spinnerAdapter;
@@ -501,7 +520,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	protected int getPosition(Spinner spinner, long id) {
 		int index = 0;
 		for (int i = 0; i < spinner.getCount(); i++) {
-			if (((UnitCursor) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
+			if (((EntityCursor<Dictionary>) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
 				index = i;
 				break;
 			}
