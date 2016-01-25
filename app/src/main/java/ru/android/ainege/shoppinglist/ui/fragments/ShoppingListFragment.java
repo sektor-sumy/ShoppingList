@@ -28,6 +28,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -39,13 +41,15 @@ import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
+import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.Image;
@@ -71,19 +75,18 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final int ADD_ACTIVITY_CODE = 0;
 	private static final int EDIT_ACTIVITY_CODE = 1;
 
-	private ShoppingListDS mItemsInListDS;
 	private ListsDS mListsDS;
 
-	private ArrayList<ShoppingList> mItemsInList = new ArrayList<>();
+	private ArrayList<Category> mCategories = new ArrayList<>();
 	private CollapsingToolbarLayout mToolbarLayout;
-	private ImageView mAppBarImage;
+	private ImageView mListImage;
 	private FloatingActionButton mFAB;
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
 	private ImageView mEmptyImage;
 	private LinearLayout mListContainer;
 	private ProgressBar mProgressBar;
-	private RecyclerViewAdapter mAdapterRV;
+	private CategoriesAdapter mAdapterRV;
 	private List mList;
 	private double mSaveSpentMoney = 0;
 	private double mSaveTotalMoney = 0;
@@ -156,7 +159,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		setHasOptionsMenu(true);
 
-		mItemsInListDS = new ShoppingListDS(getActivity());
 		mListsDS = new ListsDS(getActivity());
 		getList(getArguments().getLong(ID_LIST));
 		getSettings();
@@ -181,7 +183,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		});
 		setTitle();
 
-		mAppBarImage = (ImageView) v.findViewById(R.id.appbar_image);
+		mListImage = (ImageView) v.findViewById(R.id.appbar_image);
 		loadImage();
 
 		mFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
@@ -199,159 +201,21 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		});
 
+		mListContainer = (LinearLayout) v.findViewById(R.id.list_container);
 		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
+		mEmptyImage = (ImageView) v.findViewById(R.id.empty_list);
 
 		mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
 		mTotalMoney = (TextView) v.findViewById(R.id.total_money);
 
-		mEmptyImage = (ImageView) v.findViewById(R.id.empty_list);
-		mListContainer = (LinearLayout) v.findViewById(R.id.list_container);
-
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-		mAdapterRV = new RecyclerViewAdapter(mList.getCurrency().getSymbol());
+		mAdapterRV = new CategoriesAdapter(mList.getCurrency().getSymbol());
 		mItemsListRV.setAdapter(mAdapterRV);
-		mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
-					@Override
-					public void onItemClick(int position) {
-						if (mActionMode != null) {
-							mAdapterRV.toggleSelection(position);
-							return;
-						}
-
-						ShoppingList item = mItemsInList.get(position);
-						ShoppingList itemInList = new ShoppingList(item.getItem(),
-								mList.getId(),
-								item.isBought(),
-								item.getItemData());
-
-						Intent i = new Intent(getActivity(), ItemActivity.class);
-						i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
-
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							startActivityForResult(i, EDIT_ACTIVITY_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-						} else {
-							startActivityForResult(i, EDIT_ACTIVITY_CODE);
-						}
-					}
-
-					@Override
-					public void onItemLongClick(int position) {
-						if (mActionMode != null) {
-							return;
-						}
-
-						mActionMode = getActivity().startActionMode(mActionModeCallback);
-						mAdapterRV.toggleSelection(position);
-					}
-
-					@Override
-					public void onSwipeRight(int position) {
-						if (mActionMode != null) {
-							return;
-						}
-
-						//show is item cross off or not
-						RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mItemsListRV.findViewHolderForAdapterPosition(position);
-						boolean isBought;
-						if (holder.mIsBought.getVisibility() == View.VISIBLE) {
-							holder.mIsBought.setVisibility(View.GONE);
-							isBought = false;
-						} else {
-							holder.mIsBought.setVisibility(View.VISIBLE);
-							isBought = true;
-						}
-
-						//update data in db
-						ShoppingList item = mItemsInList.get(position);
-						mItemsInListDS.setIsBought(isBought, item.getIdItem(), mList.getId());
-
-						//update recyclerView
-						//try to update spent sum
-						//if set bought items in the end of list - refresh position
-						mAdapterRV.getItem(position).setBought(isBought);
-
-						if (mIsBoughtEndInList) {
-							ShoppingList.sort(mItemsInList);
-							int toPosition = getPosition(item.getIdItem());
-							if (toPosition != -1) {
-								mAdapterRV.notifyItemMoved(position, toPosition);
-								mItemsListRV.scrollToPosition(toPosition);
-							}
-						}
-
-						double sum = sumOneItem(item);
-						if (isBought) {
-							mSaveSpentMoney += sum;
-						} else {
-							mSaveSpentMoney -= sum;
-						}
-						updateSpentSum(mSaveSpentMoney);
-
-					}
-				})
-		);
 
 		showCaseView();
 
 		return v;
-	}
-
-	private void showCaseView() {
-		ShowcaseView showcaseView = new ShowcaseView.Builder(getActivity())
-				.setTarget(new ViewTarget(mFAB))
-				.setContentTitle(getString(R.string.showcase_create_item))
-				.setContentText(getString(R.string.showcase_create_item_desc))
-				.setStyle(R.style.Showcase)
-				.singleShot(Showcase.SHOT_ADD_ITEM)
-				.build();
-
-		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.ok), false);
-	}
-
-	private void showCaseViews() {
-		RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
-		mView = holder.mTextView;
-		showcaseView = new ShowcaseView.Builder(getActivity())
-				.setTarget(new ViewTarget(mView))
-				.setContentTitle(getString(R.string.showcase_edit_item))
-				.setContentText(getString(R.string.showcase_edit_item_desc))
-				.setOnClickListener(this)
-				.setStyle(R.style.Showcase)
-				.singleShot(Showcase.SHOT_ITEM_IN_LIST)
-				.build();
-
-		showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
-		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
-	}
-
-	@Override
-	public void onClick(View v) {
-		RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
-		switch (counter) {
-			case 1:
-				showcaseView.setShowcase(new ViewTarget(mView), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_swipe_item));
-				showcaseView.setContentText(getString(R.string.showcase_swipe_item_desc));
-				break;
-			case 2:
-				holder.mIsBought.setVisibility(View.VISIBLE);
-				showcaseView.setShowcase(new ViewTarget(mView), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_unswipe_item));
-				showcaseView.setContentText(getString(R.string.showcase_unswipe_item_desc));
-				break;
-			case 3:
-				holder.mIsBought.setVisibility(View.GONE);
-				showcaseView.setShowcase(new ViewTarget(mView), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_delete_item));
-				showcaseView.setContentText(getString(R.string.showcase_delete_item_desc));
-				showcaseView.setButtonText(getString(R.string.close));
-				break;
-			case 4:
-				showcaseView.hide();
-				break;
-		}
-		counter++;
 	}
 
 	@Override
@@ -391,63 +255,16 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				return true;
 			case R.id.settings:
 				Intent i = new Intent(getActivity(), SettingsActivity.class);
+
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 				} else {
 					startActivity(i);
 				}
+
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		Loader<Cursor> loader = null;
-		switch (id) {
-			case DATA_LOADER:
-				loader = new ItemsInListCursorLoader(getActivity(), mList.getId());
-				break;
-			default:
-				break;
-		}
-		return loader;
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		switch (loader.getId()) {
-			case DATA_LOADER:
-				if (mProgressBar.getVisibility() == View.VISIBLE) {
-					mProgressBar.setVisibility(View.GONE);
-				}
-
-				if (data.moveToFirst()) {
-					mItemsInList = ((ShoppingListCursor) data).getEntities();
-					ShoppingList.sort(mItemsInList);
-
-					mAdapterRV.setCurrency(mList.getCurrency().getSymbol());     //update data in adapter
-
-					updateSums();
-					hideEmptyStates();
-				} else {
-					showEmptyStates();
-				}
-				data.close();
-				break;
-			default:
-				break;
-		}
-	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> loader) {
-		switch (loader.getId()) {
-			case DATA_LOADER:
-				break;
-			default:
-				break;
 		}
 	}
 
@@ -479,12 +296,97 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	}
 
+	@Override
+	public void onClick(View v) {
+		CategoriesAdapter.ViewHolder categoryHolder = (CategoriesAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
+		CategoriesAdapter.ItemsAdapter.ViewHolder holder = (CategoriesAdapter.ItemsAdapter.ViewHolder) categoryHolder.mItemsInCategory.findViewHolderForLayoutPosition(0);
+
+		switch (counter) {
+			case 1:
+				showcaseView.setShowcase(new ViewTarget(mView), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_swipe_item));
+				showcaseView.setContentText(getString(R.string.showcase_swipe_item_desc));
+				break;
+			case 2:
+				holder.mIsBought.setVisibility(View.VISIBLE);
+				showcaseView.setShowcase(new ViewTarget(mView), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_unswipe_item));
+				showcaseView.setContentText(getString(R.string.showcase_unswipe_item_desc));
+				break;
+			case 3:
+				holder.mIsBought.setVisibility(View.GONE);
+				showcaseView.setShowcase(new ViewTarget(mView), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_delete_item));
+				showcaseView.setContentText(getString(R.string.showcase_delete_item_desc));
+				showcaseView.setButtonText(getString(R.string.close));
+				break;
+			case 4:
+				showcaseView.hide();
+				break;
+		}
+		counter++;
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		Loader<Cursor> loader = null;
+		switch (id) {
+			case DATA_LOADER:
+				loader = new ItemsInListCursorLoader(getActivity(), mList.getId());
+				break;
+			default:
+				break;
+		}
+		return loader;
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		switch (loader.getId()) {
+			case DATA_LOADER:
+				if (mProgressBar.getVisibility() == View.VISIBLE) {
+					mProgressBar.setVisibility(View.GONE);
+				}
+
+				if (data.moveToFirst()) {
+					ArrayList<ShoppingList> itemsInList = ((CategoriesDS.CategoryCursor) data).getItemsInListCursor().getEntities();
+					mCategories = ((CategoriesDS.CategoryCursor) data).getCategoriesWithItems(itemsInList);
+
+					mAdapterRV.setCurrency(mList.getCurrency().getSymbol());     //update data in adapter
+
+					updateSums();
+					hideEmptyStates();
+				} else {
+					showEmptyStates();
+				}
+				data.close();
+				break;
+			default:
+				break;
+		}
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		switch (loader.getId()) {
+			case DATA_LOADER:
+				break;
+			default:
+				break;
+		}
+	}
+
+	private void updateData() {
+		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
+	}
+
 	private void getSettings() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
 		mIsBoughtEndInList = prefs.getBoolean(getString(R.string.settings_key_sort_is_bought), true);
 		String sortType;
 		String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
+
 		if (regular.contains(getString(R.string.sort_order_alphabet))) {
 			sortType = ShoppingList.ALPHABET;
 		} else if (regular.contains(getString(R.string.sort_order_up_price))) {
@@ -496,34 +398,31 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		} else {
 			sortType = ShoppingList.ALPHABET;
 		}
+
 		ShoppingList.setSortSettings(mIsBoughtEndInList, sortType);
-
 		saveId(mList.getId());
-	}
-
-	private String localValue(double value) {
-		NumberFormat nf = NumberFormat.getInstance();
-		nf.setMinimumFractionDigits(2);
-		nf.setMaximumFractionDigits(2);
-		return nf.format(value);
 	}
 
 	private void getList(long idList) {
 		ListCursor cursor = mListsDS.get(idList);
+
 		if (cursor.moveToFirst()) {
 			mList = cursor.getEntity();
 		}
+
 		cursor.close();
 	}
 
 	private void saveId(long id) {
 		SharedPreferences mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = mSettings.edit();
+
 		if (id != -1) {
 			editor.putLong(APP_PREFERENCES_ID, id);
 		} else {
 			editor.remove(APP_PREFERENCES_ID);
 		}
+
 		editor.apply();
 	}
 
@@ -534,7 +433,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	protected void loadImage() {
 		Image.create().insertImageToView(getActivity(),
 				mList.getImagePath(),
-				mAppBarImage);
+				mListImage);
 	}
 
 	private void showEmptyStates() {
@@ -551,51 +450,48 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mEmptyImage.setVisibility(View.GONE);
 	}
 
-	private void updateData() {
-		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
-	}
-
 	private void deleteSelectedItems() {
-		ArrayList<Integer> items = mAdapterRV.getSelectedItems();
-		Collections.sort(items);
+		ArrayList<ShoppingList> items = mAdapterRV.getSelectedItems();
 
-		for (int i = items.size() - 1; i >= 0; i--) {
-			int position = items.get(i);
-			new ItemDataDS(getActivity()).delete(mItemsInList.get(position).getIdItemData());
-			mAdapterRV.removeItem(position);
+		for (ShoppingList item : items) {
+			new ItemDataDS(getActivity()).delete(item.getIdItemData());
+			mAdapterRV.removeItem(item);
+		}
 
-			if (mItemsInList.size() > 0) {
-				updateSums();
-				hideEmptyStates();
-			} else {
-				showEmptyStates();
-			}
+		mAdapterRV.getSelectedItems().clear();
+
+		if (mCategories.size() > 0) {
+			updateSums();
+			hideEmptyStates();
+		} else {
+			showEmptyStates();
 		}
 	}
 
-	private int getPosition(long id) {
-		int index = -1;
-		for (int i = 0; i < mItemsInList.size(); ++i) {
-			if (mItemsInList.get(i).getIdItem() == id) {
-				index = i;
-				break;
-			}
-		}
-		return index;
+	private String localValue(double value) {
+		NumberFormat nf = NumberFormat.getInstance();
+		nf.setMinimumFractionDigits(2);
+		nf.setMaximumFractionDigits(2);
+		return nf.format(value);
 	}
 
 	private double sumMoney(boolean onlyBought) {
 		double sum = 0;
-		for (ShoppingList item : mItemsInList) {
-			if ((onlyBought && item.isBought()) || !onlyBought) {
-				sum += sumOneItem(item);
+
+		for (Category category : mCategories) {
+			for (ShoppingList item : category.getItemsByCategoryInList()) {
+				if ((onlyBought && item.isBought()) || !onlyBought) {
+					sum += sumOneItem(item);
+				}
 			}
 		}
+
 		if (onlyBought) {
 			mSaveSpentMoney = sum;
 		} else {
 			mSaveTotalMoney = sum;
 		}
+
 		return sum;
 	}
 
@@ -622,11 +518,42 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mSpentMoney.setText(spentMoney);
 	}
 
-	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-		private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
+	private void showCaseView() {
+		ShowcaseView showcaseView = new ShowcaseView.Builder(getActivity())
+				.setTarget(new ViewTarget(mFAB))
+				.setContentTitle(getString(R.string.showcase_create_item))
+				.setContentText(getString(R.string.showcase_create_item_desc))
+				.setStyle(R.style.Showcase)
+				.singleShot(Showcase.SHOT_ADD_ITEM)
+				.build();
+
+		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.ok), false);
+	}
+
+	private void showCaseViews() {
+		CategoriesAdapter.ViewHolder categoryHolder = (CategoriesAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
+		CategoriesAdapter.ItemsAdapter.ViewHolder holder = (CategoriesAdapter.ItemsAdapter.ViewHolder) categoryHolder.mItemsInCategory.findViewHolderForLayoutPosition(0);
+
+		mView = holder.mName;
+		showcaseView = new ShowcaseView.Builder(getActivity())
+				.setTarget(new ViewTarget(mView))
+				.setContentTitle(getString(R.string.showcase_edit_item))
+				.setContentText(getString(R.string.showcase_edit_item_desc))
+				.setOnClickListener(this)
+				.setStyle(R.style.Showcase)
+				.singleShot(Showcase.SHOT_ITEM_IN_LIST)
+				.build();
+
+		showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
+		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
+	}
+
+	public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
+		private HashMap<Long, RecyclerView> dataMap = new HashMap<>();
+		private final ArrayList<ShoppingList> mSelectedItems = new ArrayList<>();
 		private String mCurrencyList;
 
-		public RecyclerViewAdapter(String currency) {
+		public CategoriesAdapter(String currency) {
 			mCurrencyList = currency;
 		}
 
@@ -636,48 +563,250 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		@Override
-		public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._shopping_list_item, parent, false);
+		public CategoriesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._shopping_list_category, parent, false);
 			return new ViewHolder(v);
 		}
 
 		@Override
 		public void onBindViewHolder(ViewHolder holder, int position) {
-			ShoppingList itemInList = mItemsInList.get(position);
+			Category category = mCategories.get(position);
+			String categoryName = category.getName();
 
-			holder.mView.setSelected(mSelectedItems.contains(position));
-			Image.create().insertImageToView(getActivity(), itemInList.getItem().getImagePath(), holder.mImage);
-			holder.mTextView.setText(itemInList.getItem().getName());
+			holder.mCategory.setText(categoryName);
+			setRV(category.getItemsByCategoryInList(), holder);
+		}
 
-			if (itemInList.getItemData().getAmount() == 0) {
-				holder.mAmount.setText("-");
-			} else {
-				String amount = NumberFormat.getInstance().format(itemInList.getItemData().getAmount())
-						+ " " + itemInList.getItemData().getUnit().getName();
-				holder.mAmount.setText(amount);
+		private void setRV(ArrayList<ShoppingList> itemsInCategory, final ViewHolder holder) {
+			for (ShoppingList item : itemsInCategory) {
+				dataMap.put(item.getIdItem(), holder.mItemsInCategory);
 			}
 
-			String price = localValue(itemInList.getItemData().getPrice()) + " " + mCurrencyList;
-			holder.mPrice.setText(price);
-			int visibility = View.GONE;
+			ViewGroup.LayoutParams params = holder.mItemsInCategory.getLayoutParams();
+			params.height = getResources().getDimensionPixelSize(R.dimen.row_list_height) * itemsInCategory.size();
+			holder.mItemsInCategory.setLayoutParams(params);
 
-			if (itemInList.isBought()) {
-				visibility = View.VISIBLE;
-			}
+			holder.mItemsInCategory.setLayoutManager(new LinearLayoutManager(getActivity()));
+			holder.mItemsInCategory.setAdapter(new ItemsAdapter(itemsInCategory));
+			holder.mItemsInCategory.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), holder.mItemsInCategory, new RecyclerItemClickListener.OnItemClickListener() {
+				@Override
+				public void onItemClick(int position) {
+					ItemsAdapter adapter = (ItemsAdapter) holder.mItemsInCategory.getAdapter();
+					ShoppingList item = adapter.getItem(position);
 
-			holder.mIsBought.setVisibility(visibility);
+					if (mActionMode != null) {
+						toggleSelection(item);
+						return;
+					}
+
+					ShoppingList itemInList = new ShoppingList(item.getItem(),
+							mList.getId(),
+							item.isBought(),
+							item.getItemData());
+
+					Intent i = new Intent(getActivity(), ItemActivity.class);
+					i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
+
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						startActivityForResult(i, EDIT_ACTIVITY_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+					} else {
+						startActivityForResult(i, EDIT_ACTIVITY_CODE);
+					}
+				}
+
+				@Override
+				public void onItemLongClick(int position) {
+					if (mActionMode != null) {
+						return;
+					}
+
+					mActionMode = getActivity().startActionMode(mActionModeCallback);
+
+					ItemsAdapter adapter = (ItemsAdapter) holder.mItemsInCategory.getAdapter();
+					toggleSelection(adapter.getItem(position));
+				}
+
+				@Override
+				public void onSwipeRight(int position) {
+					if (mActionMode != null) {
+						return;
+					}
+
+					RecyclerView rv = holder.mItemsInCategory;
+					ItemsAdapter adapter = (ItemsAdapter) rv.getAdapter();
+					ShoppingList item = adapter.getItem(position);
+					boolean isBought = !item.isBought();
+
+					//update data in db
+					new ShoppingListDS(getActivity()).setIsBought(isBought, item.getIdItem(), mList.getId());
+
+					//update adapter
+					item.setBought(isBought);
+					adapter.notifyItemChanged(position);
+
+					//if set bought items in the end of list - refresh position
+					if (mIsBoughtEndInList) {
+						ShoppingList.sort(adapter.getItems());
+						int toPosition = adapter.getItems().indexOf(item);
+
+						if (toPosition != -1 && position != toPosition) {
+							adapter.notifyItemMoved(position, toPosition);
+							rv.scrollToPosition(toPosition);
+						}
+					}
+
+					//update spent sum
+					double sum = sumOneItem(item);
+
+					if (isBought) {
+						mSaveSpentMoney += sum;
+					} else {
+						mSaveSpentMoney -= sum;
+					}
+
+					updateSpentSum(mSaveSpentMoney);
+				}
+			}));
 		}
 
 		@Override
 		public int getItemCount() {
-			return mItemsInList.size();
+			return mCategories.size();
+		}
+
+		public int getPosition(long id) {
+			int index = -1;
+			for (int i = 0; i < mCategories.size(); ++i) {
+				if (mCategories.get(i).getId() == id) {
+					index = i;
+					break;
+				}
+			}
+			return index;
+		}
+
+		public ArrayList<ShoppingList> getSelectedItems() {
+			return mSelectedItems;
+		}
+
+		public void clearSelections() {
+			mSelectedItems.clear();
+			dataMap.clear();
+			notifyDataSetChanged();
+		}
+
+		public void toggleSelection(ShoppingList item) {
+			toggleSelection(item, true);
+		}
+
+		public void toggleSelection(ShoppingList item, boolean removeIfExist) {
+			if (mSelectedItems.contains(item)) {
+				if (removeIfExist) {
+					for (int i = 0; i < mSelectedItems.size(); i++) {
+						if (mSelectedItems.get(i).getIdItem() == item.getIdItem()) {
+							mSelectedItems.remove(i);
+							break;
+						}
+					}
+				}
+			} else {
+				mSelectedItems.add(item);
+			}
+
+			if (dataMap.containsKey(item.getIdItem())) {
+				ItemsAdapter adapter = (ItemsAdapter) dataMap.get(item.getIdItem()).getAdapter();
+				adapter.notifyItemChanged(adapter.getItems().indexOf(item));
+			}
+		}
+
+		public void selectItems(boolean isBought) {
+			boolean isAllSelected = checkAllSelected(isBought);
+
+			for (Category c : mCategories) {
+				for (ShoppingList item : c.getItemsByCategoryInList()) {
+					if (item.isBought() == isBought) {
+						//if all item selected - remove selection from them
+						//else select items
+						toggleSelection(item, isAllSelected);
+					}
+				}
+			}
+
+		}
+
+		private boolean checkAllSelected(boolean isBought) {
+			for (Category c : mCategories) {
+				for (ShoppingList item : c.getItemsByCategoryInList()) {
+					if (item.isBought() == isBought) {
+						if (!mSelectedItems.contains(item)) {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
+
+		public void removeItem(ShoppingList item) {
+			if (dataMap.containsKey(item.getIdItem())) {
+				RecyclerView rv = dataMap.get(item.getIdItem());
+				ItemsAdapter adapter = (ItemsAdapter) rv.getAdapter();
+
+				if (adapter.getItemCount() == 1) {
+					long idCategory = adapter.getItem(0).getItemData().getIdCategory();
+					int position = getPosition(idCategory);
+					mCategories.remove(position);
+					mAdapterRV.notifyItemRemoved(position);
+				} else {
+					int position = adapter.getItems().indexOf(item);
+					adapter.getItems().remove(position);
+					adapter.notifyItemRemoved(position);
+
+					setHeightRV(rv);
+				}
+			} else {
+				for (int i = 0; i < mCategories.size(); i++) {
+					ArrayList<ShoppingList> items = mCategories.get(i).getItemsByCategoryInList();
+
+					if (items.size() == 1) {
+						mCategories.remove(mCategories.get(i));
+					} else {
+						for (int j = 0; j < items.size(); j++) {
+							if (items.get(j).getIdItem() == item.getIdItem()) {
+								items.remove(j);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private void setHeightRV(final RecyclerView rv) {
+			ViewGroup.LayoutParams params = rv.getLayoutParams();
+			final int oldHeight = params.height;
+			final int newHeight = getResources().getDimensionPixelSize(R.dimen.row_list_height) * rv.getAdapter().getItemCount();
+
+			Animation a = new Animation() {
+				@Override
+				protected void applyTransformation(float interpolatedTime, Transformation t) {
+					rv.getLayoutParams().height = oldHeight - (int) ((oldHeight - newHeight) * interpolatedTime);
+					rv.requestLayout();
+				}
+
+				@Override
+				public boolean willChangeBounds() {
+					return true;
+				}
+			};
+			a.setDuration(500);
+			rv.startAnimation(a);
 		}
 
 		@Override
 		public void onViewAttachedToWindow(ViewHolder holder) {
 			super.onViewAttachedToWindow(holder);
 
-			holder.mTextView.post(new Runnable() {
+			holder.mCategory.post(new Runnable() {
 				@Override
 				public void run() {
 					if (Showcase.shouldBeShown(getActivity(), Showcase.SHOT_ITEM_IN_LIST)) {
@@ -687,83 +816,87 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			});
 		}
 
-		public void removeItem(int position) {
-			mItemsInList.remove(position);
-			if (mSelectedItems.contains(position)) {
-				mSelectedItems.remove(mSelectedItems.indexOf(position));
-			}
-			notifyItemRemoved(position);
-		}
-
-		public ShoppingList getItem(int position) {
-			return mItemsInList.get(position);
-		}
-
-		public void toggleSelection(int position) {
-			toggleSelection(position, true);
-		}
-
-		public void toggleSelection(int position, boolean removeIfExist) {
-			if (mSelectedItems.contains(position)) {
-				if (removeIfExist) {
-					for (int i = 0; i < mSelectedItems.size(); i++) {
-						if (mSelectedItems.get(i) == position) {
-							mSelectedItems.remove(i);
-							break;
-						}
-					}
-				}
-			} else {
-				mSelectedItems.add(position);
-			}
-			notifyItemChanged(position);
-		}
-
-		public void clearSelections() {
-			mSelectedItems.clear();
-			notifyDataSetChanged();
-		}
-
-		public void selectItems(boolean isBought) {
-			boolean isAllSelected = checkAllSelected(isBought);
-			for (int position = 0; position < mItemsInList.size(); position++) {
-				if (mItemsInList.get(position).isBought() == isBought) {
-					toggleSelection(position, isAllSelected);
-				}
-			}
-		}
-
-		private boolean checkAllSelected(boolean isBought) {
-			for (int position = 0; position < mItemsInList.size(); position++) {
-				if (mItemsInList.get(position).isBought() == isBought) {
-					if (!mSelectedItems.contains(position)) {
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-
-		public ArrayList<Integer> getSelectedItems() {
-			return mSelectedItems;
-		}
-
 		public class ViewHolder extends RecyclerView.ViewHolder {
-			public final View mView;
-			public final ImageView mImage;
-			public final TextView mTextView;
-			public final TextView mAmount;
-			public final TextView mPrice;
-			public final View mIsBought;
+			public final TextView mCategory;
+			public final RecyclerView mItemsInCategory;
 
 			public ViewHolder(View v) {
 				super(v);
-				mView = v;
-				mImage = (ImageView) v.findViewById(R.id.item_image_list);
-				mTextView = (TextView) v.findViewById(R.id.item_name_list);
-				mAmount = (TextView) v.findViewById(R.id.item_amount_list);
-				mPrice = (TextView) v.findViewById(R.id.item_price_list);
-				mIsBought = v.findViewById(R.id.is_bought_list);
+				mCategory = (TextView) v.findViewById(R.id.category);
+				mItemsInCategory = (RecyclerView) v.findViewById(R.id.items_in_category);
+			}
+		}
+
+		public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> {
+			private ArrayList<ShoppingList> mItems = new ArrayList<>();
+
+			public ItemsAdapter(ArrayList<ShoppingList> itemsInCategory) {
+				mItems = itemsInCategory;
+			}
+
+			@Override
+			public ItemsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+				View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._shopping_list_item, parent, false);
+				return new ViewHolder(v);
+			}
+
+			@Override
+			public void onBindViewHolder(ViewHolder holder, int position) {
+				ShoppingList itemInList = mItems.get(position);
+
+				holder.mView.setSelected(mSelectedItems.contains(itemInList));
+				Image.create().insertImageToView(getActivity(), itemInList.getItem().getImagePath(), holder.mImage);
+				holder.mName.setText(itemInList.getItem().getName());
+
+				if (itemInList.getItemData().getAmount() == 0) {
+					holder.mAmount.setText("-");
+				} else {
+					String amount = NumberFormat.getInstance().format(itemInList.getItemData().getAmount())
+							+ " " + itemInList.getItemData().getUnit().getName();
+					holder.mAmount.setText(amount);
+				}
+
+				String price = localValue(itemInList.getItemData().getPrice()) + " " + mCurrencyList;
+				holder.mPrice.setText(price);
+				int visibility = View.GONE;
+
+				if (itemInList.isBought()) {
+					visibility = View.VISIBLE;
+				}
+
+				holder.mIsBought.setVisibility(visibility);
+			}
+
+			@Override
+			public int getItemCount() {
+				return mItems.size();
+			}
+
+			public ArrayList<ShoppingList> getItems() {
+				return mItems;
+			}
+
+			public ShoppingList getItem(int position) {
+				return mItems.get(position);
+			}
+
+			public class ViewHolder extends RecyclerView.ViewHolder {
+				public final View mView;
+				public final ImageView mImage;
+				public final TextView mName;
+				public final TextView mAmount;
+				public final TextView mPrice;
+				public final View mIsBought;
+
+				public ViewHolder(View v) {
+					super(v);
+					mView = v;
+					mImage = (ImageView) v.findViewById(R.id.item_image_list);
+					mName = (TextView) v.findViewById(R.id.item_name_list);
+					mAmount = (TextView) v.findViewById(R.id.item_amount_list);
+					mPrice = (TextView) v.findViewById(R.id.item_price_list);
+					mIsBought = v.findViewById(R.id.is_bought_list);
+				}
 			}
 		}
 	}
@@ -780,7 +913,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		@Override
 		public Cursor loadInBackground() {
-			return new ShoppingListDS(mContext).getItemsInList(mIdList);
+			CategoriesDS.CategoryCursor categoryCursor = new CategoriesDS(mContext).getCategoriesInList(mIdList);
+
+			if (categoryCursor.moveToFirst()) {
+				ShoppingListCursor itemsCursor = new ShoppingListDS(mContext).getItemsInList(mIdList);
+				categoryCursor.setItemsInListCursor(itemsCursor);
+
+			}
+
+			return categoryCursor;
 		}
 	}
 }

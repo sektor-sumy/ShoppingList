@@ -5,8 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+
 import ru.android.ainege.shoppinglist.db.entities.Category;
+import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
+import ru.android.ainege.shoppinglist.db.tables.ItemDataTable;
+import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 
 public class CategoriesDS extends DictionaryDS<Category> {
 
@@ -22,6 +27,21 @@ public class CategoriesDS extends DictionaryDS<Category> {
 	public static CategoryCursor getAll(SQLiteDatabase db) {
 		Cursor cursor = db.query(CategoriesTable.TABLE_NAME, null, null,
 				null, null, null, CategoriesTable.COLUMN_NAME);
+		return new CategoryCursor(cursor);
+	}
+
+	public CategoryCursor getCategoriesInList(long idList) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		String selectQuery = "SELECT " + CategoriesTable.TABLE_NAME + ".*" +
+				" FROM " + CategoriesTable.TABLE_NAME +
+				" INNER JOIN " + ItemDataTable.TABLE_NAME +
+				" ON " + CategoriesTable.TABLE_NAME + "." + CategoriesTable.COLUMN_ID + " = " + ItemDataTable.TABLE_NAME + "." + ItemDataTable.COLUMN_ID_CATEGORY +
+				" INNER JOIN " + ShoppingListTable.TABLE_NAME +
+				" ON " + ItemDataTable.TABLE_NAME + "." + ItemDataTable.COLUMN_ID + " = " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_DATA +
+				" WHERE " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " = ?" +
+				" GROUP BY " + CategoriesTable.TABLE_NAME + "." + CategoriesTable.COLUMN_NAME +
+				" ORDER BY " + CategoriesTable.COLUMN_NAME;
+		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(idList)});
 		return new CategoryCursor(cursor);
 	}
 
@@ -75,8 +95,18 @@ public class CategoriesDS extends DictionaryDS<Category> {
 	}
 
 	public static class CategoryCursor extends EntityCursor<Category> {
+		private ShoppingListDS.ShoppingListCursor mItemsInListCursor;
+
 		public CategoryCursor(Cursor cursor) {
 			super(cursor);
+		}
+
+		public ShoppingListDS.ShoppingListCursor getItemsInListCursor() {
+			return mItemsInListCursor;
+		}
+
+		public void setItemsInListCursor(ShoppingListDS.ShoppingListCursor itemsInListCursor) {
+			mItemsInListCursor = itemsInListCursor;
 		}
 
 		public Category getEntity() {
@@ -84,6 +114,33 @@ public class CategoriesDS extends DictionaryDS<Category> {
 			String name = getString(getColumnIndex(CategoriesTable.COLUMN_NAME));
 
 			return new Category(id, name);
+		}
+
+		public Category getCategoryWithItems(ArrayList<ShoppingList> itemInList) {
+			Category category = getEntity();
+			ArrayList<ShoppingList> itemsInCategory = new ArrayList<>();
+
+			for (ShoppingList item : itemInList) {
+				if (category.getId() == item.getItemData().getIdCategory()) {
+					itemsInCategory.add(item);
+				}
+			}
+
+			ShoppingList.sort(itemsInCategory);
+			category.setItemsByCategoryInList(itemsInCategory);
+
+			return category;
+		}
+
+		public ArrayList<Category> getCategoriesWithItems(ArrayList<ShoppingList> itemInList) {
+			ArrayList<Category> categories = new ArrayList<>();
+			moveToFirst();
+
+			do {
+				categories.add(getCategoryWithItems(itemInList));
+			} while (moveToNext());
+
+			return categories;
 		}
 	}
 }
