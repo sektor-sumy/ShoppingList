@@ -101,6 +101,9 @@
 	<string name="settings_title_sort_type">Порядок сортировки</string>
 	<string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
 	<string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
+	<string name="settings_key_use_category">use_category</string>
+	<string name="settings_title_use_category">Использование категорий</string>
+	<string name="settings_summary_use_category">Разбивать товары по категориям в списке</string>
 
 	<string name="settings_category_data_item">Настройка данных по умолчанию</string>
 	<string name="settings_key_sort_is_default_data">sort_is_default_data</string>

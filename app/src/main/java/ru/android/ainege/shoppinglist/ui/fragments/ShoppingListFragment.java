@@ -91,6 +91,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private double mSaveSpentMoney = 0;
 	private double mSaveTotalMoney = 0;
 	private boolean mIsBoughtEndInList;
+	private boolean mIsUseCategory;
 
 	private android.view.ActionMode mActionMode;
 	private final ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -350,7 +351,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 				if (data.moveToFirst()) {
 					ArrayList<ShoppingList> itemsInList = ((CategoriesDS.CategoryCursor) data).getItemsInListCursor().getEntities();
-					mCategories = ((CategoriesDS.CategoryCursor) data).getCategoriesWithItems(itemsInList);
+					if (mIsUseCategory) {
+						mCategories = ((CategoriesDS.CategoryCursor) data).getCategoriesWithItems(itemsInList);
+					} else {
+						ShoppingList.sort(itemsInList);
+						ArrayList<Category> categories = new ArrayList<>();
+						categories.add(new Category(itemsInList));
+						mCategories = categories;
+					}
 
 					mAdapterRV.setCurrency(mList.getCurrency().getSymbol());     //update data in adapter
 
@@ -384,6 +392,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
 		mIsBoughtEndInList = prefs.getBoolean(getString(R.string.settings_key_sort_is_bought), true);
+		mIsUseCategory = prefs.getBoolean(getString(R.string.settings_key_use_category), true);
 		String sortType;
 		String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
 
@@ -571,9 +580,16 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		@Override
 		public void onBindViewHolder(ViewHolder holder, int position) {
 			Category category = mCategories.get(position);
-			String categoryName = category.getName();
 
-			holder.mCategory.setText(categoryName);
+			if (mIsUseCategory) {
+				String categoryName = category.getName();
+				holder.mCategory.setText(categoryName);
+				holder.mCategory.setVisibility(View.VISIBLE);
+			} else {
+				holder.mCategory.setVisibility(View.GONE);
+			}
+
+
 			setRV(category.getItemsByCategoryInList(), holder);
 		}
 

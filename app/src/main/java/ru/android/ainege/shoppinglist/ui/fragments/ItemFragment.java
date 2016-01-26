@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -27,6 +29,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -96,6 +99,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	ToggleButton mIsBought;
 	private TextView mFinishPrice;
 
+	private boolean mIsUseCategory;
 	private ShowcaseView showcaseView;
 	private int counter = 1;
 
@@ -116,6 +120,9 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 		mItemDS = new ItemDS(getActivity());
 		mItemsInListDS = new ShoppingListDS(getActivity());
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		mIsUseCategory = prefs.getBoolean(getString(R.string.settings_key_use_category), true);
 	}
 
 	@Override
@@ -339,6 +346,10 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 		mCategory = (Spinner) v.findViewById(R.id.category);
 		mCategory.setAdapter(getCategoriesAdapter());
+		if (!mIsUseCategory) {
+			LinearLayout categoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
+			categoryContainer.setVisibility(View.GONE);
+		}
 
 		mComment = (EditText) v.findViewById(R.id.comment);
 

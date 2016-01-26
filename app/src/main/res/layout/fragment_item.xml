@@ -195,32 +195,34 @@
 				android:textAppearance="?android:attr/textAppearanceSmall"
 				android:visibility="gone"/>
 
-			<TextView
-				android:id="@+id/category_text"
-				android:layout_width="@dimen/column_left"
-				android:layout_height="wrap_content"
-				android:layout_alignParentLeft="true"
-				android:layout_alignParentStart="true"
-				android:gravity="left"
-				android:text="@string/category"
-				android:layout_alignBottom="@+id/category"
-				android:layout_marginBottom="1dp"/>
-
-			<Spinner
-				android:id="@+id/category"
+			<LinearLayout
+				android:id="@+id/category_container"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@+id/finish_price"
-				android:layout_marginTop="20dp"
-				android:layout_toEndOf="@+id/category_text"
-				android:layout_toRightOf="@+id/category_text"
-				android:gravity="center"/>
+				android:layout_below="@+id/finish_price">
+
+				<TextView
+					android:id="@+id/category_text"
+					android:layout_width="@dimen/column_left"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="1dp"
+					android:gravity="left"
+					android:text="@string/category"/>
+
+				<Spinner
+					android:id="@+id/category"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="20dp"
+					android:gravity="center"/>
+
+			</LinearLayout>
 
 			<android.support.design.widget.TextInputLayout
 				android:id="@+id/comment_input_layout"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@+id/category_text"
+				android:layout_below="@+id/category_container"
 				android:layout_marginTop="8dp">
 
 				<EditText

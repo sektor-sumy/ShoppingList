@@ -7,11 +7,6 @@
 			android:key="@string/settings_key_open_last_list"
 			android:summary="@string/settings_summary_open_last_list"
 			android:title="@string/settings_title_open_last_list"/>
-		<CheckBoxPreference
-			android:defaultValue="true"
-			android:key="@string/settings_key_sort_is_bought"
-			android:summary="@string/settings_summary_sort_is_bought"
-			android:title="@string/settings_title_sort_is_bought"/>
 		<ListPreference
 			android:defaultValue="@string/sort_order_alphabet"
 			android:dialogTitle="@string/settings_dialog_title_sort_type"
@@ -20,6 +15,16 @@
 			android:key="@string/settings_key_sort_type"
 			android:summary="@string/settings_summary_sort_type"
 			android:title="@string/settings_title_sort_type"/>
+		<CheckBoxPreference
+			android:defaultValue="true"
+			android:key="@string/settings_key_sort_is_bought"
+			android:summary="@string/settings_summary_sort_is_bought"
+			android:title="@string/settings_title_sort_is_bought"/>
+		<CheckBoxPreference
+			android:defaultValue="true"
+			android:key="@string/settings_key_use_category"
+			android:summary="@string/settings_summary_use_category"
+			android:title="@string/settings_title_use_category"/>
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/settings_category_data_item">

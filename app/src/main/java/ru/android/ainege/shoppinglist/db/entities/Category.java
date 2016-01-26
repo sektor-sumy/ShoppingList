@@ -13,6 +13,11 @@ public class Category extends Dictionary {
 		super(id, name);
 	}
 
+	public Category( ArrayList<ShoppingList>  itemsByCategories) {
+		super("");
+		mItemsByCategoriesInList = itemsByCategories;
+	}
+
 	public ArrayList<ShoppingList> getItemsByCategoryInList() {
 		return mItemsByCategoriesInList;
 	}
