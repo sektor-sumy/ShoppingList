@@ -87,6 +87,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private LinearLayout mListContainer;
 	private ProgressBar mProgressBar;
 	private CategoriesAdapter mAdapterRV;
+	private HashMap<Long, Boolean> collapseCategoryStates = new HashMap<>();
 	private List mList;
 	private double mSaveSpentMoney = 0;
 	private double mSaveTotalMoney = 0;
@@ -527,6 +528,28 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mSpentMoney.setText(spentMoney);
 	}
 
+	private Animation getAnimationRV(final RecyclerView rv, final int oldHeight, final int newHeight, final boolean isUp) {
+		Animation a = new Animation() {
+			@Override
+			protected void applyTransformation(float interpolatedTime, Transformation t) {
+				if (isUp) {
+					rv.getLayoutParams().height = oldHeight - (int) ((oldHeight - newHeight) * interpolatedTime);
+				} else {
+					rv.getLayoutParams().height = oldHeight + (int) ((newHeight - oldHeight) * interpolatedTime);
+				}
+				rv.requestLayout();
+			}
+
+			@Override
+			public boolean willChangeBounds() {
+				return true;
+			}
+		};
+		a.setDuration(500);
+
+		return a;
+	}
+
 	private void showCaseView() {
 		ShowcaseView showcaseView = new ShowcaseView.Builder(getActivity())
 				.setTarget(new ViewTarget(mFAB))
@@ -589,18 +612,27 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				holder.mCategory.setVisibility(View.GONE);
 			}
 
-
-			setRV(category.getItemsByCategoryInList(), holder);
+			setRV(category, holder);
 		}
 
-		private void setRV(ArrayList<ShoppingList> itemsInCategory, final ViewHolder holder) {
+		private void setRV(Category category, final ViewHolder holder) {
+			ArrayList<ShoppingList> itemsInCategory = category.getItemsByCategoryInList();
+			boolean isAllBought = true;
+
 			for (ShoppingList item : itemsInCategory) {
 				dataMap.put(item.getIdItem(), holder.mItemsInCategory);
+
+				if (!item.isBought()) {
+					isAllBought = false;
+				}
 			}
 
-			ViewGroup.LayoutParams params = holder.mItemsInCategory.getLayoutParams();
-			params.height = getResources().getDimensionPixelSize(R.dimen.row_list_height) * itemsInCategory.size();
-			holder.mItemsInCategory.setLayoutParams(params);
+			if ((collapseCategoryStates.containsKey(category.getId()) && !collapseCategoryStates.get(category.getId()))
+					|| (!collapseCategoryStates.containsKey(category.getId()) && !isAllBought)) {
+				ViewGroup.LayoutParams params = holder.mItemsInCategory.getLayoutParams();
+				params.height = getResources().getDimensionPixelSize(R.dimen.row_list_height) * itemsInCategory.size();
+				holder.mItemsInCategory.setLayoutParams(params);
+			}
 
 			holder.mItemsInCategory.setLayoutManager(new LinearLayoutManager(getActivity()));
 			holder.mItemsInCategory.setAdapter(new ItemsAdapter(itemsInCategory));
@@ -778,7 +810,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					adapter.getItems().remove(position);
 					adapter.notifyItemRemoved(position);
 
-					setHeightRV(rv);
+					ViewGroup.LayoutParams params = rv.getLayoutParams();
+					final int oldHeight = params.height;
+					final int newHeight = getResources().getDimensionPixelSize(R.dimen.row_list_height) * rv.getAdapter().getItemCount();
+					rv.startAnimation(getAnimationRV(rv, oldHeight, newHeight, true));
+
 				}
 			} else {
 				for (int i = 0; i < mCategories.size(); i++) {
@@ -795,27 +831,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					}
 				}
 			}
-		}
-
-		private void setHeightRV(final RecyclerView rv) {
-			ViewGroup.LayoutParams params = rv.getLayoutParams();
-			final int oldHeight = params.height;
-			final int newHeight = getResources().getDimensionPixelSize(R.dimen.row_list_height) * rv.getAdapter().getItemCount();
-
-			Animation a = new Animation() {
-				@Override
-				protected void applyTransformation(float interpolatedTime, Transformation t) {
-					rv.getLayoutParams().height = oldHeight - (int) ((oldHeight - newHeight) * interpolatedTime);
-					rv.requestLayout();
-				}
-
-				@Override
-				public boolean willChangeBounds() {
-					return true;
-				}
-			};
-			a.setDuration(500);
-			rv.startAnimation(a);
 		}
 
 		@Override
@@ -840,6 +855,28 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				super(v);
 				mCategory = (TextView) v.findViewById(R.id.category);
 				mItemsInCategory = (RecyclerView) v.findViewById(R.id.items_in_category);
+
+				mCategory.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						int itemPosition = getAdapterPosition();
+						Category category = mCategories.get(itemPosition);
+
+						Animation a;
+
+						if (mItemsInCategory.getHeight() != 0) {
+							a = getAnimationRV(mItemsInCategory, mItemsInCategory.getHeight(), 0, true);
+							collapseCategoryStates.put(category.getId(), true);
+						} else {
+							int newHeight = getResources().getDimensionPixelSize(R.dimen.row_list_height) * mItemsInCategory.getAdapter().getItemCount();
+							a = getAnimationRV(mItemsInCategory, mItemsInCategory.getHeight(), newHeight, false);
+							collapseCategoryStates.put(category.getId(), false);
+						}
+
+						mItemsInCategory.clearAnimation();
+						mItemsInCategory.startAnimation(a);
+					}
+				});
 			}
 		}
 
