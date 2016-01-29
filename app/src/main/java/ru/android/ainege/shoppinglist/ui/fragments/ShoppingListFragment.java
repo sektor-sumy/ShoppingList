@@ -478,6 +478,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	}
 
+	private void updateSums() {
+		updateSums(sumMoney(true), sumMoney(false));
+	}
+
+	private void updateSums(double spentMoney, double totalMoney) {
+		updateSpentSum(spentMoney);
+
+		String total = localValue(totalMoney) + " " + mList.getCurrency().getSymbol();
+		mTotalMoney.setText(total);
+	}
+
+	private void updateSpentSum(double newSum) {
+		String spentMoney = localValue(newSum) + " " + mList.getCurrency().getSymbol();
+		mSpentMoney.setText(spentMoney);
+	}
+
 	private String localValue(double value) {
 		NumberFormat nf = NumberFormat.getInstance();
 		nf.setMinimumFractionDigits(2);
@@ -510,22 +526,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		double amount = item.getItemData().getAmount();
 		double sum = price * (amount == 0 ? 1 : amount);
 		return new BigDecimal(sum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-	}
-
-	private void updateSums() {
-		updateSums(sumMoney(true), sumMoney(false));
-	}
-
-	private void updateSums(double spentMoney, double totalMoney) {
-		updateSpentSum(spentMoney);
-
-		String total = localValue(totalMoney) + " " + mList.getCurrency().getSymbol();
-		mTotalMoney.setText(total);
-	}
-
-	private void updateSpentSum(double newSum) {
-		String spentMoney = localValue(newSum) + " " + mList.getCurrency().getSymbol();
-		mSpentMoney.setText(spentMoney);
 	}
 
 	private Animation getAnimationRV(final RecyclerView rv, final int oldHeight, final int newHeight, final boolean isUp) {
@@ -581,7 +581,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
-		private HashMap<Long, RecyclerView> dataMap = new HashMap<>();
+		private HashMap<Long, ViewHolder> dataMap = new HashMap<>();
 		private final ArrayList<ShoppingList> mSelectedItems = new ArrayList<>();
 		private String mCurrencyList;
 
@@ -615,17 +615,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			setRV(category, holder);
 		}
 
-		private void setRV(Category category, final ViewHolder holder) {
+		private void setRV(final Category category, final ViewHolder holder) {
 			ArrayList<ShoppingList> itemsInCategory = category.getItemsByCategoryInList();
 			boolean isAllBought = true;
+			double sum = 0;
 
 			for (ShoppingList item : itemsInCategory) {
-				dataMap.put(item.getIdItem(), holder.mItemsInCategory);
+				dataMap.put(item.getIdItem(), holder);
 
 				if (!item.isBought()) {
 					isAllBought = false;
+				} else {
+					sum += sumOneItem(item);
 				}
 			}
+
+			updateSpentCategorySum(holder, sum);
 
 			if ((collapseCategoryStates.containsKey(category.getId()) && !collapseCategoryStates.get(category.getId()))
 					|| (!collapseCategoryStates.containsKey(category.getId()) && !isAllBought)) {
@@ -635,7 +640,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 
 			holder.mItemsInCategory.setLayoutManager(new LinearLayoutManager(getActivity()));
-			holder.mItemsInCategory.setAdapter(new ItemsAdapter(itemsInCategory));
+			holder.mItemsInCategory.setAdapter(new ItemsAdapter(itemsInCategory, sum));
 			holder.mItemsInCategory.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), holder.mItemsInCategory, new RecyclerItemClickListener.OnItemClickListener() {
 				@Override
 				public void onItemClick(int position) {
@@ -705,14 +710,19 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 					//update spent sum
 					double sum = sumOneItem(item);
+					double categorySpentMoney = adapter.getSum();
 
 					if (isBought) {
 						mSaveSpentMoney += sum;
+						categorySpentMoney += sum;
 					} else {
 						mSaveSpentMoney -= sum;
+						categorySpentMoney -= sum;
 					}
 
 					updateSpentSum(mSaveSpentMoney);
+					updateSpentCategorySum(holder, categorySpentMoney);
+					adapter.setSum(categorySpentMoney);
 				}
 			}));
 		}
@@ -762,7 +772,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 
 			if (dataMap.containsKey(item.getIdItem())) {
-				ItemsAdapter adapter = (ItemsAdapter) dataMap.get(item.getIdItem()).getAdapter();
+				ItemsAdapter adapter = (ItemsAdapter) dataMap.get(item.getIdItem()).mItemsInCategory.getAdapter();
 				adapter.notifyItemChanged(adapter.getItems().indexOf(item));
 			}
 		}
@@ -797,7 +807,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		public void removeItem(ShoppingList item) {
 			if (dataMap.containsKey(item.getIdItem())) {
-				RecyclerView rv = dataMap.get(item.getIdItem());
+				ViewHolder holder = dataMap.get(item.getIdItem());
+				RecyclerView rv = holder.mItemsInCategory;
 				ItemsAdapter adapter = (ItemsAdapter) rv.getAdapter();
 
 				if (adapter.getItemCount() == 1) {
@@ -806,9 +817,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					mCategories.remove(position);
 					mAdapterRV.notifyItemRemoved(position);
 				} else {
-					int position = adapter.getItems().indexOf(item);
-					adapter.getItems().remove(position);
-					adapter.notifyItemRemoved(position);
+					adapter.removeItem(adapter.getItems().indexOf(item));
+
+					double spentCategorySum = adapter.getSum() - sumOneItem(item);
+					updateSpentCategorySum(holder, spentCategorySum);
+					adapter.setSum(spentCategorySum);
 
 					ViewGroup.LayoutParams params = rv.getLayoutParams();
 					final int oldHeight = params.height;
@@ -833,6 +846,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		}
 
+		private void updateSpentCategorySum(ViewHolder holder, double sum) {
+			String sumText = localValue(sum) + " " + mCurrencyList;
+			holder.mSumCategory.setText(sumText);
+		}
+
 		@Override
 		public void onViewAttachedToWindow(ViewHolder holder) {
 			super.onViewAttachedToWindow(holder);
@@ -849,11 +867,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
 			public final TextView mCategory;
+			public TextView mSumCategory;
 			public final RecyclerView mItemsInCategory;
 
 			public ViewHolder(View v) {
 				super(v);
 				mCategory = (TextView) v.findViewById(R.id.category);
+				mSumCategory = (TextView) v.findViewById(R.id.sum_category);
 				mItemsInCategory = (RecyclerView) v.findViewById(R.id.items_in_category);
 
 				mCategory.setOnClickListener(new View.OnClickListener() {
@@ -882,9 +902,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> {
 			private ArrayList<ShoppingList> mItems = new ArrayList<>();
+			private double mSum;
 
-			public ItemsAdapter(ArrayList<ShoppingList> itemsInCategory) {
+			public ItemsAdapter(ArrayList<ShoppingList> itemsInCategory, double sum) {
 				mItems = itemsInCategory;
+				mSum = sum;
 			}
 
 			@Override
@@ -931,6 +953,19 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			public ShoppingList getItem(int position) {
 				return mItems.get(position);
+			}
+
+			public double getSum() {
+				return mSum;
+			}
+
+			public void setSum(double sum) {
+				mSum = sum;
+			}
+
+			public void removeItem(int position) {
+				getItems().remove(position);
+				notifyItemRemoved(position);
 			}
 
 			public class ViewHolder extends RecyclerView.ViewHolder {
