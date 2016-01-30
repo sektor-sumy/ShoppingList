@@ -25,6 +25,12 @@
 			android:key="@string/settings_key_use_category"
 			android:summary="@string/settings_summary_use_category"
 			android:title="@string/settings_title_use_category"/>
+		<CheckBoxPreference
+			android:defaultValue="true"
+			android:key="@string/settings_key_collapse_category"
+			android:summary="@string/settings_summary_collapse_category"
+			android:title="@string/settings_title_collapse_category"
+			android:dependency="@string/settings_key_use_category" />
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/settings_category_data_item">

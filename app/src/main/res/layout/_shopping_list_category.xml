@@ -16,6 +16,7 @@
 		android:paddingTop="@dimen/padding_8dp">
 
 		<LinearLayout
+			android:id="@+id/category_container"
 			android:orientation="horizontal"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">

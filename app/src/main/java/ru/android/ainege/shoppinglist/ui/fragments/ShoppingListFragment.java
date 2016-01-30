@@ -93,6 +93,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private double mSaveTotalMoney = 0;
 	private boolean mIsBoughtEndInList;
 	private boolean mIsUseCategory;
+	private boolean mIsCollapsedCategory = false;
 
 	private android.view.ActionMode mActionMode;
 	private final ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -391,9 +392,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private void getSettings() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
 		mIsBoughtEndInList = prefs.getBoolean(getString(R.string.settings_key_sort_is_bought), true);
 		mIsUseCategory = prefs.getBoolean(getString(R.string.settings_key_use_category), true);
+
+		if (mIsUseCategory) {
+			mIsCollapsedCategory = prefs.getBoolean(getString(R.string.settings_key_collapse_category), true);
+		}
+
 		String sortType;
 		String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
 
@@ -607,9 +612,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			if (mIsUseCategory) {
 				String categoryName = category.getName();
 				holder.mCategory.setText(categoryName);
-				holder.mCategory.setVisibility(View.VISIBLE);
+				holder.mCategoryContainer.setVisibility(View.VISIBLE);
 			} else {
-				holder.mCategory.setVisibility(View.GONE);
+				holder.mCategoryContainer.setVisibility(View.GONE);
 			}
 
 			setRV(category, holder);
@@ -632,7 +637,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			updateSpentCategorySum(holder, sum);
 
-			if ((collapseCategoryStates.containsKey(category.getId()) && !collapseCategoryStates.get(category.getId()))
+			if (!mIsCollapsedCategory
+					|| (collapseCategoryStates.containsKey(category.getId()) && !collapseCategoryStates.get(category.getId()))
 					|| (!collapseCategoryStates.containsKey(category.getId()) && !isAllBought)) {
 				ViewGroup.LayoutParams params = holder.mItemsInCategory.getLayoutParams();
 				params.height = getResources().getDimensionPixelSize(R.dimen.row_list_height) * itemsInCategory.size();
@@ -866,12 +872,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
+			public LinearLayout mCategoryContainer;
 			public final TextView mCategory;
 			public TextView mSumCategory;
 			public final RecyclerView mItemsInCategory;
 
 			public ViewHolder(View v) {
 				super(v);
+				mCategoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
 				mCategory = (TextView) v.findViewById(R.id.category);
 				mSumCategory = (TextView) v.findViewById(R.id.sum_category);
 				mItemsInCategory = (RecyclerView) v.findViewById(R.id.items_in_category);
@@ -879,6 +887,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mCategory.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						if (!mIsCollapsedCategory) {
+							return;
+						}
+
 						int itemPosition = getAdapterPosition();
 						Category category = mCategories.get(itemPosition);
 
@@ -1006,7 +1018,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			if (categoryCursor.moveToFirst()) {
 				ShoppingListCursor itemsCursor = new ShoppingListDS(mContext).getItemsInList(mIdList);
 				categoryCursor.setItemsInListCursor(itemsCursor);
-
 			}
 
 			return categoryCursor;
