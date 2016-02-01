@@ -610,8 +610,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			Category category = mCategories.get(position);
 
 			if (mIsUseCategory) {
-				String categoryName = category.getName();
-				holder.mCategory.setText(categoryName);
+				holder.mColor.setBackgroundColor(category.getColor());
+				holder.mCategory.setText(category.getName());
 				holder.mCategoryContainer.setVisibility(View.VISIBLE);
 			} else {
 				holder.mCategoryContainer.setVisibility(View.GONE);
@@ -873,6 +873,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
 			public LinearLayout mCategoryContainer;
+			public TextView mColor;
 			public final TextView mCategory;
 			public TextView mSumCategory;
 			public final RecyclerView mItemsInCategory;
@@ -880,6 +881,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			public ViewHolder(View v) {
 				super(v);
 				mCategoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
+				mColor = (TextView) v.findViewById(R.id.color);
 				mCategory = (TextView) v.findViewById(R.id.category);
 				mSumCategory = (TextView) v.findViewById(R.id.sum_category);
 				mItemsInCategory = (RecyclerView) v.findViewById(R.id.items_in_category);
@@ -932,6 +934,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				ShoppingList itemInList = mItems.get(position);
 
 				holder.mView.setSelected(mSelectedItems.contains(itemInList));
+				holder.mColor.setBackgroundColor(itemInList.getItemData().getCategory().getColor());
 				Image.create().insertImageToView(getActivity(), itemInList.getItem().getImagePath(), holder.mImage);
 				holder.mName.setText(itemInList.getItem().getName());
 
@@ -982,6 +985,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			public class ViewHolder extends RecyclerView.ViewHolder {
 				public final View mView;
+				public TextView mColor;
 				public final ImageView mImage;
 				public final TextView mName;
 				public final TextView mAmount;
@@ -991,6 +995,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				public ViewHolder(View v) {
 					super(v);
 					mView = v;
+					mColor = (TextView) v.findViewById(R.id.color);
 					mImage = (ImageView) v.findViewById(R.id.item_image_list);
 					mName = (TextView) v.findViewById(R.id.item_name_list);
 					mAmount = (TextView) v.findViewById(R.id.item_amount_list);

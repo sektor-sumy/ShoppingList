@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
+import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
 import ru.android.ainege.shoppinglist.db.tables.ItemDataTable;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 
@@ -44,11 +45,19 @@ public class ItemDS extends GenericDS<Item> {
 		return new ItemCursor(cursor);
 	}
 
-	public ItemCursor getNames(String substring) {
+	public Cursor getNames(String substring) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("Select * from " + ItemsTable.TABLE_NAME + " where " +
-				ItemsTable.COLUMN_NAME + " like '%" + substring + "%';", null);
-		return new ItemCursor(cursor);
+		Cursor cursor = db.rawQuery("SELECT " + ItemsTable.TABLE_NAME + ".*, " +
+				CategoriesTable.TABLE_NAME + "." + CategoriesTable.COLUMN_COLOR +
+				" FROM " +  ItemsTable.TABLE_NAME +
+				" INNER JOIN " + ItemDataTable.TABLE_NAME +
+				" ON " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID_DATA + " = " +
+				ItemDataTable.TABLE_NAME + "." + ItemDataTable.COLUMN_ID +
+				" INNER JOIN " + CategoriesTable.TABLE_NAME +
+				" ON " + ItemDataTable.TABLE_NAME + "." + ItemDataTable.COLUMN_ID_CATEGORY + " = " +
+				CategoriesTable.TABLE_NAME + "." + CategoriesTable.COLUMN_ID +
+				" WHERE " +	ItemsTable.COLUMN_NAME + " LIKE '%" + substring + "%'", null);
+		return cursor;
 	}
 
 	public long getIdData(long id) {

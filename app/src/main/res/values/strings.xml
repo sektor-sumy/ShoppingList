@@ -141,4 +141,8 @@
 	<string name="setting_key_unit">setting_key_unit</string>
 	<string name="unit_info">Единица измерения</string>
 	<string name="ask_delete_item">Значение уже используется. При удалении, оно будет заменено случайным. \nУдалить?</string>
+
+	<string name="setting_key_category">setting_key_category</string>
+	<string name="setting_title_category">Категории товаров</string>
+	<string name="category_info">Категория товаров</string>
 </resources>

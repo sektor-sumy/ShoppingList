@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.CategoryFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.CurrencyFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.UnitFragment;
 
@@ -21,6 +22,8 @@ public class SettingsDictionaryActivity extends SingleFragmentActivity {
 			fr = new CurrencyFragment();
 		} else if (type.equals(getString(R.string.setting_key_unit))) {
 			fr = new UnitFragment();
+		} else if (type.equals(getString(R.string.setting_key_category))) {
+			fr = new CategoryFragment();
 		}
 
 		return fr;

@@ -3,6 +3,7 @@ package ru.android.ainege.shoppinglist.ui.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -357,16 +358,13 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	SimpleCursorAdapter getCompleteTextAdapter(FilterQueryProvider provider) {
-		SimpleCursorAdapter completeTextAdapter = new SimpleCursorAdapter(getActivity(),
-				android.R.layout.simple_dropdown_item_1line,
-				null,
-				new String[]{ItemsTable.COLUMN_NAME},
-				new int[]{android.R.id.text1}, 0);
+		SimpleCursorAdapter completeTextAdapter = new AutoCompleteAdapter(getActivity(),
+				R.layout.spinner_autocomplite, null, new String[]{}, new int[]{}, 0);
 		completeTextAdapter.setFilterQueryProvider(provider);
 		completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
 			@Override
 			public CharSequence convertToString(Cursor cursor) {
-				return ((ItemCursor) cursor).getEntity().getName();
+				return cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME));
 			}
 		});
 		return completeTextAdapter;
@@ -495,12 +493,11 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	private SimpleCursorAdapter getCategoriesAdapter() {
-		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
-				android.R.layout.simple_spinner_item,
+		SimpleCursorAdapter spinnerAdapter = new AutoCompleteAdapter(getActivity(),
+				R.layout.spinner_color_item,
 				new CategoriesDS(getActivity()).getAll(),
-				new String[]{CategoriesTable.COLUMN_NAME},
-				new int[]{android.R.id.text1}, 0);
-		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				new String[]{}, new int[]{}, 0);
+		spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_color_item);
 		return spinnerAdapter;
 	}
 
@@ -555,5 +552,57 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			}
 			cursor.close();
 		}
+	}
+
+	private class AutoCompleteAdapter extends SimpleCursorAdapter {
+
+		public AutoCompleteAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+			super(context, layout, c, from, to, flags);
+		}
+
+		@Override
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			return setHolderToView(super.newView(context, cursor, parent));
+		}
+
+		@Override
+		public void bindView(View view, Context context, Cursor cursor) {
+			super.bindView(view, context, cursor);
+
+			ViewHolder holder = (ViewHolder) view.getTag();
+			String name = "";
+
+			if (cursor.getColumnIndex(ItemsTable.COLUMN_NAME) != -1) {
+				name = cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME));
+			} else if (cursor.getColumnIndex(CategoriesTable.COLUMN_NAME) != -1) {
+				name = cursor.getString(cursor.getColumnIndex(CategoriesTable.COLUMN_NAME));
+			}
+
+			holder.mName.setText(name);
+			holder.mColor.setBackgroundColor(cursor.getInt(cursor.getColumnIndex(CategoriesTable.COLUMN_COLOR)));
+		}
+
+		@Override
+		public View newDropDownView(Context context, Cursor cursor, ViewGroup parent) {
+			return setHolderToView(super.newDropDownView(context, cursor, parent));
+		}
+
+		private View setHolderToView(View v) {
+			ViewHolder holder = new ViewHolder(v);
+			v.setTag(holder);
+
+			return v;
+		}
+
+		private class ViewHolder {
+			public TextView mName;
+			public TextView mColor;
+
+			ViewHolder(View v) {
+				mName = (TextView) v.findViewById(R.id.name);
+				mColor = (TextView) v.findViewById(R.id.color);
+			}
+		}
+
 	}
 }

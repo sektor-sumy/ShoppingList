@@ -48,5 +48,8 @@
 		<Preference
 			android:key="@string/setting_key_unit"
 			android:title="@string/setting_title_unit"/>
+		<Preference
+			android:key="@string/setting_key_category"
+			android:title="@string/setting_title_category"/>
 	</PreferenceCategory>
 </PreferenceScreen>

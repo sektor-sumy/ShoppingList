@@ -228,19 +228,19 @@
 	</string-array>
 
 	<string-array name="categories">
-		<item>другое</item>
-		<item>алкоголь</item>
-		<item>молочное</item>
-		<item>бакалея</item>
-		<item>овощи</item>
-		<item>фрукты</item>
-		<item>зелень</item>
-		<item>хлебный</item>
-		<item>кондитерский</item>
-		<item>замороженое</item>
-		<item>рыба</item>
-		<item>мясо</item>
-		<item>суши</item>
-		<item>бытовая химия</item>
+		<item>другое—0xFF444444</item>
+		<item>алкоголь—0xFF888888</item>
+		<item>молочное—0xFFFF0000</item>
+		<item>бакалея—0xFF00FF00</item>
+		<item>овощи—0xFF00FF00</item>
+		<item>фрукты—0xFFFF0000</item>
+		<item>зелень—0xFFFF0000</item>
+		<item>хлебный—0xFFFFFF00</item>
+		<item>кондитерский—0xFFFFFF00</item>
+		<item>замороженое—0xFF0000FF</item>
+		<item>рыба—0xFFFF0000</item>
+		<item>мясо—0xFFFF0000</item>
+		<item>суши—0xFF00FF00</item>
+		<item>бытовая химия—0xFFCCCCCC</item>
 	</string-array>
 </resources>

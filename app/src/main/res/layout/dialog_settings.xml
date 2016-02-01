@@ -46,4 +46,31 @@
 
 	</android.support.design.widget.TextInputLayout>
 
+	<LinearLayout
+		android:id="@+id/color_picker"
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:visibility="gone">
+
+		<com.larswerkman.lobsterpicker.LobsterPicker
+			android:id="@+id/lobster_picker"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"/>
+
+		<com.larswerkman.lobsterpicker.sliders.LobsterShadeSlider
+			android:id="@+id/shade_slider"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"/>
+
+		<com.larswerkman.lobsterpicker.sliders.LobsterOpacitySlider
+			android:id="@+id/opacity_slider"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"/>
+
+	</LinearLayout>
+
 </LinearLayout>

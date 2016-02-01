@@ -14,6 +14,12 @@
 		android:paddingTop="@dimen/padding_8dp"
 		android:paddingBottom="@dimen/padding_8dp">
 
+		<TextView
+			android:id="@+id/color"
+			android:layout_width="5dp"
+			android:layout_height="match_parent"
+			android:background="@android:color/transparent"/>
+
 		<ImageView
 			android:id="@+id/item_image_list"
 			android:layout_width="@dimen/avatar_hw"

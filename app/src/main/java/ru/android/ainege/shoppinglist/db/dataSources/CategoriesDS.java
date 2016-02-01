@@ -91,6 +91,7 @@ public class CategoriesDS extends DictionaryDS<Category> {
 	private ContentValues createContentValues(Category category) {
 		ContentValues values = new ContentValues();
 		values.put(CategoriesTable.COLUMN_NAME, category.getName());
+		values.put(CategoriesTable.COLUMN_COLOR, category.getColor());
 		return values;
 	}
 
@@ -112,8 +113,9 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		public Category getEntity() {
 			long id = getLong(getColumnIndex(CategoriesTable.COLUMN_ID));
 			String name = getString(getColumnIndex(CategoriesTable.COLUMN_NAME));
+			int color = getInt(getColumnIndex(CategoriesTable.COLUMN_COLOR));
 
-			return new Category(id, name);
+			return new Category(id, name, color);
 		}
 
 		public Category getCategoryWithItems(ArrayList<ShoppingList> itemInList) {

@@ -54,11 +54,13 @@ public class SettingsActivity extends SingleFragmentActivity {
 				public boolean onPreferenceClick(Preference preference) {
 					Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
 					i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, getString(R.string.settings_key_currency));
+
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 					} else {
 						startActivity(i);
 					}
+
 					return true;
 				}
 			});
@@ -69,11 +71,30 @@ public class SettingsActivity extends SingleFragmentActivity {
 				public boolean onPreferenceClick(Preference preference) {
 					Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
 					i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, getString(R.string.setting_key_unit));
+
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 					} else {
 						startActivity(i);
 					}
+
+					return true;
+				}
+			});
+
+			Preference categorySettings = findPreference(getString(R.string.setting_key_category));
+			categorySettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
+					i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, getString(R.string.setting_key_category));
+
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+					} else {
+						startActivity(i);
+					}
+
 					return true;
 				}
 			});

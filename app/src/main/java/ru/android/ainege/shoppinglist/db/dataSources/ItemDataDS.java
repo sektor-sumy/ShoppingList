@@ -24,6 +24,16 @@ public class ItemDataDS extends GenericDS<ItemData> {
 		return result;
 	}
 
+	public boolean isCategoryUsed(long idCategory) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(ItemDataTable.TABLE_NAME, null, ItemDataTable.COLUMN_ID_CATEGORY + " = " + idCategory,
+				null, null, null, null);
+		ItemDataCursor dataCursor = new ItemDataCursor(cursor);
+		boolean result = dataCursor.getCount() > 0;
+		cursor.close();
+		return result;
+	}
+
 	@Override
 	public int update(ItemData data) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();

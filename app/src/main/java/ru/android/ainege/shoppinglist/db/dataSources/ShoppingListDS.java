@@ -29,7 +29,8 @@ public class ShoppingListDS extends GenericDS<ShoppingList> {
 		String selectQuery = "SELECT " + ShoppingListTable.TABLE_NAME + ".*, " +
 				ItemsTable.COLUMN_NAME + ", " + ItemsTable.COLUMN_DEFAULT_IMAGE_PATH + ", " +
 				ItemsTable.COLUMN_IMAGE_PATH + ", " + ItemDataTable.TABLE_NAME + ".*, " +
-				UnitsTable.COLUMN_NAME + ", " + CategoriesTable.COLUMN_NAME +
+				UnitsTable.COLUMN_NAME + ", " + CategoriesTable.COLUMN_NAME + ", " +
+				CategoriesTable.COLUMN_COLOR +
 				" FROM " + ShoppingListTable.TABLE_NAME +
 				" INNER JOIN " + ItemsTable.TABLE_NAME + " ON " +
 				ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_ITEM + " = " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID +
@@ -150,8 +151,9 @@ public class ShoppingListDS extends GenericDS<ShoppingList> {
 				}
 
 				if (getColumnIndex(CategoriesTable.COLUMN_NAME) != -1) {
-					String categotyName = getString(getColumnIndex(CategoriesTable.COLUMN_NAME));
-					data.setCategory(new Category(idCategory, categotyName));
+					String categoryName = getString(getColumnIndex(CategoriesTable.COLUMN_NAME));
+					int color = getInt(getColumnIndex(CategoriesTable.COLUMN_COLOR));
+					data.setCategory(new Category(idCategory, categoryName, color));
 				}
 
 				shoppingList.setItemData(data);
