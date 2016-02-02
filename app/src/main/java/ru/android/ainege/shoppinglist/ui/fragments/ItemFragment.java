@@ -579,7 +579,10 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			}
 
 			holder.mName.setText(name);
-			holder.mColor.setBackgroundColor(cursor.getInt(cursor.getColumnIndex(CategoriesTable.COLUMN_COLOR)));
+
+			if (mIsUseCategory) {
+				holder.mColor.setBackgroundColor(cursor.getInt(cursor.getColumnIndex(CategoriesTable.COLUMN_COLOR)));
+			}
 		}
 
 		@Override

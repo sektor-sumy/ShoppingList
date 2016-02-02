@@ -9,7 +9,9 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:orientation="horizontal"
-		android:gravity="center">
+		android:gravity="center"
+		android:paddingLeft="@dimen/padding_16dp"
+		android:paddingRight="@dimen/padding_16dp">
 
 		<TextView
 			android:id="@+id/color"
@@ -23,7 +25,7 @@
 			android:layout_width="@dimen/avatar_hw"
 			android:layout_height="@dimen/avatar_hw"
 			android:scaleType="centerCrop"
-			android:layout_marginRight="@dimen/padding_8dp"/>
+			android:layout_marginRight="@dimen/padding_12dp"/>
 
 		<TextView
 			android:id="@+id/item_name_list"
@@ -65,7 +67,8 @@
 		android:layout_height="1dp"
 		android:layout_gravity="center"
 		android:background="@android:color/black"
-		android:layout_marginLeft="8dp"
+		android:layout_marginLeft="@dimen/padding_12dp"
+		android:layout_marginRight="@dimen/padding_12dp"
 		android:visibility="gone"/>
 
 </FrameLayout>

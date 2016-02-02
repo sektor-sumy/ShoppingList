@@ -17,7 +17,9 @@
 			android:id="@+id/category_container"
 			android:orientation="horizontal"
 			android:layout_width="match_parent"
-			android:layout_height="@dimen/row_list_category_height">
+			android:layout_height="@dimen/row_list_category_height"
+			android:paddingLeft="@dimen/padding_16dp"
+			android:paddingRight="@dimen/padding_16dp">
 
 			<TextView
 				android:id="@+id/color"

@@ -50,6 +50,7 @@
 			android:title="@string/setting_title_unit"/>
 		<Preference
 			android:key="@string/setting_key_category"
-			android:title="@string/setting_title_category"/>
+			android:title="@string/setting_title_category"
+			android:dependency="@string/settings_key_use_category" />
 	</PreferenceCategory>
 </PreferenceScreen>

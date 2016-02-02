@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -947,8 +948,18 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			public void onBindViewHolder(ViewHolder holder, int position) {
 				ShoppingList itemInList = mItems.get(position);
 
+				if (mIsUseCategory) {
+					FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) holder.mIsBought.getLayoutParams();
+					param.setMargins(getResources().getDimensionPixelSize(R.dimen.padding_24dp), 0, getResources().getDimensionPixelSize(R.dimen.padding_16dp), 0);
+					holder.mIsBought.setLayoutParams(param);
+
+					holder.mColor.setVisibility(View.VISIBLE);
+					holder.mColor.setBackgroundColor(itemInList.getItemData().getCategory().getColor());
+				} else {
+					holder.mColor.setVisibility(View.GONE);
+				}
+
 				holder.mView.setSelected(mSelectedItems.contains(itemInList));
-				holder.mColor.setBackgroundColor(itemInList.getItemData().getCategory().getColor());
 				Image.create().insertImageToView(getActivity(), itemInList.getItem().getImagePath(), holder.mImage);
 				holder.mName.setText(itemInList.getItem().getName());
 

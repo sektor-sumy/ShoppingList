@@ -133,8 +133,6 @@
 				android:clipToPadding="false"
 				android:paddingBottom="65dp"
 				android:paddingTop="@dimen/padding_8dp"
-				android:paddingLeft="@dimen/padding_16dp"
-				android:paddingRight="@dimen/padding_16dp"
 				android:scrollbars="vertical"/>
 
 		</LinearLayout>
