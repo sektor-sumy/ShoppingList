@@ -98,23 +98,21 @@
 
 				<TextView
 					android:id="@+id/spent_money"
-					android:layout_width="wrap_content"
+					android:layout_width="0dp"
 					android:layout_height="wrap_content"
 					android:layout_marginRight="2dp"
 					android:layout_weight="0.5"
 					android:gravity="center"
-					android:maxWidth="@dimen/column_wight"
 					android:singleLine="true"
 					android:textStyle="bold"/>
 
 				<TextView
 					android:id="@+id/total_money"
-					android:layout_width="wrap_content"
+					android:layout_width="0dp"
 					android:layout_height="wrap_content"
 					android:layout_marginLeft="2dp"
 					android:layout_weight="0.5"
 					android:gravity="center"
-					android:maxWidth="@dimen/column_wight"
 					android:singleLine="true"
 					android:textStyle="bold"/>
 
@@ -134,6 +132,9 @@
 				android:layout_weight="1"
 				android:clipToPadding="false"
 				android:paddingBottom="65dp"
+				android:paddingTop="@dimen/padding_8dp"
+				android:paddingLeft="@dimen/padding_16dp"
+				android:paddingRight="@dimen/padding_16dp"
 				android:scrollbars="vertical"/>
 
 		</LinearLayout>

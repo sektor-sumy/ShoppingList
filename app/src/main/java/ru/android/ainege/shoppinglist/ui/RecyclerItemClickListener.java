@@ -38,7 +38,7 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
 
 				if (childView != null && mListener != null) {
 					int swipe_distanceX = 120;
-					int swipe_distanceY = (int) context.getResources().getDimension(R.dimen.row_list_height);
+					int swipe_distanceY = (int) context.getResources().getDimension(R.dimen.row_list_item_height);
 					int swipe_velocity = 200; //measure in pixels per second
 
 					if (((e2.getX() - e1.getX()) > swipe_distanceX) && (Math.abs(e2.getY() - e1.getY()) <= swipe_distanceY)

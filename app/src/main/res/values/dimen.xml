@@ -2,7 +2,9 @@
 <resources>
 	<dimen name="padding_16dp">16dp</dimen>
 	<dimen name="padding_8dp">8dp</dimen>
-	<dimen name="row_list_height">56dp</dimen>
+	<dimen name="padding_4dp">4dp</dimen>
+	<dimen name="row_list_category_height">48dp</dimen>
+	<dimen name="row_list_item_height">56dp</dimen>
 	<dimen name="avatar_hw">40dp</dimen>
 
 	<dimen name="drawer_wight">240dp</dimen>
@@ -12,7 +14,8 @@
 	<dimen name="scrim_height">85dp</dimen>
 	<dimen name="floating_button_margin">24dp</dimen>
 
-	<dimen name="column_wight">75dp</dimen>
+	<dimen name="column_amount_wight">60dp</dimen>
+	<dimen name="column_price_wight">80dp</dimen>
 
 	<!--fragment_item-->
 	<dimen name="column_left">100dp</dimen>

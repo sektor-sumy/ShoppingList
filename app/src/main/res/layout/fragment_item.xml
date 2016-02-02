@@ -109,9 +109,6 @@
 				android:id="@+id/amount_text"
 				android:layout_width="@dimen/column_left"
 				android:layout_height="wrap_content"
-				android:layout_alignParentLeft="true"
-				android:layout_alignParentStart="true"
-				android:gravity="left"
 				android:text="@string/amount"
 				android:layout_alignBottom="@+id/amount_input_layout"
 				android:layout_marginBottom="@dimen/margin_bottom"/>
@@ -139,7 +136,7 @@
 				android:id="@+id/amount_unit"
 				android:layout_width="@dimen/column_right"
 				android:layout_height="wrap_content"
-				android:layout_toEndOf="@+id/price_input_layout"
+				android:layout_toRightOf="@+id/price_input_layout"
 				android:gravity="center"
 				android:layout_alignBottom="@+id/amount_input_layout"
 				android:layout_marginBottom="@dimen/margin_bottom"/>
@@ -148,9 +145,6 @@
 				android:id="@+id/price_text"
 				android:layout_width="@dimen/column_left"
 				android:layout_height="wrap_content"
-				android:layout_alignParentLeft="true"
-				android:layout_alignParentStart="true"
-				android:gravity="left"
 				android:text="@string/price"
 				android:layout_alignBottom="@+id/price_input_layout"
 				android:layout_marginBottom="@dimen/margin_bottom"/>
@@ -178,8 +172,7 @@
 				android:id="@+id/currency"
 				android:layout_width="@dimen/column_right"
 				android:layout_height="wrap_content"
-				android:layout_alignEnd="@+id/comment_input_layout"
-				android:layout_alignRight="@+id/comment_input_layout"
+				android:layout_alignRight="@+id/name_input_layout"
 				android:gravity="center"
 				android:layout_alignBottom="@+id/price_input_layout"
 				android:layout_marginBottom="@dimen/margin_bottom"/>
@@ -205,16 +198,14 @@
 					android:id="@+id/category_text"
 					android:layout_width="@dimen/column_left"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="1dp"
-					android:gravity="left"
+					android:layout_gravity="bottom"
 					android:text="@string/category"/>
 
 				<Spinner
 					android:id="@+id/category"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="20dp"
-					android:gravity="center"/>
+					android:layout_marginTop="20dp"/>
 
 			</LinearLayout>
 
@@ -240,8 +231,7 @@
 				android:id="@+id/is_bought"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_alignEnd="@+id/amount_unit"
-				android:layout_alignRight="@+id/amount_unit"
+				android:layout_alignRight="@+id/name_input_layout"
 				android:layout_below="@+id/comment_input_layout"
 				android:background="@null"
 				android:drawableRight="@drawable/ic_toggle_button"

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -622,31 +623,33 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		private void setRV(final Category category, final ViewHolder holder) {
 			ArrayList<ShoppingList> itemsInCategory = category.getItemsByCategoryInList();
-			boolean isAllBought = true;
+			int boughtItems = 0;
 			double sum = 0;
 
 			for (ShoppingList item : itemsInCategory) {
 				dataMap.put(item.getIdItem(), holder);
 
-				if (!item.isBought()) {
-					isAllBought = false;
-				} else {
+				if (item.isBought()) {
+					boughtItems ++;
 					sum += sumOneItem(item);
 				}
 			}
 
 			updateSpentCategorySum(holder, sum);
+			boolean isAllBought = (boughtItems == itemsInCategory.size());
 
 			if (!mIsCollapsedCategory
 					|| (collapseCategoryStates.containsKey(category.getId()) && !collapseCategoryStates.get(category.getId()))
 					|| (!collapseCategoryStates.containsKey(category.getId()) && !isAllBought)) {
 				ViewGroup.LayoutParams params = holder.mItemsInCategory.getLayoutParams();
-				params.height = getResources().getDimensionPixelSize(R.dimen.row_list_height) * itemsInCategory.size();
+				params.height = getResources().getDimensionPixelSize(R.dimen.row_list_item_height) * itemsInCategory.size();
 				holder.mItemsInCategory.setLayoutParams(params);
+			} else if (isAllBought) {
+				holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
 			}
 
 			holder.mItemsInCategory.setLayoutManager(new LinearLayoutManager(getActivity()));
-			holder.mItemsInCategory.setAdapter(new ItemsAdapter(itemsInCategory, sum));
+			holder.mItemsInCategory.setAdapter(new ItemsAdapter(itemsInCategory, sum, boughtItems));
 			holder.mItemsInCategory.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), holder.mItemsInCategory, new RecyclerItemClickListener.OnItemClickListener() {
 				@Override
 				public void onItemClick(int position) {
@@ -721,14 +724,23 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					if (isBought) {
 						mSaveSpentMoney += sum;
 						categorySpentMoney += sum;
+						adapter.mBoughtItems++;
 					} else {
 						mSaveSpentMoney -= sum;
 						categorySpentMoney -= sum;
+						adapter.mBoughtItems--;
 					}
 
 					updateSpentSum(mSaveSpentMoney);
 					updateSpentCategorySum(holder, categorySpentMoney);
 					adapter.setSum(categorySpentMoney);
+
+					//if all items bought in the category - cross off the category else delete cross
+					if (adapter.mBoughtItems == adapter.getItemCount()) {
+						holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+					} else {
+						holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+					}
 				}
 			}));
 		}
@@ -831,7 +843,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 					ViewGroup.LayoutParams params = rv.getLayoutParams();
 					final int oldHeight = params.height;
-					final int newHeight = getResources().getDimensionPixelSize(R.dimen.row_list_height) * rv.getAdapter().getItemCount();
+					final int newHeight = getResources().getDimensionPixelSize(R.dimen.row_list_item_height) * rv.getAdapter().getItemCount();
 					rv.startAnimation(getAnimationRV(rv, oldHeight, newHeight, true));
 
 				}
@@ -902,7 +914,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 							a = getAnimationRV(mItemsInCategory, mItemsInCategory.getHeight(), 0, true);
 							collapseCategoryStates.put(category.getId(), true);
 						} else {
-							int newHeight = getResources().getDimensionPixelSize(R.dimen.row_list_height) * mItemsInCategory.getAdapter().getItemCount();
+							int newHeight = getResources().getDimensionPixelSize(R.dimen.row_list_item_height) * mItemsInCategory.getAdapter().getItemCount();
 							a = getAnimationRV(mItemsInCategory, mItemsInCategory.getHeight(), newHeight, false);
 							collapseCategoryStates.put(category.getId(), false);
 						}
@@ -917,10 +929,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> {
 			private ArrayList<ShoppingList> mItems = new ArrayList<>();
 			private double mSum;
+			private int mBoughtItems;
 
-			public ItemsAdapter(ArrayList<ShoppingList> itemsInCategory, double sum) {
+			public ItemsAdapter(ArrayList<ShoppingList> itemsInCategory, double sum, int boughtItems) {
 				mItems = itemsInCategory;
 				mSum = sum;
+				mBoughtItems = boughtItems;
 			}
 
 			@Override

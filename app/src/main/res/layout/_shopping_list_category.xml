@@ -10,35 +10,41 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="center_horizontal|bottom"
 		android:orientation="vertical"
-		android:paddingBottom="@dimen/padding_8dp"
-		android:paddingLeft="@dimen/padding_16dp"
-		android:paddingRight="@dimen/padding_16dp"
-		android:paddingTop="@dimen/padding_8dp">
+		android:paddingTop="@dimen/padding_4dp"
+		android:paddingBottom="@dimen/padding_4dp">
 
 		<LinearLayout
 			android:id="@+id/category_container"
 			android:orientation="horizontal"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent">
+			android:layout_height="@dimen/row_list_category_height">
 
 			<TextView
 				android:id="@+id/color"
 				android:layout_width="5dp"
 				android:layout_height="match_parent"
-				android:background="@android:color/transparent"/>
+				android:background="@android:color/transparent"
+				android:layout_marginRight="@dimen/padding_8dp"/>
 
 			<TextView
 				android:id="@+id/category"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
-				android:textAppearance="?android:attr/textAppearanceLarge"
-				android:layout_weight="1"/>
+				android:layout_gravity="center_vertical"
+				android:textColor="@android:color/black"
+				android:textSize="18sp"
+				android:singleLine="true"
+				android:layout_weight="0.6"
+				android:layout_marginRight="@dimen/padding_8dp"/>
 
 			<TextView
 				android:id="@+id/sum_category"
-				android:layout_width="wrap_content"
+				android:layout_width="0dp"
 				android:layout_height="wrap_content"
-				android:textAppearance="?android:attr/textAppearanceMedium"/>
+				android:layout_gravity="center_vertical"
+				android:gravity="right"
+				android:singleLine="true"
+				android:layout_weight="0.4"/>
 
 		</LinearLayout>
 

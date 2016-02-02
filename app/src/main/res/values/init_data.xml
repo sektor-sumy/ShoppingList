@@ -2,207 +2,207 @@
 <resources>
 	<string-array name="items">
 		<!--Хлебо-булочные-->
-		<item>Хлеб—шт—bread.jpg—хлебный</item>
-		<item>Батон—шт—baton.jpg—хлебный</item>
-		<item>Пирожное—шт—cake.jpg—хлебный</item>
-		<item>Торт—шт—big cake.jpg—хлебный</item>
+		<item>Хлеб—шт—bread.jpg—Хлебный</item>
+		<item>Батон—шт—baton.jpg—Хлебный</item>
+		<item>Пирожное—шт—cake.jpg—Хлебный</item>
+		<item>Торт—шт—big cake.jpg—Хлебный</item>
 		<!--Кондитерская-->
-		<item>Конфеты—кг—candies.jpg—кондитерский</item>
-		<item>Шоколадка—шт—chocolate.jpg—кондитерский</item>
-		<item>Вафли—кг—wafer.jpg—кондитерский</item>
-		<item>Зефир—кг—zephyr.jpg—кондитерский</item>
+		<item>Конфеты—кг—candies.jpg—Кондитерский</item>
+		<item>Шоколадка—шт—chocolate.jpg—Кондитерский</item>
+		<item>Вафли—кг—wafer.jpg—Кондитерский</item>
+		<item>Зефир—кг—zephyr.jpg—Кондитерский</item>
 		<!--Сладости-->
-		<item>Мёд—банка—honey.jpg—бакалея</item>
-		<item>Варенье—банка—jam.jpg—бакалея</item>
-		<item>Джем—банка—jam.jpg—бакалея</item>
-		<item>Халва—кг—halva.jpg—бакалея</item>
-		<item>Печенье—кг—biscuit.jpg—бакалея</item>
-		<item>Желе—упак—jelly.jpg—бакалея</item>
+		<item>Мёд—банка—honey.jpg—Бакалея</item>
+		<item>Варенье—банка—jam.jpg—Бакалея</item>
+		<item>Джем—банка—jam.jpg—Бакалея</item>
+		<item>Халва—кг—halva.jpg—Бакалея</item>
+		<item>Печенье—кг—biscuit.jpg—Бакалея</item>
+		<item>Желе—упак—jelly.jpg—Бакалея</item>
 		<!--Чай/кофе-->
-		<item>Черный чай—упак—tea.jpg—бакалея</item>
-		<item>Зеленый чай—упак—green tea.jpg—бакалея</item>
-		<item>Кофе—упак—coffee.jpg—бакалея</item>
+		<item>Черный чай—упак—tea.jpg—Бакалея</item>
+		<item>Зеленый чай—упак—green tea.jpg—Бакалея</item>
+		<item>Кофе—упак—coffee.jpg—Бакалея</item>
 		<!--Замороженная продукция-->
-		<item>Рыба—кг—fish.jpg—замороженое</item>
-		<item>Креветки—кг—shrimp.jpg—замороженое</item>
-		<item>Тесто—упак—dough.jpg—замороженое</item>
-		<item>Слоеное тесто—упак—puff pastry.jpg—замороженое</item>
-		<item>Пельмени—кг—dumplings.jpg—замороженое</item>
-		<item>Вареники—кг—vareniki.jpg—замороженое</item>
+		<item>Рыба—кг—fish.jpg—Замороженое</item>
+		<item>Креветки—кг—shrimp.jpg—Замороженое</item>
+		<item>Тесто—упак—dough.jpg—Замороженое</item>
+		<item>Слоеное тесто—упак—puff pastry.jpg—Замороженое</item>
+		<item>Пельмени—кг—dumplings.jpg—Замороженое</item>
+		<item>Вареники—кг—vareniki.jpg—Замороженое</item>
 		<!--Рыбное-->
-		<item>Лосось—кг—fish.jpg—рыба</item>
-		<item>Форель—кг—fish.jpg—рыба</item>
-		<item>Горбуша—кг—fish.jpg—рыба</item>
-		<item>Нерка—кг—fish.jpg—рыба</item>
-		<item>Мидии—кг—mussels.jpg—рыба</item>
-		<item>Кальмары—кг—squids.jpg—рыба</item>
-		<item>Красная Икра—банка—red caviar.jpg—рыба</item>
-		<item>Черная Икра—банка—black caviar.jpg—рыба</item>
-		<item>Крабовые палочки—кг—crab sticks.jpg—рыба</item>
-		<item>Крабовое мясо—кг—crab meat.jpg—рыба</item>
-		<item>Селедка—кг—herring.jpg—рыба</item>
+		<item>Лосось—кг—fish.jpg—Рыба</item>
+		<item>Форель—кг—fish.jpg—Рыба</item>
+		<item>Горбуша—кг—fish.jpg—Рыба</item>
+		<item>Нерка—кг—fish.jpg—Рыба</item>
+		<item>Мидии—кг—mussels.jpg—Рыба</item>
+		<item>Кальмары—кг—squids.jpg—Рыба</item>
+		<item>Красная Икра—банка—red caviar.jpg—Рыба</item>
+		<item>Черная Икра—банка—black caviar.jpg—Рыба</item>
+		<item>Крабовые палочки—кг—crab sticks.jpg—Рыба</item>
+		<item>Крабовое мясо—кг—crab meat.jpg—Рыба</item>
+		<item>Селедка—кг—herring.jpg—Рыба</item>
 		<!--Мясо-->
-		<item>Колбаса—кг—sausage.jpg—мясо</item>
-		<item>Сосиски—кг—frankfurters.jpg—мясо</item>
-		<item>Мясо—кг—meat.jpg—мясо</item>
-		<item>Свинина—кг—meat.jpg—мясо</item>
-		<item>Говядина—кг—meat.jpg—мясо</item>
-		<item>Курица—кг—chicken.jpg—мясо</item>
+		<item>Колбаса—кг—sausage.jpg—Мясо</item>
+		<item>Сосиски—кг—frankfurters.jpg—Мясо</item>
+		<item>Мясо—кг—meat.jpg—Мясо</item>
+		<item>Свинина—кг—meat.jpg—Мясо</item>
+		<item>Говядина—кг—meat.jpg—Мясо</item>
+		<item>Курица—кг—chicken.jpg—Мясо</item>
 		<!--Молочное-->
-		<item>Сыр—кг—cheese.jpg—молочное</item>
-		<item>Молоко—л—milk.jpg—молочное</item>
-		<item>Творог—кг—cottage cheese.jpg—молочное</item>
-		<item>Сметана—упак—sour cream.jpg—молочное</item>
-		<item>Кефир—л—kefir.jpg—молочное</item>
-		<item>Сливочное масло—упак—butter.jpg—молочное</item>
-		<item>Сгущенка—шт—condensed milk.jpg—молочное</item>
-		<item>Мороженое—шт—ice cream.jpg—молочное</item>
-		<item>Йогурт—упак—yogurt.jpg—молочное</item>
-		<item>Яйца—упак—eggs.jpg—молочное</item>
+		<item>Сыр—кг—cheese.jpg—Молочное</item>
+		<item>Молоко—л—milk.jpg—Молочное</item>
+		<item>Творог—кг—cottage cheese.jpg—Молочное</item>
+		<item>Сметана—упак—sour cream.jpg—Молочное</item>
+		<item>Кефир—л—kefir.jpg—Молочное</item>
+		<item>Сливочное масло—упак—butter.jpg—Молочное</item>
+		<item>Сгущенка—шт—condensed milk.jpg—Молочное</item>
+		<item>Мороженое—шт—ice cream.jpg—Молочное</item>
+		<item>Йогурт—упак—yogurt.jpg—Молочное</item>
+		<item>Яйца—упак—eggs.jpg—Молочное</item>
 		<!--Овощи-->
-		<item>Картофель—кг—potato.jpg—овощи</item>
-		<item>Капуста—кг—cabbage.jpg—овощи</item>
-		<item>Морковь—кг—carrot.jpg—овощи</item>
-		<item>Помидоры—кг—tomato.jpg—овощи</item>
-		<item>Огурцы—кг—cucumber.jpg—овощи</item>
-		<item>Чеснок—кг—garlic.jpg—овощи</item>
-		<item>Лук—кг—onion.jpg—овощи</item>
-		<item>Грибы—кг—mushrooms.jpg—овощи</item>
-		<item>Кукуруза—кг—corn.jpg—овощи</item>
-		<item>Стручковый горошек—кг—pea pods.jpg—овощи</item>
-		<item>Баклажаны—кг—eggplant.jpg—овощи</item>
-		<item>Кабачки—кг—courgettes.jpg—овощи</item>
-		<item>Свекла—кг—beet.jpg—овощи</item>
-		<item>Хрен—кг—horseradish.jpg—овощи</item>
-		<item>Авокадо—шт—avocado.jpg—овощи</item>
+		<item>Картофель—кг—potato.jpg—Овощи</item>
+		<item>Капуста—кг—cabbage.jpg—Овощи</item>
+		<item>Морковь—кг—carrot.jpg—Овощи</item>
+		<item>Помидоры—кг—tomato.jpg—Овощи</item>
+		<item>Огурцы—кг—cucumber.jpg—Овощи</item>
+		<item>Чеснок—кг—garlic.jpg—Овощи</item>
+		<item>Лук—кг—onion.jpg—Овощи</item>
+		<item>Грибы—кг—mushrooms.jpg—Овощи</item>
+		<item>Кукуруза—кг—corn.jpg—Овощи</item>
+		<item>Стручковый горошек—кг—pea pods.jpg—Овощи</item>
+		<item>Баклажаны—кг—eggplant.jpg—Овощи</item>
+		<item>Кабачки—кг—courgettes.jpg—Овощи</item>
+		<item>Свекла—кг—beet.jpg—Овощи</item>
+		<item>Хрен—кг—horseradish.jpg—Овощи</item>
+		<item>Авокадо—шт—avocado.jpg—Овощи</item>
 		<!--Фрукты-->
-		<item>Виноград—кг—grapes.jpg—фрукты</item>
-		<item>Яблоки—кг—typo.jpg—фрукты</item>
-		<item>Апельсины—кг—orange.jpg—фрукты</item>
-		<item>Мандарины—кг—mandarin.jpg—фрукты</item>
-		<item>Ананас—кг—pineapple.jpg—фрукты</item>
-		<item>Бананы—кг—banana.jpg—фрукты</item>
-		<item>Лимон—кг—lemon.jpg—фрукты</item>
-		<item>Персики—кг—peaches.jpg—фрукты</item>
-		<item>Нектарин—кг—nectarine.jpg—фрукты</item>
-		<item>Малина—кг—raspberries.jpg—фрукты</item>
-		<item>Арбуз—кг—watermelon.jpg—фрукты</item>
-		<item>Дыня—кг—melon.jpg—фрукты</item>
-		<item>Груши—кг—pears.jpg—фрукты</item>
-		<item>Грейпфрут—кг—grapefruit.jpg—фрукты</item>
-		<item>Киви—кг—kiwi.jpg—фрукты</item>
+		<item>Виноград—кг—grapes.jpg—Фрукты</item>
+		<item>Яблоки—кг—typo.jpg—Фрукты</item>
+		<item>Апельсины—кг—orange.jpg—Фрукты</item>
+		<item>Мандарины—кг—mandarin.jpg—Фрукты</item>
+		<item>Ананас—кг—pineapple.jpg—Фрукты</item>
+		<item>Бананы—кг—banana.jpg—Фрукты</item>
+		<item>Лимон—кг—lemon.jpg—Фрукты</item>
+		<item>Персики—кг—peaches.jpg—Фрукты</item>
+		<item>Нектарин—кг—nectarine.jpg—Фрукты</item>
+		<item>Малина—кг—raspberries.jpg—Фрукты</item>
+		<item>Арбуз—кг—watermelon.jpg—Фрукты</item>
+		<item>Дыня—кг—melon.jpg—Фрукты</item>
+		<item>Груши—кг—pears.jpg—Фрукты</item>
+		<item>Грейпфрут—кг—grapefruit.jpg—Фрукты</item>
+		<item>Киви—кг—kiwi.jpg—Фрукты</item>
 		<!--Зелень-->
-		<item>Укроп—упак—dill.jpg—зелень</item>
-		<item>Салат—упак—salad.jpg—зелень</item>
-		<item>Мята—упак—mint.jpg—зелень</item>
-		<item>Базилик—упак—basil.jpg—зелень</item>
+		<item>Укроп—упак—dill.jpg—Зелень</item>
+		<item>Салат—упак—salad.jpg—Зелень</item>
+		<item>Мята—упак—mint.jpg—Зелень</item>
+		<item>Базилик—упак—basil.jpg—Зелень</item>
 		<!--Алкоголь-->
-		<item>Вино—бут—wine.jpg—алкоголь</item>
-		<item>Пиво—бут—beer.jpg—алкоголь</item>
-		<item>Водка—бут—vodka.jpg—алкоголь</item>
-		<item>Коньяк—бут—cognac.jpg—алкоголь</item>
-		<item>Шампанское—бут—champagne.jpg—алкоголь</item>
-		<item>Минеральная вода—л—water.jpg—алкоголь</item>
-		<item>Сок—л—juice.jpg—алкоголь</item>
+		<item>Вино—бут—wine.jpg—Алкоголь</item>
+		<item>Пиво—бут—beer.jpg—Алкоголь</item>
+		<item>Водка—бут—vodka.jpg—Алкоголь</item>
+		<item>Коньяк—бут—cognac.jpg—Алкоголь</item>
+		<item>Шампанское—бут—champagne.jpg—Алкоголь</item>
+		<item>Минеральная вода—л—water.jpg—Алкоголь</item>
+		<item>Сок—л—juice.jpg—Алкоголь</item>
 		<!--Специи и соусы-->
-		<item>Майонез—шт—mayonnaise.jpg—бакалея</item>
-		<item>Кетчуп—шт—ketchup.jpg—бакалея</item>
-		<item>Горчица—шт—mustard.jpg—бакалея</item>
-		<item>Соль—кг—salt.jpg—бакалея</item>
-		<item>Сахар—кг—sugar.jpg—бакалея</item>
-		<item>Растительное масло—бут—vegetable oil.jpg—бакалея</item>
-		<item>Оливковое масло—бут—olive oil.jpg—бакалея</item>
-		<item>Уксус—бут—vinegar.jpg—бакалея</item>
-		<item>Черный перец—упак—black pepper.jpg—бакалея</item>
-		<item>Красный перец—упак—paprika.jpg—бакалея</item>
-		<item>Гвоздика—упак—cloves.jpg—бакалея</item>
-		<item>Корица—упак—koritza.jpg—бакалея</item>
-		<item>Лавровый лист—упак—bay leaf.jpg—бакалея</item>
+		<item>Майонез—шт—mayonnaise.jpg—Бакалея</item>
+		<item>Кетчуп—шт—ketchup.jpg—Бакалея</item>
+		<item>Горчица—шт—mustard.jpg—Бакалея</item>
+		<item>Соль—кг—salt.jpg—Бакалея</item>
+		<item>Сахар—кг—sugar.jpg—Бакалея</item>
+		<item>Растительное масло—бут—vegetable oil.jpg—Бакалея</item>
+		<item>Оливковое масло—бут—olive oil.jpg—Бакалея</item>
+		<item>Уксус—бут—vinegar.jpg—Бакалея</item>
+		<item>Черный перец—упак—black pepper.jpg—Бакалея</item>
+		<item>Красный перец—упак—paprika.jpg—Бакалея</item>
+		<item>Гвоздика—упак—cloves.jpg—Бакалея</item>
+		<item>Корица—упак—koritza.jpg—Бакалея</item>
+		<item>Лавровый лист—упак—bay leaf.jpg—Бакалея</item>
 		<!--Консервы-->
-		<item>Зеленый горошек—банка—pea pods.jpg—бакалея</item>
-		<item>Оливки—банка—olives.jpg—бакалея</item>
-		<item>Маслины—банка—black olives.jpg—бакалея</item>
-		<item>Рыбные консервы—банка—canned fish.jpg—бакалея</item>
-		<item>Шпроты—банка—sprat.jpg—бакалея</item>
-		<item>Соленые помидоры—банка—canned tomatoes.jpg—бакалея</item>
-		<item>Маринованные помидоры—банка—canned tomatoes.jpg—бакалея</item>
-		<item>Консервированные помидоры—банка—canned tomatoes.jpg—бакалея</item>
-		<item>Соленые огурцы—банка—canned cucumbers.jpg—бакалея</item>
-		<item>Маринованные огурцы—банка—canned cucumbers.jpg—бакалея</item>
-		<item>Консервированные огурцы—банка—canned cucumbers.jpg—бакалея</item>
+		<item>Зеленый горошек—банка—pea pods.jpg—Бакалея</item>
+		<item>Оливки—банка—olives.jpg—Бакалея</item>
+		<item>Маслины—банка—black olives.jpg—Бакалея</item>
+		<item>Рыбные консервы—банка—canned fish.jpg—Бакалея</item>
+		<item>Шпроты—банка—sprat.jpg—Бакалея</item>
+		<item>Соленые помидоры—банка—canned tomatoes.jpg—Бакалея</item>
+		<item>Маринованные помидоры—банка—canned tomatoes.jpg—Бакалея</item>
+		<item>Консервированные помидоры—банка—canned tomatoes.jpg—Бакалея</item>
+		<item>Соленые огурцы—банка—canned cucumbers.jpg—Бакалея</item>
+		<item>Маринованные огурцы—банка—canned cucumbers.jpg—Бакалея</item>
+		<item>Консервированные огурцы—банка—canned cucumbers.jpg—Бакалея</item>
 		<!--Круппы/маакроны-->
-		<item>Макароны—кг—pasta.jpg—бакалея</item>
-		<item>Гречка—кг—buckwheat.jpg—бакалея</item>
-		<item>Рис—кг—rice.jpg—бакалея</item>
-		<item>Чечевица—кг—lentil.jpg—бакалея</item>
-		<item>Пшено—кг—millet.jpg—бакалея</item>
-		<item>Мука—кг—flour.jpg—бакалея</item>
-		<item>Горох—кг—peas.jpg—бакалея</item>
-		<item>Фасоль—кг—beans.jpg—бакалея</item>
-		<item>Мюсли—упак—muesli.jpg—бакалея</item>
-		<item>Овсяные хлопья—упак—oat flakes.jpg—бакалея</item>
+		<item>Макароны—кг—pasta.jpg—Бакалея</item>
+		<item>Гречка—кг—buckwheat.jpg—Бакалея</item>
+		<item>Рис—кг—rice.jpg—Бакалея</item>
+		<item>Чечевица—кг—lentil.jpg—Бакалея</item>
+		<item>Пшено—кг—millet.jpg—Бакалея</item>
+		<item>Мука—кг—flour.jpg—Бакалея</item>
+		<item>Горох—кг—peas.jpg—Бакалея</item>
+		<item>Фасоль—кг—beans.jpg—Бакалея</item>
+		<item>Мюсли—упак—muesli.jpg—Бакалея</item>
+		<item>Овсяные хлопья—упак—oat flakes.jpg—Бакалея</item>
 		<!--Орешки-->
-		<item>Миндаль—кг—almond.jpg—бакалея</item>
-		<item>Гредский орех—кг—gredsky nut.jpg—бакалея</item>
-		<item>Арахис—кг—peanut.jpg—бакалея</item>
-		<item>Кешью—кг—cashew.jpg—бакалея</item>
-		<item>Фундук—кг—hazelnut.jpg—бакалея</item>
-		<item>Изюм—кг—raisins.jpg—бакалея</item>
-		<item>Курога—кг—gurogu.jpg—бакалея</item>
-		<item>Чернослив—кг—prune.jpg—бакалея</item>
+		<item>Миндаль—кг—almond.jpg—Бакалея</item>
+		<item>Гредский орех—кг—gredsky nut.jpg—Бакалея</item>
+		<item>Арахис—кг—peanut.jpg—Бакалея</item>
+		<item>Кешью—кг—cashew.jpg—Бакалея</item>
+		<item>Фундук—кг—hazelnut.jpg—Бакалея</item>
+		<item>Изюм—кг—raisins.jpg—Бакалея</item>
+		<item>Курога—кг—gurogu.jpg—Бакалея</item>
+		<item>Чернослив—кг—prune.jpg—Бакалея</item>
 		<!--Сушное-->
-		<item>Угорь—упак—acne.jpg—суши</item>
-		<item>Нори—упак—nori.jpg—суши</item>
-		<item>Сливочный сыр—шт—slivochii chiiz.jpg—суши</item>
-		<item>Соевый соус—бут—soy sauce.jpg—суши</item>
-		<item>Имбирь—упак—ginger.jpg—суши</item>
-		<item>Васаби—упак—wasabi.jpg—суши</item>
+		<item>Угорь—упак—acne.jpg—Суши</item>
+		<item>Нори—упак—nori.jpg—Суши</item>
+		<item>Сливочный сыр—шт—slivochii chiiz.jpg—Суши</item>
+		<item>Соевый соус—бут—soy sauce.jpg—Суши</item>
+		<item>Имбирь—упак—ginger.jpg—Суши</item>
+		<item>Васаби—упак—wasabi.jpg—Суши</item>
 		<!--всякое-->
-		<item>Дрожжи—упак—yeast.jpg—бакалея</item>
-		<item>Разрыхлитель теста—упак—baking powder.jpg—бакалея</item>
-		<item>Чипсы—упак—chips.jpg—бакалея</item>
+		<item>Дрожжи—упак—yeast.jpg—Бакалея</item>
+		<item>Разрыхлитель теста—упак—baking powder.jpg—Бакалея</item>
+		<item>Чипсы—упак—chips.jpg—Бакалея</item>
 		<!--Химия-->
-		<item>Стиральный порошок—кг—powder.jpg—бытовая химия</item>
-		<item>Зубная паста—шт—toothpaste.jpg—бытовая химия</item>
-		<item>Шампунь—шт—shampoo.jpg—бытовая химия</item>
-		<item>Мыло—шт—soap.jpg—бытовая химия</item>
-		<item>Гель для душа—шт—shower gel.jpg—бытовая химия</item>
-		<item>Моющее средство—шт—cleanser.jpg—бытовая химия</item>
-		<item>Дезодорант—шт—deodorant.jpg—бытовая химия</item>
-		<item>Гель для бритья—шт—shaving gel.jpg—бытовая химия</item>
-		<item>Пенка для бритья—шт—shaving gel.jpg—бытовая химия</item>
-		<item>Лосьон после бритья—шт—shaving lotion.jpg—бытовая химия</item>
-		<item>Крем после бритья—шт—shaving lotion.jpg—бытовая химия</item>
-		<item>Прокладки—упак—gaskets.jpg—бытовая химия</item>
-		<item>Ежедневные прокладки—упак—gaskets.jpg—бытовая химия</item>
-		<item>Тампоны—упак—tampons.jpg—бытовая химия</item>
-		<item>Презервативы—упак—condoms.jpg—бытовая химия</item>
-		<item>Лак для волос—шт—heir lac.jpg—бытовая химия</item>
-		<item>Мусс для волос—шт—heir lac.jpg—бытовая химия</item>
-		<item>Бальзам для волос—шт—heir lotion.jpg—бытовая химия</item>
-		<item>Кондиционер для волос—шт—heir lotion.jpg—бытовая химия</item>
-		<item>Краска для волос—упак—hair color.jpg—бытовая химия</item>
-		<item>Крем для лица—шт—cream.jpg—бытовая химия</item>
-		<item>Крем для тела—шт—cream.jpg—бытовая химия</item>
-		<item>Крем для глаз—шт—cream.jpg—бытовая химия</item>
-		<item>Крем для рук—шт—cream.jpg—бытовая химия</item>
-		<item>Ватные палочки—упак—cotton buds.jpg—бытовая химия</item>
-		<item>Ватные диски—упак—cotton pads.jpg—бытовая химия</item>
-		<item>Освежитель воздуха—шт—air freshener.jpg—бытовая химия</item>
-		<item>Чистящие средства—шт—cleaners.jpg—бытовая химия</item>
-		<item>Губки для мытья—упак—sponges.jpg—бытовая химия</item>
-		<item>Перчатки—упак—gloves.jpg—бытовая химия</item>
+		<item>Стиральный порошок—кг—powder.jpg—Бытовая химия</item>
+		<item>Зубная паста—шт—toothpaste.jpg—Бытовая химия</item>
+		<item>Шампунь—шт—shampoo.jpg—Бытовая химия</item>
+		<item>Мыло—шт—soap.jpg—Бытовая химия</item>
+		<item>Гель для душа—шт—shower gel.jpg—Бытовая химия</item>
+		<item>Моющее средство—шт—cleanser.jpg—Бытовая химия</item>
+		<item>Дезодорант—шт—deodorant.jpg—Бытовая химия</item>
+		<item>Гель для бритья—шт—shaving gel.jpg—Бытовая химия</item>
+		<item>Пенка для бритья—шт—shaving gel.jpg—Бытовая химия</item>
+		<item>Лосьон после бритья—шт—shaving lotion.jpg—Бытовая химия</item>
+		<item>Крем после бритья—шт—shaving lotion.jpg—Бытовая химия</item>
+		<item>Прокладки—упак—gaskets.jpg—Бытовая химия</item>
+		<item>Ежедневные прокладки—упак—gaskets.jpg—Бытовая химия</item>
+		<item>Тампоны—упак—tampons.jpg—Бытовая химия</item>
+		<item>Презервативы—упак—condoms.jpg—Бытовая химия</item>
+		<item>Лак для волос—шт—heir lac.jpg—Бытовая химия</item>
+		<item>Мусс для волос—шт—heir lac.jpg—Бытовая химия</item>
+		<item>Бальзам для волос—шт—heir lotion.jpg—Бытовая химия</item>
+		<item>Кондиционер для волос—шт—heir lotion.jpg—Бытовая химия</item>
+		<item>Краска для волос—упак—hair color.jpg—Бытовая химия</item>
+		<item>Крем для лица—шт—cream.jpg—Бытовая химия</item>
+		<item>Крем для тела—шт—cream.jpg—Бытовая химия</item>
+		<item>Крем для глаз—шт—cream.jpg—Бытовая химия</item>
+		<item>Крем для рук—шт—cream.jpg—Бытовая химия</item>
+		<item>Ватные палочки—упак—cotton buds.jpg—Бытовая химия</item>
+		<item>Ватные диски—упак—cotton pads.jpg—Бытовая химия</item>
+		<item>Освежитель воздуха—шт—air freshener.jpg—Бытовая химия</item>
+		<item>Чистящие средства—шт—cleaners.jpg—Бытовая химия</item>
+		<item>Губки для мытья—упак—sponges.jpg—Бытовая химия</item>
+		<item>Перчатки—упак—gloves.jpg—Бытовая химия</item>
 		<!--Разное-->
-		<item>Спички—упак—matches.jpg—другое</item>
-		<item>Мешки для мусора—упак—garbage bags.jpg—другое</item>
-		<item>Салфетки—упак—napkins.jpg—другое</item>
-		<item>Туалетная бумага—шт—toilet paper.jpg—другое</item>
-		<item>Пленка пищевая—шт—film food.jpg—другое</item>
-		<item>Фольга—шт—foil.jpg—другое</item>
+		<item>Спички—упак—matches.jpg—Другое</item>
+		<item>Мешки для мусора—упак—garbage bags.jpg—Другое</item>
+		<item>Салфетки—упак—napkins.jpg—Другое</item>
+		<item>Туалетная бумага—шт—toilet paper.jpg—Другое</item>
+		<item>Пленка пищевая—шт—film food.jpg—Другое</item>
+		<item>Фольга—шт—foil.jpg—Другое</item>
 		<!--Детское-->
-		<item>Подгузники—упак—diapers.jpg—другое</item>
-		<item>Детское пюре—шт— baby puree.jpg—другое</item>
-		<item>Детская смесь—упак—fusion kids .jpg—другое</item>
+		<item>Подгузники—упак—diapers.jpg—Другое</item>
+		<item>Детское пюре—шт— baby puree.jpg—Другое</item>
+		<item>Детская смесь—упак—fusion kids .jpg—Другое</item>
 
 	</string-array>
 
@@ -228,19 +228,19 @@
 	</string-array>
 
 	<string-array name="categories">
-		<item>другое—0xFF444444</item>
-		<item>алкоголь—0xFF888888</item>
-		<item>молочное—0xFFFF0000</item>
-		<item>бакалея—0xFF00FF00</item>
-		<item>овощи—0xFF00FF00</item>
-		<item>фрукты—0xFFFF0000</item>
-		<item>зелень—0xFFFF0000</item>
-		<item>хлебный—0xFFFFFF00</item>
-		<item>кондитерский—0xFFFFFF00</item>
-		<item>замороженое—0xFF0000FF</item>
-		<item>рыба—0xFFFF0000</item>
-		<item>мясо—0xFFFF0000</item>
-		<item>суши—0xFF00FF00</item>
-		<item>бытовая химия—0xFFCCCCCC</item>
+		<item>Другое—0xFF444444</item>
+		<item>Алкоголь—0xFF888888</item>
+		<item>Молочное—0xFFFF0000</item>
+		<item>Бакалея—0xFF00FF00</item>
+		<item>Овощи—0xFF00FF00</item>
+		<item>Фрукты—0xFFFF0000</item>
+		<item>Зелень—0xFFFF0000</item>
+		<item>Хлебный—0xFFFFFF00</item>
+		<item>Кондитерский—0xFFFFFF00</item>
+		<item>Замороженое—0xFF0000FF</item>
+		<item>Рыба—0xFFFF0000</item>
+		<item>Мясо—0xFFFF0000</item>
+		<item>Суши—0xFF00FF00</item>
+		<item>Бытовая химия—0xFFCCCCCC</item>
 	</string-array>
 </resources>

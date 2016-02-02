@@ -82,6 +82,7 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 		public void onBindViewHolder(CategoryViewHolder holder, int position) {
 			super.onBindViewHolder(holder, position);
 
+			holder.mColor.setVisibility(View.VISIBLE);
 			holder.mColor.setBackgroundColor(mDictionary.get(position).getColor());
 		}
 

@@ -19,9 +19,10 @@ import android.widget.Toast;
 import java.text.DecimalFormat;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.dataSources.GenericDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
-import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
+import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.ui.Image;
 
@@ -83,7 +84,7 @@ public class AddItemFragment extends ItemFragment {
 		super.setView(v);
 
 		mUnit.setSelection(getPosition(mUnit, getActivity().getResources().getStringArray(R.array.units)[0]));
-		mCategory.setSelection(getPosition(mUnit, getActivity().getResources().getStringArray(R.array.categories)[0]));
+		mCategory.setSelection(getPosition(mCategory, (getActivity().getResources().getStringArray(R.array.categories)[0]).split("—")[0]));
 
 		mName.setOnItemClickListener(getOnNameClickListener());
 		mCollapsingToolbarLayout.setTitle(getString(R.string.add));
@@ -289,7 +290,7 @@ public class AddItemFragment extends ItemFragment {
 	private int getPosition(Spinner spinner, String name) {
 		int index = 0;
 		for (int i = 0; i < spinner.getCount(); i++) {
-			if (((UnitsDS.UnitCursor) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
+			if (((GenericDS.EntityCursor<Dictionary>) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
 				index = i;
 				break;
 			}

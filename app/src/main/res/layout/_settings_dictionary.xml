@@ -3,21 +3,26 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="48dp"
-	android:orientation="horizontal">
+	android:orientation="horizontal"
+	android:paddingTop="@dimen/padding_4dp"
+	android:paddingBottom="@dimen/padding_4dp">
 
 	<TextView
 		android:id="@+id/color"
 		android:layout_width="5dp"
 		android:layout_height="match_parent"
-		android:background="@android:color/transparent"/>
+		android:background="@android:color/transparent"
+		android:layout_marginLeft="@dimen/padding_4dp"
+		android:visibility="gone"/>
 
 	<ImageView
-		android:id="@+id/default_value"
+		android:id="@+id/default_currency"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center_vertical"
 		android:background="@android:color/transparent"
-		android:paddingRight="@dimen/padding_8dp"/>
+		android:layout_marginLeft="@dimen/padding_4dp"
+		android:visibility="gone"/>
 
 	<TextView
 		android:id="@+id/name"
@@ -25,7 +30,9 @@
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
 		android:textColor="@android:color/black"
-		android:layout_gravity="center"/>
+		android:layout_gravity="center"
+		android:layout_marginLeft="@dimen/padding_16dp"
+		android:layout_marginRight="@dimen/padding_16dp"/>
 
 	<ImageButton
 		android:id="@+id/edit"
@@ -33,8 +40,7 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="center_vertical"
 		android:background="@android:color/transparent"
-		android:paddingLeft="@dimen/padding_8dp"
-		android:paddingRight="@dimen/padding_8dp"
+		android:layout_marginRight="@dimen/padding_16dp"
 		android:src="@drawable/ic_create_black_24dp"/>
 
 	<ImageButton
@@ -43,6 +49,8 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="center_vertical"
 		android:background="@android:color/transparent"
-		android:paddingLeft="@dimen/padding_8dp"
+		android:layout_marginLeft="@dimen/padding_4dp"
+		android:layout_marginRight="@dimen/padding_16dp"
 		android:src="@drawable/ic_delete_black_24dp"/>
+
 </LinearLayout>

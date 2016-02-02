@@ -119,6 +119,8 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		public void onBindViewHolder(CurrencyViewHolder holder, int position) {
 			super.onBindViewHolder(holder, position);
 
+			holder.mDefaultCurrency.setVisibility(View.VISIBLE);
+
 			if (mIdSelected == mDictionary.get(position).getId()) {
 				holder.setImageSelected();
 				mIdOld = mDictionary.get(position).getId();
@@ -155,7 +157,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 			public CurrencyViewHolder(View v) {
 				super(v);
 
-				mDefaultCurrency = (ImageView) v.findViewById(R.id.default_value);
+				mDefaultCurrency = (ImageView) v.findViewById(R.id.default_currency);
 
 				mDefaultCurrency.setOnClickListener(new View.OnClickListener() {
 					@Override
