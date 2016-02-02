@@ -389,6 +389,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void updateData() {
+		if (mActionMode != null) {
+			mActionMode.finish();
+		}
+
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 

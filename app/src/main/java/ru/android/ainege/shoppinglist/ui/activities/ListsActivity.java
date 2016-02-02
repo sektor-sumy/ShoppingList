@@ -1,6 +1,5 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
-import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +20,9 @@ public class ListsActivity extends SingleFragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		openLastList();
+		if (shouldOpenLastList()){
+			openLastList();
+		}
 	}
 
 	@Override
@@ -31,24 +32,26 @@ public class ListsActivity extends SingleFragmentActivity {
 		return new ListsFragment();
 	}
 
-	private void openLastList() {
+	private boolean shouldOpenLastList() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean isOpenLastList = prefs.getBoolean(getString(R.string.settings_key_open_last_list), false);
+		boolean isShould = false;
 
-		if (isOpenLastList) {
+		if (prefs.getBoolean(getString(R.string.settings_key_open_last_list), false)) {
 			SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-			if (mSettings.contains(APP_PREFERENCES_ID)) {
-				long id = mSettings.getLong(APP_PREFERENCES_ID, -1);
-				if (id != -1) {
-					Intent i = new Intent(this, ShoppingListActivity.class);
-					i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-					} else {
-						startActivity(i);
-					}
-				}
-			}
+			isShould = mSettings.contains(APP_PREFERENCES_ID);
+		}
+
+		return isShould;
+	}
+
+	private void openLastList() {
+		SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		long id = mSettings.getLong(APP_PREFERENCES_ID, -1);
+
+		if (id != -1) {
+			Intent i = new Intent(this, ShoppingListActivity.class);
+			i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
+			startActivity(i);
 		}
 	}
 
@@ -65,7 +68,7 @@ public class ListsActivity extends SingleFragmentActivity {
 		e.apply();
 
 		//set currency
-		CurrenciesDS currenciesDS =  new CurrenciesDS(this);
+		CurrenciesDS currenciesDS = new CurrenciesDS(this);
 		CurrenciesDS.CurrencyCursor c = currenciesDS.getByName("Рубль");
 		if (c.moveToFirst()) {
 			long id = c.getEntity().getId();

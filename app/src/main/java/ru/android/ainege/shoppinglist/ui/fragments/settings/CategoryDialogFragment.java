@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -41,6 +42,10 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 		lobsterPicker.addDecorator(opacitySlider);
 
 		colorPicker.setVisibility(View.VISIBLE);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+			v.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		}
 
 		return v;
 	}
