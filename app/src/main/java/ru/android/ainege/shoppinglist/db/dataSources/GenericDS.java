@@ -9,17 +9,19 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 
 public abstract class GenericDS<T> {
-	final Context mContext;
-	final ShoppingListSQLiteHelper mDbHelper;
+	protected Context mContext;
+	protected ShoppingListSQLiteHelper mDbHelper;
 
-	GenericDS(Context context) {
+	public GenericDS(Context context) {
 		mContext = context;
 		mDbHelper = ShoppingListSQLiteHelper.getInstance(context);
 	}
 
-	public abstract int update(T currency);
+	public abstract EntityCursor getAll();
 
-	public abstract long add(T currency);
+	public abstract int update(T entity);
+
+	public abstract long add(T entity);
 
 	public abstract void delete(long id);
 

@@ -18,19 +18,7 @@ public class ListsDS extends GenericDS<List> {
 		mDbHelper.getReadableDatabase();
 	}
 
-	public ListCursor get(long id) {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		String selectQuery = "SELECT " + ListsTable.TABLE_NAME + ".*, " +
-				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_NAME + ", " +
-				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_SYMBOL + " " +
-				"FROM " + ListsTable.TABLE_NAME + " INNER JOIN " + CurrenciesTable.TABLE_NAME + " " +
-				"ON " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID_CURRENCY + " = " +
-				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_ID + " " +
-				"WHERE " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID + " = ?";
-		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
-		return new ListCursor(cursor);
-	}
-
+	@Override
 	public ListCursor getAll() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + ListsTable.TABLE_NAME + ".*, " +
@@ -47,14 +35,17 @@ public class ListsDS extends GenericDS<List> {
 		return new ListCursor(cursor);
 	}
 
-	public boolean isCurrencyUsed(long idCurrency) {
+	public ListCursor get(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(ListsTable.TABLE_NAME, null, ListsTable.COLUMN_ID_CURRENCY + " = " + idCurrency,
-				null, null, null, null);
-		ListCursor listCursor = new ListCursor(cursor);
-		boolean result = listCursor.getCount() > 0;
-		cursor.close();
-		return result;
+		String selectQuery = "SELECT " + ListsTable.TABLE_NAME + ".*, " +
+				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_NAME + ", " +
+				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_SYMBOL + " " +
+				"FROM " + ListsTable.TABLE_NAME + " INNER JOIN " + CurrenciesTable.TABLE_NAME + " " +
+				"ON " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID_CURRENCY + " = " +
+				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_ID + " " +
+				"WHERE " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID + " = ?";
+		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
+		return new ListCursor(cursor);
 	}
 
 	@Override
@@ -64,7 +55,7 @@ public class ListsDS extends GenericDS<List> {
 		return db.update(ListsTable.TABLE_NAME, values, ListsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(list.getId())});
 	}
 
-	public void updateCurrency(long oldId, long newId) {
+	public void changeCurrency(long oldId, long newId) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(ListsTable.COLUMN_ID_CURRENCY, newId);
@@ -113,14 +104,11 @@ public class ListsDS extends GenericDS<List> {
 				list.setCurrency(new Currency(idCurrency, currencyName, currencySymbol));
 			}
 
-			if (getColumnIndex(ListsTable.AMOUNT_BOUGHT_ITEMS) != -1) {
-				int amount_bought_items = getInt(getColumnIndex(ListsTable.AMOUNT_BOUGHT_ITEMS));
-				list.setAmountBoughtItems(amount_bought_items);
-			}
-
 			if (getColumnIndex(ListsTable.AMOUNT_ITEMS) != -1) {
 				int amount_items = getInt(getColumnIndex(ListsTable.AMOUNT_ITEMS));
+				int amount_bought_items = getInt(getColumnIndex(ListsTable.AMOUNT_BOUGHT_ITEMS));
 				list.setAmountItems(amount_items);
+				list.setAmountBoughtItems(amount_bought_items);
 			}
 
 			return list;

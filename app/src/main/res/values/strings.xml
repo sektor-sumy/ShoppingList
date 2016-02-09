@@ -115,7 +115,7 @@
 
 	<string name="settings_category_other">Другое</string>
 	<string name="settings_key_currency">settings_key_summary</string>
-	<string name="setting_title_currency">Валюты</string>
+	<string name="settings_title_currency">Валюты</string>
 
 	<string name="settings_key_open_last_list">open_last_list</string>
 	<string name="settings_title_open_last_list">Открывать последний список</string>
@@ -133,16 +133,16 @@
 
 	<string name="error_empty">Не может быть пустым</string>
 	<string name="error_one_item">Что-то должно остаться</string>
-	<string name="setting_currency">Настройка валют</string>
+	<string name="settings_currency">Настройка валют</string>
 	<string name="select_default_currency">Выбрана валютой по умолчанию</string>
 	<string name="currency_info">Информация о валюте</string>
 
-	<string name="setting_title_unit">Единицы измерения</string>
-	<string name="setting_key_unit">setting_key_unit</string>
+	<string name="settings_title_unit">Единицы измерения</string>
+	<string name="settings_key_unit">setting_key_unit</string>
 	<string name="unit_info">Единица измерения</string>
 	<string name="ask_delete_item">Значение уже используется. При удалении, оно будет заменено случайным. \nУдалить?</string>
 
-	<string name="setting_key_category">setting_key_category</string>
-	<string name="setting_title_category">Категории товаров</string>
+	<string name="settings_key_category">setting_key_category</string>
+	<string name="settings_title_category">Категории товаров</string>
 	<string name="category_info">Категория товаров</string>
 </resources>

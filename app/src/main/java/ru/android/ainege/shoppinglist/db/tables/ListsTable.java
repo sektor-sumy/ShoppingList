@@ -3,10 +3,9 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import ru.android.ainege.shoppinglist.ui.Image;
+import ru.android.ainege.shoppinglist.util.Image;
 
 public class ListsTable {
-
 	public static final String TABLE_NAME = "Lists";
 
 	public static final String COLUMN_ID = "_id";
@@ -32,10 +31,12 @@ public class ListsTable {
 	}
 
 	private static void initialData(SQLiteDatabase db) {
-			ContentValues contentValue = new ContentValues();
-			contentValue.put(COLUMN_NAME, "Ваш список");
-			contentValue.put(COLUMN_ID_CURRENCY, 1);
-			contentValue.put(COLUMN_IMAGE_PATH, Image.LIST_IMAGE_PATH + "random_list_0.png");
-			db.insert(TABLE_NAME, null, contentValue);
+		ContentValues contentValue = new ContentValues();
+
+		contentValue.put(COLUMN_NAME, "Ваш список");
+		contentValue.put(COLUMN_ID_CURRENCY, 1);
+		contentValue.put(COLUMN_IMAGE_PATH, Image.LIST_IMAGE_PATH + "random_list_0.png");
+
+		db.insert(TABLE_NAME, null, contentValue);
 	}
 }

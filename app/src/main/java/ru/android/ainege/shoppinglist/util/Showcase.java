@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui;
+package ru.android.ainege.shoppinglist.util;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,7 +20,6 @@ public class Showcase {
 	private static ShowcaseView mShowcaseView;
 	private static Activity mActivity;
 
-
 	public static Showcase newInstance(ShowcaseView showcaseView, Activity activity) {
 		Showcase showcase = new Showcase();
 
@@ -28,6 +27,11 @@ public class Showcase {
 		mActivity = activity;
 
 		return showcase;
+	}
+
+	public static boolean shouldBeShown(Context context, int type) {
+		return !context.getSharedPreferences(PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE)
+				.getBoolean("hasShot" + type, false);
 	}
 
 	public void setButton(String text, boolean isRight) {
@@ -41,10 +45,5 @@ public class Showcase {
 
 		mShowcaseView.setButtonPosition(lp);
 		mShowcaseView.setButtonText(text);
-	}
-
-	public static boolean shouldBeShown(Context context, int type) {
-		return !context.getSharedPreferences(PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE)
-				.getBoolean("hasShot" + type, false);
 	}
 }

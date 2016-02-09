@@ -40,46 +40,50 @@ import android.widget.TextView;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-import ru.android.ainege.shoppinglist.ui.Image;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
-import ru.android.ainege.shoppinglist.ui.Showcase;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
+import ru.android.ainege.shoppinglist.util.Image;
+import ru.android.ainege.shoppinglist.util.Showcase;
 
+import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
 import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 
 
-public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
+public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
-
 	private static final String ID_LIST = "idList";
-	private static final int EDIT_FRAGMENT_CODE = 3;
-	private static final int ANSWER_FRAGMENT_CODE = 4;
-	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
-	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
+
+	private static final int ADD_ITEM = 0;
+	private static final int EDIT_ITEM = 1;
+	private static final int EDIT_LIST = 3;
+	private static final int IS_DELETE_LIST = 4;
+	private static final int SETTINGS = 5;
+	private static final String EDIT_ITEM_DATE = "editListDialog";
+	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
 	private static final int DATA_LOADER = 0;
 
-	private static final int ADD_ACTIVITY_CODE = 0;
-	private static final int EDIT_ACTIVITY_CODE = 1;
-
 	private ListsDS mListsDS;
+	private List mList;
 
 	private ArrayList<Category> mCategories = new ArrayList<>();
+	private HashMap<Long, Boolean> collapseCategoryStates = new HashMap<>();
+	private double mSaveSpentMoney = 0;
+	private double mSaveTotalMoney = 0;
+
 	private CollapsingToolbarLayout mToolbarLayout;
 	private ImageView mListImage;
 	private FloatingActionButton mFAB;
@@ -89,10 +93,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private LinearLayout mListContainer;
 	private ProgressBar mProgressBar;
 	private CategoriesAdapter mAdapterRV;
-	private HashMap<Long, Boolean> collapseCategoryStates = new HashMap<>();
-	private List mList;
-	private double mSaveSpentMoney = 0;
-	private double mSaveTotalMoney = 0;
+
+	private SharedPreferences mSharedPref;
+	private boolean mIsUpdateData = false;
 	private boolean mIsBoughtEndInList;
 	private boolean mIsUseCategory;
 	private boolean mIsCollapsedCategory = false;
@@ -155,6 +158,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
@@ -162,11 +166,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}
 
-		setHasOptionsMenu(true);
-
 		mListsDS = new ListsDS(getActivity());
 		getList(getArguments().getLong(ID_LIST));
-		getSettings();
+		saveId(mList.getId());
+
+		readSettings();
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
@@ -199,9 +203,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				i.putExtra(ItemActivity.EXTRA_ID_LIST, mList.getId());
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					startActivityForResult(i, ADD_ACTIVITY_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+					startActivityForResult(i, ADD_ITEM, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 				} else {
-					startActivityForResult(i, ADD_ACTIVITY_CODE);
+					startActivityForResult(i, ADD_ITEM);
 				}
 			}
 		});
@@ -227,10 +231,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public void onResume() {
 		super.onResume();
 
-		getList(getArguments().getLong(ID_LIST));
-
-		getSettings();
-		updateData();
+		if (mIsUpdateData) {
+			updateData();
+			mIsUpdateData = false;
+		}
 	}
 
 	@Override
@@ -250,21 +254,21 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		switch (item.getItemId()) {
 			case R.id.delete_list:
 				QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list));
-				dialogFrag.setTargetFragment(ShoppingListFragment.this, ANSWER_FRAGMENT_CODE);
-				dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
+				dialogFrag.setTargetFragment(ShoppingListFragment.this, IS_DELETE_LIST);
+				dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
 				return true;
 			case R.id.update_list:
 				ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
-				editListDialog.setTargetFragment(ShoppingListFragment.this, EDIT_FRAGMENT_CODE);
-				editListDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
+				editListDialog.setTargetFragment(ShoppingListFragment.this, EDIT_LIST);
+				editListDialog.show(getFragmentManager(), EDIT_ITEM_DATE);
 				return true;
 			case R.id.settings:
 				Intent i = new Intent(getActivity(), SettingsActivity.class);
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+					startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 				} else {
-					startActivity(i);
+					startActivityForResult(i, SETTINGS);
 				}
 
 				return true;
@@ -274,24 +278,40 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		mIsUpdateData = true;
+
+		if (key.equals(getString(R.string.settings_key_sort_is_bought))) {
+			readIsBoughtSetting();
+		} else if (key.equals(getString(R.string.settings_key_use_category))) {
+			readCategorySetting();
+		} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
+			readCollapseCategorySetting();
+		} else if (key.equals(getString(R.string.settings_key_sort_type))) {
+			readSortTypeSetting();
+		}
+	}
+
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) return;
 
 		switch (requestCode) {
-			case ADD_ACTIVITY_CODE:
-				updateData();
+			case ADD_ITEM:
+			case EDIT_ITEM:
+			case SETTINGS:
+				mIsUpdateData = true;
+				getList(getArguments().getLong(ID_LIST));
+				updateSums(mSaveSpentMoney, mSaveTotalMoney);
 				break;
-			case EDIT_ACTIVITY_CODE:
-				updateData();
-				break;
-			case ANSWER_FRAGMENT_CODE:
+			case IS_DELETE_LIST:
 				mListsDS.delete(mList.getId());
 				Image.deleteFile(mList.getImagePath());
 
 				saveId(-1);
 				getActivity().onBackPressed();
 				break;
-			case EDIT_FRAGMENT_CODE:
+			case EDIT_LIST:
 				getList(getArguments().getLong(ID_LIST));
 				loadImage();
 				setTitle();
@@ -354,11 +374,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				}
 
 				if (data.moveToFirst()) {
-					ArrayList<ShoppingList> itemsInList = ((CategoriesDS.CategoryCursor) data).getItemsInListCursor().getEntities();
 					if (mIsUseCategory) {
-						mCategories = ((CategoriesDS.CategoryCursor) data).getCategoriesWithItems(itemsInList);
+						mCategories = ((CategoryCursor) data).getEntities();
 					} else {
+						ArrayList<ShoppingList> itemsInList = ((CategoryCursor) data).getItemsInListCursor().getEntities();
 						ShoppingList.sort(itemsInList);
+
 						ArrayList<Category> categories = new ArrayList<>();
 						categories.add(new Category(itemsInList));
 						mCategories = categories;
@@ -388,6 +409,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	}
 
+	//todo fix open actionMode
 	private void updateData() {
 		if (mActionMode != null) {
 			mActionMode.finish();
@@ -396,17 +418,32 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
-	private void getSettings() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		mIsBoughtEndInList = prefs.getBoolean(getString(R.string.settings_key_sort_is_bought), true);
-		mIsUseCategory = prefs.getBoolean(getString(R.string.settings_key_use_category), true);
+	private void readSettings() {
+		mSharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		mSharedPref.registerOnSharedPreferenceChangeListener(this);
 
-		if (mIsUseCategory) {
-			mIsCollapsedCategory = prefs.getBoolean(getString(R.string.settings_key_collapse_category), true);
-		}
+		readIsBoughtSetting();
+		readCategorySetting();
+		readCollapseCategorySetting();
+		readSortTypeSetting();
+	}
 
+	private void readIsBoughtSetting() {
+		mIsBoughtEndInList = mSharedPref.getBoolean(getString(R.string.settings_key_sort_is_bought), true);
+		ShoppingList.setSortSettings(mIsBoughtEndInList);
+	}
+
+	private void readCategorySetting() {
+		mIsUseCategory = mSharedPref.getBoolean(getString(R.string.settings_key_use_category), true);
+	}
+
+	private void readCollapseCategorySetting() {
+		mIsCollapsedCategory = mSharedPref.getBoolean(getString(R.string.settings_key_collapse_category), true);
+	}
+
+	private void readSortTypeSetting() {
 		String sortType;
-		String regular = prefs.getString(getString(R.string.settings_key_sort_type), "");
+		String regular = mSharedPref.getString(getString(R.string.settings_key_sort_type), "");
 
 		if (regular.contains(getString(R.string.sort_order_alphabet))) {
 			sortType = ShoppingList.ALPHABET;
@@ -420,8 +457,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			sortType = ShoppingList.ALPHABET;
 		}
 
-		ShoppingList.setSortSettings(mIsBoughtEndInList, sortType);
-		saveId(mList.getId());
+		ShoppingList.setSortSettings(sortType);
 	}
 
 	private void getList(long idList) {
@@ -451,7 +487,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mToolbarLayout.setTitle(mList.getName());
 	}
 
-	protected void loadImage() {
+	private void loadImage() {
 		Image.create().insertImageToView(getActivity(),
 				mList.getImagePath(),
 				mListImage);
@@ -475,7 +511,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		ArrayList<ShoppingList> items = mAdapterRV.getSelectedItems();
 
 		for (ShoppingList item : items) {
-			new ItemDataDS(getActivity()).delete(item.getIdItemData());
+			new ShoppingListDS(getActivity()).delete(item.getIdItemData());
 			mAdapterRV.removeItem(item);
 		}
 
@@ -490,7 +526,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void updateSums() {
-		updateSums(sumMoney(true), sumMoney(false));
+		updateSums(sumSpentMoney(), sumTotalMoney());
 	}
 
 	private void updateSums(double spentMoney, double totalMoney) {
@@ -512,31 +548,26 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		return nf.format(value);
 	}
 
-	private double sumMoney(boolean onlyBought) {
+	private double sumTotalMoney() {
 		double sum = 0;
 
 		for (Category category : mCategories) {
-			for (ShoppingList item : category.getItemsByCategoryInList()) {
-				if ((onlyBought && item.isBought()) || !onlyBought) {
-					sum += sumOneItem(item);
-				}
-			}
+			sum += category.calculateTotalSum();
 		}
 
-		if (onlyBought) {
-			mSaveSpentMoney = sum;
-		} else {
-			mSaveTotalMoney = sum;
-		}
-
+		mSaveTotalMoney = sum;
 		return sum;
 	}
 
-	private double sumOneItem(ShoppingList item) {
-		double price = item.getItemData().getPrice();
-		double amount = item.getItemData().getAmount();
-		double sum = price * (amount == 0 ? 1 : amount);
-		return new BigDecimal(sum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+	private double sumSpentMoney() {
+		double sum = 0;
+
+		for (Category category : mCategories) {
+			sum += category.calculateSpentSum();
+		}
+
+		mSaveSpentMoney = sum;
+		return sum;
 	}
 
 	private Animation getAnimationRV(final RecyclerView rv, final int oldHeight, final int newHeight, final boolean isUp) {
@@ -591,9 +622,32 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
 	}
 
+	private static class ItemsInListCursorLoader extends CursorLoader {
+		private final Context mContext;
+		private final long mIdList;
+
+		public ItemsInListCursorLoader(Context context, long idList) {
+			super(context);
+			mContext = context;
+			mIdList = idList;
+		}
+
+		@Override
+		public Cursor loadInBackground() {
+			CategoryCursor categoryCursor = new CategoriesDS(mContext).getCategoriesInList(mIdList);
+
+			if (categoryCursor.moveToFirst()) {
+				ShoppingListCursor itemsCursor = new ShoppingListDS(mContext).getItemsInList(mIdList);
+				categoryCursor.setItemsInListCursor(itemsCursor);
+			}
+
+			return categoryCursor;
+		}
+	}
+
 	public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
-		private HashMap<Long, ViewHolder> dataMap = new HashMap<>();
 		private final ArrayList<ShoppingList> mSelectedItems = new ArrayList<>();
+		private HashMap<Long, ViewHolder> dataMap = new HashMap<>();
 		private String mCurrencyList;
 
 		public CategoriesAdapter(String currency) {
@@ -618,9 +672,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			if (mIsUseCategory) {
 				holder.mColor.setBackgroundColor(category.getColor());
 				holder.mCategory.setText(category.getName());
-				holder.mCategoryContainer.setVisibility(View.VISIBLE);
-			} else {
-				holder.mCategoryContainer.setVisibility(View.GONE);
 			}
 
 			setRV(category, holder);
@@ -628,20 +679,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		private void setRV(final Category category, final ViewHolder holder) {
 			ArrayList<ShoppingList> itemsInCategory = category.getItemsByCategoryInList();
-			int boughtItems = 0;
-			double sum = 0;
 
 			for (ShoppingList item : itemsInCategory) {
 				dataMap.put(item.getIdItem(), holder);
-
-				if (item.isBought()) {
-					boughtItems ++;
-					sum += sumOneItem(item);
-				}
 			}
 
-			updateSpentCategorySum(holder, sum);
-			boolean isAllBought = (boughtItems == itemsInCategory.size());
+			category.calculateSpentSum();
+			updateSpentCategorySum(holder, category.getSpentSum());
+			boolean isAllBought = (category.countBoughtItems() == itemsInCategory.size());
 
 			if (!mIsCollapsedCategory
 					|| (collapseCategoryStates.containsKey(category.getId()) && !collapseCategoryStates.get(category.getId()))
@@ -650,11 +695,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				params.height = getResources().getDimensionPixelSize(R.dimen.row_list_item_height) * itemsInCategory.size();
 				holder.mItemsInCategory.setLayoutParams(params);
 			} else if (isAllBought) {
-				holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 			}
 
 			holder.mItemsInCategory.setLayoutManager(new LinearLayoutManager(getActivity()));
-			holder.mItemsInCategory.setAdapter(new ItemsAdapter(itemsInCategory, sum, boughtItems));
+			holder.mItemsInCategory.setAdapter(new ItemsAdapter(itemsInCategory));
 			holder.mItemsInCategory.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), holder.mItemsInCategory, new RecyclerItemClickListener.OnItemClickListener() {
 				@Override
 				public void onItemClick(int position) {
@@ -666,18 +711,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						return;
 					}
 
-					ShoppingList itemInList = new ShoppingList(item.getItem(),
-							mList.getId(),
-							item.isBought(),
-							item.getItemData());
-
 					Intent i = new Intent(getActivity(), ItemActivity.class);
-					i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
+					i.putExtra(ItemActivity.EXTRA_ITEM, item);
 
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						startActivityForResult(i, EDIT_ACTIVITY_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+						startActivityForResult(i, EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 					} else {
-						startActivityForResult(i, EDIT_ACTIVITY_CODE);
+						startActivityForResult(i, EDIT_ITEM);
 					}
 				}
 
@@ -702,6 +742,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					RecyclerView rv = holder.mItemsInCategory;
 					ItemsAdapter adapter = (ItemsAdapter) rv.getAdapter();
 					ShoppingList item = adapter.getItem(position);
+					Category category = item.getCategory();
 					boolean isBought = !item.isBought();
 
 					//update data in db
@@ -723,28 +764,28 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					}
 
 					//update spent sum
-					double sum = sumOneItem(item);
-					double categorySpentMoney = adapter.getSum();
+					double sum = item.getSum();
+					double categorySpentMoney = category.getSpentSum();
+					int boughtItems = category.getBoughtItemsCount();
 
 					if (isBought) {
 						mSaveSpentMoney += sum;
-						categorySpentMoney += sum;
-						adapter.mBoughtItems++;
+						category.setSpentSum(categorySpentMoney + sum);
+						category.setBoughtItemsCount(boughtItems++);
 					} else {
 						mSaveSpentMoney -= sum;
-						categorySpentMoney -= sum;
-						adapter.mBoughtItems--;
+						category.setSpentSum(categorySpentMoney - sum);
+						category.setBoughtItemsCount(boughtItems--);
 					}
 
 					updateSpentSum(mSaveSpentMoney);
 					updateSpentCategorySum(holder, categorySpentMoney);
-					adapter.setSum(categorySpentMoney);
 
 					//if all items bought in the category - cross off the category else delete cross
-					if (adapter.mBoughtItems == adapter.getItemCount()) {
+					if (boughtItems == adapter.getItemCount()) {
 						holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 					} else {
-						holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+						holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
 					}
 				}
 			}));
@@ -835,16 +876,16 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				ItemsAdapter adapter = (ItemsAdapter) rv.getAdapter();
 
 				if (adapter.getItemCount() == 1) {
-					long idCategory = adapter.getItem(0).getItemData().getIdCategory();
+					long idCategory = adapter.getItem(0).getIdCategory();
 					int position = getPosition(idCategory);
 					mCategories.remove(position);
 					mAdapterRV.notifyItemRemoved(position);
 				} else {
 					adapter.removeItem(adapter.getItems().indexOf(item));
 
-					double spentCategorySum = adapter.getSum() - sumOneItem(item);
-					updateSpentCategorySum(holder, spentCategorySum);
-					adapter.setSum(spentCategorySum);
+					Category category = adapter.getItem(0).getCategory();
+					category.setSpentSum(category.getSpentSum() - item.getSum());
+					updateSpentCategorySum(holder, category.getSpentSum());
 
 					ViewGroup.LayoutParams params = rv.getLayoutParams();
 					final int oldHeight = params.height;
@@ -862,6 +903,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						for (int j = 0; j < items.size(); j++) {
 							if (items.get(j).getIdItem() == item.getIdItem()) {
 								items.remove(j);
+								break;
 							}
 						}
 					}
@@ -889,11 +931,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
+			public final TextView mCategory;
+			public final RecyclerView mItemsInCategory;
 			public LinearLayout mCategoryContainer;
 			public TextView mColor;
-			public final TextView mCategory;
 			public TextView mSumCategory;
-			public final RecyclerView mItemsInCategory;
 
 			public ViewHolder(View v) {
 				super(v);
@@ -902,6 +944,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mCategory = (TextView) v.findViewById(R.id.category);
 				mSumCategory = (TextView) v.findViewById(R.id.sum_category);
 				mItemsInCategory = (RecyclerView) v.findViewById(R.id.items_in_category);
+
+				if (mIsUseCategory) {
+					mCategoryContainer.setVisibility(View.VISIBLE);
+				} else {
+					mCategoryContainer.setVisibility(View.GONE);
+				}
 
 				mCategory.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -912,7 +960,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 						int itemPosition = getAdapterPosition();
 						Category category = mCategories.get(itemPosition);
-
 						Animation a;
 
 						if (mItemsInCategory.getHeight() != 0) {
@@ -933,13 +980,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> {
 			private ArrayList<ShoppingList> mItems = new ArrayList<>();
-			private double mSum;
-			private int mBoughtItems;
 
-			public ItemsAdapter(ArrayList<ShoppingList> itemsInCategory, double sum, int boughtItems) {
+			public ItemsAdapter(ArrayList<ShoppingList> itemsInCategory) {
 				mItems = itemsInCategory;
-				mSum = sum;
-				mBoughtItems = boughtItems;
 			}
 
 			@Override
@@ -953,29 +996,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				ShoppingList itemInList = mItems.get(position);
 
 				if (mIsUseCategory) {
-					FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) holder.mIsBought.getLayoutParams();
-					param.setMargins(getResources().getDimensionPixelSize(R.dimen.padding_24dp), 0, getResources().getDimensionPixelSize(R.dimen.padding_16dp), 0);
-					holder.mIsBought.setLayoutParams(param);
-
-					holder.mColor.setVisibility(View.VISIBLE);
-					holder.mColor.setBackgroundColor(itemInList.getItemData().getCategory().getColor());
-				} else {
-					holder.mColor.setVisibility(View.GONE);
+					holder.mColor.setBackgroundColor(itemInList.getCategory().getColor());
 				}
 
 				holder.mView.setSelected(mSelectedItems.contains(itemInList));
 				Image.create().insertImageToView(getActivity(), itemInList.getItem().getImagePath(), holder.mImage);
 				holder.mName.setText(itemInList.getItem().getName());
 
-				if (itemInList.getItemData().getAmount() == 0) {
+				if (itemInList.getAmount() == 0) {
 					holder.mAmount.setText("-");
 				} else {
-					String amount = NumberFormat.getInstance().format(itemInList.getItemData().getAmount())
-							+ " " + itemInList.getItemData().getUnit().getName();
+					String amount = NumberFormat.getInstance().format(itemInList.getAmount())
+							+ " " + itemInList.getUnit().getName();
 					holder.mAmount.setText(amount);
 				}
 
-				String price = localValue(itemInList.getItemData().getPrice()) + " " + mCurrencyList;
+				String price = localValue(itemInList.getPrice()) + " " + mCurrencyList;
 				holder.mPrice.setText(price);
 				int visibility = View.GONE;
 
@@ -999,27 +1035,19 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				return mItems.get(position);
 			}
 
-			public double getSum() {
-				return mSum;
-			}
-
-			public void setSum(double sum) {
-				mSum = sum;
-			}
-
 			public void removeItem(int position) {
-				getItems().remove(position);
+				mItems.remove(position);
 				notifyItemRemoved(position);
 			}
 
 			public class ViewHolder extends RecyclerView.ViewHolder {
 				public final View mView;
-				public TextView mColor;
 				public final ImageView mImage;
 				public final TextView mName;
 				public final TextView mAmount;
 				public final TextView mPrice;
 				public final View mIsBought;
+				public TextView mColor;
 
 				public ViewHolder(View v) {
 					super(v);
@@ -1030,31 +1058,19 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					mAmount = (TextView) v.findViewById(R.id.item_amount_list);
 					mPrice = (TextView) v.findViewById(R.id.item_price_list);
 					mIsBought = v.findViewById(R.id.is_bought_list);
+
+					if (mIsUseCategory) {
+						FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) mIsBought.getLayoutParams();
+						param.setMargins(getResources().getDimensionPixelSize(R.dimen.padding_24dp), 0, getResources().getDimensionPixelSize(R.dimen.padding_16dp), 0);
+						mIsBought.setLayoutParams(param);
+
+						mColor.setVisibility(View.VISIBLE);
+					} else {
+						mColor.setVisibility(View.GONE);
+					}
+
 				}
 			}
-		}
-	}
-
-	private static class ItemsInListCursorLoader extends CursorLoader {
-		private final Context mContext;
-		private final long mIdList;
-
-		public ItemsInListCursorLoader(Context context, long idList) {
-			super(context);
-			mContext = context;
-			mIdList = idList;
-		}
-
-		@Override
-		public Cursor loadInBackground() {
-			CategoriesDS.CategoryCursor categoryCursor = new CategoriesDS(mContext).getCategoriesInList(mIdList);
-
-			if (categoryCursor.moveToFirst()) {
-				ShoppingListCursor itemsCursor = new ShoppingListDS(mContext).getItemsInList(mIdList);
-				categoryCursor.setItemsInListCursor(itemsCursor);
-			}
-
-			return categoryCursor;
 		}
 	}
 }

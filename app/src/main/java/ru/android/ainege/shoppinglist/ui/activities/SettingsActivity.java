@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import ru.android.ainege.shoppinglist.R;
 
 public class SettingsActivity extends SingleFragmentActivity {
+	private static final String IS_OPENED_DICTIONARY = "isOpenedDictionary";
 
 	@Override
 	protected int getDefaultContainer() {
@@ -48,56 +49,9 @@ public class SettingsActivity extends SingleFragmentActivity {
 				actionBar.setDisplayHomeAsUpEnabled(true);
 			}
 
-			Preference currencySettings = findPreference(getString(R.string.settings_key_currency));
-			currencySettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-				@Override
-				public boolean onPreferenceClick(Preference preference) {
-					Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
-					i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, getString(R.string.settings_key_currency));
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-					} else {
-						startActivity(i);
-					}
-
-					return true;
-				}
-			});
-
-			Preference unitSettings = findPreference(getString(R.string.setting_key_unit));
-			unitSettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-				@Override
-				public boolean onPreferenceClick(Preference preference) {
-					Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
-					i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, getString(R.string.setting_key_unit));
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-					} else {
-						startActivity(i);
-					}
-
-					return true;
-				}
-			});
-
-			Preference categorySettings = findPreference(getString(R.string.setting_key_category));
-			categorySettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-				@Override
-				public boolean onPreferenceClick(Preference preference) {
-					Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
-					i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, getString(R.string.setting_key_category));
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-					} else {
-						startActivity(i);
-					}
-
-					return true;
-				}
-			});
+			startSettingByKey(getString(R.string.settings_key_currency));
+			startSettingByKey(getString(R.string.settings_key_unit));
+			startSettingByKey(getString(R.string.settings_key_category));
 
 		}
 
@@ -116,6 +70,30 @@ public class SettingsActivity extends SingleFragmentActivity {
 				default:
 					return super.onOptionsItemSelected(item);
 			}
+		}
+
+		private void startSettingByKey(final String key) {
+			Preference categorySettings = findPreference(key);
+			categorySettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
+					i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, key);
+
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+					} else {
+						startActivity(i);
+					}
+
+					sendResult(true);
+					return true;
+				}
+			});
+		}
+
+		void sendResult(boolean isOpenedDictionary) {
+			getActivity().setResult(android.app.Activity.RESULT_OK, new Intent().putExtra(IS_OPENED_DICTIONARY, isOpenedDictionary));
 		}
 	}
 }

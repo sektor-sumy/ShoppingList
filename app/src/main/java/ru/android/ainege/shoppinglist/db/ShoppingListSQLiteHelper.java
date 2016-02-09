@@ -12,7 +12,7 @@ import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
-import ru.android.ainege.shoppinglist.ui.Showcase;
+import ru.android.ainege.shoppinglist.util.Showcase;
 
 public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "shoppingList.db";
@@ -70,7 +70,7 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		switch(oldVersion) {
+		switch (oldVersion) {
 			case 1:
 				SharedPreferences sp = mCtx.getSharedPreferences(Showcase.PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE);
 

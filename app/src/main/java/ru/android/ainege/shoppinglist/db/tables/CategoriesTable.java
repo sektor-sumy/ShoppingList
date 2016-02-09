@@ -3,6 +3,7 @@ package ru.android.ainege.shoppinglist.db.tables;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +14,6 @@ import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 
 public class CategoriesTable {
-
 	public static final String TABLE_NAME = "Categories";
 
 	public static final String COLUMN_ID = "_id";
@@ -36,7 +36,7 @@ public class CategoriesTable {
 		initialData(db, ShoppingListSQLiteHelper.parseInitData(ctx.getResources().getStringArray(R.array.categories)));
 	}
 
-	public static HashMap<String, Category> getCategories (SQLiteDatabase db){
+	public static HashMap<String, Category> getCategories(SQLiteDatabase db) {
 		ArrayList<Category> categoriesDB = CategoriesDS.getAll(db).getEntities();
 		HashMap<String, Category> unit = new HashMap<>();
 
@@ -55,5 +55,4 @@ public class CategoriesTable {
 			db.insert(TABLE_NAME, null, contentValue);
 		}
 	}
-
 }

@@ -10,14 +10,15 @@ import android.widget.TextView;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
+
+import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
 
 public class CategoryFragment extends DictionaryFragment<Category> {
 
 	@Override
 	protected String getTitle() {
-		return getString(R.string.setting_title_category);
+		return getString(R.string.settings_title_category);
 	}
 
 	@Override
@@ -26,8 +27,8 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 			@Override
 			public void onClick(View v) {
 				GeneralDialogFragment addItemDialog = new CategoryDialogFragment();
-				addItemDialog.setTargetFragment(CategoryFragment.this, ADD_FRAGMENT_CODE);
-				addItemDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);
+				addItemDialog.setTargetFragment(CategoryFragment.this, ADD);
+				addItemDialog.show(getFragmentManager(), ADD_DATE);
 			}
 		};
 	}
@@ -39,12 +40,12 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 
 	@Override
 	protected RecyclerViewAdapter getAdapter() {
-		return new CategoryViewAdapter();
+		return new CategoryAdapter();
 	}
 
 	@Override
 	protected boolean isEntityUsed(long idCategory) {
-		return new ItemDataDS(getActivity()).isCategoryUsed(idCategory);
+		return getDS().isUsed(idCategory);
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 		switch (loader.getId()) {
 			case DATA_LOADER:
 				if (data.moveToFirst()) {
-					mDictionary = ((CategoriesDS.CategoryCursor) data).getEntities();
+					mDictionary = ((CategoryCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
 				}
 
@@ -66,33 +67,33 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 	@Override
 	protected void showEditDialog(int position) {
 		GeneralDialogFragment editItemDialog = CategoryDialogFragment.newInstance(mDictionary.get(position));
-		editItemDialog.setTargetFragment(CategoryFragment.this, EDIT_FRAGMENT_CODE);
-		editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
+		editItemDialog.setTargetFragment(CategoryFragment.this, EDIT);
+		editItemDialog.show(getFragmentManager(), EDIT_DATE);
 	}
 
-	private class CategoryViewAdapter extends RecyclerViewAdapter<CategoryViewAdapter.CategoryViewHolder> {
+	private class CategoryAdapter extends RecyclerViewAdapter<CategoryAdapter.CategoryHolder> {
 
 		@Override
-		public CategoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		public CategoryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._settings_dictionary, parent, false);
-			return new CategoryViewHolder(v);
+			return new CategoryHolder(v);
 		}
 
 		@Override
-		public void onBindViewHolder(CategoryViewHolder holder, int position) {
+		public void onBindViewHolder(CategoryHolder holder, int position) {
 			super.onBindViewHolder(holder, position);
 
-			holder.mColor.setVisibility(View.VISIBLE);
 			holder.mColor.setBackgroundColor(mDictionary.get(position).getColor());
 		}
 
-		public class CategoryViewHolder extends RecyclerViewAdapter<CategoryViewHolder>.ViewHolder {
+		public class CategoryHolder extends RecyclerViewAdapter<CategoryHolder>.ViewHolder {
 			public TextView mColor;
 
-			public CategoryViewHolder(View v) {
+			public CategoryHolder(View v) {
 				super(v);
 
 				mColor = (TextView) v.findViewById(R.id.color);
+				mColor.setVisibility(View.VISIBLE);
 			}
 		}
 	}

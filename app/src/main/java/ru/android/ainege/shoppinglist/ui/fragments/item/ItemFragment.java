@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments;
+package ru.android.ainege.shoppinglist.ui.fragments.item;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -52,52 +52,49 @@ import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
-import ru.android.ainege.shoppinglist.db.entities.Item;
-import ru.android.ainege.shoppinglist.db.entities.ItemData;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
 import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
-import ru.android.ainege.shoppinglist.ui.Image;
-import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
-import ru.android.ainege.shoppinglist.ui.Showcase;
-import ru.android.ainege.shoppinglist.ui.Validation;
+import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
+import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
+import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
+import ru.android.ainege.shoppinglist.util.Image;
+import ru.android.ainege.shoppinglist.util.Showcase;
+import ru.android.ainege.shoppinglist.util.Validation;
 
-import static ru.android.ainege.shoppinglist.db.dataSources.ItemDS.*;
-import static ru.android.ainege.shoppinglist.db.dataSources.UnitsDS.*;
+import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCursor;
 
-public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, OnBackPressedListener, View.OnClickListener {
+public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, ItemActivity.OnBackPressedInterface, View.OnClickListener {
 	private static final String ID_ITEM = "idItem";
-	private static final int TAKE_PHOTO_CODE = 0;
-	private static final int LOAD_IMAGE_CODE = 1;
+	private static final int TAKE_PHOTO = 0;
+	private static final int LOAD_IMAGE = 1;
+	private static final int IS_SAVE_CHANGES = 2;
+	private static final String IS_SAVE_CHANGES_DATE = "answerDialog";
 
-	protected static final int ANSWER_FRAGMENT_CODE = 2;
-	protected static final String ANSWER_FRAGMENT_DATE = "answerDialog";
+	protected ImageView mAppBarImage;
+	protected CollapsingToolbarLayout mCollapsingToolbarLayout;
+	protected TextInputLayout mNameInputLayout;
+	protected AutoCompleteTextView mName;
+	protected TextView mInfo;
+	protected TextInputLayout mAmountInputLayout;
+	protected EditText mAmount;
+	protected Spinner mUnit;
+	protected TextInputLayout mPriceInputLayout;
+	protected EditText mPrice;
+	protected Spinner mCategory;
+	protected EditText mComment;
+	protected ToggleButton mIsBought;
 
-	ItemDS mItemDS;
-	ShoppingListDS mItemsInListDS;
+	protected ItemDS mItemDS;
+	protected ShoppingListDS mItemsInListDS;
+	protected ShoppingList mItemInList;
+	protected boolean mIsImageLoaded = true;
+	protected boolean mIsProposedItem = false;
 
-	boolean mIsProposedItem = false;
 	private String mCurrencyList;
 	private File mFile;
-	protected String mImagePath;
-	protected String mImageDefaultPath;
-	protected boolean mIsImageLoad = true;
 	private String mPhotoPath;
-
-	ImageView mAppBarImage;
-	CollapsingToolbarLayout mCollapsingToolbarLayout;
-	TextInputLayout mNameInputLayout;
-	AutoCompleteTextView mName;
-	TextView mInfo;
-	TextInputLayout mAmountInputLayout;
-	EditText mAmount;
-	Spinner mUnit;
-	TextInputLayout mPriceInputLayout;
-	EditText mPrice;
-	Spinner mCategory;
-	EditText mComment;
-	ToggleButton mIsBought;
 	private TextView mFinishPrice;
 
 	private boolean mIsUseCategory;
@@ -111,6 +108,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	protected abstract boolean saveData();
 
 	protected abstract long getIdList();
+
+	protected abstract void updatedItem();
 
 	protected abstract void resetImage();
 
@@ -130,7 +129,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_item, container, false);
 
-		getCurrency();
+		setCurrency();
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -159,7 +158,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			}
 		});
 
-		setView(v);
+		setupView(v);
 		showCaseViews();
 
 		return v;
@@ -219,7 +218,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.take_photo:
-				mIsImageLoad = false;
+				mIsImageLoaded = false;
 				Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
 				mFile = Image.create().createImageFile();
@@ -227,16 +226,16 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 					mPhotoPath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
 
 					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
-					startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+					startActivityForResult(cameraIntent, TAKE_PHOTO);
 				} else {
 					Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 				}
 				return true;
 			case R.id.select_from_gallery:
-				mIsImageLoad = false;
+				mIsImageLoaded = false;
 				Intent galleryIntent = new Intent(Intent.ACTION_PICK,
 						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-				startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
+				startActivityForResult(galleryIntent, LOAD_IMAGE);
 				return true;
 			case R.id.default_image:
 				resetImage();
@@ -249,9 +248,9 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) {
-			mIsImageLoad = true;
+			mIsImageLoaded = true;
 
-			if (requestCode ==  ANSWER_FRAGMENT_CODE) {
+			if (requestCode == IS_SAVE_CHANGES) {
 				getActivity().finish();
 			}
 
@@ -262,12 +261,12 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
 		switch (requestCode) {
-			case TAKE_PHOTO_CODE:
-				mImagePath = mPhotoPath;
+			case TAKE_PHOTO:
+				mItemInList.getItem().setImagePath(mPhotoPath);
 				deletePhotoFromGallery();
-				new Image.BitmapWorkerTask(mFile,  metrics.widthPixels - 30, this).execute();
+				new Image.BitmapWorkerTask(mFile, metrics.widthPixels - 30, this).execute();
 				break;
-			case LOAD_IMAGE_CODE:
+			case LOAD_IMAGE:
 				Uri selectedImage = data.getData();
 
 				try {
@@ -280,7 +279,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 						mPhotoPath = Image.PATH_PROTOCOL + file.getAbsolutePath();
 						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, this).execute();
 
-						mImagePath = mPhotoPath;
+						mItemInList.getItem().setImagePath(mPhotoPath);
 					} else {
 						Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
@@ -288,7 +287,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 					e.printStackTrace();
 				}
 				break;
-			case ANSWER_FRAGMENT_CODE:
+			case IS_SAVE_CHANGES:
 				saveItem();
 				break;
 		}
@@ -296,30 +295,22 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 	@Override
 	public void updateImage() {
-		mIsImageLoad = true;
-		loadImage(false);
+		mIsImageLoaded = true;
+		loadImage();
 	}
 
 	@Override
 	public void onBackPressed() {
 		if (mName.length() != 0) {
 			QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_save_item));
-			dialogFrag.setTargetFragment(ItemFragment.this, ANSWER_FRAGMENT_CODE);
-			dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
+			dialogFrag.setTargetFragment(ItemFragment.this, IS_SAVE_CHANGES);
+			dialogFrag.show(getFragmentManager(), IS_SAVE_CHANGES_DATE);
 		} else {
 			getActivity().finish();
 		}
 	}
 
-	private void saveItem() {
-		if (saveData()) {
-			getActivity().finish();
-		} else {
-			Toast.makeText(getActivity(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
-		}
-	}
-
-	void setView(View v) {
+	protected void setupView(View v) {
 		mCollapsingToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.collapsing_toolbar);
 
 		mInfo = (TextView) v.findViewById(R.id.info);
@@ -357,9 +348,13 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		mIsBought = (ToggleButton) v.findViewById(R.id.is_bought);
 	}
 
-	SimpleCursorAdapter getCompleteTextAdapter(FilterQueryProvider provider) {
-		SimpleCursorAdapter completeTextAdapter = new AutoCompleteAdapter(getActivity(),
-				R.layout.spinner_autocomplite, null, new String[]{}, new int[]{}, 0);
+	protected void loadImage() {
+		Image.create().insertImageToView(getActivity(), mItemInList.getItem().getImagePath(), mAppBarImage);
+	}
+
+	protected SimpleCursorAdapter getCompleteTextAdapter(FilterQueryProvider provider) {
+		SimpleCursorAdapter completeTextAdapter = new ColorAdapter(getActivity(),
+				R.layout.spinner_autocomplite, null);
 		completeTextAdapter.setFilterQueryProvider(provider);
 		completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
 			@Override
@@ -370,49 +365,56 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		return completeTextAdapter;
 	}
 
-	void disableError(TextInputLayout field) {
+	protected void disableError(TextInputLayout field) {
 		if (field.getError() != null) {
 			field.setError(null);
 			field.setErrorEnabled(false);
 		}
 	}
 
-	String getName() {
-		return mName.getText().toString().trim();
-	}
+	protected ShoppingList updateItemInList() {
+		updatedItem();
 
-	Item getItem() {
-		String name = getName();
-		double amount = 0.0;
+		double amount = 0;
 		if (mAmount.getText().length() > 0) {
 			amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
 		}
-		double price = 0.0;
+		mItemInList.setAmount(amount);
+		mItemInList.setUnit(((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity());
+
+		double price = 0;
 		if (mPrice.getText().length() > 0) {
 			price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
 		}
-		String comment = mComment.getText().toString();
+		mItemInList.setPrice(price);
 
-		return new Item(name, mImagePath, new ItemData(amount,
-				((UnitCursor) mUnit.getSelectedItem()).getEntity(),
-				price,
-				((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity(),
-				comment));
+		mItemInList.setCategory(((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity());
+		mItemInList.setComment(mComment.getText().toString());
+
+		mItemInList.setBought(mIsBought.isChecked());
+		return mItemInList;
 	}
 
-	ShoppingList getItemInList(Item item) {
-		return new ShoppingList(item,
-				getIdList(),
-				mIsBought.isChecked(),
-				item.getItemData()
-		);
+	protected String getName() {
+		return mName.getText().toString().trim();
 	}
 
-	void sendResult(long id) {
+	protected void sendResult(long id) {
 		getActivity().setResult(android.app.Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
 	}
 
-	private void getCurrency() {
+	protected int getPosition(Spinner spinner, long id) {
+		int index = 0;
+		for (int i = 0; i < spinner.getCount(); i++) {
+			if (((EntityCursor<Dictionary>) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
+
+	private void setCurrency() {
 		CurrencyCursor cursor = new CurrenciesDS(getActivity()).getByList(getIdList());
 		if (cursor.moveToFirst()) {
 			mCurrencyList = cursor.getEntity().getSymbol();
@@ -435,7 +437,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			@Override
 			public void afterTextChanged(Editable s) {
 				if (s != null && s.length() > 0) {
-					if (!Validation.isValid(s.toString().trim(), false)) {
+					if (!Validation.isAmountValid(s.toString().trim())) {
 						mAmountInputLayout.setError(getString(R.string.error_value));
 					} else {
 						disableError(mAmountInputLayout);
@@ -466,7 +468,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			@Override
 			public void afterTextChanged(Editable s) {
 				if (s != null && s.length() > 0) {
-					if (!Validation.isValid(s.toString().trim(), true)) {
+					if (!Validation.isPriceValid(s.toString().trim())) {
 						mPriceInputLayout.setError(getString(R.string.error_value));
 					} else {
 						disableError(mPriceInputLayout);
@@ -493,10 +495,9 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	private SimpleCursorAdapter getCategoriesAdapter() {
-		SimpleCursorAdapter spinnerAdapter = new AutoCompleteAdapter(getActivity(),
+		SimpleCursorAdapter spinnerAdapter = new ColorAdapter(getActivity(),
 				R.layout.spinner_color_item,
-				new CategoriesDS(getActivity()).getAll(),
-				new String[]{}, new int[]{}, 0);
+				new CategoriesDS(getActivity()).getAll());
 		spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_color_item);
 		return spinnerAdapter;
 	}
@@ -516,28 +517,16 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		return nf.format(value);
 	}
 
-	protected void loadImage(boolean isDefaultImage) {
-		if (isDefaultImage) {
-			mImagePath = mImageDefaultPath;
-			Image.create().insertImageToView(getActivity(), mImageDefaultPath, mAppBarImage);
+	private void saveItem() {
+		if (saveData()) {
+			getActivity().finish();
 		} else {
-			Image.create().insertImageToView(getActivity(), mImagePath, mAppBarImage);
+			Toast.makeText(getActivity(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
 		}
-	}
-
-	protected int getPosition(Spinner spinner, long id) {
-		int index = 0;
-		for (int i = 0; i < spinner.getCount(); i++) {
-			if (((EntityCursor<Dictionary>) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
-				index = i;
-				break;
-			}
-		}
-		return index;
 	}
 
 	private void deletePhotoFromGallery() {
-		String[] projection = { BaseColumns._ID, MediaStore.Images.ImageColumns.DATE_TAKEN };
+		String[] projection = {BaseColumns._ID, MediaStore.Images.ImageColumns.DATE_TAKEN};
 
 		Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 				projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
@@ -554,10 +543,10 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		}
 	}
 
-	private class AutoCompleteAdapter extends SimpleCursorAdapter {
+	private class ColorAdapter extends SimpleCursorAdapter {
 
-		public AutoCompleteAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-			super(context, layout, c, from, to, flags);
+		public ColorAdapter(Context context, int layout, Cursor c) {
+			super(context, layout, c, new String[]{}, new int[]{}, 0);
 		}
 
 		@Override

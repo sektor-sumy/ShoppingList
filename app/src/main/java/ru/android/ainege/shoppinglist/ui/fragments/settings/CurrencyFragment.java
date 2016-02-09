@@ -17,19 +17,22 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
-import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
-import ru.android.ainege.shoppinglist.ui.Showcase;
+import ru.android.ainege.shoppinglist.util.Showcase;
 
 public class CurrencyFragment extends DictionaryFragment<Currency> {
 	private boolean mFlag = true;
 
 	private void showCaseView() {
+		CurrencyAdapter.CurrencyHolder holder;
+
 		if (Showcase.shouldBeShown(getActivity(), Showcase.SHOT_CURRENCY)) {
 			mDictionaryRV.scrollToPosition(7);
+			holder = (CurrencyAdapter.CurrencyHolder) mDictionaryRV.findViewHolderForLayoutPosition(7);
+		} else {
+			holder = (CurrencyAdapter.CurrencyHolder) mDictionaryRV.findViewHolderForLayoutPosition(0);
 		}
 
-		CurrencyViewAdapter.CurrencyViewHolder holder = (CurrencyViewAdapter.CurrencyViewHolder) mDictionaryRV.findViewHolderForLayoutPosition(7);
 		new ShowcaseView.Builder(getActivity())
 				.setTarget(new ViewTarget(holder.mDefaultCurrency))
 				.setContentTitle(getString(R.string.showcase_default_currency))
@@ -41,7 +44,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 	@Override
 	protected String getTitle() {
-		return getString(R.string.setting_currency);
+		return getString(R.string.settings_currency);
 	}
 
 	@Override
@@ -50,8 +53,8 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 			@Override
 			public void onClick(View v) {
 				GeneralDialogFragment addItemDialog = new CurrencyDialogFragment();
-				addItemDialog.setTargetFragment(CurrencyFragment.this, ADD_FRAGMENT_CODE);
-				addItemDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);
+				addItemDialog.setTargetFragment(CurrencyFragment.this, ADD);
+				addItemDialog.show(getFragmentManager(), ADD_DATE);
 			}
 		};
 	}
@@ -63,12 +66,12 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 	@Override
 	protected RecyclerViewAdapter getAdapter() {
-		return new CurrencyViewAdapter();
+		return new CurrencyAdapter();
 	}
 
 	@Override
 	protected boolean isEntityUsed(long idCurrency) {
-		return new ListsDS(getActivity()).isCurrencyUsed(idCurrency);
+		return getDS().isUsed(idCurrency);
 	}
 
 	@Override
@@ -89,8 +92,8 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 	@Override
 	protected void showEditDialog(int position) {
 		GeneralDialogFragment editItemDialog = CurrencyDialogFragment.newInstance(mDictionary.get(position));
-		editItemDialog.setTargetFragment(CurrencyFragment.this, EDIT_FRAGMENT_CODE);
-		editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
+		editItemDialog.setTargetFragment(CurrencyFragment.this, EDIT);
+		editItemDialog.show(getFragmentManager(), EDIT_DATE);
 	}
 
 	private void saveCurrencySetting(long id) {
@@ -100,26 +103,24 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		editor.apply();
 	}
 
-	public class CurrencyViewAdapter extends RecyclerViewAdapter<CurrencyViewAdapter.CurrencyViewHolder> {
+	public class CurrencyAdapter extends RecyclerViewAdapter<CurrencyAdapter.CurrencyHolder> {
 		public long mIdOld;
 		public long mIdSelected;
 
-		public CurrencyViewAdapter() {
+		public CurrencyAdapter() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 			mIdSelected = prefs.getLong(getString(R.string.settings_key_currency), -1);
 		}
 
 		@Override
-		public CurrencyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		public CurrencyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._settings_dictionary, parent, false);
-			return new CurrencyViewHolder(v);
+			return new CurrencyHolder(v);
 		}
 
 		@Override
-		public void onBindViewHolder(CurrencyViewHolder holder, int position) {
+		public void onBindViewHolder(CurrencyHolder holder, int position) {
 			super.onBindViewHolder(holder, position);
-
-			holder.mDefaultCurrency.setVisibility(View.VISIBLE);
 
 			if (mIdSelected == mDictionary.get(position).getId()) {
 				holder.setImageSelected();
@@ -137,7 +138,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		}
 
 		@Override
-		public void onViewAttachedToWindow(CurrencyViewHolder holder) {
+		public void onViewAttachedToWindow(CurrencyHolder holder) {
 			super.onViewAttachedToWindow(holder);
 
 			holder.mDefaultCurrency.post(new Runnable() {
@@ -151,13 +152,14 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 			});
 		}
 
-		public class CurrencyViewHolder extends RecyclerViewAdapter<CurrencyViewHolder>.ViewHolder {
+		public class CurrencyHolder extends RecyclerViewAdapter<CurrencyHolder>.ViewHolder {
 			public final ImageView mDefaultCurrency;
 
-			public CurrencyViewHolder(View v) {
+			public CurrencyHolder(View v) {
 				super(v);
 
 				mDefaultCurrency = (ImageView) v.findViewById(R.id.default_currency);
+				mDefaultCurrency.setVisibility(View.VISIBLE);
 
 				mDefaultCurrency.setOnClickListener(new View.OnClickListener() {
 					@Override

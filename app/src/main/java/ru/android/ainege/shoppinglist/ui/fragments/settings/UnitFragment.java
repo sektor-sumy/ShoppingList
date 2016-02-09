@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
@@ -16,7 +15,7 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 
 	@Override
 	protected String getTitle() {
-		return getString(R.string.setting_title_unit);
+		return getString(R.string.settings_title_unit);
 	}
 
 	@Override
@@ -25,8 +24,8 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 			@Override
 			public void onClick(View v) {
 				GeneralDialogFragment addItemDialog = new UnitDialogFragment();
-				addItemDialog.setTargetFragment(UnitFragment.this, ADD_FRAGMENT_CODE);
-				addItemDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);
+				addItemDialog.setTargetFragment(UnitFragment.this, ADD);
+				addItemDialog.show(getFragmentManager(), ADD_DATE);
 			}
 		};
 	}
@@ -38,12 +37,12 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 
 	@Override
 	protected RecyclerViewAdapter getAdapter() {
-		return new UnitViewAdapter();
+		return new UnitAdapter();
 	}
 
 	@Override
 	protected boolean isEntityUsed(long idUnit) {
-		return new ItemDataDS(getActivity()).isUnitUsed(idUnit);
+		return getDS().isUsed(idUnit);
 	}
 
 	@Override
@@ -64,11 +63,11 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 	@Override
 	protected void showEditDialog(int position) {
 		GeneralDialogFragment editItemDialog = UnitDialogFragment.newInstance(mDictionary.get(position));
-		editItemDialog.setTargetFragment(UnitFragment.this, EDIT_FRAGMENT_CODE);
-		editItemDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
+		editItemDialog.setTargetFragment(UnitFragment.this, EDIT);
+		editItemDialog.show(getFragmentManager(), EDIT_DATE);
 	}
 
-	private class UnitViewAdapter extends RecyclerViewAdapter<RecyclerViewAdapter.ViewHolder> {
+	private class UnitAdapter extends RecyclerViewAdapter<RecyclerViewAdapter.ViewHolder> {
 
 		@Override
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

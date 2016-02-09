@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments;
+package ru.android.ainege.shoppinglist.ui;
 
 public interface ImageFragmentInterface {
 	void updateImage();

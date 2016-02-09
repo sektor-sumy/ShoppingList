@@ -37,10 +37,10 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
-import ru.android.ainege.shoppinglist.ui.Image;
-import ru.android.ainege.shoppinglist.ui.Showcase;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
+import ru.android.ainege.shoppinglist.util.Image;
+import ru.android.ainege.shoppinglist.util.Showcase;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 
@@ -48,29 +48,30 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
 
-	private static final int ADD_FRAGMENT_CODE = 1;
-	private static final int EDIT_FRAGMENT_CODE = 2;
-	private static final int ANSWER_FRAGMENT_CODE = 3;
+	private static final int ADD_LIST = 1;
+	private static final int EDIT_LIST = 2;
+	private static final int IS_DELETE_LIST = 3;
+	private static final String ADD_LIST_DATE = "addListDialog";
+	private static final String EDIT_LIST_DATE = "editListDialog";
+	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
 	private static final int DATA_LOADER = 0;
-	private static final String ADD_FRAGMENT_DATE = "addListDialog";
-	private static final String EDIT_FRAGMENT_DATE = "editListDialog";
-	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
-	ArrayList<List> mLists = new ArrayList<>();
-	private int mPositionForDelete;
-	private ListsDS mListsDS;
-	private RecyclerView mListsRV;
-	private ImageView mEmptyImage;
-	private RecyclerViewAdapter mAdapterRV;
-	private ProgressBar mProgressBar;
-	private FloatingActionButton mAddItemFAB;
 
+	private ArrayList<List> mLists = new ArrayList<>();
+	private ListsDS mListsDS;
+	private int mPositionForDelete;
+	private boolean mIsUpdateData = false;
+
+	private RecyclerView mListsRV;
+	private ListsAdapter mAdapterRV;
+	private FloatingActionButton mAddItemFAB;
+	private ProgressBar mProgressBar;
+	private ImageView mEmptyImage;
 	private ShowcaseView showcaseView;
 	private int counter = 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setHasOptionsMenu(true);
 
 		mListsDS = new ListsDS(getActivity());
@@ -83,9 +84,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-		ActionBar bar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-		if (bar != null) {
-			bar.setTitle(R.string.you_lists);
+		ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+		if (actionBar != null) {
+			actionBar.setTitle(R.string.you_lists);
 		}
 
 		mAddItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
@@ -93,68 +94,31 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			@Override
 			public void onClick(View v) {
 				ListDialogFragment addListDialog = new ListDialogFragment();
-				addListDialog.setTargetFragment(ListsFragment.this, ADD_FRAGMENT_CODE);
-				addListDialog.show(getFragmentManager(), ADD_FRAGMENT_DATE);
+				addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
+				addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
 			}
 		});
 
 		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
+		mEmptyImage = (ImageView) v.findViewById(R.id.empty_lists);
 
 		mListsRV = (RecyclerView) v.findViewById(R.id.lists);
 		mListsRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-		mEmptyImage = (ImageView) v.findViewById(R.id.empty_lists);
-
-		mAdapterRV = new RecyclerViewAdapter();
+		mAdapterRV = new ListsAdapter();
 		mListsRV.setAdapter(mAdapterRV);
 
 		showCaseView();
 		return v;
 	}
 
-	private void showCaseView() {
-		showcaseView = new ShowcaseView.Builder(getActivity())
-				.setTarget(new ViewTarget(mAddItemFAB))
-				.setContentTitle(getString(R.string.showcase_create_list))
-				.setContentText(getString(R.string.showcase_create_list_desc))
-				.setOnClickListener(this)
-				.setStyle(R.style.Showcase)
-				.singleShot(Showcase.SHOT_LIST)
-				.build();
-
-		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
-	}
-
-	@Override
-	public void onClick(View v) {
-		RecyclerViewAdapter.ViewHolder holder = (RecyclerViewAdapter.ViewHolder) mListsRV.findViewHolderForLayoutPosition(0);
-		switch (counter) {
-			case 1:
-				showcaseView.setShowcase(new ViewTarget(holder.mDelete), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_manage_list));
-				showcaseView.setContentText(getString(R.string.showcase_manage_list_desc));
-				showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
-				break;
-			case 2:
-				showcaseView.setShowcase(new ViewTarget(holder.mImage), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_open_list));
-				showcaseView.setContentText(getString(R.string.showcase_open_list_desc));
-				showcaseView.forceTextPosition(ShowcaseView.BELOW_SHOWCASE);
-				Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.close), true);
-				break;
-			case 3:
-				showcaseView.hide();
-				break;
-		}
-		counter++;
-	}
-
 	@Override
 	public void onResume() {
 		super.onResume();
 
-		mAdapterRV.notifyItemChanged(0); //update adapter or crash app
-		updateData();
+		if (mIsUpdateData) {
+			updateData();
+			mIsUpdateData = false;
+		}
 	}
 
 	@Override
@@ -168,14 +132,43 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		switch (item.getItemId()) {
 			case R.id.settings:
 				Intent i = new Intent(getActivity(), SettingsActivity.class);
+
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 				} else {
 					startActivity(i);
 				}
+
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode != Activity.RESULT_OK) return;
+
+		switch (requestCode) {
+			case ADD_LIST:
+			case EDIT_LIST:
+				updateData();
+				break;
+			case IS_DELETE_LIST:
+				List list = mLists.get(mPositionForDelete);
+
+				mListsDS.delete(list.getId());
+				mAdapterRV.removeItem(mPositionForDelete);
+				Image.deleteFile(list.getImagePath());
+
+				if (mLists.size() > 0) {
+					hideEmptyStates();
+				} else {
+					showEmptyStates();
+				}
+
+				deleteSaveListFromSettings();
+				break;
 		}
 	}
 
@@ -224,43 +217,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode != Activity.RESULT_OK) return;
-
-		switch (requestCode) {
-			case ADD_FRAGMENT_CODE:
-				updateData();
-				break;
-			case EDIT_FRAGMENT_CODE:
-				updateData();
-				break;
-			case ANSWER_FRAGMENT_CODE:
-				List list = mLists.get(mPositionForDelete);
-
-				mListsDS.delete(list.getId());
-				mAdapterRV.removeItem(mPositionForDelete);
-
-				Image.deleteFile(list.getImagePath());
-
-				if (mLists.size() > 0) {
-					hideEmptyStates();
-				} else {
-					showEmptyStates();
-				}
-
-				deleteSettings();
-				break;
-		}
-	}
-
-	private void deleteSettings() {
-		SharedPreferences mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = mSettings.edit();
-		editor.remove(APP_PREFERENCES_ID);
-		editor.apply();
-	}
-
 	private void showEmptyStates() {
 		mListsRV.setVisibility(View.GONE);
 		mEmptyImage.setVisibility(View.VISIBLE);
@@ -269,6 +225,53 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private void hideEmptyStates() {
 		mListsRV.setVisibility(View.VISIBLE);
 		mEmptyImage.setVisibility(View.GONE);
+	}
+
+	private void deleteSaveListFromSettings() {
+		SharedPreferences mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+
+		if (mLists.get(mPositionForDelete).getId() == mSettings.getLong(APP_PREFERENCES_ID, -1)) {
+			SharedPreferences.Editor editor = mSettings.edit();
+			editor.remove(APP_PREFERENCES_ID);
+			editor.apply();
+		}
+	}
+
+	private void showCaseView() {
+		showcaseView = new ShowcaseView.Builder(getActivity())
+				.setTarget(new ViewTarget(mAddItemFAB))
+				.setContentTitle(getString(R.string.showcase_create_list))
+				.setContentText(getString(R.string.showcase_create_list_desc))
+				.setOnClickListener(this)
+				.setStyle(R.style.Showcase)
+				.singleShot(Showcase.SHOT_LIST)
+				.build();
+
+		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
+	}
+
+	@Override
+	public void onClick(View v) {
+		ListsAdapter.ViewHolder holder = (ListsAdapter.ViewHolder) mListsRV.findViewHolderForLayoutPosition(0);
+		switch (counter) {
+			case 1:
+				showcaseView.setShowcase(new ViewTarget(holder.mDelete), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_manage_list));
+				showcaseView.setContentText(getString(R.string.showcase_manage_list_desc));
+				showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
+				break;
+			case 2:
+				showcaseView.setShowcase(new ViewTarget(holder.mImage), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_open_list));
+				showcaseView.setContentText(getString(R.string.showcase_open_list_desc));
+				showcaseView.forceTextPosition(ShowcaseView.BELOW_SHOWCASE);
+				Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.close), true);
+				break;
+			case 3:
+				showcaseView.hide();
+				break;
+		}
+		counter++;
 	}
 
 	private static class ListsCursorLoader extends CursorLoader {
@@ -285,10 +288,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 	}
 
-	public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+	public class ListsAdapter extends RecyclerView.Adapter<ListsAdapter.ViewHolder> {
 
 		@Override
-		public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		public ListsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._list_item, parent, false);
 			return new ViewHolder(v);
 		}
@@ -298,29 +301,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			List list = mLists.get(position);
 
 			Image.create().insertImageToView(getActivity(), list.getImagePath(), holder.mImage);
-
 			holder.mName.setText(list.getName());
-
-			int amountItem = list.getAmountItems();
-			String statisticsShopping;
-
-			if (amountItem == 0) {
-				statisticsShopping = getString(R.string.list_empty);
-			} else {
-				int amountBoughtItems = list.getAmountBoughtItems();
-
-				if (amountBoughtItems == 0) {
-					statisticsShopping = getString(R.string.nothing_bought) + amountItem;
-				} else {
-					if (amountItem == amountBoughtItems) {
-						statisticsShopping = getString(R.string.all_bought);
-					} else {
-						statisticsShopping = getString(R.string.bought) + amountBoughtItems + getString(R.string.of) + amountItem;
-					}
-				}
-			}
-
-			holder.mStatisticsShopping.setText(statisticsShopping);
+			holder.mStatisticsShopping.setText(getStatisticsShopping(list));
 		}
 
 		@Override
@@ -331,6 +313,29 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		public void removeItem(int position) {
 			mLists.remove(position);
 			notifyItemRemoved(position);
+		}
+
+		private String getStatisticsShopping(List list) {
+			int amountItems = list.getAmountItems();
+			String statisticsShopping;
+
+			if (amountItems == 0) {
+				statisticsShopping = getString(R.string.list_empty);
+			} else {
+				int amountBoughtItems = list.getAmountBoughtItems();
+
+				if (amountBoughtItems == 0) {
+					statisticsShopping = getString(R.string.nothing_bought) + amountItems;
+				} else {
+					if (amountItems == amountBoughtItems) {
+						statisticsShopping = getString(R.string.all_bought);
+					} else {
+						statisticsShopping = getString(R.string.bought) + amountBoughtItems + getString(R.string.of) + amountItems;
+					}
+				}
+			}
+
+			return statisticsShopping;
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
@@ -357,8 +362,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						List list = mLists.get(itemPosition);
 
 						ListDialogFragment editListDialog = ListDialogFragment.newInstance(list);
-						editListDialog.setTargetFragment(ListsFragment.this, EDIT_FRAGMENT_CODE);
-						editListDialog.show(getFragmentManager(), EDIT_FRAGMENT_DATE);
+						editListDialog.setTargetFragment(ListsFragment.this, EDIT_LIST);
+						editListDialog.show(getFragmentManager(), EDIT_LIST_DATE);
 					}
 				});
 
@@ -368,19 +373,21 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						mPositionForDelete = getAdapterPosition();
 
 						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list));
-						dialogFrag.setTargetFragment(ListsFragment.this, ANSWER_FRAGMENT_CODE);
-						dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
+						dialogFrag.setTargetFragment(ListsFragment.this, IS_DELETE_LIST);
+						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
 					}
 				});
 
 				mView.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						mIsUpdateData = true;
 						int itemPosition = getAdapterPosition();
 						List list = mLists.get(itemPosition);
 
-						Intent i = new Intent(v.getContext(), ShoppingListActivity.class);
+						Intent i = new Intent(getActivity(), ShoppingListActivity.class);
 						i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, list.getId());
+
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 						} else {

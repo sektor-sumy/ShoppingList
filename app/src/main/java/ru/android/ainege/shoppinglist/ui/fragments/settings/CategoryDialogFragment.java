@@ -14,10 +14,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 
 public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
-	private LinearLayout colorPicker;
-	private LobsterPicker lobsterPicker;
-	private LobsterShadeSlider shadeSlider;
-	private LobsterOpacitySlider opacitySlider;
+	private LobsterPicker mLobsterPicker;
 
 	public static CategoryDialogFragment newInstance(Category category) {
 		Bundle args = new Bundle();
@@ -33,15 +30,15 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 	protected View setupView() {
 		View v = super.setupView();
 
-		colorPicker = (LinearLayout) v.findViewById(R.id.color_picker);
-		lobsterPicker = (LobsterPicker) v.findViewById(R.id.lobster_picker);
-		shadeSlider = (LobsterShadeSlider) v.findViewById(R.id.shade_slider);
-		opacitySlider = (LobsterOpacitySlider) v.findViewById(R.id.opacity_slider);
+		LinearLayout mColorPicker = (LinearLayout) v.findViewById(R.id.color_picker);
+		mLobsterPicker = (LobsterPicker) v.findViewById(R.id.lobster_picker);
+		LobsterShadeSlider shadeSlider = (LobsterShadeSlider) v.findViewById(R.id.shade_slider);
+		LobsterOpacitySlider opacitySlider = (LobsterOpacitySlider) v.findViewById(R.id.opacity_slider);
 
-		lobsterPicker.addDecorator(shadeSlider);
-		lobsterPicker.addDecorator(opacitySlider);
+		mLobsterPicker.addDecorator(shadeSlider);
+		mLobsterPicker.addDecorator(opacitySlider);
 
-		colorPicker.setVisibility(View.VISIBLE);
+		mColorPicker.setVisibility(View.VISIBLE);
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
 			v.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -59,7 +56,7 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 	protected void setDataToView() {
 		super.setDataToView();
 
-		lobsterPicker.setColor(mEditItem.getColor());
+		mLobsterPicker.setColor(mEditItem.getColor());
 	}
 
 
@@ -76,7 +73,7 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 		}
 
 		if (!mNameInputLayout.isErrorEnabled()) {
-			int color = lobsterPicker.getColor();
+			int color = mLobsterPicker.getColor();
 			CategoriesDS categoryDS = new CategoriesDS(getActivity());
 			long id;
 

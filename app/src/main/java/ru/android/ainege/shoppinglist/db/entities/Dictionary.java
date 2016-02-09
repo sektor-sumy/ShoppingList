@@ -6,13 +6,13 @@ public class Dictionary implements Serializable {
 	private long mId;
 	private String mName;
 
-	Dictionary(String name) {
+	public Dictionary(String name) {
 		mName = name;
 	}
 
-	Dictionary(long id, String name) {
+	public Dictionary(long id, String name) {
 		this(name);
-		this.mId = id;
+		mId = id;
 	}
 
 	public long getId() {
@@ -20,7 +20,7 @@ public class Dictionary implements Serializable {
 	}
 
 	public void setId(long id) {
-		this.mId = id;
+		mId = id;
 	}
 
 	public String getName() {

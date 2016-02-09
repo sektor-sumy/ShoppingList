@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
@@ -19,15 +20,15 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		super(context);
 	}
 
-	@Override
-	public EntityCursor<Category> getAll() {
-		return getAll(mDbHelper.getReadableDatabase());
-	}
-
 	public static CategoryCursor getAll(SQLiteDatabase db) {
 		Cursor cursor = db.query(CategoriesTable.TABLE_NAME, null, null,
 				null, null, null, CategoriesTable.COLUMN_NAME);
 		return new CategoryCursor(cursor);
+	}
+
+	@Override
+	public EntityCursor<Category> getAll() {
+		return getAll(mDbHelper.getReadableDatabase());
 	}
 
 	public CategoryCursor getCategoriesInList(long idList) {
@@ -45,6 +46,7 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		return new CategoryCursor(cursor);
 	}
 
+	@Override
 	public long getRandomId(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(CategoriesTable.TABLE_NAME, null, CategoriesTable.COLUMN_ID + " != " + id,
@@ -54,6 +56,16 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		long selectedId = category.getEntity().getId();
 		cursor.close();
 		return selectedId;
+	}
+
+	@Override
+	public boolean isUsed(long idCategory) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(ItemDataTable.TABLE_NAME, null, ItemDataTable.COLUMN_ID_CATEGORY + " = " + idCategory,
+				null, null, null, null);
+		boolean result = cursor.getCount() > 0;
+		cursor.close();
+		return result;
 	}
 
 	@Override
@@ -71,6 +83,7 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		return db.insert(CategoriesTable.TABLE_NAME, null, values);
 	}
 
+	//todo update delete
 	@Override
 	public void delete(long id) {
 		long newId = getRandomId(id);
@@ -78,7 +91,6 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.beginTransaction();
 		try {
-			//TODO update category
 			//new ListsDS(mContext).updateCategory(id, newId);
 
 			db.delete(CategoriesTable.TABLE_NAME, CategoriesTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
@@ -96,17 +108,17 @@ public class CategoriesDS extends DictionaryDS<Category> {
 	}
 
 	public static class CategoryCursor extends EntityCursor<Category> {
-		private ShoppingListDS.ShoppingListCursor mItemsInListCursor;
+		private ShoppingListCursor mItemsInListCursor;
 
 		public CategoryCursor(Cursor cursor) {
 			super(cursor);
 		}
 
-		public ShoppingListDS.ShoppingListCursor getItemsInListCursor() {
+		public ShoppingListCursor getItemsInListCursor() {
 			return mItemsInListCursor;
 		}
 
-		public void setItemsInListCursor(ShoppingListDS.ShoppingListCursor itemsInListCursor) {
+		public void setItemsInListCursor(ShoppingListCursor itemsInListCursor) {
 			mItemsInListCursor = itemsInListCursor;
 		}
 
@@ -115,34 +127,23 @@ public class CategoriesDS extends DictionaryDS<Category> {
 			String name = getString(getColumnIndex(CategoriesTable.COLUMN_NAME));
 			int color = getInt(getColumnIndex(CategoriesTable.COLUMN_COLOR));
 
-			return new Category(id, name, color);
-		}
+			Category category = new Category(id, name, color);
 
-		public Category getCategoryWithItems(ArrayList<ShoppingList> itemInList) {
-			Category category = getEntity();
-			ArrayList<ShoppingList> itemsInCategory = new ArrayList<>();
+			if (mItemsInListCursor != null) {
+				ArrayList<ShoppingList> itemsInCategory = new ArrayList<>();
 
-			for (ShoppingList item : itemInList) {
-				if (category.getId() == item.getItemData().getIdCategory()) {
-					itemsInCategory.add(item);
+				for (ShoppingList item : mItemsInListCursor.getEntities()) {
+					if (category.getId() == item.getIdCategory()) {
+						item.setCategory(category);
+						itemsInCategory.add(item);
+					}
 				}
+
+				ShoppingList.sort(itemsInCategory);
+				category.setItemsByCategoryInList(itemsInCategory);
 			}
 
-			ShoppingList.sort(itemsInCategory);
-			category.setItemsByCategoryInList(itemsInCategory);
-
 			return category;
-		}
-
-		public ArrayList<Category> getCategoriesWithItems(ArrayList<ShoppingList> itemInList) {
-			ArrayList<Category> categories = new ArrayList<>();
-			moveToFirst();
-
-			do {
-				categories.add(getCategoryWithItems(itemInList));
-			} while (moveToNext());
-
-			return categories;
 		}
 	}
 }

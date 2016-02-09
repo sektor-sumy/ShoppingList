@@ -1,36 +1,27 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-import java.io.Serializable;
-
-public class Item implements Serializable {
+public class Item extends ItemData {
 	private long mId;
 	private String mName;
 	private String mDefaultImagePath;
 	private String mImagePath;
-	private long mIdItemData;
-	private ItemData mItemData;
 
-	public Item(String name, String imagePath, ItemData itemData) {
+	public Item(){}
+
+	public Item(String name, String defaultImagePath) {
 		mName = name;
-		mImagePath = imagePath;
-		mItemData = itemData;
-		if (mItemData != null) {
-			mIdItemData = mItemData.getId();
-		}
-	}
-
-	public Item(long id, String name, String defaultImagePath, String imagePath) {
-		this(name, imagePath, null);
-		mId = id;
 		mDefaultImagePath = defaultImagePath;
 	}
 
-	public Item(long id, String name, String defaultImagePath, String imagePath, ItemData itemData) {
-		this(id, name, defaultImagePath, imagePath);
-		mItemData = itemData;
-		if (mItemData != null) {
-			mIdItemData = mItemData.getId();
-		}
+	public Item(String name, String defaultImagePath, String imagePath) {
+		this(name, defaultImagePath);
+		mImagePath = imagePath;
+	}
+
+	public Item(long id, String name, String defaultImagePath, String imagePath, long idData) {
+		this(name, defaultImagePath, imagePath);
+		mId = id;
+		mIdItemData = idData;
 	}
 
 	public long getId() {
@@ -38,7 +29,7 @@ public class Item implements Serializable {
 	}
 
 	public void setId(long id) {
-		this.mId = id;
+		mId = id;
 	}
 
 	public String getName() {
@@ -49,42 +40,23 @@ public class Item implements Serializable {
 		mName = name;
 	}
 
-	public void setDefaultImagePath(String imagePath) {
-		mDefaultImagePath = imagePath;
-	}
-
 	public String getDefaultImagePath() {
 		return mDefaultImagePath;
 	}
 
-	public void setImagePath(String imagePath) {
-		mImagePath = imagePath;
+	public void setDefaultImagePath(String imagePath) {
+		mDefaultImagePath = imagePath;
 	}
 
 	public String getImagePath() {
 		return mImagePath;
 	}
 
-	public long getIdItemData() {
-		return mIdItemData;
+	public void setImagePath(String imagePath) {
+		mImagePath = imagePath;
 	}
 
-	public void setIdItemData(long id) {
-		mIdItemData = id;
-
-		if (mItemData != null) {
-			mItemData.setId(mIdItemData);
-		}
-	}
-
-	public ItemData getItemData() {
-		return mItemData;
-	}
-
-	public void setItemData(ItemData itemData) {
-		mItemData = itemData;
-		if (mItemData != null) {
-			mIdItemData = mItemData.getId();
-		}
+	public boolean isNew() {
+		return mId == 0;
 	}
 }

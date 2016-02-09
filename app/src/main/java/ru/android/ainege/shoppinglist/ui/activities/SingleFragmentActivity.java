@@ -21,7 +21,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 		injectFragment(getFragment(), getDefaultContainer());
 	}
 
-	int getDefaultContainer() {
+	protected int getDefaultContainer() {
 		return R.id.fragment_container;
 	}
 

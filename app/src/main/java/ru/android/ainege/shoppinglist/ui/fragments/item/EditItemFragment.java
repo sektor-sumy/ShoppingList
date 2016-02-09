@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments;
+package ru.android.ainege.shoppinglist.ui.fragments.item;
 
 import android.database.Cursor;
 import android.os.Build;
@@ -20,10 +20,12 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingList
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 
+import static java.lang.String.format;
+
 public class EditItemFragment extends ItemFragment {
 	private static final String ITEM_IN_LIST = "itemInList";
 
-	private ShoppingList mItemInList;
+	private long mOriginalIdItem;
 
 	public static EditItemFragment newInstance(ShoppingList itemInList) {
 		Bundle args = new Bundle();
@@ -39,6 +41,7 @@ public class EditItemFragment extends ItemFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mItemInList = (ShoppingList) getArguments().getSerializable(ITEM_IN_LIST);
+		mOriginalIdItem = mItemInList.getIdItem();
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
@@ -54,9 +57,31 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected void setView(View v) {
-		super.setView(v);
+	protected void setupView(View v) {
+		super.setupView(v);
 		setDataToView();
+	}
+
+	private void setDataToView() {
+		loadImage();
+
+		mName.setText(mItemInList.getItem().getName());
+		mName.setSelection(mItemInList.getItem().getName().length());
+
+		if (mItemInList.getAmount() != 0) {
+			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getAmount()));
+		}
+		mUnit.setSelection(getPosition(mUnit, mItemInList.getUnit().getId()));
+
+		if (mItemInList.getPrice() != 0) {
+			mPrice.setText(format("%.2f", mItemInList.getPrice()));
+		}
+
+		mCategory.setSelection(getPosition(mCategory, mItemInList.getCategory().getId()));
+		mComment.setText(mItemInList.getComment());
+
+
+		mIsBought.setChecked(mItemInList.isBought());
 	}
 
 	@Override
@@ -76,10 +101,10 @@ public class EditItemFragment extends ItemFragment {
 			public void afterTextChanged(Editable s) {
 				if (s.length() == 0) {
 					mNameInputLayout.setError(getString(R.string.error_name));
-				} else {
+				} else if (s.toString().equals(s.toString().trim())) {
 					disableError(mNameInputLayout);
 					//Check is the item in the list or catalog of items. If there is a warning display
-					ShoppingListCursor cursor = mItemsInListDS.existItemInList(s.toString().trim(), mItemInList.getIdList());
+					ShoppingListCursor cursor = mItemsInListDS.getByName(s.toString().trim(), mItemInList.getIdList());
 					showInfo(cursor.moveToFirst() && !cursor.getEntity().getItem().getName().equals(mItemInList.getItem().getName()));
 					cursor.close();
 					if (mIsProposedItem) {
@@ -106,7 +131,7 @@ public class EditItemFragment extends ItemFragment {
 			@Override
 			public Cursor runQuery(CharSequence charSequence) {
 				Cursor managedCursor = null;
-				if (charSequence != null && !charSequence.equals(mItemInList.getItem().getName())) {
+				if (charSequence != null && !charSequence.toString().trim().equals(mItemInList.getItem().getName())) {
 					managedCursor = mItemDS.getNames(charSequence.toString().trim());
 					if (managedCursor.moveToFirst()) {
 						mIsProposedItem = true;
@@ -117,28 +142,6 @@ public class EditItemFragment extends ItemFragment {
 		});
 	}
 
-	private void setDataToView() {
-		mImageDefaultPath = mItemInList.getItem().getDefaultImagePath();
-		mImagePath = mItemInList.getItem().getImagePath();
-		loadImage(false);
-
-		mName.setText(mItemInList.getItem().getName());
-		mName.setSelection(mItemInList.getItem().getName().length());
-
-		if (mItemInList.getItemData().getAmount() != 0) {
-			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getItemData().getAmount()));
-		}
-		mUnit.setSelection(getPosition(mUnit, mItemInList.getItemData().getUnit().getId()));
-
-		if (mItemInList.getItemData().getPrice() != 0) {
-			mPrice.setText(String.format("%.2f", mItemInList.getItemData().getPrice()));
-		}
-
-		mCategory.setSelection(getPosition(mCategory, mItemInList.getItemData().getCategory().getId()));
-		mComment.setText(mItemInList.getItemData().getComment());
-		mIsBought.setChecked(mItemInList.isBought());
-	}
-
 	@Override
 	protected boolean saveData() {
 		boolean isSave = false;
@@ -147,35 +150,25 @@ public class EditItemFragment extends ItemFragment {
 			mNameInputLayout.setError(getString(R.string.error_length_name));
 		}
 
-		if (!mIsImageLoad) {
+		if (!mIsImageLoaded) {
 			Toast.makeText(getActivity(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
 			return false;
 		}
 
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
 				!mPriceInputLayout.isErrorEnabled()) {
-			Item item = getItem();
+			updateItemInList();
+			boolean isItemChanged = mItemInList.getItem().isNew();
+			mItemInList.updateItem(getActivity());
 
-			if (getName().equals(mItemInList.getItem().getName())) { //name didn't change
-				item.getItemData().setId(mItemDS.getIdData(item.getId()));
-				mItemDS.update(item);
-
-				//Update item in list
-				item.setIdItemData(mItemInList.getIdItemData());
-				mItemsInListDS.update(getItemInList(item));
+			if (!isItemChanged) {
+				mItemsInListDS.update(mItemInList);
 			} else {
-				long idItem = (int) addItem(item);
-				item.setId(idItem);
-
-				//Update item in list
-				item.setIdItemData(mItemInList.getIdItemData());
-				mItemsInListDS.update(getItemInList(item), mItemInList.getIdItem());
+				mItemsInListDS.update(mItemInList, mOriginalIdItem);
 			}
 
 			sendResult(mItemInList.getIdItem());
 			isSave = true;
-
-
 		}
 		return isSave;
 	}
@@ -186,31 +179,26 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected void resetImage() {
-		loadImage(true);
+	protected void updatedItem() {
+		if (!getName().equals(mItemInList.getItem().getName())) {
+			mItemInList.setItem(new Item(getName(), mItemInList.getItem().getImagePath(), mItemInList.getItem().getImagePath()));
+		}
 	}
 
 	@Override
-	Item getItem() {
-		Item item = super.getItem();
-		item.setId(mItemInList.getIdItem());
-		item.setImagePath(mImagePath);
-		item.setDefaultImagePath(mImageDefaultPath);
-		return item;
+	protected void resetImage() {
+		if (!mItemInList.getItem().getImagePath().equals(mItemInList.getItem().getDefaultImagePath())) {
+			mItemInList.getItem().setImagePath(mItemInList.getItem().getDefaultImagePath());
+			loadImage();
+		}
 	}
 
 	@Override
 	public void onBackPressed() {
-		if (!mItemInList.equals(getItemInList(getItem()))) {
+		if (!mItemInList.equals(mItemInList)) {
 			super.onBackPressed();
 		} else {
 			getActivity().finish();
 		}
-
-	}
-
-	private long addItem(Item item) {
-		item.setDefaultImagePath(mImagePath);
-		return mItemDS.add(item);
 	}
 }

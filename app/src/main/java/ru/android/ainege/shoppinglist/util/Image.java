@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui;
+package ru.android.ainege.shoppinglist.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.fragments.ImageFragmentInterface;
+import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 
 import static android.graphics.Bitmap.CompressFormat;
 import static android.graphics.Bitmap.createBitmap;
@@ -31,11 +31,25 @@ public class Image {
 	public static final String ITEM_IMAGE_PATH = ASSETS_IMAGE_PATH + "item/";
 	private static final double MIN_RATIO = 1.25;
 	private static final double MAX_RATIO = 2;
+
 	protected int mLoadingImage = R.drawable.loader;
 	private int mDefaultImage = R.drawable.load_error;
 
 	public static Image create() {
 		return new Image();
+	}
+
+	public static String getFilePath(File file) {
+		return Image.PATH_PROTOCOL + file.getAbsolutePath();
+	}
+
+	public static boolean deleteFile(String path) {
+		boolean result = false;
+		if (!path.contains(Image.ASSETS_IMAGE_PATH)) {
+			File f = new File(Uri.parse(path).getPath());
+			result = f.delete();
+		}
+		return result;
 	}
 
 	public Image insertImageToView(Context context, Uri path, ImageView image) {
@@ -76,19 +90,6 @@ public class Image {
 		} else {
 			return null;
 		}
-	}
-
-	public static String getFilePath(File file) {
-		return Image.PATH_PROTOCOL + file.getAbsolutePath();
-	}
-
-	public static boolean deleteFile(String path){
-		boolean result = false;
-		if (!path.contains(Image.ASSETS_IMAGE_PATH)) {
-			File f = new File(Uri.parse(path).getPath());
-			result = f.delete();
-		}
-		return result;
 	}
 
 	public boolean postProcessingToFile(File file, int widthImageView) {

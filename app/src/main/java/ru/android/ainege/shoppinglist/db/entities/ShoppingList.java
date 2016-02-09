@@ -1,27 +1,38 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-import java.io.Serializable;
+import android.content.Context;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
-public class ShoppingList implements Serializable {
-	private static String mType;
-	private static boolean mIsBoughtEndInList;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
+import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDS;
 
+public class ShoppingList extends ItemData {
 	public final static String ALPHABET = "alphabet";
 	public final static String UP_PRICE = "upPrice";
 	public final static String DOWN_PRICE = "downPrice";
 	public final static String ORDER_ADDING = "orderAdding";
 
+	private static String mType;
+	private static boolean mIsBoughtEndInList;
+
 	private long mIdItem;
 	private long mIdList;
 	private boolean mIsBought;
-	private long mIdItemData;
 	private Date mDate;
+
 	private Item mItem;
-	private ItemData mItemData;
+
+	private double mSum = 0;
+
+	public ShoppingList(long idList) {
+		mIdList = idList;
+		mItem = new Item();
+	}
 
 	public ShoppingList(long idItem, long idList, boolean isBought, long idData, Date date) {
 		mIdItem = idItem;
@@ -31,81 +42,11 @@ public class ShoppingList implements Serializable {
 		mDate = date;
 	}
 
-	public ShoppingList(Item item, long idList, boolean isBought, ItemData itemData) {
-		this(item.getId(), idList, isBought, itemData.getId(), null);
-		mItem = item;
-		mItemData = itemData;
-	}
-
-	public long getIdItem() {
-		return mIdItem;
-	}
-
-	public void setIdItem(long idItem) {
-		mIdItem = idItem;
-	}
-
-	public long getIdList() {
-		return mIdList;
-	}
-
-	public void setIdList(long idList) {
-		mIdList = idList;
-	}
-
-	public boolean isBought() {
-		return mIsBought;
-	}
-
-	public void setBought(boolean bought) {
-		mIsBought = bought;
-	}
-
-	public long getIdItemData() {
-		return mIdItemData;
-	}
-
-	public void setIdItemData(long id) {
-		mIdItemData = id;
-	}
-
-	public Date getDate() {
-		return mDate;
-	}
-
-	public void setDate(Date date) {
-		mDate = date;
-	}
-
-	public Item getItem() {
-		return mItem;
-	}
-
-	public void setItem(Item item) {
-		mItem = item;
-		if (mItem != null) {
-			mIdItem = mItem.getId();
-		}
-	}
-
-	public ItemData getItemData() {
-		return mItemData;
-	}
-
-	public void setItemData(ItemData itemData) {
-		mItemData = itemData;
-	}
-
-	public boolean equals(ShoppingList item) {
-		return !(!mItem.getName().equals(item.getItem().getName()) ||
-				!mItem.getImagePath().equals(item.getItem().getImagePath()) ||
-				mIsBought != item.isBought() || getItemData().getAmount() != item.getItemData().getAmount() ||
-				getItemData().getIdUnit() != item.getItemData().getIdUnit() || getItemData().getPrice() != item.getItemData().getPrice() ||
-				!getItemData().getComment().equals(item.getItemData().getComment()));
-	}
-
-	public static void setSortSettings(boolean isBoughtEndInList, String type) {
+	public static void setSortSettings(boolean isBoughtEndInList) {
 		mIsBoughtEndInList = isBoughtEndInList;
+	}
+
+	public static void setSortSettings(String type) {
 		mType = type;
 	}
 
@@ -128,10 +69,10 @@ public class ShoppingList implements Serializable {
 						result = lhs.getItem().getName().compareToIgnoreCase(rhs.getItem().getName());
 						break;
 					case UP_PRICE:
-						result = (int) (lhs.getItemData().getPrice() - rhs.getItemData().getPrice());
+						result = (int) (lhs.getPrice() - rhs.getPrice());
 						break;
 					case DOWN_PRICE:
-						result = (int) (rhs.getItemData().getPrice() - lhs.getItemData().getPrice());
+						result = (int) (rhs.getPrice() - lhs.getPrice());
 						break;
 					case ORDER_ADDING:
 						result = (int) (lhs.getDate().getTime() - rhs.getDate().getTime());
@@ -141,5 +82,92 @@ public class ShoppingList implements Serializable {
 				return result;
 			}
 		});
+	}
+
+	public long getIdItem() {
+		return mIdItem;
+	}
+
+	public void setIdItem(long idItem) {
+		mIdItem = idItem;
+
+		if (mItem != null) {
+			mItem.setId(mIdItem);
+		}
+	}
+
+	public long getIdList() {
+		return mIdList;
+	}
+
+	public void setIdList(long idList) {
+		mIdList = idList;
+	}
+
+	public boolean isBought() {
+		return mIsBought;
+	}
+
+	public void setBought(boolean bought) {
+		mIsBought = bought;
+	}
+
+	public Date getDate() {
+		return mDate;
+	}
+
+	public void setDate(Date date) {
+		mDate = date;
+	}
+
+	public Item getItem() {
+		return mItem;
+	}
+
+	public void setItem(Item item) {
+		mItem = item;
+
+		if (mItem != null) {
+			mIdItem = mItem.getId();
+		}
+	}
+
+	public double getSum() {
+		mSum = mPrice * (mAmount == 0 ? 1 : mAmount);
+		return new BigDecimal(mSum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+	}
+
+	public void setSum(double sum) {
+		mSum = sum;
+	}
+
+	public boolean equals(ShoppingList item) {
+		return !(!mItem.getName().equals(item.getItem().getName()) ||
+				!mItem.getImagePath().equals(item.getItem().getImagePath()) ||
+				mIsBought != item.isBought() ||
+				mAmount != item.getAmount() ||
+				mIdUnit != item.getIdUnit() ||
+				mPrice != item.getPrice() ||
+				mIdCategory != item.getIdCategory() ||
+				!mComment.equals(item.getComment()));
+	}
+
+	public long updateItem(Context context) {
+		long idItem = mItem.getId();
+
+		mItem.setAmount(mAmount);
+		mItem.setUnit(mUnit);
+		mItem.setPrice(mPrice);
+		mItem.setCategory(mCategory);
+		mItem.setComment(mComment);
+
+		if (!mItem.isNew()) {
+			new ItemDataDS(context).update(mItem);
+		} else {
+			idItem = new ItemDS(context).add(mItem);
+			setIdItem(idItem);
+		}
+
+		return idItem;
 	}
 }

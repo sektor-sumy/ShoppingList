@@ -33,16 +33,17 @@ import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 
 public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-	static final int ADD_FRAGMENT_CODE = 1;
-	static final int EDIT_FRAGMENT_CODE = 2;
+	protected static final int ADD = 1;
+	protected static final int EDIT = 2;
+	protected static final String ADD_DATE = "addItemDialog";
+	protected static final String EDIT_DATE = "editItemDialog";
+	protected static final int DATA_LOADER = 0;
 	private static final int ANSWER_FRAGMENT_CODE = 3;
-	static final String ADD_FRAGMENT_DATE = "addItemDialog";
-	static final String EDIT_FRAGMENT_DATE = "editItemDialog";
-	static final int DATA_LOADER = 0;
 	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
-	ArrayList<T> mDictionary = new ArrayList<>();
-	RecyclerViewAdapter mAdapterRV;
-	RecyclerView mDictionaryRV;
+
+	protected ArrayList<T> mDictionary = new ArrayList<>();
+	protected RecyclerViewAdapter mAdapterRV;
+	protected RecyclerView mDictionaryRV;
 
 	protected abstract String getTitle();
 
@@ -140,10 +141,10 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 		if (resultCode != Activity.RESULT_OK) return;
 
 		switch (requestCode) {
-			case ADD_FRAGMENT_CODE:
+			case ADD:
 				updateData();
 				break;
-			case EDIT_FRAGMENT_CODE:
+			case EDIT:
 				updateData();
 				break;
 			case ANSWER_FRAGMENT_CODE:

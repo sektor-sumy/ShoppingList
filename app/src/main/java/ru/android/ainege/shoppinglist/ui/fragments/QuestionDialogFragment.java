@@ -11,9 +11,10 @@ import android.os.Bundle;
 import ru.android.ainege.shoppinglist.R;
 
 public class QuestionDialogFragment extends DialogFragment {
-	private static final String MESSAGE = "message";
 	public static final String ID = "id";
 	public static final String POSITION = "position";
+
+	private static final String MESSAGE = "message";
 	private static final String OK_CLICK = "okClick";
 
 	public static QuestionDialogFragment newInstance(String message) {

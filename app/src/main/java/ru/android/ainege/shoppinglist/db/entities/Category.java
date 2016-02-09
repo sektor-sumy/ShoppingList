@@ -6,6 +6,9 @@ public class Category extends Dictionary {
 	private int mColor;
 	private ArrayList<ShoppingList> mItemsByCategoriesInList;
 
+	private double mSpentSum;
+	private int mBoughtItemsCount;
+
 	public Category(String name, int color) {
 		super(name);
 		mColor = color;
@@ -16,8 +19,8 @@ public class Category extends Dictionary {
 		mColor = color;
 	}
 
-	public Category( ArrayList<ShoppingList>  itemsByCategories) {
-		super("");
+	public Category(ArrayList<ShoppingList> itemsByCategories) {
+		super(null);
 		mItemsByCategoriesInList = itemsByCategories;
 	}
 
@@ -35,5 +38,52 @@ public class Category extends Dictionary {
 
 	public void setItemsByCategoryInList(ArrayList<ShoppingList> itemsByCategoryInList) {
 		mItemsByCategoriesInList = itemsByCategoryInList;
+	}
+
+	public double getSpentSum() {
+		return mSpentSum;
+	}
+
+	public void setSpentSum(double spentSum) {
+		mSpentSum = spentSum;
+	}
+
+	public int getBoughtItemsCount() {
+		return mBoughtItemsCount;
+	}
+
+	public void setBoughtItemsCount(int boughtItemsCount) {
+		mBoughtItemsCount = boughtItemsCount;
+	}
+
+	public double calculateTotalSum() {
+		return sum(false);
+	}
+
+	public double calculateSpentSum() {
+		mSpentSum = sum(true);
+		return mSpentSum;
+	}
+
+	public int countBoughtItems() {
+		for (ShoppingList item : mItemsByCategoriesInList) {
+			if (item.isBought()) {
+				mBoughtItemsCount++;
+			}
+		}
+
+		return mBoughtItemsCount;
+	}
+
+	private double sum(boolean onlyBought) {
+		double sum = 0;
+
+		for (ShoppingList item : mItemsByCategoriesInList) {
+			if ((onlyBought && item.isBought()) || !onlyBought) {
+				sum += item.getSum();
+			}
+		}
+
+		return sum;
 	}
 }

@@ -37,16 +37,16 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
-import ru.android.ainege.shoppinglist.ui.Image;
+import ru.android.ainege.shoppinglist.util.Image;
+import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 
-import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.*;
+import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
 
-public class ListDialogFragment extends DialogFragment implements ImageFragmentInterface{
+public class ListDialogFragment extends DialogFragment implements ImageFragmentInterface {
 	private static final String ID_LIST = "idList";
 	private static final String LIST = "list";
-
-	private static final int TAKE_PHOTO_CODE = 0;
-	private static final int LOAD_IMAGE_CODE = 1;
+	private static final int TAKE_PHOTO = 0;
+	private static final int LOAD_IMAGE = 1;
 
 	private ImageView mImageList;
 	private TextInputLayout mNameInputLayout;
@@ -88,7 +88,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		mName = (EditText) v.findViewById(R.id.name);
 		mCurrency = (Spinner) v.findViewById(R.id.currency);
 		mCurrency.setAdapter(getSpinnerAdapter());
-		mCurrency.setSelection(getPosition(mCurrency, getIdCurrency()));
+		mCurrency.setSelection(getPosition(mCurrency, getDefaultIdCurrency()));
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(v)
@@ -113,6 +113,35 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		}
 
 		return builder.create();
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		if (getDialog() == null) {
+			return;
+		}
+
+		final AlertDialog dialog = (AlertDialog) getDialog();
+
+		Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+		positiveButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Boolean wantToCloseDialog = saveData();
+				if (wantToCloseDialog) {
+					dialog.dismiss();
+				}
+			}
+		});
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		mName.setSelection(mName.getText().length());
 	}
 
 	@Override
@@ -147,16 +176,15 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 					mPhotoPath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
 
 					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
-					startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+					startActivityForResult(cameraIntent, TAKE_PHOTO);
 				} else {
 					Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 				}
 				break;
 			case R.id.select_from_gallery:
 				mIsImageLoad = false;
-				Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-				startActivityForResult(galleryIntent, LOAD_IMAGE_CODE);
+				Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+				startActivityForResult(galleryIntent, LOAD_IMAGE);
 				break;
 			case R.id.random_image:
 				setRandomImage();
@@ -165,13 +193,6 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 				return super.onContextItemSelected(item);
 		}
 		return true;
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		mName.setSelection(mName.getText().length());
 	}
 
 	@Override
@@ -186,12 +207,12 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
 		switch (requestCode) {
-			case TAKE_PHOTO_CODE:
+			case TAKE_PHOTO:
 				mImagePath = mPhotoPath;
 				deletePhotoFromGallery();
 				new Image.BitmapWorkerTask(mFile, metrics.widthPixels - 30, this).execute();
 				break;
-			case LOAD_IMAGE_CODE:
+			case LOAD_IMAGE:
 				Uri selectedImage = data.getData();
 
 				try {
@@ -216,31 +237,19 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	}
 
 	@Override
-	public void onStart() {
-		super.onStart();
-
-		if (getDialog() == null) {
-			return;
-		}
-
-		final AlertDialog dialog = (AlertDialog) getDialog();
-
-		Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-		positiveButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Boolean wantToCloseDialog = saveData();
-				if (wantToCloseDialog) {
-					dialog.dismiss();
-				}
-			}
-		});
-	}
-
-	@Override
 	public void updateImage() {
 		mIsImageLoad = true;
 		loadImage();
+	}
+
+	private void setDataToView() {
+		mImagePath = mEditList.getImagePath();
+		loadImage();
+
+		mName.setText(mEditList.getName());
+		mName.setSelection(mName.getText().length());
+
+		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
 	}
 
 	private SimpleCursorAdapter getSpinnerAdapter() {
@@ -253,19 +262,9 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		return spinnerAdapter;
 	}
 
-	private long getIdCurrency() {
+	private long getDefaultIdCurrency() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		return prefs.getLong(getResources().getString(R.string.settings_key_currency), -1);
-	}
-
-	private void setDataToView() {
-		mImagePath = mEditList.getImagePath();
-		loadImage();
-
-		mName.setText(mEditList.getName());
-		mName.setSelection(mName.getText().length());
-
-		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
 	}
 
 	private int getPosition(Spinner spinner, long idCurrency) {
@@ -282,13 +281,15 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 
 	private void loadImage() {
 		Image.create().insertImageToView(getActivity(), mImagePath, mImageList);
- 	}
+	}
 
 	private void setRandomImage() {
 		String path;
+
 		do {
 			path = Image.LIST_IMAGE_PATH + "random_list_" + new Random().nextInt(9) + ".png";
 		} while (path.equals(mImagePath));
+
 		mImagePath = path;
 		loadImage();
 	}
@@ -338,7 +339,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	}
 
 	private void deletePhotoFromGallery() {
-		String[] projection = { BaseColumns._ID, MediaStore.Images.ImageColumns.DATE_TAKEN };
+		String[] projection = {BaseColumns._ID, MediaStore.Images.ImageColumns.DATE_TAKEN};
 
 		Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 				projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");

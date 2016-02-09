@@ -14,18 +14,17 @@ public class SettingsDictionaryActivity extends SingleFragmentActivity {
 	@Override
 	protected Fragment getFragment() {
 		Intent intent = getIntent();
-
 		String type = intent.getStringExtra(EXTRA_TYPE);
+		Fragment fragment = null;
 
-		Fragment fr = null;
 		if (type.equals(getString(R.string.settings_key_currency))) {
-			fr = new CurrencyFragment();
-		} else if (type.equals(getString(R.string.setting_key_unit))) {
-			fr = new UnitFragment();
-		} else if (type.equals(getString(R.string.setting_key_category))) {
-			fr = new CategoryFragment();
+			fragment = new CurrencyFragment();
+		} else if (type.equals(getString(R.string.settings_key_unit))) {
+			fragment = new UnitFragment();
+		} else if (type.equals(getString(R.string.settings_key_category))) {
+			fragment = new CategoryFragment();
 		}
 
-		return fr;
+		return fragment;
 	}
 }

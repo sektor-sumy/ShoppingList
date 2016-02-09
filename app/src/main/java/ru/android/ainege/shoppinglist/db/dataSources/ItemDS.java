@@ -17,6 +17,17 @@ public class ItemDS extends GenericDS<Item> {
 		super(context);
 	}
 
+	//for db v1
+	public static ItemCursor getAll(SQLiteDatabase db) {
+		return new ItemDS.ItemCursor(db.query(ItemsTable.TABLE_NAME, null, null,
+				null, null, null, null));
+	}
+
+	@Override
+	public EntityCursor<ItemData> getAll() {
+		return null;
+	}
+
 	public ItemCursor getWithData(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + ItemsTable.TABLE_NAME + ".*, " +
@@ -32,12 +43,6 @@ public class ItemDS extends GenericDS<Item> {
 		return new ItemCursor(cursor);
 	}
 
-	//for db v1
-	public static ItemCursor getAll(SQLiteDatabase db) {
-		return  new ItemDS.ItemCursor(db.query(ItemsTable.TABLE_NAME, null, null,
-				null, null, null, null));
-	}
-
 	public ItemCursor getByName(String name) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(ItemsTable.TABLE_NAME, null, ItemsTable.COLUMN_NAME + " like ?",
@@ -49,43 +54,34 @@ public class ItemDS extends GenericDS<Item> {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("SELECT " + ItemsTable.TABLE_NAME + ".*, " +
 				CategoriesTable.TABLE_NAME + "." + CategoriesTable.COLUMN_COLOR +
-				" FROM " +  ItemsTable.TABLE_NAME +
+				" FROM " + ItemsTable.TABLE_NAME +
 				" INNER JOIN " + ItemDataTable.TABLE_NAME +
 				" ON " + ItemsTable.TABLE_NAME + "." + ItemsTable.COLUMN_ID_DATA + " = " +
 				ItemDataTable.TABLE_NAME + "." + ItemDataTable.COLUMN_ID +
 				" INNER JOIN " + CategoriesTable.TABLE_NAME +
 				" ON " + ItemDataTable.TABLE_NAME + "." + ItemDataTable.COLUMN_ID_CATEGORY + " = " +
 				CategoriesTable.TABLE_NAME + "." + CategoriesTable.COLUMN_ID +
-				" WHERE " +	ItemsTable.COLUMN_NAME + " LIKE '%" + substring + "%'", null);
+				" WHERE " + ItemsTable.COLUMN_NAME + " LIKE '%" + substring + "%'", null);
 		return cursor;
-	}
-
-	public long getIdData(long id) {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(ItemsTable.TABLE_NAME, new String[]{ItemsTable.COLUMN_ID_DATA}, ItemsTable.COLUMN_ID + " = ?",
-				new String[]{id + ""}, null, null, null);
-		cursor.moveToFirst();
-		long idData = cursor.getLong(0);
-		cursor.close();
-		return idData;
 	}
 
 	@Override
 	public int update(Item item) {
-		new ItemDataDS(mContext).update(item.getItemData());
+		new ItemDataDS(mContext).update(new ItemData(item));
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(item);
 		return db.update(ItemsTable.TABLE_NAME, values, ItemsTable.COLUMN_ID + " = ?",
-				new String[]{String.valueOf(item.getId())});
+				new String[]{String.valueOf(item.getIdItemData())});
 	}
 
 	@Override
 	public long add(Item item) {
-		long idData = new ItemDataDS(mContext).add(item.getItemData());
+		long idData = new ItemDataDS(mContext).add(new ItemData(item));
+		item.setIdItemData(idData);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-		ContentValues values = createContentValues(item, idData);
+		ContentValues values = createContentValues(item);
 		return db.insert(ItemsTable.TABLE_NAME, null, values);
 	}
 
@@ -100,12 +96,7 @@ public class ItemDS extends GenericDS<Item> {
 		values.put(ItemsTable.COLUMN_NAME, item.getName());
 		values.put(ItemsTable.COLUMN_DEFAULT_IMAGE_PATH, item.getDefaultImagePath());
 		values.put(ItemsTable.COLUMN_IMAGE_PATH, item.getImagePath());
-		return values;
-	}
-
-	private ContentValues createContentValues(Item item, long id) {
-		ContentValues values = createContentValues(item);
-		values.put(ItemsTable.COLUMN_ID_DATA, id);
+		values.put(ItemsTable.COLUMN_ID_DATA, item.getIdItemData());
 		return values;
 	}
 
@@ -115,37 +106,23 @@ public class ItemDS extends GenericDS<Item> {
 		}
 
 		public Item getEntity() {
-			ItemData data = new ItemData();
-
-			if (getColumnIndex(ItemDataTable.COLUMN_AMOUNT) != -1) {
-				data.setAmount(getDouble(getColumnIndex(ItemDataTable.COLUMN_AMOUNT)));
-			}
-
-			if (getColumnIndex(ItemDataTable.COLUMN_ID_UNIT) != -1) {
-				data.setIdUnit(getLong(getColumnIndex(ItemDataTable.COLUMN_ID_UNIT)));
-			}
-
-			if (getColumnIndex(ItemDataTable.COLUMN_PRICE) != -1) {
-				data.setPrice(getDouble(getColumnIndex(ItemDataTable.COLUMN_PRICE)));
-			}
-
-			if (getColumnIndex(ItemDataTable.COLUMN_ID_CATEGORY) != -1) {
-				data.setIdCategory(getLong(getColumnIndex(ItemDataTable.COLUMN_ID_CATEGORY)));
-			}
-
-			if (getColumnIndex(ItemDataTable.COLUMN_COMMENT) != -1) {
-				data.setComment(getString(getColumnIndex(ItemDataTable.COLUMN_COMMENT)));
-			}
-
 			long id = getLong(getColumnIndex(ItemsTable.COLUMN_ID));
 			String name = getString(getColumnIndex(ItemsTable.COLUMN_NAME));
 			String defaultImagePath = getString(getColumnIndex(ItemsTable.COLUMN_DEFAULT_IMAGE_PATH));
 			String imagePath = getString(getColumnIndex(ItemsTable.COLUMN_IMAGE_PATH));
 			long idData = getLong(getColumnIndex(ItemsTable.COLUMN_ID_DATA));
 
-			data.setId(idData);
+			Item item = new Item(id, name, defaultImagePath, imagePath, idData);
 
-			return new Item(id, name, defaultImagePath, imagePath, data);
+			if (getColumnIndex(ItemDataTable.COLUMN_AMOUNT) != -1) {
+				item.setAmount(getDouble(getColumnIndex(ItemDataTable.COLUMN_AMOUNT)));
+				item.setIdUnit(getLong(getColumnIndex(ItemDataTable.COLUMN_ID_UNIT)));
+				item.setPrice(getDouble(getColumnIndex(ItemDataTable.COLUMN_PRICE)));
+				item.setIdCategory(getLong(getColumnIndex(ItemDataTable.COLUMN_ID_CATEGORY)));
+				item.setComment(getString(getColumnIndex(ItemDataTable.COLUMN_COMMENT)));
+			}
+
+			return item;
 		}
 	}
 }

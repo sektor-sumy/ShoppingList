@@ -20,7 +20,7 @@ public class ListsActivity extends SingleFragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (shouldOpenLastList()){
+		if (shouldOpenLastList()) {
 			openLastList();
 		}
 	}

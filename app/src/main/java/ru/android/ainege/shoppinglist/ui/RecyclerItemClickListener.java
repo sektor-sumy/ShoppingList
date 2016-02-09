@@ -9,7 +9,6 @@ import android.view.View;
 import ru.android.ainege.shoppinglist.R;
 
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
-
 	private final OnItemClickListener mListener;
 	private final GestureDetector mGestureDetector;
 

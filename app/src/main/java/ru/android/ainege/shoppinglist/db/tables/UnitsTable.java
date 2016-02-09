@@ -12,7 +12,6 @@ import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
 public class UnitsTable {
-
 	public static final String TABLE_NAME = "Units";
 
 	public static final String COLUMN_ID = "_id";
@@ -33,8 +32,8 @@ public class UnitsTable {
 		switch (oldVersion) {
 			case 1:
 				HashMap<String, Unit> dictionary = getUnit(db);
-
 				String[] units = ctx.getResources().getStringArray(R.array.units);
+
 				for (String unit : units) {
 					if (!dictionary.containsKey(unit.toLowerCase())) {
 						add(db, unit);
@@ -43,7 +42,7 @@ public class UnitsTable {
 		}
 	}
 
-	public static HashMap<String, Unit> getUnit (SQLiteDatabase db){
+	public static HashMap<String, Unit> getUnit(SQLiteDatabase db) {
 		ArrayList<Unit> unitsDB = UnitsDS.getAll(db).getEntities();
 		HashMap<String, Unit> unit = new HashMap<>();
 

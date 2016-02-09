@@ -44,13 +44,13 @@
 		android:title="@string/settings_category_other">
 		<Preference
 			android:key="@string/settings_key_currency"
-			android:title="@string/setting_title_currency"/>
+			android:title="@string/settings_title_currency"/>
 		<Preference
-			android:key="@string/setting_key_unit"
-			android:title="@string/setting_title_unit"/>
+			android:key="@string/settings_key_unit"
+			android:title="@string/settings_title_unit"/>
 		<Preference
-			android:key="@string/setting_key_category"
-			android:title="@string/setting_title_category"
+			android:key="@string/settings_key_category"
+			android:title="@string/settings_title_category"
 			android:dependency="@string/settings_key_use_category" />
 	</PreferenceCategory>
 </PreferenceScreen>

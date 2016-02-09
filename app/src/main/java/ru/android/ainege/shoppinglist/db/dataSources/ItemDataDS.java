@@ -2,7 +2,6 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
@@ -14,24 +13,9 @@ public class ItemDataDS extends GenericDS<ItemData> {
 		super(context);
 	}
 
-	public boolean isUnitUsed(long idUnit) {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(ItemDataTable.TABLE_NAME, null, ItemDataTable.COLUMN_ID_UNIT + " = " + idUnit,
-				null, null, null, null);
-		ItemDataCursor dataCursor = new ItemDataCursor(cursor);
-		boolean result = dataCursor.getCount() > 0;
-		cursor.close();
-		return result;
-	}
-
-	public boolean isCategoryUsed(long idCategory) {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(ItemDataTable.TABLE_NAME, null, ItemDataTable.COLUMN_ID_CATEGORY + " = " + idCategory,
-				null, null, null, null);
-		ItemDataCursor dataCursor = new ItemDataCursor(cursor);
-		boolean result = dataCursor.getCount() > 0;
-		cursor.close();
-		return result;
+	@Override
+	public EntityCursor<ItemData> getAll() {
+		return null;
 	}
 
 	@Override
@@ -39,10 +23,10 @@ public class ItemDataDS extends GenericDS<ItemData> {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(data);
 		return db.update(ItemDataTable.TABLE_NAME, values, ItemDataTable.COLUMN_ID + " = ?",
-				new String[]{String.valueOf(data.getId())});
+				new String[]{String.valueOf(data.getIdItemData())});
 	}
 
-	public void updateUnit(long oldId, long newId) {
+	public void changeUnit(long oldId, long newId) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(ItemDataTable.COLUMN_ID_UNIT, newId);
@@ -85,22 +69,5 @@ public class ItemDataDS extends GenericDS<ItemData> {
 		}
 
 		return values;
-	}
-
-	public static class ItemDataCursor extends GenericDS.EntityCursor<ItemData> {
-		public ItemDataCursor(Cursor cursor) {
-			super(cursor);
-		}
-
-		public ItemData getEntity() {
-			long id = getLong(getColumnIndex(ItemDataTable.COLUMN_ID));
-			double amount = getDouble(getColumnIndex(ItemDataTable.COLUMN_AMOUNT));
-			long idUnit = getLong(getColumnIndex(ItemDataTable.COLUMN_ID_UNIT));
-			double price = getDouble(getColumnIndex(ItemDataTable.COLUMN_PRICE));
-			long idCategory = getLong(getColumnIndex(ItemDataTable.COLUMN_ID_CATEGORY));
-			String comment = getString(getColumnIndex(ItemDataTable.COLUMN_COMMENT));
-
-			return new ItemData(id, amount, idUnit, price, idCategory, comment);
-		}
 	}
 }

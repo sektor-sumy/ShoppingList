@@ -8,7 +8,6 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.ShoppingListSQLiteHelper;
 
 public class CurrenciesTable {
-
 	public static final String TABLE_NAME = "Currencies";
 
 	public static final String COLUMN_ID = "_id";
@@ -39,5 +38,4 @@ public class CurrenciesTable {
 			db.insert(TABLE_NAME, null, contentValue);
 		}
 	}
-
 }

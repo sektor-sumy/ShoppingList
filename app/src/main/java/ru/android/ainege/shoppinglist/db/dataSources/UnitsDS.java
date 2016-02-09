@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import ru.android.ainege.shoppinglist.db.entities.Unit;
+import ru.android.ainege.shoppinglist.db.tables.ItemDataTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class UnitsDS extends DictionaryDS<Unit> {
@@ -14,17 +15,18 @@ public class UnitsDS extends DictionaryDS<Unit> {
 		super(context);
 	}
 
-	@Override
-	public UnitCursor getAll() {
-		return getAll(mDbHelper.getReadableDatabase());
-	}
-
 	public static UnitCursor getAll(SQLiteDatabase db) {
 		Cursor cursor = db.query(UnitsTable.TABLE_NAME, null, null,
 				null, null, null, UnitsTable.COLUMN_NAME);
 		return new UnitCursor(cursor);
 	}
 
+	@Override
+	public UnitCursor getAll() {
+		return getAll(mDbHelper.getReadableDatabase());
+	}
+
+	@Override
 	public long getRandomId(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(UnitsTable.TABLE_NAME, null, UnitsTable.COLUMN_ID + " != " + id,
@@ -34,6 +36,16 @@ public class UnitsDS extends DictionaryDS<Unit> {
 		long selectedId = unit.getEntity().getId();
 		cursor.close();
 		return selectedId;
+	}
+
+	@Override
+	public boolean isUsed(long idUnit) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(ItemDataTable.TABLE_NAME, null, ItemDataTable.COLUMN_ID_UNIT + " = " + idUnit,
+				null, null, null, null);
+		boolean result = cursor.getCount() > 0;
+		cursor.close();
+		return result;
 	}
 
 	@Override
@@ -51,6 +63,7 @@ public class UnitsDS extends DictionaryDS<Unit> {
 		return db.insert(UnitsTable.TABLE_NAME, null, values);
 	}
 
+	//todo update delete
 	@Override
 	public void delete(long id) {
 		long newId = getRandomId(id);
@@ -58,7 +71,7 @@ public class UnitsDS extends DictionaryDS<Unit> {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.beginTransaction();
 		try {
-			new ItemDataDS(mContext).updateUnit(id, newId);
+			new ItemDataDS(mContext).changeUnit(id, newId);
 
 			db.delete(UnitsTable.TABLE_NAME, UnitsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 			db.setTransactionSuccessful();

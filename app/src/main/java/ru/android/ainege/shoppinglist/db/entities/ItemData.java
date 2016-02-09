@@ -3,49 +3,34 @@ package ru.android.ainege.shoppinglist.db.entities;
 import java.io.Serializable;
 
 public class ItemData implements Serializable {
-	private long mId;
-	private double mAmount;
-	private long mIdUnit;
-	private double mPrice;
-	private long mIdCategory;
-	private String mComment;
-	private Unit mUnit;
-	private Category mCategory;
+	protected long mIdItemData;
+	protected double mAmount;
+	protected long mIdUnit;
+	protected double mPrice;
+	protected long mIdCategory;
+	protected String mComment;
 
-	public ItemData() {}
+	protected Unit mUnit;
+	protected Category mCategory;
 
-	public ItemData(long idUnit, long idCategory) {
-		mIdUnit = idUnit;
-		mIdCategory = idCategory;
+	protected ItemData() {
 	}
 
-	public ItemData(long id, double amount, long idUnit, double price, long idCategory, String comment) {
-		this(idUnit, idCategory);
-		mId = id;
-		mAmount = amount;
-		mPrice = price;
-		mComment = comment;
+	public ItemData(ItemData itemData) {
+		mIdItemData = itemData.getIdItemData();
+		mAmount = itemData.getAmount();
+		mPrice = itemData.getPrice();
+		mComment = itemData.getComment();
+		setUnit(itemData.getUnit());
+		setCategory(itemData.getCategory());
 	}
 
-	public ItemData(double amount, long idUnit, double price, long idCategory, String comment) {
-		this(idUnit, idCategory);
-		mAmount = amount;
-		mPrice = price;
-		mComment = comment;
+	public long getIdItemData() {
+		return mIdItemData;
 	}
 
-	public ItemData(double amount, Unit unit, double price, Category category, String comment) {
-		this(amount, unit.getId(), price, category.getId(), comment);
-		mUnit = unit;
-		mComment = comment;
-	}
-
-	public long getId() {
-		return mId;
-	}
-
-	public void setId(long id) {
-		this.mId = id;
+	public void setIdItemData(long id) {
+		mIdItemData = id;
 	}
 
 	public double getAmount() {
@@ -69,7 +54,7 @@ public class ItemData implements Serializable {
 	}
 
 	public void setPrice(double price) {
-		this.mPrice = price;
+		mPrice = price;
 	}
 
 	public long getIdCategory() {
@@ -94,6 +79,7 @@ public class ItemData implements Serializable {
 
 	public void setUnit(Unit unit) {
 		mUnit = unit;
+
 		if (mUnit != null) {
 			mIdUnit = mUnit.getId();
 		}
@@ -105,6 +91,7 @@ public class ItemData implements Serializable {
 
 	public void setCategory(Category category) {
 		mCategory = category;
+
 		if (mCategory != null) {
 			mIdCategory = mCategory.getId();
 		}

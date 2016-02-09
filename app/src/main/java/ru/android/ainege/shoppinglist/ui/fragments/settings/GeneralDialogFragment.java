@@ -16,13 +16,13 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 
 public abstract class GeneralDialogFragment<T extends Dictionary> extends DialogFragment {
-	static final String ITEM = "item";
+	protected static final String ITEM = "item";
 	private static final String ID_ITEM = "idItem";
 
-	TextInputLayout mNameInputLayout;
-	EditText mName;
+	protected TextInputLayout mNameInputLayout;
+	protected EditText mName;
 
-	T mEditItem;
+	protected T mEditItem;
 
 	protected abstract String getTitle();
 
@@ -55,23 +55,6 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 		return builder.create();
 	}
 
-	View setupView() {
-		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_settings, null);
-
-		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
-		mName = (EditText) v.findViewById(R.id.name);
-
-		return v;
-	}
-
-	void setDataToView() {
-		mEditItem = (T) getArguments().getSerializable(ITEM);
-
-		mName.setText(mEditItem != null ? mEditItem.getName() : null);
-		mName.setSelection(mName.getText().length());
-	}
-
 	@Override
 	public void onStart() {
 		super.onStart();
@@ -94,7 +77,24 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 		});
 	}
 
-	void sendResult(long id) {
+	protected View setupView() {
+		LayoutInflater inflater = getActivity().getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_settings, null);
+
+		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
+		mName = (EditText) v.findViewById(R.id.name);
+
+		return v;
+	}
+
+	protected void setDataToView() {
+		mEditItem = (T) getArguments().getSerializable(ITEM);
+
+		mName.setText(mEditItem != null ? mEditItem.getName() : null);
+		mName.setSelection(mName.getText().length());
+	}
+
+	protected void sendResult(long id) {
 		if (getTargetFragment() == null)
 			return;
 

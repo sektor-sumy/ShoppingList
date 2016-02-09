@@ -8,6 +8,7 @@ public class List implements Serializable {
 	private String mName;
 	private long mIdCurrency;
 	private String mImagePath;
+
 	private ArrayList<ShoppingList> mItemsInList;
 	private Currency mCurrency;
 
@@ -30,7 +31,7 @@ public class List implements Serializable {
 	}
 
 	public void setId(long id) {
-		this.mId = id;
+		mId = id;
 	}
 
 	public String getName() {
@@ -45,16 +46,16 @@ public class List implements Serializable {
 		return mIdCurrency;
 	}
 
-	public void setImagePath(String imagePath) {
-		mImagePath = imagePath;
+	public void setIdCurrency(long id) {
+		mIdCurrency = id;
 	}
 
 	public String getImagePath() {
 		return mImagePath;
 	}
 
-	public void setIdCurrency(long id) {
-		this.mIdCurrency = id;
+	public void setImagePath(String imagePath) {
+		mImagePath = imagePath;
 	}
 
 	public ArrayList<ShoppingList> getItemsInList() {
@@ -62,7 +63,7 @@ public class List implements Serializable {
 	}
 
 	public void setItemsInList(ArrayList<ShoppingList> itemsInList) {
-		this.mItemsInList = itemsInList;
+		mItemsInList = itemsInList;
 	}
 
 	public Currency getCurrency() {
@@ -71,6 +72,7 @@ public class List implements Serializable {
 
 	public void setCurrency(Currency currency) {
 		mCurrency = currency;
+
 		if (mCurrency != null) {
 			mIdCurrency = mCurrency.getId();
 		}
@@ -81,7 +83,7 @@ public class List implements Serializable {
 	}
 
 	public void setAmountBoughtItems(int amountBoughtItems) {
-		this.mAmountBoughtItems = amountBoughtItems;
+		mAmountBoughtItems = amountBoughtItems;
 	}
 
 	public int getAmountItems() {
@@ -89,7 +91,7 @@ public class List implements Serializable {
 	}
 
 	public void setAmountItems(int amountItems) {
-		this.mAmountItems = amountItems;
+		mAmountItems = amountItems;
 	}
 }
 

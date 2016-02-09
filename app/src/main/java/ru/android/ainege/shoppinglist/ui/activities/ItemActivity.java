@@ -4,20 +4,28 @@ import android.app.Fragment;
 import android.content.Intent;
 
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
-import ru.android.ainege.shoppinglist.ui.fragments.AddItemFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.EditItemFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.ItemFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.item.AddItemFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.item.EditItemFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 
 public class ItemActivity extends SingleFragmentActivity {
 	public final static String EXTRA_ID_LIST = "idList";
 	public final static String EXTRA_ITEM = "item";
 
-	OnBackPressedListener mOnBackPressedListener;
+	private OnBackPressedInterface mOnBackPressedListener;
 
 	@Override
 	protected Fragment getFragment() {
 		return createFragment();
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (mOnBackPressedListener != null) {
+			mOnBackPressedListener.onBackPressed();
+		} else {
+			super.onBackPressed();
+		}
 	}
 
 	private Fragment createFragment() {
@@ -34,16 +42,11 @@ public class ItemActivity extends SingleFragmentActivity {
 		}
 
 		mOnBackPressedListener = fragment;
-		
+
 		return fragment;
 	}
 
-	@Override
-	public void onBackPressed() {
-		if (mOnBackPressedListener != null) {
-			mOnBackPressedListener.onBackPressed();
-		} else {
-			super.onBackPressed();
-		}
+	public interface OnBackPressedInterface {
+		void onBackPressed();
 	}
 }

@@ -13,19 +13,18 @@ import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
-import ru.android.ainege.shoppinglist.ui.Image;
+import ru.android.ainege.shoppinglist.util.Image;
 
 public class ItemsTable {
-
 	public static final String TABLE_NAME = "Items";
-
-	private static final String COLUMN_ID_UNIT = "id_unit";
 
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_NAME = "item_name";
-	public static final String COLUMN_IMAGE_PATH = "item_image_path";
+	public static final String COLUMN_IMAGE_PATH = "image_path";
 	public static final String COLUMN_DEFAULT_IMAGE_PATH = "default_image_path";
 	public static final String COLUMN_ID_DATA = "id_data";
+
+	private static final String COLUMN_ID_UNIT = "id_unit";
 
 	private static final int INIT_DATA_NAME = 0;
 	private static final int INIT_DATA_UNIT = 1;
@@ -77,7 +76,7 @@ public class ItemsTable {
 							}
 
 							db.update(ItemsTable.TABLE_NAME, contentValue, ItemsTable.COLUMN_ID + " = ?",
-									new String[]{String.valueOf(item.getId())});
+									new String[]{String.valueOf(item.getIdItemData())});
 						}
 					} else {
 						ContentValues contentValue = new ContentValues();
