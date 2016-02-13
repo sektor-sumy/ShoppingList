@@ -8,7 +8,7 @@ import android.view.View;
 
 import ru.android.ainege.shoppinglist.R;
 
-public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
+public class RecyclerItemClickListener extends RecyclerView.SimpleOnItemTouchListener {
 	private final OnItemClickListener mListener;
 	private final GestureDetector mGestureDetector;
 
@@ -59,16 +59,6 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
 	}
 
 	public interface OnItemClickListener {

@@ -668,25 +668,20 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		@Override
 		public void onBindViewHolder(ViewHolder holder, int position) {
 			Category category = mCategories.get(position);
-
-			if (mIsUseCategory) {
-				holder.mColor.setBackgroundColor(category.getColor());
-				holder.mCategory.setText(category.getName());
-			}
-
-			setRV(category, holder);
-		}
-
-		private void setRV(final Category category, final ViewHolder holder) {
 			ArrayList<ShoppingList> itemsInCategory = category.getItemsByCategoryInList();
+			boolean isAllBought = (category.countBoughtItems() == itemsInCategory.size());
 
 			for (ShoppingList item : itemsInCategory) {
 				dataMap.put(item.getIdItem(), holder);
 			}
 
-			category.calculateSpentSum();
-			updateSpentCategorySum(holder, category.getSpentSum());
-			boolean isAllBought = (category.countBoughtItems() == itemsInCategory.size());
+			if (mIsUseCategory) {
+				holder.mColor.setBackgroundColor(category.getColor());
+				holder.mCategory.setText(category.getName());
+
+				category.calculateSpentSum();
+				holder.updateSpentCategorySum(category.getSpentSum());
+			}
 
 			if (!mIsCollapsedCategory
 					|| (collapseCategoryStates.containsKey(category.getId()) && !collapseCategoryStates.get(category.getId()))
@@ -698,97 +693,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 			}
 
-			holder.mItemsInCategory.setLayoutManager(new LinearLayoutManager(getActivity()));
 			holder.mItemsInCategory.setAdapter(new ItemsAdapter(itemsInCategory));
-			holder.mItemsInCategory.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), holder.mItemsInCategory, new RecyclerItemClickListener.OnItemClickListener() {
-				@Override
-				public void onItemClick(int position) {
-					ItemsAdapter adapter = (ItemsAdapter) holder.mItemsInCategory.getAdapter();
-					ShoppingList item = adapter.getItem(position);
-
-					if (mActionMode != null) {
-						toggleSelection(item);
-						return;
-					}
-
-					Intent i = new Intent(getActivity(), ItemActivity.class);
-					i.putExtra(ItemActivity.EXTRA_ITEM, item);
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						startActivityForResult(i, EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-					} else {
-						startActivityForResult(i, EDIT_ITEM);
-					}
-				}
-
-				@Override
-				public void onItemLongClick(int position) {
-					if (mActionMode != null) {
-						return;
-					}
-
-					mActionMode = getActivity().startActionMode(mActionModeCallback);
-
-					ItemsAdapter adapter = (ItemsAdapter) holder.mItemsInCategory.getAdapter();
-					toggleSelection(adapter.getItem(position));
-				}
-
-				@Override
-				public void onSwipeRight(int position) {
-					if (mActionMode != null) {
-						return;
-					}
-
-					RecyclerView rv = holder.mItemsInCategory;
-					ItemsAdapter adapter = (ItemsAdapter) rv.getAdapter();
-					ShoppingList item = adapter.getItem(position);
-					Category category = item.getCategory();
-					boolean isBought = !item.isBought();
-
-					//update data in db
-					new ShoppingListDS(getActivity()).setIsBought(isBought, item.getIdItem(), mList.getId());
-
-					//update adapter
-					item.setBought(isBought);
-					adapter.notifyItemChanged(position);
-
-					//if set bought items in the end of list - refresh position
-					if (mIsBoughtEndInList) {
-						ShoppingList.sort(adapter.getItems());
-						int toPosition = adapter.getItems().indexOf(item);
-
-						if (toPosition != -1 && position != toPosition) {
-							adapter.notifyItemMoved(position, toPosition);
-							rv.scrollToPosition(toPosition);
-						}
-					}
-
-					//update spent sum
-					double sum = item.getSum();
-					double categorySpentMoney = category.getSpentSum();
-					int boughtItems = category.getBoughtItemsCount();
-
-					if (isBought) {
-						mSaveSpentMoney += sum;
-						category.setSpentSum(categorySpentMoney + sum);
-						category.setBoughtItemsCount(boughtItems++);
-					} else {
-						mSaveSpentMoney -= sum;
-						category.setSpentSum(categorySpentMoney - sum);
-						category.setBoughtItemsCount(boughtItems--);
-					}
-
-					updateSpentSum(mSaveSpentMoney);
-					updateSpentCategorySum(holder, categorySpentMoney);
-
-					//if all items bought in the category - cross off the category else delete cross
-					if (boughtItems == adapter.getItemCount()) {
-						holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-					} else {
-						holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-					}
-				}
-			}));
 		}
 
 		@Override
@@ -885,7 +790,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 					Category category = adapter.getItem(0).getCategory();
 					category.setSpentSum(category.getSpentSum() - item.getSum());
-					updateSpentCategorySum(holder, category.getSpentSum());
+					holder.updateSpentCategorySum(category.getSpentSum());
 
 					ViewGroup.LayoutParams params = rv.getLayoutParams();
 					final int oldHeight = params.height;
@@ -909,11 +814,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					}
 				}
 			}
-		}
-
-		private void updateSpentCategorySum(ViewHolder holder, double sum) {
-			String sumText = localValue(sum) + " " + mCurrencyList;
-			holder.mSumCategory.setText(sumText);
 		}
 
 		@Override
@@ -975,6 +875,104 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						mItemsInCategory.startAnimation(a);
 					}
 				});
+
+				mItemsInCategory.setLayoutManager(new LinearLayoutManager(getActivity()));
+				mItemsInCategory.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsInCategory, new RecyclerItemClickListener.OnItemClickListener() {
+					@Override
+					public void onItemClick(int position) {
+						ItemsAdapter adapter = (ItemsAdapter) mItemsInCategory.getAdapter();
+						ShoppingList item = adapter.getItem(position);
+
+						if (mActionMode != null) {
+							toggleSelection(item);
+							return;
+						}
+
+						Intent i = new Intent(getActivity(), ItemActivity.class);
+						i.putExtra(ItemActivity.EXTRA_ITEM, item);
+
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							startActivityForResult(i, EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+						} else {
+							startActivityForResult(i, EDIT_ITEM);
+						}
+					}
+
+					@Override
+					public void onItemLongClick(int position) {
+						if (mActionMode != null) {
+							return;
+						}
+
+						mActionMode = getActivity().startActionMode(mActionModeCallback);
+
+						ItemsAdapter adapter = (ItemsAdapter) mItemsInCategory.getAdapter();
+						toggleSelection(adapter.getItem(position));
+					}
+
+					@Override
+					public void onSwipeRight(int position) {
+						if (mActionMode != null) {
+							return;
+						}
+
+						ItemsAdapter adapter = (ItemsAdapter) mItemsInCategory.getAdapter();
+						ShoppingList item = adapter.getItem(position);
+						Category category = item.getCategory();
+						boolean isBought = !item.isBought();
+
+						//update data in db
+						new ShoppingListDS(getActivity()).setIsBought(isBought, item.getIdItem(), mList.getId());
+
+						//update adapter
+						item.setBought(isBought);
+						adapter.notifyItemChanged(position);
+
+						//if set bought items in the end of list - refresh position
+						if (mIsBoughtEndInList) {
+							ShoppingList.sort(adapter.getItems());
+							int toPosition = adapter.getItems().indexOf(item);
+
+							if (toPosition != -1 && position != toPosition) {
+								adapter.notifyItemMoved(position, toPosition);
+								mItemsInCategory.scrollToPosition(toPosition);
+							}
+						}
+
+						//update spent sum
+						double sum = item.getSum();
+						double categorySpentMoney = category.getSpentSum();
+						int boughtItems = category.getBoughtItemsCount();
+
+						if (isBought) {
+							mSaveSpentMoney += sum;
+							category.setSpentSum(categorySpentMoney + sum);
+							category.setBoughtItemsCount(++boughtItems);
+						} else {
+							mSaveSpentMoney -= sum;
+							category.setSpentSum(categorySpentMoney - sum);
+							category.setBoughtItemsCount(--boughtItems);
+						}
+
+						updateSpentSum(mSaveSpentMoney);
+						updateSpentCategorySum(categorySpentMoney);
+
+						//if all items bought in the category - cross off the category else delete cross
+						if (boughtItems == adapter.getItemCount()) {
+							mCategory.setPaintFlags(mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+						} else {
+							mCategory.setPaintFlags(mCategory.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+						}
+					}
+				}));
+
+			}
+
+
+
+			private void updateSpentCategorySum(double sum) {
+				String sumText = localValue(sum) + " " + mCurrencyList;
+				mSumCategory.setText(sumText);
 			}
 		}
 

@@ -66,6 +66,8 @@ public class Category extends Dictionary {
 	}
 
 	public int countBoughtItems() {
+		mBoughtItemsCount = 0;
+
 		for (ShoppingList item : mItemsByCategoriesInList) {
 			if (item.isBought()) {
 				mBoughtItemsCount++;
