@@ -1,60 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/category_container"
 	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:background="@drawable/statelist_item_selection">
+	android:layout_height="@dimen/row_list_category_height"
+	android:background="@drawable/statelist_item_selection"
+	android:orientation="horizontal"
+	android:paddingLeft="@dimen/padding_16dp"
+	android:paddingRight="@dimen/padding_16dp"
+	android:paddingTop="@dimen/padding_4dp">
 
-	<LinearLayout
-		android:layout_width="match_parent"
+	<TextView
+		android:id="@+id/color"
+		android:layout_width="5dp"
+		android:layout_height="match_parent"
+		android:layout_marginRight="@dimen/padding_8dp"
+		android:background="@android:color/transparent"/>
+
+	<TextView
+		android:id="@+id/category"
+		android:layout_width="0dp"
 		android:layout_height="wrap_content"
-		android:layout_gravity="center_horizontal|bottom"
-		android:orientation="vertical"
-		android:paddingTop="@dimen/padding_4dp"
-		android:paddingBottom="@dimen/padding_4dp">
+		android:layout_gravity="center_vertical"
+		android:layout_marginRight="@dimen/padding_8dp"
+		android:layout_weight="0.6"
+		android:paddingBottom="@dimen/padding_4dp"
+		android:singleLine="true"
+		android:textColor="@android:color/black"
+		android:textSize="18sp"/>
 
-		<LinearLayout
-			android:id="@+id/category_container"
-			android:orientation="horizontal"
-			android:layout_width="match_parent"
-			android:layout_height="@dimen/row_list_category_height"
-			android:paddingLeft="@dimen/padding_16dp"
-			android:paddingRight="@dimen/padding_16dp">
+	<TextView
+		android:id="@+id/sum_category"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical"
+		android:layout_weight="0.4"
+		android:gravity="right"
+		android:paddingBottom="@dimen/padding_4dp"
+		android:singleLine="true"/>
 
-			<TextView
-				android:id="@+id/color"
-				android:layout_width="5dp"
-				android:layout_height="match_parent"
-				android:background="@android:color/transparent"
-				android:layout_marginRight="@dimen/padding_8dp"/>
-
-			<TextView
-				android:id="@+id/category"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center_vertical"
-				android:textColor="@android:color/black"
-				android:textSize="18sp"
-				android:singleLine="true"
-				android:layout_weight="0.6"
-				android:layout_marginRight="@dimen/padding_8dp"/>
-
-			<TextView
-				android:id="@+id/sum_category"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center_vertical"
-				android:gravity="right"
-				android:singleLine="true"
-				android:layout_weight="0.4"/>
-
-		</LinearLayout>
-
-		<android.support.v7.widget.RecyclerView
-			android:id="@+id/items_in_category"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
-
-	</LinearLayout>
-
-</FrameLayout>
+</LinearLayout>

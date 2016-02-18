@@ -18,14 +18,15 @@
 			android:layout_width="5dp"
 			android:layout_height="match_parent"
 			android:background="@android:color/transparent"
-			android:layout_marginRight="12dp"/>
+			android:layout_marginRight="@dimen/padding_8dp"
+			android:visibility="gone"/>
 
 		<ImageView
 			android:id="@+id/item_image_list"
 			android:layout_width="@dimen/avatar_hw"
 			android:layout_height="@dimen/avatar_hw"
 			android:scaleType="centerCrop"
-			android:layout_marginRight="@dimen/padding_12dp"/>
+			android:layout_marginRight="@dimen/padding_8dp"/>
 
 		<TextView
 			android:id="@+id/item_name_list"

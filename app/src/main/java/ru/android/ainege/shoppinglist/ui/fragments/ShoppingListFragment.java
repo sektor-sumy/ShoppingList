@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,7 +20,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
-import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,22 +27,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.adapter.ShoppingListAdapter;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
@@ -52,17 +44,15 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingList
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.util.Image;
-import ru.android.ainege.shoppinglist.util.Showcase;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
 import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 
 
-public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
 	private static final String ID_LIST = "idList";
@@ -80,7 +70,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private List mList;
 
 	private ArrayList<Category> mCategories = new ArrayList<>();
-	private HashMap<Long, Boolean> collapseCategoryStates = new HashMap<>();
+	//private HashMap<Long, Boolean> collapseCategoryStates = new HashMap<>();
 	private double mSaveSpentMoney = 0;
 	private double mSaveTotalMoney = 0;
 
@@ -92,7 +82,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private ImageView mEmptyImage;
 	private LinearLayout mListContainer;
 	private ProgressBar mProgressBar;
-	private CategoriesAdapter mAdapterRV;
+	private ShoppingListAdapter mAdapterRV;
 
 	private SharedPreferences mSharedPref;
 	private boolean mIsUpdateData = false;
@@ -100,7 +90,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private boolean mIsUseCategory;
 	private boolean mIsCollapsedCategory = false;
 
-	private android.view.ActionMode mActionMode;
+	//<editor-fold desc="Удалениие - ActionMode -">
+	/*private android.view.ActionMode mActionMode;
 	private final ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
 		@Override
@@ -139,11 +130,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			mFAB.setVisibility(View.VISIBLE);
 			mActionMode = null;
 		}
-	};
-
-	private ShowcaseView showcaseView;
+	};*/
+	//</editor-fold>
+	//<editor-fold desc="Обучение -">
+	/*private ShowcaseView showcaseView;
 	private int counter = 1;
-	private View mView;
+	private View mView;*/
+	//</editor-fold>
 
 	public static ShoppingListFragment newInstance(long id) {
 		Bundle args = new Bundle();
@@ -190,10 +183,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				getActivity().onBackPressed();
 			}
 		});
-		setTitle();
 
 		mListImage = (ImageView) v.findViewById(R.id.appbar_image);
-		loadImage();
 
 		mFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
 		mFAB.setOnClickListener(new View.OnClickListener() {
@@ -219,10 +210,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-		mAdapterRV = new CategoriesAdapter(mList.getCurrency().getSymbol());
+		mAdapterRV = new ShoppingListAdapter(getActivity());
 		mItemsListRV.setAdapter(mAdapterRV);
 
-		showCaseView();
+		//showCaseView();
+		setListData();
 
 		return v;
 	}
@@ -278,21 +270,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		mIsUpdateData = true;
-
-		if (key.equals(getString(R.string.settings_key_sort_is_bought))) {
-			readIsBoughtSetting();
-		} else if (key.equals(getString(R.string.settings_key_use_category))) {
-			readCategorySetting();
-		} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
-			readCollapseCategorySetting();
-		} else if (key.equals(getString(R.string.settings_key_sort_type))) {
-			readSortTypeSetting();
-		}
-	}
-
-	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) return;
 
@@ -313,45 +290,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				break;
 			case EDIT_LIST:
 				getList(getArguments().getLong(ID_LIST));
-				loadImage();
-				setTitle();
+				setListData();
 				updateSums(mSaveSpentMoney, mSaveTotalMoney);
-				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
+				//mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
 				break;
 		}
 	}
 
-	@Override
-	public void onClick(View v) {
-		CategoriesAdapter.ViewHolder categoryHolder = (CategoriesAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
-		CategoriesAdapter.ItemsAdapter.ViewHolder holder = (CategoriesAdapter.ItemsAdapter.ViewHolder) categoryHolder.mItemsInCategory.findViewHolderForLayoutPosition(0);
-
-		switch (counter) {
-			case 1:
-				showcaseView.setShowcase(new ViewTarget(mView), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_swipe_item));
-				showcaseView.setContentText(getString(R.string.showcase_swipe_item_desc));
-				break;
-			case 2:
-				holder.mIsBought.setVisibility(View.VISIBLE);
-				showcaseView.setShowcase(new ViewTarget(mView), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_unswipe_item));
-				showcaseView.setContentText(getString(R.string.showcase_unswipe_item_desc));
-				break;
-			case 3:
-				holder.mIsBought.setVisibility(View.GONE);
-				showcaseView.setShowcase(new ViewTarget(mView), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_delete_item));
-				showcaseView.setContentText(getString(R.string.showcase_delete_item_desc));
-				showcaseView.setButtonText(getString(R.string.close));
-				break;
-			case 4:
-				showcaseView.hide();
-				break;
-		}
-		counter++;
-	}
-
+	//<editor-fold desc="Загрузчик">
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		Loader<Cursor> loader = null;
@@ -385,7 +331,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						mCategories = categories;
 					}
 
-					mAdapterRV.setCurrency(mList.getCurrency().getSymbol());     //update data in adapter
+					mAdapterRV.setData(mCategories, mList.getCurrency().getSymbol(), mIsUseCategory);     //update data in adapter
 
 					updateSums();
 					hideEmptyStates();
@@ -409,13 +355,25 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	}
 
-	//todo fix open actionMode
 	private void updateData() {
-		if (mActionMode != null) {
-			mActionMode.finish();
-		}
-
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
+	}
+	//</editor-fold>
+
+	//<editor-fold desc="Настройки">
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		mIsUpdateData = true;
+
+		if (key.equals(getString(R.string.settings_key_sort_is_bought))) {
+			readIsBoughtSetting();
+		} else if (key.equals(getString(R.string.settings_key_use_category))) {
+			readCategorySetting();
+		} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
+			readCollapseCategorySetting();
+		} else if (key.equals(getString(R.string.settings_key_sort_type))) {
+			readSortTypeSetting();
+		}
 	}
 
 	private void readSettings() {
@@ -459,7 +417,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		ShoppingList.setSortSettings(sortType);
 	}
+	//</editor-fold>
 
+	//<editor-fold desc="Настройка списка">
 	private void getList(long idList) {
 		ListCursor cursor = mListsDS.get(idList);
 
@@ -469,6 +429,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		cursor.close();
 	}
+
+	private void setListData() {
+		setTitle();
+		loadImage();
+	}
+
+	private void setTitle() {
+		mToolbarLayout.setTitle(mList.getName());
+	}
+
+	private void loadImage() {
+		Image.create().insertImageToView(getActivity(),
+				mList.getImagePath(),
+				mListImage);
+	}
+	//</editor-fold>
 
 	private void saveId(long id) {
 		SharedPreferences mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
@@ -483,23 +459,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		editor.apply();
 	}
 
-	private void setTitle() {
-		mToolbarLayout.setTitle(mList.getName());
-	}
-
-	private void loadImage() {
-		Image.create().insertImageToView(getActivity(),
-				mList.getImagePath(),
-				mListImage);
-	}
-
 	private void showEmptyStates() {
 		mListContainer.setVisibility(View.GONE);
 		mEmptyImage.setVisibility(View.VISIBLE);
 
-		if (mActionMode != null) {
+		/*if (mActionMode != null) {
 			mActionMode.finish();
-		}
+		}*/
 	}
 
 	private void hideEmptyStates() {
@@ -507,7 +473,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mEmptyImage.setVisibility(View.GONE);
 	}
 
-	private void deleteSelectedItems() {
+	//<editor-fold desc="Удаление -">
+	/*private void deleteSelectedItems() {
 		ArrayList<ShoppingList> items = mAdapterRV.getSelectedItems();
 
 		for (ShoppingList item : items) {
@@ -523,8 +490,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		} else {
 			showEmptyStates();
 		}
-	}
+	}*/
+	//</editor-fold>
 
+	//<editor-fold desc="Сумма списка">
 	private void updateSums() {
 		updateSums(sumSpentMoney(), sumTotalMoney());
 	}
@@ -569,8 +538,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mSaveSpentMoney = sum;
 		return sum;
 	}
+	//</editor-fold>
 
-	private Animation getAnimationRV(final RecyclerView rv, final int oldHeight, final int newHeight, final boolean isUp) {
+	//<editor-fold desc="Анимация -">
+	/*private Animation getAnimationRV(final RecyclerView rv, final int oldHeight, final int newHeight, final boolean isUp) {
 		Animation a = new Animation() {
 			@Override
 			protected void applyTransformation(float interpolatedTime, Transformation t) {
@@ -590,9 +561,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		a.setDuration(500);
 
 		return a;
-	}
+	}*/
+	//</editor-fold>
 
-	private void showCaseView() {
+	//<editor-fold desc="Обучение -">
+	/*private void showCaseView() {
 		ShowcaseView showcaseView = new ShowcaseView.Builder(getActivity())
 				.setTarget(new ViewTarget(mFAB))
 				.setContentTitle(getString(R.string.showcase_create_item))
@@ -622,6 +595,39 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
 	}
 
+
+	@Override
+	public void onClick(View v) {
+		CategoriesAdapter.ViewHolder categoryHolder = (CategoriesAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
+		CategoriesAdapter.ItemsAdapter.ViewHolder holder = (CategoriesAdapter.ItemsAdapter.ViewHolder) categoryHolder.mItemsInCategory.findViewHolderForLayoutPosition(0);
+
+		switch (counter) {
+			case 1:
+				showcaseView.setShowcase(new ViewTarget(mView), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_swipe_item));
+				showcaseView.setContentText(getString(R.string.showcase_swipe_item_desc));
+				break;
+			case 2:
+				holder.mIsBought.setVisibility(View.VISIBLE);
+				showcaseView.setShowcase(new ViewTarget(mView), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_unswipe_item));
+				showcaseView.setContentText(getString(R.string.showcase_unswipe_item_desc));
+				break;
+			case 3:
+				holder.mIsBought.setVisibility(View.GONE);
+				showcaseView.setShowcase(new ViewTarget(mView), true);
+				showcaseView.setContentTitle(getString(R.string.showcase_delete_item));
+				showcaseView.setContentText(getString(R.string.showcase_delete_item_desc));
+				showcaseView.setButtonText(getString(R.string.close));
+				break;
+			case 4:
+				showcaseView.hide();
+				break;
+		}
+		counter++;
+	}*/
+	//</editor-fold>
+
 	private static class ItemsInListCursorLoader extends CursorLoader {
 		private final Context mContext;
 		private final long mIdList;
@@ -645,7 +651,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	}
 
-	public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
+	//<editor-fold desc="Адаптер -">
+	/*public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
 		private final ArrayList<ShoppingList> mSelectedItems = new ArrayList<>();
 		private HashMap<Long, ViewHolder> dataMap = new HashMap<>();
 		private String mCurrencyList;
@@ -1070,5 +1077,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				}
 			}
 		}
-	}
+	}*/
+	//</editor-fold>
 }
