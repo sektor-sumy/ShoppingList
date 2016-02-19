@@ -27,16 +27,18 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	private List<Object> mItemList = new ArrayList<>();
 
 	private Context mContext;
-	private boolean mIsUseCategory;
 	private String mCurrency;
+	private boolean mIsUseCategory;
+	private boolean mIsCollapsedCategory;
 
 	public ShoppingListAdapter(Context context) {
 		mContext = context;
 	}
 
-	public void setData(List<Category> categoryList, String currency, boolean isUseCategory) {
+	public void setData(List<Category> categoryList, String currency, boolean isUseCategory, boolean isCollapsedCategory) {
 		mCurrency = currency;
 		mIsUseCategory = isUseCategory;
+		mIsCollapsedCategory = isCollapsedCategory;
 		mItemList = generateParentChildItemList(categoryList);
 
 		notifyDataSetChanged();
@@ -80,15 +82,17 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		Object listItem = getListItem(position);
 		if (listItem instanceof Category) {
 			CategoryViewHolder categoryViewHolder = (CategoryViewHolder) holder;
-			categoryViewHolder.setMainItemClickToExpand();
 
-			if (isAllItemsBoughtInCategory((Category) listItem)){
-				categoryViewHolder.setExpanded(false);
-				categoryViewHolder.mCategory.setPaintFlags(categoryViewHolder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-			} else {
-				categoryViewHolder.setExpanded(true);
+			if (mIsCollapsedCategory) {
+				categoryViewHolder.setMainItemClickToExpand();
+
+				if (isAllItemsBoughtInCategory((Category) listItem)) {
+					categoryViewHolder.setExpanded(false);
+					categoryViewHolder.mCategory.setPaintFlags(categoryViewHolder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+				} else {
+					categoryViewHolder.setExpanded(true);
+				}
 			}
-
 
 			onBindCategoryViewHolder(categoryViewHolder, position, (Category) listItem);
 		} else if (listItem instanceof ShoppingList) {

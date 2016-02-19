@@ -331,7 +331,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						mCategories = categories;
 					}
 
-					mAdapterRV.setData(mCategories, mList.getCurrency().getSymbol(), mIsUseCategory);     //update data in adapter
+					mAdapterRV.setData(mCategories, mList.getCurrency().getSymbol(), mIsUseCategory, mIsCollapsedCategory);     //update data in adapter
 
 					updateSums();
 					hideEmptyStates();
