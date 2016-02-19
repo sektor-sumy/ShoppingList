@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.adapter;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,7 +79,18 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 		Object listItem = getListItem(position);
 		if (listItem instanceof Category) {
-			onBindCategoryViewHolder((CategoryViewHolder) holder, position, (Category) listItem);
+			CategoryViewHolder categoryViewHolder = (CategoryViewHolder) holder;
+			categoryViewHolder.setMainItemClickToExpand();
+
+			if (isAllItemsBoughtInCategory((Category) listItem)){
+				categoryViewHolder.setExpanded(false);
+				categoryViewHolder.mCategory.setPaintFlags(categoryViewHolder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			} else {
+				categoryViewHolder.setExpanded(true);
+			}
+
+
+			onBindCategoryViewHolder(categoryViewHolder, position, (Category) listItem);
 		} else if (listItem instanceof ShoppingList) {
 			onBindItemViewHolder((ItemViewHolder) holder, position, (ShoppingList) listItem);
 		} else {
@@ -181,11 +193,17 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		return nf.format(value);
 	}
 
+	private boolean isAllItemsBoughtInCategory(Category category){
+		return (category.countBoughtItems() == category.getItemsByCategoryInList().size());
+	}
+
 	private class CategoryViewHolder extends RecyclerView.ViewHolder {
 		public LinearLayout mCategoryContainer;
 		public TextView mColor;
 		public TextView mCategory;
 		public TextView mSumCategory;
+
+		private boolean mIsExpanded = true;
 
 		public CategoryViewHolder(View v) {
 			super(v);
@@ -194,6 +212,59 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 			mCategory = (TextView) v.findViewById(R.id.category);
 			mSumCategory = (TextView) v.findViewById(R.id.sum_category);
 		}
+
+		//<editor-fold desc="Extend/collapse category">
+		public boolean isExpanded() {
+			return mIsExpanded;
+		}
+
+		public void setExpanded(boolean expanded) {
+			mIsExpanded = expanded;
+		}
+
+		public void setMainItemClickToExpand() {
+			itemView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (mIsExpanded) {
+						collapseCategory();
+					} else {
+						extendCategory();
+					}
+				}
+			});
+		}
+
+		private void collapseCategory() {
+			setExpanded(false);
+
+			Category category = (Category) getListItem(getAdapterPosition());
+			int categoryPosition = getAdapterPosition();
+			List<ShoppingList> itemInList = category.getItemsByCategoryInList();
+
+			if (itemInList != null) {
+				for (int i = itemInList.size() - 1; i >= 0; i--) {
+					mItemList.remove(categoryPosition + i + 1);
+					notifyItemRemoved(categoryPosition + i + 1);
+				}
+			}
+		}
+
+		private void extendCategory(){
+			setExpanded(true);
+
+			Category category = (Category) getListItem(getAdapterPosition());
+			int categoryPosition = getAdapterPosition();
+			List<ShoppingList> itemInList = category.getItemsByCategoryInList();
+
+			if (itemInList != null) {
+				for (int i = 0; i < itemInList.size(); i++) {
+					mItemList.add(categoryPosition + i + 1, itemInList.get(i));
+					notifyItemInserted(categoryPosition + i + 1);
+				}
+			}
+		}
+		//</editor-fold>
 	}
 
 	private class ItemViewHolder extends RecyclerView.ViewHolder {
