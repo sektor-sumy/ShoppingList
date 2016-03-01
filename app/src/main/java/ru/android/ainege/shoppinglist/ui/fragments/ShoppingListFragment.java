@@ -44,6 +44,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingList
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.util.Image;
@@ -212,6 +213,36 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 		mAdapterRV = new ShoppingListAdapter(getActivity());
 		mItemsListRV.setAdapter(mAdapterRV);
+		mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
+			@Override
+			public void onClick(int position) {
+				Object item = mAdapterRV.getListItem(position);
+
+				if (item instanceof ShoppingList) {
+					onItemClick((ShoppingList) item);
+				} else if (item instanceof Category && mIsCollapsedCategory) {
+					mAdapterRV.setOnclick(mItemsListRV.findViewHolderForAdapterPosition(position), position);
+				}
+			}
+
+			@Override
+			public void onLongClick(int position) {
+				Object item = mAdapterRV.getListItem(position);
+
+				if (item instanceof ShoppingList) {
+					onItemLongClick((ShoppingList) item);
+				}
+			}
+
+			@Override
+			public void onSwipeRight(int position) {
+				Object item = mAdapterRV.getListItem(position);
+
+				if (item instanceof ShoppingList) {
+					onItemSwipeRight((ShoppingList) item, position);
+				}
+			}
+		}));
 
 		//showCaseView();
 		setListData();
@@ -471,6 +502,68 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private void hideEmptyStates() {
 		mListContainer.setVisibility(View.VISIBLE);
 		mEmptyImage.setVisibility(View.GONE);
+	}
+
+	private void onItemClick(ShoppingList itemInList){
+		Intent i = new Intent(getActivity(), ItemActivity.class);
+		i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			startActivityForResult(i, EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+		} else {
+			startActivityForResult(i, EDIT_ITEM);
+		}
+	}
+
+	private void onItemLongClick(ShoppingList itemInList) {
+
+	}
+
+	private void onItemSwipeRight(ShoppingList itemInList, int position) {
+		int categoryPosition = mAdapterRV.mItemList.indexOf(itemInList.getCategory());
+		Category category = itemInList.getCategory();
+		boolean isBought = !itemInList.isBought();
+
+		//update data in db
+		new ShoppingListDS(getActivity()).setIsBought(isBought, itemInList.getIdItem(), mList.getId());
+
+		//update adapter
+		itemInList.setBought(isBought);
+		mAdapterRV.notifyItemChanged(position);
+
+		//if set bought items in the end of list - refresh position
+		if (mIsBoughtEndInList) {
+			int oldPositionInCategory = category.getItemsByCategoryInList().indexOf(itemInList);
+			ShoppingList.sort(category.getItemsByCategoryInList());
+			int newPositionInCategory = category.getItemsByCategoryInList().indexOf(itemInList);
+			int toPosition = position + (newPositionInCategory - oldPositionInCategory);
+
+			mAdapterRV.mItemList.remove(itemInList);
+			mAdapterRV.mItemList.add(toPosition, itemInList);
+
+			if (toPosition != -1 && position != toPosition) {
+				mAdapterRV.notifyItemMoved(position, toPosition);
+				mItemsListRV.scrollToPosition(toPosition);
+			}
+		}
+
+		//update spent sum
+		double sum = itemInList.getSum();
+		double categorySpentMoney = category.getSpentSum();
+		int boughtItems = category.getBoughtItemsCount();
+
+		if (isBought) {
+			mSaveSpentMoney += sum;
+			category.setSpentSum(categorySpentMoney + sum);
+			category.setBoughtItemsCount(++boughtItems);
+		} else {
+			mSaveSpentMoney -= sum;
+			category.setSpentSum(categorySpentMoney - sum);
+			category.setBoughtItemsCount(--boughtItems);
+		}
+
+		updateSpentSum(mSaveSpentMoney);
+		mAdapterRV.notifyItemChanged(categoryPosition);
 	}
 
 	//<editor-fold desc="Удаление -">

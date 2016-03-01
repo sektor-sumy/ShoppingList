@@ -27,7 +27,7 @@ public class RecyclerItemClickListener extends RecyclerView.SimpleOnItemTouchLis
 				View childView = recyclerView.findChildViewUnder(e.getX(), e.getY());
 
 				if (childView != null && mListener != null) {
-					mListener.onItemLongClick(recyclerView.getChildAdapterPosition(childView));
+					mListener.onLongClick(recyclerView.getChildAdapterPosition(childView));
 				}
 			}
 
@@ -55,16 +55,16 @@ public class RecyclerItemClickListener extends RecyclerView.SimpleOnItemTouchLis
 		View childView = rv.findChildViewUnder(e.getX(), e.getY());
 
 		if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-			mListener.onItemClick(rv.getChildAdapterPosition(childView));
+			mListener.onClick(rv.getChildAdapterPosition(childView));
 			return true;
 		}
 		return false;
 	}
 
 	public interface OnItemClickListener {
-		void onItemClick(int position);
+		void onClick(int position);
 
-		void onItemLongClick(int position);
+		void onLongClick(int position);
 
 		void onSwipeRight(int position);
 	}

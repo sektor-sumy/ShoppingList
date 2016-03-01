@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ru.android.ainege.shoppinglist.R;
@@ -24,7 +25,8 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	private static final int TYPE_CATEGORY = 0;
 	private static final int TYPE_ITEM = 1;
 
-	private List<Object> mItemList = new ArrayList<>();
+	public List<Object> mItemList = new ArrayList<>();
+	private HashMap<Long, Boolean> collapseCategoryStates = new HashMap<>();
 
 	private Context mContext;
 	private String mCurrency;
@@ -82,18 +84,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		Object listItem = getListItem(position);
 		if (listItem instanceof Category) {
 			CategoryViewHolder categoryViewHolder = (CategoryViewHolder) holder;
-
-			if (mIsCollapsedCategory) {
-				categoryViewHolder.setMainItemClickToExpand();
-
-				if (isAllItemsBoughtInCategory((Category) listItem)) {
-					categoryViewHolder.setExpanded(false);
-					categoryViewHolder.mCategory.setPaintFlags(categoryViewHolder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-				} else {
-					categoryViewHolder.setExpanded(true);
-				}
-			}
-
+			categoryViewHolder.setCollapsed(collapseCategoryStates.get(((Category) listItem).getId()));
 			onBindCategoryViewHolder(categoryViewHolder, position, (Category) listItem);
 		} else if (listItem instanceof ShoppingList) {
 			onBindItemViewHolder((ItemViewHolder) holder, position, (ShoppingList) listItem);
@@ -107,6 +98,12 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 			holder.mCategoryContainer.setVisibility(View.VISIBLE);
 			holder.mColor.setBackgroundColor(category.getColor());
 			holder.mCategory.setText(category.getName());
+
+			if (isAllItemsBoughtInCategory(category)) {
+				holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			} else {
+				holder.mCategory.setPaintFlags(holder.mCategory.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+			}
 
 			category.calculateSpentSum();
 			holder.mSumCategory.setText(getValueWithCurrency(category.getSpentSum()));
@@ -156,34 +153,84 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		return mItemList.size();
 	}
 
-	private Object getListItem(int position) {
+	public Object getListItem(int position) {
 		return mItemList.get(position);
 	}
 
+	//<editor-fold desc="Extend/collapse category">
+	public void setOnclick(RecyclerView.ViewHolder holder, int position) {
+		CategoryViewHolder categoryHolder = (CategoryViewHolder) holder;
+		Category category = (Category) getListItem(position);
+
+		if (categoryHolder.isCollapsed()) {
+			categoryHolder.setCollapsed(false);
+			collapseCategoryStates.put(category.getId(), false);
+			extendCategory(category, position);
+		} else {
+			categoryHolder.setCollapsed(true);
+			collapseCategoryStates.put(category.getId(), true);
+			collapseCategory(category, position);
+		}
+	}
+
+	private void collapseCategory(Category category, int position) {
+		List<ShoppingList> itemInList = category.getItemsByCategoryInList();
+
+		if (itemInList != null) {
+			for (int i = itemInList.size(); i > 0; i--) {
+				mItemList.remove(position + i);
+				notifyItemRemoved(position + i);
+			}
+		}
+	}
+
+	private void extendCategory(Category category, int position){
+		List<ShoppingList> itemInList = category.getItemsByCategoryInList();
+
+		if (itemInList != null) {
+			for (int i = 0; i < itemInList.size(); i++) {
+				mItemList.add(position + i + 1, itemInList.get(i));
+				notifyItemInserted(position + i + 1);
+			}
+		}
+	}
+	//</editor-fold>
+
 	//преобразует исходный список в список для работы с адаптером
 	private List<Object> generateParentChildItemList(List<Category> categoryList) {
-		List<Object> parentWrapperList = new ArrayList<>();
-		Category parentWrapper;
+		List<Object> list = new ArrayList<>();
+		Category category;
 
 		if (mIsUseCategory) {
 			for (int i = 0; i < categoryList.size(); i++) {
-				parentWrapper = categoryList.get(i);
-				parentWrapperList.add(parentWrapper);
+				category = categoryList.get(i);
+				list.add(category);
+				boolean isCollapsed = true;
 
-				int childListItemCount = parentWrapper.getItemsByCategoryInList().size();
-				for (int j = 0; j < childListItemCount; j++) {
-					parentWrapperList.add(parentWrapper.getItemsByCategoryInList().get(j));
+				if (!mIsCollapsedCategory ||
+						(mIsCollapsedCategory &&
+								!collapseCategoryStates.containsKey(category.getId()) &&
+								!isAllItemsBoughtInCategory(category)) ||
+						(mIsCollapsedCategory && collapseCategoryStates.containsKey(category.getId()) &&
+								!collapseCategoryStates.get(category.getId()))) {
+					isCollapsed = false;
+					int childListItemCount = category.getItemsByCategoryInList().size();
+					for (int j = 0; j < childListItemCount; j++) {
+						list.add(category.getItemsByCategoryInList().get(j));
+					}
 				}
+
+				collapseCategoryStates.put(category.getId(), isCollapsed);
 			}
 		} else {
-			parentWrapper = categoryList.get(0);
-			int childListItemCount = parentWrapper.getItemsByCategoryInList().size();
+			category = categoryList.get(0);
+			int childListItemCount = category.getItemsByCategoryInList().size();
 			for (int j = 0; j < childListItemCount; j++) {
-				parentWrapperList.add(parentWrapper.getItemsByCategoryInList().get(j));
+				list.add(category.getItemsByCategoryInList().get(j));
 			}
 		}
 
-		return parentWrapperList;
+		return list;
 	}
 
 	private String getValueWithCurrency(double value) {
@@ -197,7 +244,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		return nf.format(value);
 	}
 
-	private boolean isAllItemsBoughtInCategory(Category category){
+	public boolean isAllItemsBoughtInCategory(Category category){
 		return (category.countBoughtItems() == category.getItemsByCategoryInList().size());
 	}
 
@@ -207,7 +254,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		public TextView mCategory;
 		public TextView mSumCategory;
 
-		private boolean mIsExpanded = true;
+		private boolean mIsCollapsed = false;
 
 		public CategoryViewHolder(View v) {
 			super(v);
@@ -217,58 +264,13 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 			mSumCategory = (TextView) v.findViewById(R.id.sum_category);
 		}
 
-		//<editor-fold desc="Extend/collapse category">
-		public boolean isExpanded() {
-			return mIsExpanded;
+		public boolean isCollapsed() {
+			return mIsCollapsed;
 		}
 
-		public void setExpanded(boolean expanded) {
-			mIsExpanded = expanded;
+		public void setCollapsed(boolean collapsed) {
+			mIsCollapsed = collapsed;
 		}
-
-		public void setMainItemClickToExpand() {
-			itemView.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if (mIsExpanded) {
-						collapseCategory();
-					} else {
-						extendCategory();
-					}
-				}
-			});
-		}
-
-		private void collapseCategory() {
-			setExpanded(false);
-
-			Category category = (Category) getListItem(getAdapterPosition());
-			int categoryPosition = getAdapterPosition();
-			List<ShoppingList> itemInList = category.getItemsByCategoryInList();
-
-			if (itemInList != null) {
-				for (int i = itemInList.size() - 1; i >= 0; i--) {
-					mItemList.remove(categoryPosition + i + 1);
-					notifyItemRemoved(categoryPosition + i + 1);
-				}
-			}
-		}
-
-		private void extendCategory(){
-			setExpanded(true);
-
-			Category category = (Category) getListItem(getAdapterPosition());
-			int categoryPosition = getAdapterPosition();
-			List<ShoppingList> itemInList = category.getItemsByCategoryInList();
-
-			if (itemInList != null) {
-				for (int i = 0; i < itemInList.size(); i++) {
-					mItemList.add(categoryPosition + i + 1, itemInList.get(i));
-					notifyItemInserted(categoryPosition + i + 1);
-				}
-			}
-		}
-		//</editor-fold>
 	}
 
 	private class ItemViewHolder extends RecyclerView.ViewHolder {
