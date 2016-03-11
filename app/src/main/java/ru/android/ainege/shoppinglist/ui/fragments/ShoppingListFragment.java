@@ -349,7 +349,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				}
 
 				if (data.moveToFirst()) {
-					ArrayList<Category> categories =  new ArrayList<>();
+					ArrayList<Category> categories = new ArrayList<>();
 
 					if (mIsUseCategory) {
 						categories = ((CategoryCursor) data).getEntities();
@@ -358,6 +358,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						ShoppingList.sort(itemsInList);
 
 						categories.add(new Category(itemsInList));
+
+						for (ShoppingList item : itemsInList) {
+							item.getCategory().setItemsByCategoryInList(itemsInList);
+						}
 					}
 
 					mAdapterRV.setData(categories, mList.getCurrency().getSymbol(), mIsUseCategory, mIsCollapsedCategory);     //update data in adapter
@@ -499,7 +503,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mEmptyImage.setVisibility(View.GONE);
 	}
 
-	private void onItemClick(ShoppingList itemInList){
+	private void onItemClick(ShoppingList itemInList) {
 		if (mActionMode != null) {
 			mAdapterRV.selectItem(itemInList);
 			return;

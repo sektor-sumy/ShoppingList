@@ -285,11 +285,13 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		notifyItemRemoved(position);
 		position = mItemList.indexOf(item.getCategory());
 
-		if (item.getCategory().getItemsByCategoryInList().size() == 0) {
-			mItemList.remove(item.getCategory());
-			notifyItemRemoved(position);
-		} else {
-			notifyItemChanged(position);
+		if (position != -1) {
+			if (item.getCategory().getItemsByCategoryInList().size() == 0) {
+				mItemList.remove(item.getCategory());
+				notifyItemRemoved(position);
+			} else {
+				notifyItemChanged(position);
+			}
 		}
 	}
 
