@@ -17,8 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.util.MultiSelection;
 import ru.android.ainege.shoppinglist.util.Image;
 
 public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -113,26 +115,23 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	}
 
 	public void onBindItemViewHolder(ItemViewHolder holder, int position, ShoppingList itemInList) {
+		FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) holder.mIsBought.getLayoutParams();
+
 		if (mIsUseCategory) {
-			FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) holder.mIsBought.getLayoutParams();
-			param.setMargins(mContext.getResources().getDimensionPixelSize(R.dimen.padding_24dp),
-					0, mContext.getResources().getDimensionPixelSize(R.dimen.padding_16dp), 0);
+			param.setMargins(mContext.getResources().getDimensionPixelSize(R.dimen.padding_24dp), 0, mContext.getResources().getDimensionPixelSize(R.dimen.padding_16dp), 0);
 			holder.mIsBought.setLayoutParams(param);
 
 			holder.mColor.setVisibility(View.VISIBLE);
-
-
 			holder.mColor.setBackgroundColor(itemInList.getCategory().getColor());
 		} else {
-			FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) holder.mIsBought.getLayoutParams();
-			param.setMargins(mContext.getResources().getDimensionPixelSize(R.dimen.padding_12dp),
-					0, mContext.getResources().getDimensionPixelSize(R.dimen.padding_12dp), 0);
+			param.setMargins(mContext.getResources().getDimensionPixelSize(R.dimen.padding_12dp), 0, mContext.getResources().getDimensionPixelSize(R.dimen.padding_12dp), 0);
 			holder.mIsBought.setLayoutParams(param);
 
 			holder.mColor.setVisibility(View.GONE);
 		}
 
 		Image.create().insertImageToView(mContext, itemInList.getItem().getImagePath(), holder.mImage);
+		holder.itemView.setSelected(MultiSelection.getInstance().isContains(itemInList));
 		holder.mName.setText(itemInList.getItem().getName());
 
 		if (itemInList.getAmount() == 0) {
@@ -144,7 +143,6 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		}
 
 		holder.mPrice.setText(getValueWithCurrency(itemInList.getPrice()));
-
 		holder.mIsBought.setVisibility(itemInList.isBought() ? View.VISIBLE : View.GONE);
 	}
 
@@ -155,6 +153,10 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 	public Object getListItem(int position) {
 		return mItemList.get(position);
+	}
+
+	public List<Object> getItemList() {
+		return mItemList;
 	}
 
 	//<editor-fold desc="Extend/collapse category">
@@ -196,7 +198,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	}
 	//</editor-fold>
 
-	//преобразует исходный список в список для работы с адаптером
+	//Converts the source list on the list to work with the adapter
 	private List<Object> generateParentChildItemList(List<Category> categoryList) {
 		List<Object> list = new ArrayList<>();
 		Category category;
@@ -246,6 +248,49 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 	public boolean isAllItemsBoughtInCategory(Category category){
 		return (category.countBoughtItems() == category.getItemsByCategoryInList().size());
+	}
+
+	//<editor-fold desc="Selection">
+	public void selectItem(ShoppingList item) {
+		MultiSelection.getInstance().toggleSelection(item);
+		notifyItemChanged(mItemList.indexOf(item));
+	}
+
+	public void selectAllItems(boolean isBought) {
+		MultiSelection.getInstance().selectAllItems(mItemList, isBought);
+		notifyDataSetChanged();
+	}
+
+	public void removeSelected() {
+		ArrayList<ShoppingList> items = MultiSelection.getInstance().getSelectedItems();
+
+		for (ShoppingList item : items) {
+			new ShoppingListDS(mContext).delete(item.getIdItemData());
+			removeItem(item);
+		}
+
+		MultiSelection.getInstance().clearSelections();
+	}
+
+	public void clearSelections() {
+		MultiSelection.getInstance().clearSelections();
+		notifyDataSetChanged();
+	}
+	//</editor-fold>
+
+	public void removeItem(ShoppingList item) {
+		int position = mItemList.indexOf(item);
+		mItemList.remove(item);
+		item.getCategory().getItemsByCategoryInList().remove(item);
+		notifyItemRemoved(position);
+		position = mItemList.indexOf(item.getCategory());
+
+		if (item.getCategory().getItemsByCategoryInList().size() == 0) {
+			mItemList.remove(item.getCategory());
+			notifyItemRemoved(position);
+		} else {
+			notifyItemChanged(position);
+		}
 	}
 
 	private class CategoryViewHolder extends RecyclerView.ViewHolder {
