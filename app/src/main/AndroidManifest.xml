@@ -39,6 +39,7 @@
 			android:configChanges="orientation|keyboardHidden"
 			android:label=""
 			android:screenOrientation="portrait"
+			android:windowSoftInputMode="stateHidden|adjustResize"
 			android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
 		</activity>
 		<activity

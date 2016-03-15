@@ -13,7 +13,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -59,6 +62,7 @@ import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
+import ru.android.ainege.shoppinglist.util.AndroidBug5497Workaround;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import ru.android.ainege.shoppinglist.util.Validation;
@@ -72,6 +76,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private static final int IS_SAVE_CHANGES = 2;
 	private static final String IS_SAVE_CHANGES_DATE = "answerDialog";
 
+	private CoordinatorLayout mCoordinatorLayout;
+	private AppBarLayout mAppBarLayout;
 	protected ImageView mAppBarImage;
 	protected CollapsingToolbarLayout mCollapsingToolbarLayout;
 	protected TextInputLayout mNameInputLayout;
@@ -97,6 +103,9 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private String mPhotoPath;
 	private TextView mFinishPrice;
 
+	private boolean mIsOpenedKeyboard = false;
+	private boolean mIsExpandedAppbar;
+
 	private boolean mIsUseCategory;
 	private ShowcaseView showcaseView;
 	private int counter = 1;
@@ -116,6 +125,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		AndroidBug5497Workaround.assistActivity(getActivity());
 		setHasOptionsMenu(true);
 
 		mItemDS = new ItemDS(getActivity());
@@ -311,6 +321,37 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	protected void setupView(View v) {
+		mCoordinatorLayout = (CoordinatorLayout) v.findViewById(R.id.coordinatorLayout);
+		mCoordinatorLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				int heightDiff = mCoordinatorLayout.getRootView().getHeight() - mCoordinatorLayout.getHeight();
+				if (heightDiff > 100 && !mIsOpenedKeyboard) { // 99% of the time the height diff will be due to a keyboard.
+					mIsOpenedKeyboard = true;
+
+					if (mIsExpandedAppbar) {
+						mAppBarLayout.setExpanded(false);
+					}
+				} else if(heightDiff <= 100 && mIsOpenedKeyboard){
+					mIsOpenedKeyboard = false;
+
+					if (mIsExpandedAppbar) {
+						mAppBarLayout.setExpanded(true);
+					}
+				}
+			}
+		});
+
+		mAppBarLayout = (AppBarLayout) v.findViewById(R.id.appbar);
+		mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+			@Override
+			public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+				if (!mIsOpenedKeyboard) {
+					mIsExpandedAppbar = (verticalOffset == 0);
+				}
+			}
+		});
+
 		mCollapsingToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.collapsing_toolbar);
 
 		mInfo = (TextView) v.findViewById(R.id.info);
@@ -595,6 +636,5 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 				mColor = (TextView) v.findViewById(R.id.color);
 			}
 		}
-
 	}
 }
