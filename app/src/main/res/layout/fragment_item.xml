@@ -57,9 +57,25 @@
 					android:layout_gravity="right"
 					android:background="@android:color/transparent"
 					android:drawableLeft="@drawable/ic_done_white_24dp"
-					android:drawablePadding="10dp"
-					android:padding="10dp"
+					android:drawablePadding="2dp"
+					android:paddingLeft="5dp"
+					android:paddingRight="10dp"
 					android:text="@string/save"/>
+
+				<ToggleButton
+					android:id="@+id/is_bought"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="right"
+					android:background="@android:color/transparent"
+					android:drawableLeft="@drawable/ic_toggle_button"
+					android:drawablePadding="2dp"
+					android:paddingLeft="10dp"
+					android:paddingRight="5dp"
+					android:textOff="@string/in_card"
+					android:textOn="@string/bought"/>
+
+
 
 			</android.support.v7.widget.Toolbar>
 		</android.support.design.widget.CollapsingToolbarLayout>
@@ -228,17 +244,6 @@
 					android:maxLines="5"/>
 
 			</android.support.design.widget.TextInputLayout>
-
-			<ToggleButton
-				android:id="@+id/is_bought"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignRight="@+id/name_input_layout"
-				android:layout_below="@+id/comment_input_layout"
-				android:background="@null"
-				android:drawableRight="@drawable/ic_toggle_button"
-				android:textOff="@string/in_card"
-				android:textOn="@string/bought"/>
 
 		</RelativeLayout>
 
