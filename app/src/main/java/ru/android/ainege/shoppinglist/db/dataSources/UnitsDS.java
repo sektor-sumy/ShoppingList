@@ -27,15 +27,11 @@ public class UnitsDS extends DictionaryDS<Unit> {
 	}
 
 	@Override
-	public long getRandomId(long id) {
+	public UnitCursor getAll(long withoutId) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(UnitsTable.TABLE_NAME, null, UnitsTable.COLUMN_ID + " != " + id,
-				null, null, null, UnitsTable.COLUMN_NAME, "1");
-		UnitCursor unit = new UnitCursor(cursor);
-		unit.moveToFirst();
-		long selectedId = unit.getEntity().getId();
-		cursor.close();
-		return selectedId;
+		Cursor cursor = db.query(UnitsTable.TABLE_NAME, null, UnitsTable.COLUMN_ID + " != " + withoutId,
+				null, null, null, UnitsTable.COLUMN_NAME);
+		return new UnitCursor(cursor);
 	}
 
 	@Override
@@ -63,17 +59,20 @@ public class UnitsDS extends DictionaryDS<Unit> {
 		return db.insert(UnitsTable.TABLE_NAME, null, values);
 	}
 
-	//todo update delete
 	@Override
 	public void delete(long id) {
-		long newId = getRandomId(id);
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		db.delete(UnitsTable.TABLE_NAME, UnitsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+	}
 
+	@Override
+	public void delete(long id, long newId) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.beginTransaction();
+
 		try {
 			new ItemDataDS(mContext).changeUnit(id, newId);
-
-			db.delete(UnitsTable.TABLE_NAME, UnitsTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+			delete(id);
 			db.setTransactionSuccessful();
 		} finally {
 			db.endTransaction();
@@ -86,7 +85,7 @@ public class UnitsDS extends DictionaryDS<Unit> {
 		return values;
 	}
 
-	public static class UnitCursor extends EntityCursor<Unit> {
+	public static class UnitCursor extends DictionaryCursor<Unit> {
 		public UnitCursor(Cursor cursor) {
 			super(cursor);
 		}

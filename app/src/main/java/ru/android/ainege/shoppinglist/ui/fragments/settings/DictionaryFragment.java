@@ -148,14 +148,22 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 				updateData();
 				break;
 			case ANSWER_FRAGMENT_CODE:
-				deleteItem(data.getLongExtra(QuestionDialogFragment.ID, -1), data.getIntExtra(QuestionDialogFragment.POSITION, -1));
+				Dictionary dictionary = (Dictionary) data.getSerializableExtra(DeleteDialogFragment.REPLACEMENT);
+				deleteItem(data.getIntExtra(DeleteDialogFragment.POSITION, -1), dictionary.getId());
 				break;
 		}
 	}
 
-	private void deleteItem(long id, int position) {
-		if (id != -1 && position != -1) {
-			getDS().delete(id);
+	private void deleteItem(int position, long newId) {
+		if (position != -1) {
+			T d = mDictionary.get(position);
+
+			if (newId != -1) {
+				getDS().delete(d.getId(), newId);
+			} else {
+				getDS().delete(d.getId());
+			}
+
 			mAdapterRV.removeItem(position);
 		}
 	}
@@ -220,11 +228,11 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 							T d = mDictionary.get(itemPosition);
 
 							if (isEntityUsed(d.getId())) {
-								QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_item), d.getId(), itemPosition);
+								DeleteDialogFragment dialogFrag = DeleteDialogFragment.newInstance(d, itemPosition);
 								dialogFrag.setTargetFragment(DictionaryFragment.this, ANSWER_FRAGMENT_CODE);
 								dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
 							} else {
-								deleteItem(d.getId(), itemPosition);
+								deleteItem(itemPosition, -1);
 							}
 						}
 					}

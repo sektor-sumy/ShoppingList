@@ -35,6 +35,15 @@ public class ItemDataDS extends GenericDS<ItemData> {
 				new String[]{String.valueOf(oldId)});
 	}
 
+	public void changeCategory(long oldId, long newId) {
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(ItemDataTable.COLUMN_ID_CATEGORY, newId);
+		db.update(ItemDataTable.TABLE_NAME, values,
+				ItemDataTable.COLUMN_ID_CATEGORY + " = ?",
+				new String[]{String.valueOf(oldId)});
+	}
+
 	@Override
 	public long add(ItemData data) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();

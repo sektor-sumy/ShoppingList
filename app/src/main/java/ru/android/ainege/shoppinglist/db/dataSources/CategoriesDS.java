@@ -31,6 +31,14 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		return getAll(mDbHelper.getReadableDatabase());
 	}
 
+	@Override
+	public CategoryCursor getAll(long withoutId) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(CategoriesTable.TABLE_NAME, null, CategoriesTable.COLUMN_ID + " != " + withoutId,
+				null, null, null, CategoriesTable.COLUMN_NAME);
+		return new CategoryCursor(cursor);
+	}
+
 	public CategoryCursor getCategoriesInList(long idList) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + CategoriesTable.TABLE_NAME + ".*" +
@@ -44,18 +52,6 @@ public class CategoriesDS extends DictionaryDS<Category> {
 				" ORDER BY " + CategoriesTable.COLUMN_NAME;
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(idList)});
 		return new CategoryCursor(cursor);
-	}
-
-	@Override
-	public long getRandomId(long id) {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(CategoriesTable.TABLE_NAME, null, CategoriesTable.COLUMN_ID + " != " + id,
-				null, null, null, CategoriesTable.COLUMN_NAME, "1");
-		CategoryCursor category = new CategoryCursor(cursor);
-		category.moveToFirst();
-		long selectedId = category.getEntity().getId();
-		cursor.close();
-		return selectedId;
 	}
 
 	@Override
@@ -83,17 +79,20 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		return db.insert(CategoriesTable.TABLE_NAME, null, values);
 	}
 
-	//todo update delete
 	@Override
 	public void delete(long id) {
-		long newId = getRandomId(id);
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		db.delete(CategoriesTable.TABLE_NAME, CategoriesTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+	}
 
+	@Override
+	public void delete(long id, long newId) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.beginTransaction();
 		try {
-			//new ListsDS(mContext).updateCategory(id, newId);
+			new ItemDataDS(mContext).changeCategory(id, newId);
 
-			db.delete(CategoriesTable.TABLE_NAME, CategoriesTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+			delete(id);
 			db.setTransactionSuccessful();
 		} finally {
 			db.endTransaction();
@@ -107,7 +106,7 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		return values;
 	}
 
-	public static class CategoryCursor extends EntityCursor<Category> {
+	public static class CategoryCursor extends DictionaryCursor<Category> {
 		private ShoppingListCursor mItemsInListCursor;
 
 		public CategoryCursor(Cursor cursor) {

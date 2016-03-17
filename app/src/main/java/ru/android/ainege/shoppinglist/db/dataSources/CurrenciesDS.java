@@ -26,6 +26,14 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 		return new CurrencyCursor(cursor);
 	}
 
+	@Override
+	public CurrencyCursor getAll(long withoutId) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(CurrenciesTable.TABLE_NAME, null, CurrenciesTable.COLUMN_ID + " != " + withoutId,
+				null, null, null, CurrenciesTable.COLUMN_NAME);
+		return new CurrencyCursor(cursor);
+	}
+
 	public CurrencyCursor getByName(String name) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(CurrenciesTable.TABLE_NAME, null, CurrenciesTable.COLUMN_NAME + " = '" + name + "'",
@@ -43,18 +51,6 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 	}
 
 	@Override
-	public long getRandomId(long id) {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(CurrenciesTable.TABLE_NAME, null, CurrenciesTable.COLUMN_ID + " != " + id,
-				null, null, null, CurrenciesTable.COLUMN_NAME, "1");
-		CurrencyCursor currencyCursor = new CurrencyCursor(cursor);
-		currencyCursor.moveToFirst();
-		long selectedId = currencyCursor.getEntity().getId();
-		cursor.close();
-		return selectedId;
-	}
-
-	@Override
 	public boolean isUsed(long idCurrency) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(ListsTable.TABLE_NAME, null, ListsTable.COLUMN_ID_CURRENCY + " = " + idCurrency,
@@ -63,7 +59,6 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 		cursor.close();
 		return result;
 	}
-
 
 	@Override
 	public int update(Currency currency) {
@@ -88,20 +83,24 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 		return db.insert(CurrenciesTable.TABLE_NAME, null, values);
 	}
 
-	//todo update delete
 	@Override
 	public void delete(long id) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		long idDefaultCurrency = prefs.getLong(mContext.getString(R.string.settings_key_currency), -1);
-
-		if (id == idDefaultCurrency || idDefaultCurrency == -1) {
-			idDefaultCurrency = getRandomId(id);
-		}
-
-		new ListsDS(mContext).changeCurrency(id, idDefaultCurrency);
-
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.delete(CurrenciesTable.TABLE_NAME, CurrenciesTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+	}
+
+	@Override
+	public void delete(long id, long newId) {
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		db.beginTransaction();
+
+		try {
+			new ListsDS(mContext).changeCurrency(id, newId);
+			delete(id);
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
 	}
 
 	private ContentValues createContentValues(Currency currency) {
@@ -111,7 +110,7 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 		return values;
 	}
 
-	public static class CurrencyCursor extends EntityCursor<Currency> {
+	public static class CurrencyCursor extends DictionaryCursor<Currency> {
 		public CurrencyCursor(Cursor cursor) {
 			super(cursor);
 		}
