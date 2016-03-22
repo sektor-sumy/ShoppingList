@@ -88,12 +88,13 @@
 		android:clipToPadding="false"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-		<RelativeLayout
+		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:paddingLeft="@dimen/padding_16dp"
 			android:paddingRight="@dimen/padding_16dp"
-			android:paddingTop="10dp">
+			android:paddingTop="10dp"
+			android:orientation="vertical" >
 
 			<android.support.design.widget.TextInputLayout
 				android:id="@+id/name_input_layout"
@@ -116,90 +117,108 @@
 				android:id="@+id/info"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@id/name_input_layout"
-				android:layout_gravity="center_horizontal"
 				android:gravity="center_horizontal"
 				android:textAppearance="?android:attr/textAppearanceSmall"
 				android:textColor="#dd2c00"
 				android:visibility="gone"/>
 
-			<TextView
-				android:id="@+id/amount_text"
-				android:layout_width="@dimen/column_left"
-				android:layout_height="wrap_content"
-				android:text="@string/amount"
-				android:layout_alignBottom="@+id/amount_input_layout"
-				android:layout_marginBottom="@dimen/margin_bottom"/>
-
-			<android.support.design.widget.TextInputLayout
-				android:id="@+id/amount_input_layout"
+			<LinearLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/info"
-				android:layout_toLeftOf="@+id/amount_unit"
-				android:layout_toRightOf="@+id/amount_text">
+				android:layout_height="match_parent"
+				android:orientation="horizontal"
+				android:weightSum="1"
+				android:gravity="center_vertical">
 
-				<EditText
-					android:id="@+id/new_amount_item"
-					android:layout_width="match_parent"
+				<TextView
+					android:id="@+id/amount_text"
+					android:layout_width="@dimen/column_left"
 					android:layout_height="wrap_content"
-					android:digits="0123456789.,"
-					android:gravity="center"
-					android:inputType="numberDecimal"
-					android:singleLine="true"/>
+					android:text="@string/amount"
+					android:singleLine="true"
+					android:layout_marginTop="@dimen/margin_bottom"
+					android:layout_marginRight="@dimen/margin_columns"/>
 
-			</android.support.design.widget.TextInputLayout>
+				<android.support.design.widget.TextInputLayout
+					android:id="@+id/amount_input_layout"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1" >
 
-			<Spinner
-				android:id="@+id/amount_unit"
-				android:layout_width="@dimen/column_right"
-				android:layout_height="wrap_content"
-				android:layout_toRightOf="@+id/price_input_layout"
-				android:gravity="center"
-				android:layout_alignBottom="@+id/amount_input_layout"
-				android:layout_marginBottom="@dimen/margin_bottom"/>
+					<EditText
+						android:id="@+id/new_amount_item"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:digits="0123456789.,"
+						android:gravity="center"
+						android:inputType="numberDecimal"
+						android:singleLine="true"/>
 
-			<TextView
-				android:id="@+id/price_text"
-				android:layout_width="@dimen/column_left"
-				android:layout_height="wrap_content"
-				android:text="@string/price"
-				android:layout_alignBottom="@+id/price_input_layout"
-				android:layout_marginBottom="@dimen/margin_bottom"/>
+				</android.support.design.widget.TextInputLayout>
 
-			<android.support.design.widget.TextInputLayout
-				android:id="@+id/price_input_layout"
+				<Spinner
+					android:id="@+id/amount_unit"
+					android:layout_width="@dimen/width_spinner"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="@dimen/margin_bottom"/>
+
+				<ImageButton
+					android:id="@+id/unit_settings"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:background="@android:color/transparent"
+					android:src="@drawable/ic_settings_grey600_18dp"
+					android:layout_marginTop="@dimen/margin_bottom"
+					android:layout_marginLeft="@dimen/margin_spinner"
+					android:visibility="gone"/>
+
+			</LinearLayout>
+
+			<LinearLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/amount_input_layout"
-				android:layout_toLeftOf="@+id/currency"
-				android:layout_toRightOf="@+id/price_text">
+				android:layout_height="match_parent"
+				android:orientation="horizontal"
+				android:weightSum="1"
+				android:gravity="center_vertical">
 
-				<EditText
-					android:id="@+id/new_item_price"
-					android:layout_width="match_parent"
+				<TextView
+					android:id="@+id/price_text"
+					android:layout_width="@dimen/column_left"
 					android:layout_height="wrap_content"
-					android:digits="0123456789.,"
+					android:text="@string/price"
+					android:singleLine="true"
+					android:layout_marginTop="@dimen/margin_bottom"
+					android:layout_marginRight="@dimen/margin_columns"/>
+
+				<android.support.design.widget.TextInputLayout
+					android:id="@+id/price_input_layout"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1" >
+
+					<EditText
+						android:id="@+id/new_item_price"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:digits="0123456789.,"
+						android:gravity="center"
+						android:inputType="numberDecimal"
+						android:singleLine="true"/>
+
+				</android.support.design.widget.TextInputLayout>
+
+				<TextView
+					android:id="@+id/currency"
+					android:layout_width="@dimen/width_spinner"
+					android:layout_height="wrap_content"
 					android:gravity="center"
-					android:inputType="numberDecimal"
-					android:singleLine="true"/>
+					android:layout_marginTop="@dimen/margin_bottom" />
 
-			</android.support.design.widget.TextInputLayout>
-
-			<TextView
-				android:id="@+id/currency"
-				android:layout_width="@dimen/column_right"
-				android:layout_height="wrap_content"
-				android:layout_alignRight="@+id/name_input_layout"
-				android:gravity="center"
-				android:layout_alignBottom="@+id/price_input_layout"
-				android:layout_marginBottom="@dimen/margin_bottom"/>
+			</LinearLayout>
 
 			<TextView
 				android:id="@+id/finish_price"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@+id/price_input_layout"
 				android:ellipsize="end"
 				android:gravity="right"
 				android:maxLines="1"
@@ -210,20 +229,32 @@
 				android:id="@+id/category_container"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@+id/finish_price">
+				android:weightSum="1"
+				android:gravity="center_vertical"
+				android:layout_marginTop="20dp">
 
 				<TextView
 					android:id="@+id/category_text"
 					android:layout_width="@dimen/column_left"
 					android:layout_height="wrap_content"
-					android:layout_gravity="bottom"
-					android:text="@string/category"/>
+					android:text="@string/category"
+					android:singleLine="true"
+					android:layout_marginRight="@dimen/margin_columns" />
 
 				<Spinner
 					android:id="@+id/category"
-					android:layout_width="match_parent"
+					android:layout_width="0dp"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="20dp"/>
+					android:layout_weight="1" />
+
+				<ImageButton
+					android:id="@+id/category_settings"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:background="@android:color/transparent"
+					android:src="@drawable/ic_settings_grey600_18dp"
+					android:layout_marginLeft="@dimen/margin_spinner"
+					android:visibility="gone" />
 
 			</LinearLayout>
 
@@ -231,8 +262,7 @@
 				android:id="@+id/comment_input_layout"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@+id/category_container"
-				android:layout_marginTop="8dp">
+				android:layout_marginTop="10dp">
 
 				<EditText
 					android:id="@+id/comment"
@@ -245,7 +275,7 @@
 
 			</android.support.design.widget.TextInputLayout>
 
-		</RelativeLayout>
+		</LinearLayout>
 
 	</android.support.v4.widget.NestedScrollView>
 

@@ -22,6 +22,11 @@
 			android:title="@string/settings_title_sort_is_bought"/>
 		<CheckBoxPreference
 			android:defaultValue="true"
+			android:key="@string/settings_key_fast_edit"
+			android:summary="@string/settings_summary_fast_edit"
+			android:title="@string/settings_title_fast_edit"/>
+		<CheckBoxPreference
+			android:defaultValue="true"
 			android:key="@string/settings_key_use_category"
 			android:summary="@string/settings_summary_use_category"
 			android:title="@string/settings_title_use_category"/>

@@ -17,7 +17,7 @@ import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 
 public abstract class GeneralDialogFragment<T extends Dictionary> extends DialogFragment {
 	protected static final String ITEM = "item";
-	private static final String ID_ITEM = "idItem";
+	protected static final String ID_ITEM = "idItem";
 
 	protected TextInputLayout mNameInputLayout;
 	protected EditText mName;

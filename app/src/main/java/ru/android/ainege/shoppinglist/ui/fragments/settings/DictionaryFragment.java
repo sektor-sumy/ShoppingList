@@ -30,20 +30,22 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
-import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 
 public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+	public static final String LAST_EDIT = "lastEdit";
 	protected static final int ADD = 1;
 	protected static final int EDIT = 2;
 	protected static final String ADD_DATE = "addItemDialog";
 	protected static final String EDIT_DATE = "editItemDialog";
 	protected static final int DATA_LOADER = 0;
-	private static final int ANSWER_FRAGMENT_CODE = 3;
-	private static final String ANSWER_FRAGMENT_DATE = "answerListDialog";
+	private static final int DELETE = 3;
+	private static final String DELETE_DATE = "answerListDialog";
 
 	protected ArrayList<T> mDictionary = new ArrayList<>();
 	protected RecyclerViewAdapter mAdapterRV;
 	protected RecyclerView mDictionaryRV;
+
+	protected long lastEditId = -1;
 
 	protected abstract String getTitle();
 
@@ -107,6 +109,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
+				getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, lastEditId));
 				getActivity().finish();
 				return true;
 			default:
@@ -142,12 +145,14 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 		switch (requestCode) {
 			case ADD:
+				lastEditId = data.getLongExtra(GeneralDialogFragment.ID_ITEM, -1);
 				updateData();
 				break;
 			case EDIT:
+				lastEditId = data.getLongExtra(GeneralDialogFragment.ID_ITEM, -1);
 				updateData();
 				break;
-			case ANSWER_FRAGMENT_CODE:
+			case DELETE:
 				Dictionary dictionary = (Dictionary) data.getSerializableExtra(DeleteDialogFragment.REPLACEMENT);
 				deleteItem(data.getIntExtra(DeleteDialogFragment.POSITION, -1), dictionary.getId());
 				break;
@@ -229,8 +234,8 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 							if (isEntityUsed(d.getId())) {
 								DeleteDialogFragment dialogFrag = DeleteDialogFragment.newInstance(d, itemPosition);
-								dialogFrag.setTargetFragment(DictionaryFragment.this, ANSWER_FRAGMENT_CODE);
-								dialogFrag.show(getFragmentManager(), ANSWER_FRAGMENT_DATE);
+								dialogFrag.setTargetFragment(DictionaryFragment.this, DELETE);
+								dialogFrag.show(getFragmentManager(), DELETE_DATE);
 							} else {
 								deleteItem(itemPosition, -1);
 							}

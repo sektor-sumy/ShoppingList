@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments.item;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
@@ -32,6 +34,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
@@ -61,7 +64,9 @@ import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
 import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
+import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
 import ru.android.ainege.shoppinglist.util.AndroidBug5497Workaround;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
@@ -74,10 +79,10 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private static final int TAKE_PHOTO = 0;
 	private static final int LOAD_IMAGE = 1;
 	private static final int IS_SAVE_CHANGES = 2;
+	private static final int UNIT_SETTINGS = 3;
+	private static final int CATEGORY_SETTINGS = 4;
 	private static final String IS_SAVE_CHANGES_DATE = "answerDialog";
 
-	private CoordinatorLayout mCoordinatorLayout;
-	private AppBarLayout mAppBarLayout;
 	protected ImageView mAppBarImage;
 	protected CollapsingToolbarLayout mCollapsingToolbarLayout;
 	protected TextInputLayout mNameInputLayout;
@@ -91,10 +96,12 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	protected Spinner mCategory;
 	protected EditText mComment;
 	protected ToggleButton mIsBought;
-
 	protected ItemDS mItemDS;
 	protected ShoppingListDS mItemsInListDS;
 	protected ShoppingList mItemInList;
+	private CoordinatorLayout mCoordinatorLayout;
+	private AppBarLayout mAppBarLayout;
+
 	protected boolean mIsImageLoaded = true;
 	protected boolean mIsProposedItem = false;
 
@@ -102,6 +109,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private File mFile;
 	private String mPhotoPath;
 	private TextView mFinishPrice;
+	private long mUnitPosition;
+	private long mCategoryPosition;
 
 	private boolean mIsOpenedKeyboard = false;
 	private boolean mIsExpandedAppbar;
@@ -300,6 +309,16 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			case IS_SAVE_CHANGES:
 				saveItem();
 				break;
+			case UNIT_SETTINGS:
+				mUnit.setAdapter(getUnitsAdapter());
+				long idUnit = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
+				mUnit.setSelection(idUnit == -1 ? getPosition(mUnit, mUnitPosition) : getPosition(mUnit, idUnit));
+				break;
+			case CATEGORY_SETTINGS:
+				mCategory.setAdapter(getCategoriesAdapter());
+				long idCategory = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
+				mCategory.setSelection(idCategory == -1 ? getPosition(mCategory, mCategoryPosition) : getPosition(mCategory, idCategory));
+				break;
 		}
 	}
 
@@ -321,6 +340,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	protected void setupView(View v) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
 		mCoordinatorLayout = (CoordinatorLayout) v.findViewById(R.id.coordinatorLayout);
 		mCoordinatorLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
@@ -332,7 +353,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 					if (mIsExpandedAppbar) {
 						mAppBarLayout.setExpanded(false);
 					}
-				} else if(heightDiff <= 100 && mIsOpenedKeyboard){
+				} else if (heightDiff <= 100 && mIsOpenedKeyboard) {
 					mIsOpenedKeyboard = false;
 
 					if (mIsExpandedAppbar) {
@@ -369,6 +390,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 		mUnit = (Spinner) v.findViewById(R.id.amount_unit);
 		mUnit.setAdapter(getUnitsAdapter());
+		ImageButton unitSettings = (ImageButton) v.findViewById(R.id.unit_settings);
 
 		mPriceInputLayout = (TextInputLayout) v.findViewById(R.id.price_input_layout);
 		mPrice = (EditText) v.findViewById(R.id.new_item_price);
@@ -379,14 +401,36 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 		mCategory = (Spinner) v.findViewById(R.id.category);
 		mCategory.setAdapter(getCategoriesAdapter());
+		ImageButton categorySettings = (ImageButton) v.findViewById(R.id.category_settings);
 		if (!mIsUseCategory) {
 			LinearLayout categoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
 			categoryContainer.setVisibility(View.GONE);
 		}
 
 		mComment = (EditText) v.findViewById(R.id.comment);
-
 		mIsBought = (ToggleButton) v.findViewById(R.id.is_bought);
+
+		if (prefs.getBoolean(getString(R.string.settings_key_fast_edit), false)) {
+			unitSettings.setVisibility(View.VISIBLE);
+			unitSettings.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					mUnitPosition = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
+					settingOnClickListener(getString(R.string.settings_key_unit), UNIT_SETTINGS);
+				}
+			});
+
+			categorySettings.setVisibility(View.VISIBLE);
+			categorySettings.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					mCategoryPosition = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
+					settingOnClickListener(getString(R.string.settings_key_category), CATEGORY_SETTINGS);
+				}
+			});
+
+			mCurrency.getLayoutParams().width = getResources().getDimensionPixelOffset(R.dimen.width_currency);
+		}
 	}
 
 	protected void loadImage() {
@@ -527,7 +571,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 	private SimpleCursorAdapter getUnitsAdapter() {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
-				android.R.layout.simple_spinner_item,
+				R.layout.spinner_unit,
 				new UnitsDS(getActivity()).getAll(),
 				new String[]{UnitsTable.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
@@ -581,6 +625,17 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 				cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, BaseColumns._ID + "=" + id, null);
 			}
 			cursor.close();
+		}
+	}
+
+	private void settingOnClickListener(String value, int code) {
+		Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
+		i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, value);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			startActivityForResult(i, code, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+		} else {
+			startActivityForResult(i, code);
 		}
 	}
 
