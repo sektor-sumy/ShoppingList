@@ -3,6 +3,8 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import ru.android.ainege.shoppinglist.db.entities.Unit;
@@ -24,6 +26,18 @@ public class UnitsDS extends DictionaryDS<Unit> {
 	@Override
 	public UnitCursor getAll() {
 		return getAll(mDbHelper.getReadableDatabase());
+	}
+
+	public UnitCursor getAllForSpinner() {
+		SQLiteDatabase  db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(UnitsTable.TABLE_NAME, null, null,
+				null, null, null, UnitsTable.COLUMN_NAME);
+
+		MatrixCursor extras = new MatrixCursor(new String[] { UnitsTable.COLUMN_ID, UnitsTable.COLUMN_NAME });
+		extras.addRow(new String[] { "-1", "Добавить" });
+		Cursor[] cursors = { extras, cursor };
+
+		return new UnitCursor(new MergeCursor(cursors));
 	}
 
 	@Override

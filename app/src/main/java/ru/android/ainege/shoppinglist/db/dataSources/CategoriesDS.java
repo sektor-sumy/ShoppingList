@@ -3,6 +3,8 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
@@ -27,8 +29,21 @@ public class CategoriesDS extends DictionaryDS<Category> {
 	}
 
 	@Override
-	public EntityCursor<Category> getAll() {
+	public CategoryCursor getAll() {
 		return getAll(mDbHelper.getReadableDatabase());
+	}
+
+	public CategoryCursor getAllForSpinner() {
+		SQLiteDatabase  db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.query(CategoriesTable.TABLE_NAME, null, null,
+				null, null, null, CategoriesTable.COLUMN_NAME);
+
+		MatrixCursor extras = new MatrixCursor(new String[] { CategoriesTable.COLUMN_ID,
+				CategoriesTable.COLUMN_NAME, CategoriesTable.COLUMN_COLOR });
+		extras.addRow(new String[] { "-1", "Добавить", "0" });
+		Cursor[] cursors = { extras, cursor };
+
+		return new CategoryCursor(new MergeCursor(cursors));
 	}
 
 	@Override

@@ -101,8 +101,14 @@
 	<string name="settings_title_sort_type">Порядок сортировки</string>
 	<string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
 	<string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
-	<string name="settings_key_fast_edit">collapse_category</string>
-	<string name="settings_title_fast_edit">Переход в настройки</string>
+	<string name="settings_key_transition_screen">transition_screen</string>
+	<string name="settings_title_transition_screen">Быстрое редактирование</string>
+	<string name="settings_summary_transition_screen">Что-то будет...</string>
+	<string name="settings_key_transition">transition</string>
+	<string name="settings_title_transition">Переход в настройки</string>
+	<string name="settings_summary_transition">Что-то будет...</string>
+	<string name="settings_key_fast_edit">fast_edit</string>
+	<string name="settings_title_fast_edit">Быстрое добавление</string>
 	<string name="settings_summary_fast_edit">Что-то будет...</string>
 	<string name="settings_key_use_category">use_category</string>
 	<string name="settings_title_use_category">Использование категорий</string>

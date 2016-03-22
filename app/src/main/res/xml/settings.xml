@@ -20,11 +20,22 @@
 			android:key="@string/settings_key_sort_is_bought"
 			android:summary="@string/settings_summary_sort_is_bought"
 			android:title="@string/settings_title_sort_is_bought"/>
-		<CheckBoxPreference
-			android:defaultValue="true"
-			android:key="@string/settings_key_fast_edit"
-			android:summary="@string/settings_summary_fast_edit"
-			android:title="@string/settings_title_fast_edit"/>
+		<PreferenceScreen
+			android:key="@string/settings_key_transition_screen"
+			android:title="@string/settings_title_transition_screen"
+			android:summary="@string/settings_summary_transition_screen">
+
+			<CheckBoxPreference
+				android:defaultValue="false"
+				android:key="@string/settings_key_transition"
+				android:summary="@string/settings_summary_transition"
+				android:title="@string/settings_title_transition"/>
+			<CheckBoxPreference
+				android:defaultValue="true"
+				android:key="@string/settings_key_fast_edit"
+				android:summary="@string/settings_summary_fast_edit"
+				android:title="@string/settings_title_fast_edit"/>
+		</PreferenceScreen>
 		<CheckBoxPreference
 			android:defaultValue="true"
 			android:key="@string/settings_key_use_category"

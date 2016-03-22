@@ -1,17 +1,23 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.ActivityOptions;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import ru.android.ainege.shoppinglist.R;
 
@@ -70,6 +76,35 @@ public class SettingsActivity extends SingleFragmentActivity {
 				default:
 					return super.onOptionsItemSelected(item);
 			}
+		}
+
+		@Override
+		public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+			super.onPreferenceTreeClick(preferenceScreen, preference);
+
+			// If the user has clicked on a preference screen, set up the screen
+			if (preference instanceof PreferenceScreen) {
+				setUpNestedScreen((PreferenceScreen) preference);
+			}
+
+			return false;
+		}
+
+		public void setUpNestedScreen(PreferenceScreen preferenceScreen) {
+			final Dialog dialog = preferenceScreen.getDialog();
+
+			LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
+			Toolbar toolbar = (Toolbar) LayoutInflater.from(getActivity()).inflate(R.layout.toolbar, root, false);
+			root.addView(toolbar, 0); // insert at top
+
+			toolbar.setTitle(preferenceScreen.getTitle());
+			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
 		}
 
 		private void startSettingByKey(final String key) {

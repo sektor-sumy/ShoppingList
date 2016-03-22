@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -66,7 +67,10 @@ import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.CategoryDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.GeneralDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.UnitDialogFragment;
 import ru.android.ainege.shoppinglist.util.AndroidBug5497Workaround;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
@@ -81,7 +85,11 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private static final int IS_SAVE_CHANGES = 2;
 	private static final int UNIT_SETTINGS = 3;
 	private static final int CATEGORY_SETTINGS = 4;
+	private static final int UNIT_ADD = 5;
+	private static final int CATEGORY_ADD = 6;
 	private static final String IS_SAVE_CHANGES_DATE = "answerDialog";
+	protected static final String UNIT_ADD_DATE = "addItemDialog";
+	protected static final String CATEGORY_ADD_DATE = "addItemDialog";
 
 	protected ImageView mAppBarImage;
 	protected CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -115,7 +123,9 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private boolean mIsOpenedKeyboard = false;
 	private boolean mIsExpandedAppbar;
 
+	private SharedPreferences mPrefs;
 	private boolean mIsUseCategory;
+	private boolean mIsUseNewItemInSpinner;
 	private ShowcaseView showcaseView;
 	private int counter = 1;
 
@@ -140,8 +150,9 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		mItemDS = new ItemDS(getActivity());
 		mItemsInListDS = new ShoppingListDS(getActivity());
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		mIsUseCategory = prefs.getBoolean(getString(R.string.settings_key_use_category), true);
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		mIsUseCategory = mPrefs.getBoolean(getString(R.string.settings_key_use_category), true);
+		mIsUseNewItemInSpinner = mPrefs.getBoolean(getString(R.string.settings_key_fast_edit), false);
 	}
 
 	@Override
@@ -269,8 +280,16 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		if (resultCode != Activity.RESULT_OK) {
 			mIsImageLoaded = true;
 
-			if (requestCode == IS_SAVE_CHANGES) {
-				getActivity().finish();
+			switch (requestCode) {
+				case IS_SAVE_CHANGES:
+					getActivity().finish();
+					break;
+				case UNIT_ADD:
+					mUnit.setSelection(getPosition(mUnit, mUnitPosition));
+					break;
+				case CATEGORY_ADD:
+					mCategory.setSelection(getPosition(mCategory, mCategoryPosition));
+					break;
 			}
 
 			return;
@@ -319,6 +338,14 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 				long idCategory = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
 				mCategory.setSelection(idCategory == -1 ? getPosition(mCategory, mCategoryPosition) : getPosition(mCategory, idCategory));
 				break;
+			case UNIT_ADD:
+				mUnit.setAdapter(getUnitsAdapter());
+				mUnit.setSelection(getPosition(mUnit, data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1)));
+				break;
+			case CATEGORY_ADD:
+				mCategory.setAdapter(getCategoriesAdapter());
+				mCategory.setSelection(getPosition(mCategory, data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1)));
+				break;
 		}
 	}
 
@@ -340,8 +367,6 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	protected void setupView(View v) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
 		mCoordinatorLayout = (CoordinatorLayout) v.findViewById(R.id.coordinatorLayout);
 		mCoordinatorLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
@@ -390,6 +415,23 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 		mUnit = (Spinner) v.findViewById(R.id.amount_unit);
 		mUnit.setAdapter(getUnitsAdapter());
+		mUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				if (position == 0 && id == -1) {
+					GeneralDialogFragment addItemDialog = new UnitDialogFragment();
+					addItemDialog.setTargetFragment(ItemFragment.this, UNIT_ADD);
+					addItemDialog.show(getFragmentManager(), UNIT_ADD_DATE);
+				} else {
+					mUnitPosition = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
 		ImageButton unitSettings = (ImageButton) v.findViewById(R.id.unit_settings);
 
 		mPriceInputLayout = (TextInputLayout) v.findViewById(R.id.price_input_layout);
@@ -401,6 +443,23 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 		mCategory = (Spinner) v.findViewById(R.id.category);
 		mCategory.setAdapter(getCategoriesAdapter());
+		mCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				if (position == 0 && id == -1) {
+					GeneralDialogFragment addItemDialog = new CategoryDialogFragment();
+					addItemDialog.setTargetFragment(ItemFragment.this, CATEGORY_ADD);
+					addItemDialog.show(getFragmentManager(), CATEGORY_ADD_DATE);
+				} else {
+					mCategoryPosition = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
 		ImageButton categorySettings = (ImageButton) v.findViewById(R.id.category_settings);
 		if (!mIsUseCategory) {
 			LinearLayout categoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
@@ -410,12 +469,11 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		mComment = (EditText) v.findViewById(R.id.comment);
 		mIsBought = (ToggleButton) v.findViewById(R.id.is_bought);
 
-		if (prefs.getBoolean(getString(R.string.settings_key_fast_edit), false)) {
+		if (mPrefs.getBoolean(getString(R.string.settings_key_transition), false)) {
 			unitSettings.setVisibility(View.VISIBLE);
 			unitSettings.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					mUnitPosition = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
 					settingOnClickListener(getString(R.string.settings_key_unit), UNIT_SETTINGS);
 				}
 			});
@@ -424,7 +482,6 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			categorySettings.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					mCategoryPosition = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
 					settingOnClickListener(getString(R.string.settings_key_category), CATEGORY_SETTINGS);
 				}
 			});
@@ -489,12 +546,16 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	protected int getPosition(Spinner spinner, long id) {
-		int index = 0;
+		int index = -1;
 		for (int i = 0; i < spinner.getCount(); i++) {
 			if (((EntityCursor<Dictionary>) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
 				index = i;
 				break;
 			}
+		}
+
+		if (index == -1) {
+			index = mIsUseNewItemInSpinner ? 1 : 0;
 		}
 		return index;
 	}
@@ -570,9 +631,17 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	private SimpleCursorAdapter getUnitsAdapter() {
+		Cursor cursor;
+
+		if (mIsUseNewItemInSpinner) {
+			cursor = new UnitsDS(getActivity()).getAllForSpinner();
+		} else {
+			cursor = new UnitsDS(getActivity()).getAll();
+		}
+
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.spinner_unit,
-				new UnitsDS(getActivity()).getAll(),
+				cursor,
 				new String[]{UnitsTable.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -580,9 +649,17 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	private SimpleCursorAdapter getCategoriesAdapter() {
+		Cursor cursor;
+
+		if (mIsUseNewItemInSpinner) {
+			cursor = new CategoriesDS(getActivity()).getAllForSpinner();
+		} else {
+			cursor = new CategoriesDS(getActivity()).getAll();
+		}
+
 		SimpleCursorAdapter spinnerAdapter = new ColorAdapter(getActivity(),
 				R.layout.spinner_color_item,
-				new CategoriesDS(getActivity()).getAll());
+				cursor);
 		spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_color_item);
 		return spinnerAdapter;
 	}

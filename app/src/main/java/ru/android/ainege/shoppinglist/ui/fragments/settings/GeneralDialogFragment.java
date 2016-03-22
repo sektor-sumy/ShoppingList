@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -17,7 +18,7 @@ import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 
 public abstract class GeneralDialogFragment<T extends Dictionary> extends DialogFragment {
 	protected static final String ITEM = "item";
-	protected static final String ID_ITEM = "idItem";
+	public static final String ID_ITEM = "idItem";
 
 	protected TextInputLayout mNameInputLayout;
 	protected EditText mName;
@@ -44,6 +45,7 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 				})
 				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						sendCancelResult();
 						dialog.cancel();
 					}
 				});
@@ -99,5 +101,13 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 			return;
 
 		getTargetFragment().onActivityResult(getTargetRequestCode(), android.app.Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
+	}
+
+	protected void sendCancelResult() {
+		if (getTargetFragment() == null) {
+			return;
+		}
+
+		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
 	}
 }
