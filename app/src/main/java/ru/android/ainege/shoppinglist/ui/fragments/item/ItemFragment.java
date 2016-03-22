@@ -226,16 +226,6 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-
-		mName.setSelection(mName.getText().length());
-		mAmount.setSelection(mAmount.getText().length());
-		mPrice.setSelection(mPrice.getText().length());
-		mComment.setSelection(mComment.getText().length());
-	}
-
-	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 
@@ -406,12 +396,26 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		mName = (AutoCompleteTextView) v.findViewById(R.id.new_item_name);
 		mName.addTextChangedListener(getNameChangedListener());
 		mName.setAdapter(getCompleteTextAdapter());
+		if (mPrefs.getBoolean(getString(R.string.settings_key_text_selection_name), false)) {
+			mName.setSelectAllOnFocus(true);
+		}
 
 		mFinishPrice = (TextView) v.findViewById(R.id.finish_price);
 
 		mAmountInputLayout = (TextInputLayout) v.findViewById(R.id.amount_input_layout);
 		mAmount = (EditText) v.findViewById(R.id.new_amount_item);
 		mAmount.addTextChangedListener(getAmountChangedListener());
+		mAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus && !mPrefs.getBoolean(getString(R.string.settings_key_text_selection_amount), false)) {
+					mAmount.setSelection(mAmount.getText().length());
+				}
+			}
+		});
+		if (mPrefs.getBoolean(getString(R.string.settings_key_text_selection_amount), false)) {
+			mAmount.setSelectAllOnFocus(true);
+		}
 
 		mUnit = (Spinner) v.findViewById(R.id.amount_unit);
 		mUnit.setAdapter(getUnitsAdapter());
@@ -437,6 +441,17 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		mPriceInputLayout = (TextInputLayout) v.findViewById(R.id.price_input_layout);
 		mPrice = (EditText) v.findViewById(R.id.new_item_price);
 		mPrice.addTextChangedListener(getPriceChangedListener());
+		mPrice.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus && !mPrefs.getBoolean(getString(R.string.settings_key_text_selection_price), false)) {
+					mPrice.setSelection(mPrice.getText().length());
+				}
+			}
+		});
+		if (mPrefs.getBoolean(getString(R.string.settings_key_text_selection_price), false)) {
+			mPrice.setSelectAllOnFocus(true);
+		}
 
 		TextView mCurrency = (TextView) v.findViewById(R.id.currency);
 		mCurrency.setText(mCurrencyList);
@@ -467,6 +482,18 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		}
 
 		mComment = (EditText) v.findViewById(R.id.comment);
+		mComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus && !mPrefs.getBoolean(getString(R.string.settings_key_text_selection_comment), false)) {
+					mComment.setSelection(mComment.getText().length());
+				}
+			}
+		});
+		if (mPrefs.getBoolean(getString(R.string.settings_key_text_selection_comment), false)) {
+			mComment.setSelectAllOnFocus(true);
+		}
+
 		mIsBought = (ToggleButton) v.findViewById(R.id.is_bought);
 
 		if (mPrefs.getBoolean(getString(R.string.settings_key_transition), false)) {

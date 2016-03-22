@@ -13,11 +13,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import ru.android.ainege.shoppinglist.R;
 
@@ -93,9 +96,34 @@ public class SettingsActivity extends SingleFragmentActivity {
 		public void setUpNestedScreen(PreferenceScreen preferenceScreen) {
 			final Dialog dialog = preferenceScreen.getDialog();
 
-			LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
-			Toolbar toolbar = (Toolbar) LayoutInflater.from(getActivity()).inflate(R.layout.toolbar, root, false);
-			root.addView(toolbar, 0); // insert at top
+			Toolbar toolbar;
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
+				toolbar = (Toolbar) LayoutInflater.from(getActivity()).inflate(R.layout.toolbar, root, false);
+				root.addView(toolbar, 0); // insert at top
+			} else {
+				ViewGroup root = (ViewGroup) dialog.findViewById(android.R.id.content);
+				ListView content = (ListView) root.getChildAt(0);
+
+				root.removeAllViews();
+
+				toolbar = (Toolbar) LayoutInflater.from(getActivity()).inflate(R.layout.toolbar, root, false);
+
+				int height;
+				TypedValue tv = new TypedValue();
+				if (getActivity().getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
+					height = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+				}else{
+					height = toolbar.getHeight();
+				}
+
+				content.setPadding(0, height, 0, 0);
+
+				root.addView(content);
+				root.addView(toolbar);
+			}
+
 
 			toolbar.setTitle(preferenceScreen.getTitle());
 			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);

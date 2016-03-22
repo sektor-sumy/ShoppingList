@@ -66,7 +66,6 @@ public class EditItemFragment extends ItemFragment {
 		loadImage();
 
 		mName.setText(mItemInList.getItem().getName());
-		mName.setSelection(mItemInList.getItem().getName().length());
 
 		if (mItemInList.getAmount() != 0) {
 			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getAmount()));

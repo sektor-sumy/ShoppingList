@@ -116,6 +116,17 @@
 	<string name="settings_key_collapse_category">collapse_category</string>
 	<string name="settings_title_collapse_category">Схлопование категорий</string>
 	<string name="settings_summary_collapse_category">Сваричаивает товары в категории при клике</string>
+	<string name="settings_key_text_selection_screen">text_selection_screen</string>
+	<string name="settings_title_text_selection_screen">Выделение текста</string>
+	<string name="settings_summary_text_selection_screen">Выделять весь текст для быстрого редактирования покупки</string>
+	<string name="settings_key_text_selection_name">text_selection_name</string>
+	<string name="settings_title_text_selection_name">Название</string>
+	<string name="settings_key_text_selection_amount">text_selection_amount</string>
+	<string name="settings_title_text_selection_amount">Количество</string>
+	<string name="settings_key_text_selection_price">text_selection_price</string>
+	<string name="settings_title_text_selection_price">Цена</string>
+	<string name="settings_key_text_selection_comment">text_selection_comment</string>
+	<string name="settings_title_text_selection_comment">Коментарий</string>
 
 	<string name="settings_category_data_item">Настройка данных по умолчанию</string>
 	<string name="settings_key_sort_is_default_data">sort_is_default_data</string>

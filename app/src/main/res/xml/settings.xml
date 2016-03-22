@@ -36,6 +36,28 @@
 				android:summary="@string/settings_summary_fast_edit"
 				android:title="@string/settings_title_fast_edit"/>
 		</PreferenceScreen>
+		<PreferenceScreen
+			android:key="@string/settings_key_text_selection_screen"
+			android:title="@string/settings_title_text_selection_screen"
+			android:summary="@string/settings_summary_text_selection_screen">
+
+			<CheckBoxPreference
+				android:key="@string/settings_key_text_selection_name"
+				android:title="@string/settings_title_text_selection_name"
+				android:defaultValue="false" />
+			<CheckBoxPreference
+				android:key="@string/settings_key_text_selection_amount"
+				android:title="@string/settings_title_text_selection_amount"
+				android:defaultValue="true" />
+			<CheckBoxPreference
+				android:key="@string/settings_key_text_selection_price"
+				android:title="@string/settings_title_text_selection_price"
+				android:defaultValue="true" />
+			<CheckBoxPreference
+				android:key="@string/settings_key_text_selection_comment"
+				android:title="@string/settings_title_text_selection_comment"
+				android:defaultValue="true" />
+		</PreferenceScreen>
 		<CheckBoxPreference
 			android:defaultValue="true"
 			android:key="@string/settings_key_use_category"
