@@ -142,9 +142,12 @@
 	<string name="settings_summary_open_last_list">Запускать приложение на последнем активном списке</string>
 
 	<string name="sort_order_alphabet">алфавиту</string>
-	<string name="sort_order_up_price">возрастанию цены</string>
-	<string name="sort_order_down_price">убыванию цены</string>
 	<string name="sort_order_adding">порядку добавления</string>
+	<string name="sort_order_up_price">возрастанию цены за единицу измерения</string>
+	<string name="sort_order_down_price">убыванию цены за единицу измерения</string>
+	<string name="sort_order_up_purchase_price">возрастанию цены за покупку</string>
+	<string name="sort_order_down_purchase_price">убыванию цены за покупку</string>
+
 
 	<string name="name">Название</string>
 	<string name="currency_symbol">Символ или сокращение</string>

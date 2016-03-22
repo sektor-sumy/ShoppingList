@@ -2,8 +2,10 @@
 <resources>
 	<string-array name="sort_order">
 		<item>@string/sort_order_alphabet</item>
+		<item>@string/sort_order_adding</item>
 		<item>@string/sort_order_up_price</item>
 		<item>@string/sort_order_down_price</item>
-		<item>@string/sort_order_adding</item>
+		<item>@string/sort_order_up_purchase_price</item>
+		<item>@string/sort_order_down_purchase_price</item>
 	</string-array>
 </resources>

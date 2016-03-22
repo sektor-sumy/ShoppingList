@@ -439,12 +439,16 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		if (regular.contains(getString(R.string.sort_order_alphabet))) {
 			sortType = ShoppingList.ALPHABET;
+		} else if (regular.contains(getString(R.string.sort_order_adding))) {
+			sortType = ShoppingList.ORDER_ADDING;
 		} else if (regular.contains(getString(R.string.sort_order_up_price))) {
 			sortType = ShoppingList.UP_PRICE;
 		} else if (regular.contains(getString(R.string.sort_order_down_price))) {
 			sortType = ShoppingList.DOWN_PRICE;
-		} else if (regular.contains(getString(R.string.sort_order_adding))) {
-			sortType = ShoppingList.ORDER_ADDING;
+		} else if (regular.contains(getString(R.string.sort_order_up_purchase_price))) {
+			sortType = ShoppingList.UP_PURCHASE_PRICE;
+		} else if (regular.contains(getString(R.string.sort_order_down_purchase_price))) {
+			sortType = ShoppingList.DOWN_PURCHASE_PRICE;
 		} else {
 			sortType = ShoppingList.ALPHABET;
 		}

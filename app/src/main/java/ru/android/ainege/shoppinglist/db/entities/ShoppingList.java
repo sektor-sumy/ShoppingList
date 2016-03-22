@@ -13,9 +13,11 @@ import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDS;
 
 public class ShoppingList extends ItemData {
 	public final static String ALPHABET = "alphabet";
+	public final static String ORDER_ADDING = "orderAdding";
 	public final static String UP_PRICE = "upPrice";
 	public final static String DOWN_PRICE = "downPrice";
-	public final static String ORDER_ADDING = "orderAdding";
+	public final static String UP_PURCHASE_PRICE = "upPurchasePrice";
+	public final static String DOWN_PURCHASE_PRICE = "downPurchasePrice";
 
 	private static String mType;
 	private static boolean mIsBoughtEndInList;
@@ -68,20 +70,30 @@ public class ShoppingList extends ItemData {
 					case ALPHABET:
 						result = lhs.getItem().getName().compareToIgnoreCase(rhs.getItem().getName());
 						break;
+					case ORDER_ADDING:
+						result = (int) (lhs.getDate().getTime() - rhs.getDate().getTime());
+						break;
 					case UP_PRICE:
 						result = (int) (lhs.getPrice() - rhs.getPrice());
 						break;
 					case DOWN_PRICE:
 						result = (int) (rhs.getPrice() - lhs.getPrice());
 						break;
-					case ORDER_ADDING:
-						result = (int) (lhs.getDate().getTime() - rhs.getDate().getTime());
+					case UP_PURCHASE_PRICE:
+						result = (int) (getSum(lhs) - getSum(rhs));
+						break;
+					case DOWN_PURCHASE_PRICE:
+						result = (int) (getSum(rhs) - getSum(lhs));
 						break;
 				}
 
 				return result;
 			}
 		});
+	}
+
+	private static double getSum(ShoppingList sl) {
+		return sl.getPrice() * (sl.getAmount() == 0 ? 1 : sl.getAmount());
 	}
 
 	public long getIdItem() {
