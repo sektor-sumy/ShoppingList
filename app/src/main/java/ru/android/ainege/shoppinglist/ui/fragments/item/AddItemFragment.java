@@ -81,6 +81,7 @@ public class AddItemFragment extends ItemFragment {
 
 		mName.setOnItemClickListener(getOnNameClickListener());
 		mCollapsingToolbarLayout.setTitle(getString(R.string.add));
+		mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.transparent, null));
 	}
 
 	@Override

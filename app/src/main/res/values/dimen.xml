@@ -13,7 +13,7 @@
 	<dimen name="drawer_text_padding">16dp</dimen>
 
 	<dimen name="app_bar_height">200dp</dimen>
-	<dimen name="scrim_height">85dp</dimen>
+	<dimen name="scrim_height">90dp</dimen>
 	<dimen name="floating_button_margin">24dp</dimen>
 
 	<dimen name="column_amount_wight">60dp</dimen>

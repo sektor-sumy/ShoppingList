@@ -37,12 +37,6 @@
 				android:background="@drawable/scrim_top"
 				android:fitsSystemWindows="true"/>
 
-			<View
-				android:layout_width="match_parent"
-				android:layout_height="@dimen/scrim_height"
-				android:layout_gravity="bottom"
-				android:background="@drawable/scrim_bottom"/>
-
 			<android.support.v7.widget.Toolbar
 				android:id="@+id/toolbar"
 				android:layout_width="match_parent"
@@ -60,7 +54,8 @@
 					android:drawablePadding="2dp"
 					android:paddingLeft="5dp"
 					android:paddingRight="10dp"
-					android:text="@string/save"/>
+					android:text="@string/save"
+					android:textColor="@android:color/background_light"/>
 
 				<ToggleButton
 					android:id="@+id/is_bought"
@@ -73,7 +68,9 @@
 					android:paddingLeft="10dp"
 					android:paddingRight="5dp"
 					android:textOff="@string/in_card"
-					android:textOn="@string/bought"/>
+					android:textOn="@string/bought"
+					android:textColor="@android:color/background_light"
+					android:textAllCaps="true"/>
 
 
 
