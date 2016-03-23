@@ -103,6 +103,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			mFAB.setVisibility(View.GONE);
+
+			mAdapterRV.extendAllCategory();
 			return true;
 		}
 
@@ -125,9 +127,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			mAdapterRV.clearSelections();
 			mFAB.setVisibility(View.VISIBLE);
 			mActionMode = null;
+
+			mAdapterRV.recoveryCollapseAllCategory();
+			mAdapterRV.clearSelections();
 		}
 	};
 
@@ -218,8 +222,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 				if (item instanceof ShoppingList) {
 					onItemClick((ShoppingList) item);
-				} else if (item instanceof Category && mIsCollapsedCategory) {
-					mAdapterRV.setOnclick(mItemsListRV.findViewHolderForAdapterPosition(position), position);
+				} else if (item instanceof Category) {
+					onItemClick((Category) item, position);
 				}
 			}
 
@@ -229,6 +233,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 				if (item instanceof ShoppingList) {
 					onItemLongClick((ShoppingList) item);
+				} else if (item instanceof Category) {
+					onItemLongClick((Category) item);
 				}
 			}
 
@@ -523,6 +529,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	}
 
+	private void onItemClick(Category category, int position) {
+		if (mActionMode != null) {
+			mAdapterRV.selectAllItemsInCategory(category);
+			return;
+		}
+
+		if (mIsCollapsedCategory) {
+			mAdapterRV.setOnClick(mItemsListRV.findViewHolderForAdapterPosition(position), position);
+		}
+	}
+
 	private void onItemLongClick(ShoppingList itemInList) {
 		if (mActionMode != null) {
 			mAdapterRV.selectItem(itemInList);
@@ -531,6 +548,18 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		mActionMode = getActivity().startActionMode(mActionModeCallback);
 		mAdapterRV.selectItem(itemInList);
+		mItemsListRV.scrollToPosition(mAdapterRV.mItemList.indexOf(itemInList));
+	}
+
+	private void onItemLongClick(Category category) {
+		if (mActionMode != null) {
+			mAdapterRV.selectAllItemsInCategory(category);
+			return;
+		}
+
+		mActionMode = getActivity().startActionMode(mActionModeCallback);
+		mAdapterRV.selectAllItemsInCategory(category);
+		mItemsListRV.scrollToPosition(mAdapterRV.mItemList.indexOf(category));
 	}
 
 	private void onItemSwipeRight(ShoppingList itemInList, int position) {
@@ -749,6 +778,4 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			return categoryCursor;
 		}
 	}
-
-
 }

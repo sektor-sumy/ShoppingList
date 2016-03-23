@@ -160,7 +160,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	}
 
 	//<editor-fold desc="Extend/collapse category">
-	public void setOnclick(RecyclerView.ViewHolder holder, int position) {
+	public void setOnClick(RecyclerView.ViewHolder holder, int position) {
 		CategoryViewHolder categoryHolder = (CategoryViewHolder) holder;
 		Category category = (Category) getListItem(position);
 
@@ -193,6 +193,27 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 			for (int i = 0; i < itemInList.size(); i++) {
 				mItemList.add(position + i + 1, itemInList.get(i));
 				notifyItemInserted(position + i + 1);
+			}
+		}
+	}
+
+	public void extendAllCategory() {
+		for (int i = 0; i < mItemList.size(); i++) {
+			if (mItemList.get(i) instanceof Category && collapseCategoryStates.get(((Category) mItemList.get(i)).getId())) {
+				extendCategory((Category) mItemList.get(i), i);
+			}
+		}
+	}
+
+	public void recoveryCollapseAllCategory() {
+		for (int i = 0; i < mItemList.size(); i++) {
+			if (mItemList.get(i) instanceof Category && collapseCategoryStates.get(((Category) mItemList.get(i)).getId())) {
+				collapseCategory((Category) mItemList.get(i), i);
+			} else {
+				if (mItemList.get(i) instanceof ShoppingList && MultiSelection.getInstance().getSelectedItems().contains(mItemList.get(i))) {
+					MultiSelection.getInstance().delete(mItemList.get(i));
+					notifyItemChanged(i);
+				}
 			}
 		}
 	}
@@ -256,6 +277,11 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		notifyItemChanged(mItemList.indexOf(item));
 	}
 
+	public void selectAllItemsInCategory(Category category) {
+		MultiSelection.getInstance().selectAllItemsInCategory(category.getItemsByCategoryInList());
+		notifyItemRangeChanged(mItemList.indexOf(category) + 1, category.getItemsByCategoryInList().size());
+	}
+
 	public void selectAllItems(boolean isBought) {
 		MultiSelection.getInstance().selectAllItems(mItemList, isBought);
 		notifyDataSetChanged();
@@ -274,7 +300,6 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 	public void clearSelections() {
 		MultiSelection.getInstance().clearSelections();
-		notifyDataSetChanged();
 	}
 	//</editor-fold>
 

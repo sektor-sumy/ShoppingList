@@ -26,6 +26,10 @@ public class MultiSelection {
 		return mSelectedItems.contains(item);
 	}
 
+	public void delete(Object item) {
+		mSelectedItems.remove(item);
+	}
+
 	public void clearSelections() {
 		mSelectedItems.clear();
 	}
@@ -50,7 +54,7 @@ public class MultiSelection {
 	}
 
 	public void selectAllItems(List<Object> items, boolean isBought) {
-		boolean isAllSelected = checkAllSelected(items, isBought);
+		boolean isAllSelected = checkAllBoughtSelected(items, isBought);
 
 		for (Object item : items) {
 			if (item instanceof ShoppingList && ((ShoppingList) item).isBought() == isBought) {
@@ -59,15 +63,32 @@ public class MultiSelection {
 				toggleSelection((ShoppingList) item, isAllSelected);
 			}
 		}
-
 	}
 
-	private boolean checkAllSelected(List<Object> items, boolean isBought) {
+	private boolean checkAllBoughtSelected(List<Object> items, boolean isBought) {
 		for (Object item : items) {
 			if (item instanceof ShoppingList && ((ShoppingList) item).isBought() == isBought) {
 				if (!mSelectedItems.contains(item)) {
 					return false;
 				}
+			}
+		}
+
+		return true;
+	}
+
+	public void selectAllItemsInCategory(List<ShoppingList> items) {
+		boolean isAllSelected = checkAllSelected(items);
+
+		for (ShoppingList item : items) {
+			toggleSelection(item, isAllSelected);
+		}
+	}
+
+	private boolean checkAllSelected(List<ShoppingList> items) {
+		for (ShoppingList item : items) {
+			if (!mSelectedItems.contains(item)) {
+				return false;
 			}
 		}
 
