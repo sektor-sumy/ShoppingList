@@ -51,6 +51,7 @@
 	</android.support.design.widget.AppBarLayout>
 
 	<FrameLayout
+		android:id="@+id/main_content"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -136,17 +137,14 @@
 
 		</LinearLayout>
 
+		<ImageView
+			android:id="@+id/empty_list"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:scaleType="centerInside"
+			android:src="@drawable/empty_list"
+			android:visibility="gone"/>
 	</FrameLayout>
-
-	<ImageView
-		android:id="@+id/empty_list"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_marginTop="176dp"
-		android:scaleType="centerInside"
-		android:src="@drawable/empty_list"
-		android:background="#c6c6c6"
-		android:visibility="gone"/>
 
 	<ProgressBar
 		android:id="@+id/progressBar"

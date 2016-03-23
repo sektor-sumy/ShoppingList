@@ -28,6 +28,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -80,6 +81,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
 	private ImageView mEmptyImage;
+	private FrameLayout mFrameLayout;
 	private LinearLayout mListContainer;
 	private ProgressBar mProgressBar;
 	private ShoppingListAdapter mAdapterRV;
@@ -204,6 +206,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		});
 
+		mFrameLayout = (FrameLayout) v.findViewById(R.id.main_content);
 		mListContainer = (LinearLayout) v.findViewById(R.id.list_container);
 		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
 		mEmptyImage = (ImageView) v.findViewById(R.id.empty_list);
@@ -508,11 +511,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private void showEmptyStates() {
 		mListContainer.setVisibility(View.GONE);
 		mEmptyImage.setVisibility(View.VISIBLE);
+		mFrameLayout.setBackgroundResource(R.color.imageBackground);
 	}
 
 	private void hideEmptyStates() {
 		mListContainer.setVisibility(View.VISIBLE);
 		mEmptyImage.setVisibility(View.GONE);
+		mFrameLayout.setBackgroundResource(android.R.color.white);
 	}
 
 	private void onItemClick(ShoppingList itemInList) {

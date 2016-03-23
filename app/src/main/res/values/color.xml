@@ -9,4 +9,6 @@
 
 	<color name="translucent_scrim_bottom">#46000000</color>
 	<color name="translucent_scrim_bottom_center">#19000000</color>
+
+	<color name="imageBackground">#c6c6c6</color>
 </resources>
