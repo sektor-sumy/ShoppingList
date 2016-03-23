@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Slide;
@@ -81,7 +82,7 @@ public class AddItemFragment extends ItemFragment {
 
 		mName.setOnItemClickListener(getOnNameClickListener());
 		mCollapsingToolbarLayout.setTitle(getString(R.string.add));
-		mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.transparent, null));
+		mCollapsingToolbarLayout.setCollapsedTitleTextColor(ContextCompat.getColor(getActivity(), android.R.color.transparent));
 	}
 
 	@Override
