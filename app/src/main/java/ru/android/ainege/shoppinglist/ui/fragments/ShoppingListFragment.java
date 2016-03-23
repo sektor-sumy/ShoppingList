@@ -403,16 +403,18 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	//<editor-fold desc="Work with preferences">
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		mIsUpdateData = true;
+		if (isAdded()) {
+			mIsUpdateData = true;
 
-		if (key.equals(getString(R.string.settings_key_sort_is_bought))) {
-			readIsBoughtSetting();
-		} else if (key.equals(getString(R.string.settings_key_use_category))) {
-			readCategorySetting();
-		} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
-			readCollapseCategorySetting();
-		} else if (key.equals(getString(R.string.settings_key_sort_type))) {
-			readSortTypeSetting();
+			if (key.equals(getString(R.string.settings_key_sort_is_bought))) {
+				readIsBoughtSetting();
+			} else if (key.equals(getString(R.string.settings_key_use_category))) {
+				readCategorySetting();
+			} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
+				readCollapseCategorySetting();
+			} else if (key.equals(getString(R.string.settings_key_sort_type))) {
+				readSortTypeSetting();
+			}
 		}
 	}
 
