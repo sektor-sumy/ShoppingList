@@ -2,6 +2,7 @@ package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.view.View;
 
 import ru.android.ainege.shoppinglist.R;
@@ -24,6 +25,7 @@ public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 	protected View setupView() {
 		View v = super.setupView();
 		mName.setFilters(new InputFilter[]{new InputFilter.LengthFilter(5)});
+		mName.setRawInputType(InputType.TYPE_CLASS_TEXT);
 		return v;
 	}
 
