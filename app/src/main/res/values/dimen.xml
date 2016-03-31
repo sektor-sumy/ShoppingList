@@ -33,4 +33,6 @@
 	<dimen name="dialog_item_amount_weight">75dp</dimen>
 	<dimen name="dialog_item_spinner_weight">60dp</dimen>
 	<dimen name="dialog_item_price_weight">100dp</dimen>
+
+	<dimen name="shape_padding">10dp</dimen>
 </resources>

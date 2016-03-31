@@ -21,6 +21,7 @@
 	<string name="showcase_manage_list_desc">Нажмите на \"карандаш\" для изменения списка, а на \"корзину\" - для его удаления</string>
 	<string name="showcase_open_list">Просмотр списка</string>
 	<string name="showcase_open_list_desc">Нажмите на список для его просмотра</string>
+	<string name="showcase_setting">Настройте приложение как вам удобно</string>
 	<!--menu-->
 	<string name="take_photo">"Сделать снимок</string>
 	<string name="select_from_gallery">Выбрать из галереи</string>
@@ -39,10 +40,15 @@
 	<string name="showcase_edit_item_desc">Нажмите на товар, чтобы открыть детали</string>
 	<string name="showcase_swipe_item">Отметить товар купленым</string>
 	<string name="showcase_swipe_item_desc">Вычеркните товар, проведя по нему слева направо</string>
+	<string name="showcase_spent_sum">Следите сколько Вы уже потратили</string>
+	<string name="showcase_total_sum">Ваша итоговая сумма покупки</string>
 	<string name="showcase_unswipe_item">Отметить вычеркивание товара</string>
 	<string name="showcase_unswipe_item_desc">Для отмены, вычеркните товар повторно</string>
 	<string name="showcase_delete_item">Удаление товара</string>
 	<string name="showcase_delete_item_desc">Зажмите строку товара для перехода в режим удаления</string>
+	<string name="showcase_category_desc">Группируйте Ваши покупки по категориям</string>
+	<string name="showcase_sum_category_desc">Отслеживайте сумму покупки по каждой категории</string>
+	<string name="showcase_collapse_category_desc">Сворачивайте категории как Вам удобно, кликнув по ним</string>
 	<!--layout-->
 	<string name="spent_money">Потрачено</string>
 	<string name="all_money">Всего</string>
@@ -92,6 +98,7 @@
 	<string name="error_failed_get_file">Не удалось получить файл</string>
 
 	<!--settings-->
+	<string name="showcase_settings">Новинки</string>
 	<string name="settings">Настройки</string>
 	<string name="settings_key_sort_is_bought">sort_is_bought</string>
 	<string name="settings_list">Настройки списков</string>

@@ -19,6 +19,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -43,9 +44,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,10 +73,12 @@ import ru.android.ainege.shoppinglist.util.AndroidBug5497Workaround;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import ru.android.ainege.shoppinglist.util.Validation;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCursor;
 
-public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, ItemActivity.OnBackPressedInterface, View.OnClickListener {
+public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, ItemActivity.OnBackPressedInterface {
 	private static final String ID_ITEM = "idItem";
 	private static final int TAKE_PHOTO = 0;
 	private static final int LOAD_IMAGE = 1;
@@ -126,8 +126,6 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private SharedPreferences mPrefs;
 	private boolean mIsUseCategory;
 	private boolean mIsUseNewItemInSpinner;
-	private ShowcaseView showcaseView;
-	private int counter = 1;
 
 	protected abstract TextWatcher getNameChangedListener();
 
@@ -195,34 +193,18 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	private void showCaseViews() {
-		showcaseView = new ShowcaseView.Builder(getActivity())
-				.setTarget(new ViewTarget(mAppBarImage))
-				.setContentTitle(getString(R.string.showcase_update_image_item))
-				.setContentText(getString(R.string.showcase_update_image_item_desc))
-				.setOnClickListener(this)
-				.setStyle(R.style.Showcase)
-				.singleShot(Showcase.SHOT_ITEM)
-				.build();
+		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_ITEM);
+		sequence.setConfig(new ShowcaseConfig());
 
-		showcaseView.forceTextPosition(ShowcaseView.BELOW_SHOWCASE);
-		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
-	}
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mAppBarImage,
+				getString(R.string.showcase_update_image_item_desc))
+				.withRectangleShape(true)
+				.build());
 
-	@Override
-	public void onClick(View v) {
-		switch (counter) {
-			case 1:
-				showcaseView.setShowcase(new ViewTarget(mIsBought), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_bought_item));
-				showcaseView.setContentText(getString(R.string.showcase_bought_item_desc));
-				showcaseView.setButtonText(getString(R.string.close));
-				showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
-				break;
-			case 2:
-				showcaseView.hide();
-				break;
-		}
-		counter++;
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mIsBought,
+				getString(R.string.showcase_bought_item_desc)).build());
+
+		sequence.start();
 	}
 
 	@Override

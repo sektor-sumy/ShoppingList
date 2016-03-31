@@ -50,12 +50,16 @@ import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.util.Image;
+import ru.android.ainege.shoppinglist.util.Showcase;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
 import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 
 
-public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
+public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener, ShoppingListAdapter.ShowcaseListener {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
 	private static final String ID_LIST = "idList";
@@ -137,12 +141,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	};
 
-	//<editor-fold desc="Обучение -">
-	/*private ShowcaseView showcaseView;
-	private int counter = 1;
-	private View mView;*/
-	//</editor-fold>
-
 	public static ShoppingListFragment newInstance(long id) {
 		Bundle args = new Bundle();
 		args.putLong(ID_LIST, id);
@@ -216,7 +214,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-		mAdapterRV = new ShoppingListAdapter(getActivity());
+		mAdapterRV = new ShoppingListAdapter(getActivity(), this);
 		mItemsListRV.setAdapter(mAdapterRV);
 		mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
 			@Override
@@ -251,7 +249,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		}));
 
-		//showCaseView();
+		showCaseView();
 		setListData();
 
 		return v;
@@ -511,7 +509,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private void showEmptyStates() {
 		mListContainer.setVisibility(View.GONE);
 		mEmptyImage.setVisibility(View.VISIBLE);
-		mFrameLayout.setBackgroundResource(R.color.imageBackground);
+		mFrameLayout.setBackgroundResource(R.color.image_background);
 	}
 
 	private void hideEmptyStates() {
@@ -682,86 +680,146 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 	//</editor-fold>
 
-	//<editor-fold desc="Обучение -">
-	/*private void showCaseView() {
-		ShowcaseView showcaseView = new ShowcaseView.Builder(getActivity())
-				.setTarget(new ViewTarget(mFAB))
-				.setContentTitle(getString(R.string.showcase_create_item))
-				.setContentText(getString(R.string.showcase_create_item_desc))
-				.setStyle(R.style.Showcase)
-				.singleShot(Showcase.SHOT_ADD_ITEM)
-				.build();
+	//<editor-fold desc="Work with showcases">
+	private void showCaseView() {
+		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), String.valueOf(Showcase.SHOT_ADD_ITEM));
+		sequence.setConfig(new ShowcaseConfig());
 
-		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.ok), false);
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mFAB,
+				getString(R.string.showcase_create_item_desc)).build());
+
+		sequence.start();
+
+		sequence.setOnItemDismissedListener(new MaterialShowcaseSequence.OnSequenceItemDismissedListener() {
+			@Override
+			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
+				if (i == 0) {
+					onAttached(null);
+				}
+			}
+		});
 	}
-
-	private void showCaseViews() {
-		CategoriesAdapter.ViewHolder categoryHolder = (CategoriesAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
-		CategoriesAdapter.ItemsAdapter.ViewHolder holder = (CategoriesAdapter.ItemsAdapter.ViewHolder) categoryHolder.mItemsInCategory.findViewHolderForLayoutPosition(0);
-
-		mView = holder.mName;
-		showcaseView = new ShowcaseView.Builder(getActivity())
-				.setTarget(new ViewTarget(mView))
-				.setContentTitle(getString(R.string.showcase_edit_item))
-				.setContentText(getString(R.string.showcase_edit_item_desc))
-				.setOnClickListener(this)
-				.setStyle(R.style.Showcase)
-				.singleShot(Showcase.SHOT_ITEM_IN_LIST)
-				.build();
-
-		showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
-		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
-	}
-
 
 	@Override
-	public void onClick(View v) {
-		CategoriesAdapter.ViewHolder categoryHolder = (CategoriesAdapter.ViewHolder) mItemsListRV.findViewHolderForLayoutPosition(0);
-		CategoriesAdapter.ItemsAdapter.ViewHolder holder = (CategoriesAdapter.ItemsAdapter.ViewHolder) categoryHolder.mItemsInCategory.findViewHolderForLayoutPosition(0);
+	public void onAttached(String idActiveSequence) {
+		MaterialShowcaseSequence itemSequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_ITEM_IN_LIST);
 
-		switch (counter) {
-			case 1:
-				showcaseView.setShowcase(new ViewTarget(mView), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_swipe_item));
-				showcaseView.setContentText(getString(R.string.showcase_swipe_item_desc));
-				break;
-			case 2:
-				holder.mIsBought.setVisibility(View.VISIBLE);
-				showcaseView.setShowcase(new ViewTarget(mView), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_unswipe_item));
-				showcaseView.setContentText(getString(R.string.showcase_unswipe_item_desc));
-				break;
-			case 3:
-				holder.mIsBought.setVisibility(View.GONE);
-				showcaseView.setShowcase(new ViewTarget(mView), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_delete_item));
-				showcaseView.setContentText(getString(R.string.showcase_delete_item_desc));
-				showcaseView.setButtonText(getString(R.string.close));
-				break;
-			case 4:
-				showcaseView.hide();
-				break;
-		}
-		counter++;
-	}*/
-	//</editor-fold>
-	//<editor-fold desc="Адаптер -">
-	/*public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
-		@Override
-		public void onViewAttachedToWindow(ViewHolder holder) {
-			super.onViewAttachedToWindow(holder);
+		if (!Showcase.SHOT_ITEM_IN_LIST.equals(idActiveSequence) && !itemSequence.hasFired()) {
+			for (int i = 0; i < mAdapterRV.getItemCount(); i++) {
+				RecyclerView.ViewHolder nextHolder = mItemsListRV.findViewHolderForLayoutPosition(i);
 
-			holder.mCategory.post(new Runnable() {
-				@Override
-				public void run() {
-					if (Showcase.shouldBeShown(getActivity(), Showcase.SHOT_ITEM_IN_LIST)) {
-						showCaseViews();
-					}
+				if (nextHolder != null && nextHolder instanceof ShoppingListAdapter.ItemViewHolder) {
+					showcaseItem(itemSequence, (ShoppingListAdapter.ItemViewHolder) nextHolder);
+					return;
 				}
-			});
+			}
 		}
-	}*/
-	//</editor-fold>
+
+		MaterialShowcaseSequence categorySequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CATEGORY);
+		MaterialShowcaseSequence categoryCollapseSequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CATEGORY_COLLAPSE);
+
+		if (!Showcase.SHOT_CATEGORY.equals(idActiveSequence) && !categorySequence.hasFired()) {
+			RecyclerView.ViewHolder holder = mItemsListRV.findViewHolderForLayoutPosition(0);
+
+			if (holder != null && holder instanceof ShoppingListAdapter.CategoryViewHolder) {
+				showcaseCategory(categorySequence, (ShoppingListAdapter.CategoryViewHolder) holder);
+				return;
+			}
+		} else if (mIsCollapsedCategory && !Showcase.SHOT_CATEGORY_COLLAPSE.equals(idActiveSequence) && !categoryCollapseSequence.hasFired()) {
+			RecyclerView.ViewHolder holder = mItemsListRV.findViewHolderForLayoutPosition(0);
+
+			if (holder != null && holder instanceof ShoppingListAdapter.CategoryViewHolder) {
+				showcaseCollapseCategory((ShoppingListAdapter.CategoryViewHolder) holder);
+			}
+		}
+	}
+
+	private void showcaseItem(final MaterialShowcaseSequence sequence, final ShoppingListAdapter.ItemViewHolder holder) {
+		sequence.setConfig(new ShowcaseConfig());
+
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
+				getString(R.string.showcase_edit_item_desc))
+				.withRectangleShape(true)
+				.build());
+
+		if (holder.mIsBought.getVisibility() == View.GONE) {
+			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
+					getString(R.string.showcase_swipe_item_desc))
+					.withRectangleShape(true)
+					.build());
+
+			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
+							getString(R.string.showcase_unswipe_item_desc))
+							.withRectangleShape(true)
+							.build());
+		} else {
+			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
+					getString(R.string.showcase_unswipe_item_desc))
+					.withRectangleShape(true)
+					.build());
+
+			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
+					getString(R.string.showcase_swipe_item_desc))
+					.withRectangleShape(true)
+					.build());
+		}
+
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
+						getString(R.string.showcase_delete_item_desc))
+						.withRectangleShape(true)
+						.build());
+
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mSpentMoney,
+				getString(R.string.showcase_spent_sum)).build());
+
+		sequence.start();
+
+		sequence.setOnItemDismissedListener(new MaterialShowcaseSequence.OnSequenceItemDismissedListener() {
+			@Override
+			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
+				switch (i) {
+					case 1:
+					case 2:
+						holder.mIsBought.setVisibility(holder.mIsBought.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+						break;
+					case 4:
+						onAttached(Showcase.SHOT_ITEM_IN_LIST);
+						break;
+				}
+			}
+		});
+	}
+
+	private void showcaseCategory(final MaterialShowcaseSequence sequence, ShoppingListAdapter.CategoryViewHolder holder) {
+		sequence.setConfig(new ShowcaseConfig());
+
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mCategoryContainer,
+				getString(R.string.showcase_category_desc))
+				.withRectangleShape(true)
+				.build());
+
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mSumCategory,
+				getString(R.string.showcase_sum_category_desc)).build());
+
+		sequence.start();
+
+		sequence.setOnItemDismissedListener(new MaterialShowcaseSequence.OnSequenceItemDismissedListener() {
+			@Override
+			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
+				if (i == 1) {
+					onAttached(Showcase.SHOT_CATEGORY);
+				}
+			}
+		});
+	}
+
+	private void showcaseCollapseCategory(ShoppingListAdapter.CategoryViewHolder holder) {
+		Showcase.createShowcase(getActivity(), holder.mCategoryContainer,
+				getString(R.string.showcase_collapse_category_desc))
+				.withRectangleShape(true)
+				.singleUse(Showcase.SHOT_CATEGORY_COLLAPSE)
+				.show();
+	}
 
 	private static class ItemsInListCursorLoader extends CursorLoader {
 		private final Context mContext;

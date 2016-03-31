@@ -26,11 +26,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 import java.util.ArrayList;
 
@@ -41,10 +39,14 @@ import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 
-public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
+public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
 
@@ -66,8 +68,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private FloatingActionButton mAddItemFAB;
 	private ProgressBar mProgressBar;
 	private ImageView mEmptyImage;
-	private ShowcaseView showcaseView;
-	private int counter = 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -107,7 +107,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mAdapterRV = new ListsAdapter();
 		mListsRV.setAdapter(mAdapterRV);
 
-		showCaseView();
+		showcaseView();
+
 		return v;
 	}
 
@@ -195,7 +196,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 				if (data.moveToFirst()) {
 					mLists = ((ListCursor) data).getEntities();
-					mAdapterRV.notifyDataSetChanged();
+					mAdapterRV.setDate();
 					hideEmptyStates();
 				} else {
 					showEmptyStates();
@@ -237,42 +238,43 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 	}
 
-	private void showCaseView() {
-		showcaseView = new ShowcaseView.Builder(getActivity())
-				.setTarget(new ViewTarget(mAddItemFAB))
-				.setContentTitle(getString(R.string.showcase_create_list))
-				.setContentText(getString(R.string.showcase_create_list_desc))
-				.setOnClickListener(this)
-				.setStyle(R.style.Showcase)
-				.singleShot(Showcase.SHOT_LIST)
-				.build();
+	//<editor-fold desc="work with showcases">
+	private void showcaseView() {
+		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), String.valueOf(Showcase.SHOT_ADD_LIST));
+		sequence.setConfig(new ShowcaseConfig());
 
-		Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.next), false);
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mAddItemFAB,
+				getString(R.string.showcase_create_list_desc)).build());
+
+		sequence.start();
+
+		sequence.setOnItemDismissedListener(new MaterialShowcaseSequence.OnSequenceItemDismissedListener() {
+			@Override
+			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
+				if (i == 0) {
+					ListsAdapter.ViewHolder holder = (ListsAdapter.ViewHolder) mListsRV.findViewHolderForLayoutPosition(0);
+
+					if (holder != null) {
+						showCaseList(holder);
+					}
+				}
+			}
+		});
 	}
 
-	@Override
-	public void onClick(View v) {
-		ListsAdapter.ViewHolder holder = (ListsAdapter.ViewHolder) mListsRV.findViewHolderForLayoutPosition(0);
-		switch (counter) {
-			case 1:
-				showcaseView.setShowcase(new ViewTarget(holder.mDelete), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_manage_list));
-				showcaseView.setContentText(getString(R.string.showcase_manage_list_desc));
-				showcaseView.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
-				break;
-			case 2:
-				showcaseView.setShowcase(new ViewTarget(holder.mImage), true);
-				showcaseView.setContentTitle(getString(R.string.showcase_open_list));
-				showcaseView.setContentText(getString(R.string.showcase_open_list_desc));
-				showcaseView.forceTextPosition(ShowcaseView.BELOW_SHOWCASE);
-				Showcase.newInstance(showcaseView, getActivity()).setButton(getString(R.string.close), true);
-				break;
-			case 3:
-				showcaseView.hide();
-				break;
-		}
-		counter++;
+	private void showCaseList(ListsAdapter.ViewHolder holder) {
+		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_LIST);
+		sequence.setConfig(new ShowcaseConfig());
+
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mButtonsContainer,
+				getString(R.string.showcase_manage_list_desc)).build());
+
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mImage,
+				getString(R.string.showcase_open_list_desc)).build());
+
+		sequence.start();
 	}
+	//</editor-fold>
 
 	private static class ListsCursorLoader extends CursorLoader {
 		private final Context mContext;
@@ -289,6 +291,14 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	public class ListsAdapter extends RecyclerView.Adapter<ListsAdapter.ViewHolder> {
+		private boolean mIsShowShowcase = false;
+
+		public void setDate() {
+			if (new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_ADD_LIST).hasFired()) {
+				mIsShowShowcase = true;
+			}
+			notifyDataSetChanged();
+		}
 
 		@Override
 		public ListsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -308,6 +318,21 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		@Override
 		public int getItemCount() {
 			return mLists.size();
+		}
+
+		@Override
+		public void onViewAttachedToWindow(final ViewHolder holder) {
+			super.onViewAttachedToWindow(holder);
+
+			if (mIsShowShowcase) {
+				mIsShowShowcase = false;
+				holder.itemView.post(new Runnable() {
+					@Override
+					public void run() {
+						showCaseList(holder);
+					}
+				});
+			}
 		}
 
 		public void removeItem(int position) {
@@ -339,19 +364,19 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
-			public final View mView;
-			public final ImageView mImage;
-			public final TextView mName;
-			public final TextView mStatisticsShopping;
-			public final ImageButton mEdit;
-			public final ImageButton mDelete;
+			public ImageView mImage;
+			public TextView mName;
+			public TextView mStatisticsShopping;
+			public LinearLayout mButtonsContainer;
+			public ImageButton mEdit;
+			public ImageButton mDelete;
 
 			public ViewHolder(View v) {
 				super(v);
-				mView = v;
 				mImage = (ImageView) v.findViewById(R.id.image_list);
 				mName = (TextView) v.findViewById(R.id.name_list);
 				mStatisticsShopping = (TextView) v.findViewById(R.id.statistics_shopping);
+				mButtonsContainer = (LinearLayout) v.findViewById(R.id.buttons_container);
 				mEdit = (ImageButton) v.findViewById(R.id.edit_list);
 				mDelete = (ImageButton) v.findViewById(R.id.delete_list);
 
@@ -378,7 +403,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					}
 				});
 
-				mView.setOnClickListener(new View.OnClickListener() {
+				itemView.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						mIsUpdateData = true;

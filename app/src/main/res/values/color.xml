@@ -10,5 +10,8 @@
 	<color name="translucent_scrim_bottom">#46000000</color>
 	<color name="translucent_scrim_bottom_center">#19000000</color>
 
-	<color name="imageBackground">#c6c6c6</color>
+	<color name="image_background">#c6c6c6</color>
+
+	<color name="showcase_title_color">#ffffff</color>
+	<color name="showcase_background_color">#dd335075</color>
 </resources>

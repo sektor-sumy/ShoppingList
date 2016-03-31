@@ -1,6 +1,6 @@
 package ru.android.ainege.shoppinglist.adapter;
 
-import android.content.Context;
+import android.app.Activity;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,8 +20,11 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.util.MultiSelection;
 import ru.android.ainege.shoppinglist.util.Image;
+import ru.android.ainege.shoppinglist.util.Showcase;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 
 public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	private static final int TYPE_CATEGORY = 0;
@@ -30,13 +33,21 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	public List<Object> mItemList = new ArrayList<>();
 	private HashMap<Long, Boolean> collapseCategoryStates = new HashMap<>();
 
-	private Context mContext;
+	private Activity mActivity;
 	private String mCurrency;
 	private boolean mIsUseCategory;
 	private boolean mIsCollapsedCategory;
 
-	public ShoppingListAdapter(Context context) {
-		mContext = context;
+	private ShowcaseListener mShowcaseListener;
+	private boolean mIsShowShowcase = false;
+
+	public interface ShowcaseListener {
+		void onAttached(String idActiveSequence);
+	}
+
+	public ShoppingListAdapter(Activity activity, ShoppingListFragment fragment) {
+		mActivity = activity;
+		mShowcaseListener = fragment;
 	}
 
 	public void setData(List<Category> categoryList, String currency, boolean isUseCategory, boolean isCollapsedCategory) {
@@ -45,6 +56,9 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		mIsCollapsedCategory = isCollapsedCategory;
 		mItemList = generateParentChildItemList(categoryList);
 
+		if (new MaterialShowcaseSequence(mActivity, Showcase.SHOT_ADD_ITEM).hasFired()) {
+			mIsShowShowcase = true;
+		}
 		notifyDataSetChanged();
 	}
 
@@ -118,19 +132,19 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) holder.mIsBought.getLayoutParams();
 
 		if (mIsUseCategory) {
-			param.setMargins(mContext.getResources().getDimensionPixelSize(R.dimen.padding_24dp), 0, mContext.getResources().getDimensionPixelSize(R.dimen.padding_16dp), 0);
+			param.setMargins(mActivity.getResources().getDimensionPixelSize(R.dimen.padding_24dp), 0, mActivity.getResources().getDimensionPixelSize(R.dimen.padding_16dp), 0);
 			holder.mIsBought.setLayoutParams(param);
 
 			holder.mColor.setVisibility(View.VISIBLE);
 			holder.mColor.setBackgroundColor(itemInList.getCategory().getColor());
 		} else {
-			param.setMargins(mContext.getResources().getDimensionPixelSize(R.dimen.padding_12dp), 0, mContext.getResources().getDimensionPixelSize(R.dimen.padding_12dp), 0);
+			param.setMargins(mActivity.getResources().getDimensionPixelSize(R.dimen.padding_12dp), 0, mActivity.getResources().getDimensionPixelSize(R.dimen.padding_12dp), 0);
 			holder.mIsBought.setLayoutParams(param);
 
 			holder.mColor.setVisibility(View.GONE);
 		}
 
-		Image.create().insertImageToView(mContext, itemInList.getItem().getImagePath(), holder.mImage);
+		Image.create().insertImageToView(mActivity, itemInList.getItem().getImagePath(), holder.mImage);
 		holder.itemView.setSelected(MultiSelection.getInstance().isContains(itemInList));
 		holder.mName.setText(itemInList.getItem().getName());
 
@@ -157,6 +171,21 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 	public List<Object> getItemList() {
 		return mItemList;
+	}
+
+	@Override
+	public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
+		super.onViewAttachedToWindow(holder);
+
+		if (mIsShowShowcase && mShowcaseListener != null) {
+			mIsShowShowcase = false;
+			holder.itemView.post(new Runnable() {
+				@Override
+				public void run() {
+					mShowcaseListener.onAttached(null);
+				}
+			});
+		}
 	}
 
 	//<editor-fold desc="Extend/collapse category">
@@ -187,6 +216,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	}
 
 	private void extendCategory(Category category, int position){
+		mIsShowShowcase = true;
 		List<ShoppingList> itemInList = category.getItemsByCategoryInList();
 
 		if (itemInList != null) {
@@ -291,7 +321,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		ArrayList<ShoppingList> items = MultiSelection.getInstance().getSelectedItems();
 
 		for (ShoppingList item : items) {
-			new ShoppingListDS(mContext).delete(item.getIdItemData());
+			new ShoppingListDS(mActivity).delete(item.getIdItemData());
 			removeItem(item);
 		}
 
@@ -320,7 +350,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		}
 	}
 
-	private class CategoryViewHolder extends RecyclerView.ViewHolder {
+	public class CategoryViewHolder extends RecyclerView.ViewHolder {
 		public LinearLayout mCategoryContainer;
 		public TextView mColor;
 		public TextView mCategory;
@@ -345,7 +375,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		}
 	}
 
-	private class ItemViewHolder extends RecyclerView.ViewHolder {
+	public class ItemViewHolder extends RecyclerView.ViewHolder {
 		public ImageView mImage;
 		public TextView mName;
 		public TextView mAmount;

@@ -9,9 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
-
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
@@ -19,27 +16,25 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.util.Showcase;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 
 public class CurrencyFragment extends DictionaryFragment<Currency> {
-	private boolean mFlag = true;
-
 	private void showCaseView() {
 		CurrencyAdapter.CurrencyHolder holder;
+		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CURRENCY);
 
-		if (Showcase.shouldBeShown(getActivity(), Showcase.SHOT_CURRENCY)) {
+		if (!sequence.hasFired()) {
 			mDictionaryRV.scrollToPosition(7);
 			holder = (CurrencyAdapter.CurrencyHolder) mDictionaryRV.findViewHolderForLayoutPosition(7);
 		} else {
 			holder = (CurrencyAdapter.CurrencyHolder) mDictionaryRV.findViewHolderForLayoutPosition(0);
 		}
 
-		new ShowcaseView.Builder(getActivity())
-				.setTarget(new ViewTarget(holder.mDefaultCurrency))
-				.setContentTitle(getString(R.string.showcase_default_currency))
-				.setContentText(getString(R.string.showcase_default_currency_desc))
-				.setStyle(R.style.Showcase)
-				.singleShot(Showcase.SHOT_CURRENCY)
-				.build();
+		Showcase.createShowcase(getActivity(), holder.mDefaultCurrency,
+				getString(R.string.showcase_default_currency_desc))
+				.withRectangleShape(true)
+				.singleUse(Showcase.SHOT_CURRENCY)
+				.show();
 	}
 
 	@Override
@@ -106,6 +101,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 	public class CurrencyAdapter extends RecyclerViewAdapter<CurrencyAdapter.CurrencyHolder> {
 		public long mIdOld;
 		public long mIdSelected;
+		private boolean mIsShowShowcase = true;
 
 		public CurrencyAdapter() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -141,15 +137,15 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		public void onViewAttachedToWindow(CurrencyHolder holder) {
 			super.onViewAttachedToWindow(holder);
 
-			holder.mDefaultCurrency.post(new Runnable() {
-				@Override
-				public void run() {
-					if (mFlag) {
+			if (mIsShowShowcase) {
+				mIsShowShowcase = false;
+				holder.mDefaultCurrency.post(new Runnable() {
+					@Override
+					public void run() {
 						showCaseView();
-						mFlag = false;
 					}
-				}
-			});
+				});
+			}
 		}
 
 		public class CurrencyHolder extends RecyclerViewAdapter<CurrencyHolder>.ViewHolder {

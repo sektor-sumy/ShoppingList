@@ -72,7 +72,7 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		switch (oldVersion) {
 			case 1:
-				SharedPreferences sp = mCtx.getSharedPreferences(Showcase.PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE);
+				/*SharedPreferences sp = mCtx.getSharedPreferences(Showcase.PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE);
 
 				SharedPreferences.Editor e = sp.edit();
 				e.putBoolean("hasShot" + Showcase.SHOT_LIST, true);
@@ -80,11 +80,10 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 				e.putBoolean("hasShot" + Showcase.SHOT_ITEM_IN_LIST, true);
 				e.putBoolean("hasShot" + Showcase.SHOT_ITEM, true);
 				e.putBoolean("hasShot" + Showcase.SHOT_CURRENCY, true);
-				e.apply();
+				e.apply();*/
 
 				UnitsTable.onUpgrade(db, mCtx, oldVersion, newVersion);
 				ItemsTable.onUpgrade(db, mCtx, oldVersion, newVersion);
-
 		}
 	}
 }

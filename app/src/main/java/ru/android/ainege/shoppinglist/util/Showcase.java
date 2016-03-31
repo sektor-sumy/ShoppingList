@@ -1,49 +1,31 @@
 package ru.android.ainege.shoppinglist.util;
 
-import android.app.Activity;
-import android.content.Context;
-import android.widget.RelativeLayout;
 
-import com.github.amlcurran.showcaseview.ShowcaseView;
+import android.app.Activity;
+import android.support.v4.content.ContextCompat;
+import android.view.View;
 
 import ru.android.ainege.shoppinglist.R;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class Showcase {
-	public static final String PREFS_SHOWCASE_INTERNAL = "showcase_internal";
+	public static final String SHOT_ADD_LIST = "add_list";
+	public static final String SHOT_LIST = "list";
+	public static final String SHOT_LIST_IMAGE = "list_image";
+	public static final String SHOT_ADD_ITEM = "add_item";
+	public static final String SHOT_ITEM_IN_LIST = "item_in_list";
+	public static final String SHOT_ITEM = "item";
+	public static final String SHOT_CATEGORY = "category";
+	public static final String SHOT_CATEGORY_COLLAPSE = "category_collapse";
+	public static final String SHOT_CURRENCY = "currency";
 
-	private static int shot = 0;
-	public static final int SHOT_LIST = shot++;
-	public static final int SHOT_ADD_ITEM = shot++;
-	public static final int SHOT_ITEM_IN_LIST = shot++;
-	public static final int SHOT_ITEM = shot++;
-	public static final int SHOT_CURRENCY = shot++;
-	private static ShowcaseView mShowcaseView;
-	private static Activity mActivity;
-
-	public static Showcase newInstance(ShowcaseView showcaseView, Activity activity) {
-		Showcase showcase = new Showcase();
-
-		mShowcaseView = showcaseView;
-		mActivity = activity;
-
-		return showcase;
-	}
-
-	public static boolean shouldBeShown(Context context, int type) {
-		return !context.getSharedPreferences(PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE)
-				.getBoolean("hasShot" + type, false);
-	}
-
-	public void setButton(String text, boolean isRight) {
-		int margin = (int) mActivity.getResources().getDimension(R.dimen.floating_button_margin);
-		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-		if (isRight) {
-			lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		}
-		lp.setMargins(margin, margin, margin, margin);
-
-		mShowcaseView.setButtonPosition(lp);
-		mShowcaseView.setButtonText(text);
+	public static MaterialShowcaseView.Builder createShowcase (Activity activity, View target, String content) {
+		return new MaterialShowcaseView.Builder(activity)
+				.setTarget(target)
+				.setMaskColour(ContextCompat.getColor(activity, R.color.showcase_background_color))
+				.setContentText(content)
+				.setContentTextColor(ContextCompat.getColor(activity, R.color.showcase_title_color))
+				.setDismissOnTouch(true)
+				.setShapePadding(activity.getResources().getDimensionPixelOffset(R.dimen.shape_padding));
 	}
 }
