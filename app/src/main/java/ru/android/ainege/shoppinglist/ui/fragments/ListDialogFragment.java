@@ -33,10 +33,10 @@ import java.io.IOException;
 import java.util.Random;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.ITable.ICurrencies;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
-import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 
@@ -256,7 +256,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.spinner_currency,
 				new CurrenciesDS(getActivity()).getAll(),
-				new String[]{CurrenciesTable.COLUMN_SYMBOL, CurrenciesTable.COLUMN_NAME},
+				new String[]{ICurrencies.COLUMN_SYMBOL, ICurrencies.COLUMN_NAME},
 				new int[]{R.id.currency_symbol, R.id.currency_name}, 0);
 		spinnerAdapter.setDropDownViewResource(R.layout.spinner_currency_drop);
 		return spinnerAdapter;

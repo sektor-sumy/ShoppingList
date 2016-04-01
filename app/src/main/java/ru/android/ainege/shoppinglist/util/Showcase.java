@@ -9,9 +9,10 @@ import ru.android.ainege.shoppinglist.R;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class Showcase {
+	public static final String PREFS_SHOWCASE = "material_showcaseview_prefs";
+
 	public static final String SHOT_ADD_LIST = "add_list";
 	public static final String SHOT_LIST = "list";
-	public static final String SHOT_LIST_IMAGE = "list_image";
 	public static final String SHOT_ADD_ITEM = "add_item";
 	public static final String SHOT_ITEM_IN_LIST = "item_in_list";
 	public static final String SHOT_ITEM = "item";

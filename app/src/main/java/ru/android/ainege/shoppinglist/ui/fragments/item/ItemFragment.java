@@ -19,7 +19,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -50,6 +49,9 @@ import java.io.IOException;
 import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.ITable.IItems;
+import ru.android.ainege.shoppinglist.db.ITable.IUnits;
+import ru.android.ainege.shoppinglist.db.ITable.ICategories;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
@@ -58,9 +60,6 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
-import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
-import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
@@ -510,7 +509,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
 			@Override
 			public CharSequence convertToString(Cursor cursor) {
-				return cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME));
+				return cursor.getString(cursor.getColumnIndex(IItems.COLUMN_NAME));
 			}
 		});
 		return completeTextAdapter;
@@ -651,7 +650,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.spinner_unit,
 				cursor,
-				new String[]{UnitsTable.COLUMN_NAME},
+				new String[]{IUnits.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		return spinnerAdapter;
@@ -743,16 +742,16 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			ViewHolder holder = (ViewHolder) view.getTag();
 			String name = "";
 
-			if (cursor.getColumnIndex(ItemsTable.COLUMN_NAME) != -1) {
-				name = cursor.getString(cursor.getColumnIndex(ItemsTable.COLUMN_NAME));
-			} else if (cursor.getColumnIndex(CategoriesTable.COLUMN_NAME) != -1) {
-				name = cursor.getString(cursor.getColumnIndex(CategoriesTable.COLUMN_NAME));
+			if (cursor.getColumnIndex(IItems.COLUMN_NAME) != -1) {
+				name = cursor.getString(cursor.getColumnIndex(IItems.COLUMN_NAME));
+			} else if (cursor.getColumnIndex(ICategories.COLUMN_NAME) != -1) {
+				name = cursor.getString(cursor.getColumnIndex(ICategories.COLUMN_NAME));
 			}
 
 			holder.mName.setText(name);
 
 			if (mIsUseCategory) {
-				holder.mColor.setBackgroundColor(cursor.getInt(cursor.getColumnIndex(CategoriesTable.COLUMN_COLOR)));
+				holder.mColor.setBackgroundColor(cursor.getInt(cursor.getColumnIndex(ICategories.COLUMN_COLOR)));
 			}
 		}
 

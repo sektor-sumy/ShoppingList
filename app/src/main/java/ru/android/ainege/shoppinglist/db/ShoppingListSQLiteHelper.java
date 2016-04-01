@@ -1,22 +1,16 @@
 package ru.android.ainege.shoppinglist.db;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
-import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
-import ru.android.ainege.shoppinglist.db.tables.ItemDataTable;
-import ru.android.ainege.shoppinglist.db.tables.ItemsTable;
-import ru.android.ainege.shoppinglist.db.tables.ListsTable;
-import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
-import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
-import ru.android.ainege.shoppinglist.util.Showcase;
+import ru.android.ainege.shoppinglist.db.migration.Create;
+import ru.android.ainege.shoppinglist.db.migration.Migration2;
+import ru.android.ainege.shoppinglist.db.migration.Migration3;
 
 public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "shoppingList.db";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	private static ShoppingListSQLiteHelper instance;
 	private final Context mCtx;
 
@@ -59,31 +53,16 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase sqLiteDatabase) {
-		CurrenciesTable.onCreate(sqLiteDatabase, mCtx);
-		UnitsTable.onCreate(sqLiteDatabase, mCtx);
-		CategoriesTable.onCreate(sqLiteDatabase, mCtx);
-		ItemDataTable.onCreate(sqLiteDatabase);
-		ItemsTable.onCreate(sqLiteDatabase, mCtx);
-		ListsTable.onCreate(sqLiteDatabase);
-		ShoppingListTable.onCreate(sqLiteDatabase);
+		new Create(sqLiteDatabase, mCtx).run();
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		switch (oldVersion) {
 			case 1:
-				/*SharedPreferences sp = mCtx.getSharedPreferences(Showcase.PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE);
-
-				SharedPreferences.Editor e = sp.edit();
-				e.putBoolean("hasShot" + Showcase.SHOT_LIST, true);
-				e.putBoolean("hasShot" + Showcase.SHOT_ADD_ITEM, true);
-				e.putBoolean("hasShot" + Showcase.SHOT_ITEM_IN_LIST, true);
-				e.putBoolean("hasShot" + Showcase.SHOT_ITEM, true);
-				e.putBoolean("hasShot" + Showcase.SHOT_CURRENCY, true);
-				e.apply();*/
-
-				UnitsTable.onUpgrade(db, mCtx, oldVersion, newVersion);
-				ItemsTable.onUpgrade(db, mCtx, oldVersion, newVersion);
+				new Migration2(db, mCtx).run();
+			case 2:
+				new Migration3(db, mCtx).run();
 		}
 	}
 }

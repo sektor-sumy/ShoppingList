@@ -2,18 +2,14 @@ package ru.android.ainege.shoppinglist.db.dataSources;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.preference.PreferenceManager;
 
-import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.ITable;
+import ru.android.ainege.shoppinglist.db.ITable.ILists;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
-import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
-import ru.android.ainege.shoppinglist.db.tables.ListsTable;
 
-public class CurrenciesDS extends DictionaryDS<Currency> {
-
+public class CurrenciesDS extends DictionaryDS<Currency> implements ITable.ICurrencies{
 	public CurrenciesDS(Context context) {
 		super(context);
 	}
@@ -21,39 +17,39 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 	@Override
 	public CurrencyCursor getAll() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(CurrenciesTable.TABLE_NAME, null, null,
-				null, null, null, CurrenciesTable.COLUMN_NAME);
+		Cursor cursor = db.query(TABLE_NAME, null, null,
+				null, null, null, COLUMN_NAME);
 		return new CurrencyCursor(cursor);
 	}
 
 	@Override
 	public CurrencyCursor getAll(long withoutId) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(CurrenciesTable.TABLE_NAME, null, CurrenciesTable.COLUMN_ID + " != " + withoutId,
-				null, null, null, CurrenciesTable.COLUMN_NAME);
+		Cursor cursor = db.query(TABLE_NAME, null, COLUMN_ID + " != " + withoutId,
+				null, null, null, COLUMN_NAME);
 		return new CurrencyCursor(cursor);
 	}
 
 	public CurrencyCursor getByName(String name) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(CurrenciesTable.TABLE_NAME, null, CurrenciesTable.COLUMN_NAME + " = '" + name + "'",
+		Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME + " = '" + name + "'",
 				null, null, null, null);
 		return new CurrencyCursor(cursor);
 	}
 
 	public CurrencyCursor getByList(long idList) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("Select " + CurrenciesTable.TABLE_NAME + ".* from " + CurrenciesTable.TABLE_NAME +
-				" INNER JOIN " + ListsTable.TABLE_NAME + " ON " +
-				CurrenciesTable.TABLE_NAME + "." + CurrenciesTable.COLUMN_ID + " = " + ListsTable.TABLE_NAME + "." + ListsTable.COLUMN_ID_CURRENCY +
-				" where " + ListsTable.TABLE_NAME + " . " + ListsTable.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
+		Cursor cursor = db.rawQuery("Select " + TABLE_NAME + ".* from " + TABLE_NAME +
+				" INNER JOIN " + ILists.TABLE_NAME + " ON " +
+				TABLE_NAME + "." + COLUMN_ID + " = " + ILists.TABLE_NAME + "." + ILists.COLUMN_ID_CURRENCY +
+				" where " + ILists.TABLE_NAME + " . " + ILists.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
 		return new CurrencyCursor(cursor);
 	}
 
 	@Override
 	public boolean isUsed(long idCurrency) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(ListsTable.TABLE_NAME, null, ListsTable.COLUMN_ID_CURRENCY + " = " + idCurrency,
+		Cursor cursor = db.query(ILists.TABLE_NAME, null, ILists.COLUMN_ID_CURRENCY + " = " + idCurrency,
 				null, null, null, null);
 		boolean result = cursor.getCount() > 0;
 		cursor.close();
@@ -64,15 +60,15 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 	public int update(Currency currency) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(currency);
-		return db.update(CurrenciesTable.TABLE_NAME, values, CurrenciesTable.COLUMN_ID + " = ?",
+		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?",
 				new String[]{String.valueOf(currency.getId())});
 	}
 
 	public int update(String newSymbol, String oldSymbol) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
-		values.put(CurrenciesTable.COLUMN_SYMBOL, newSymbol);
-		return db.update(CurrenciesTable.TABLE_NAME, values, CurrenciesTable.COLUMN_SYMBOL + " = ?",
+		values.put(COLUMN_SYMBOL, newSymbol);
+		return db.update(TABLE_NAME, values, COLUMN_SYMBOL + " = ?",
 				new String[]{oldSymbol});
 	}
 
@@ -80,13 +76,13 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 	public long add(Currency currency) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(currency);
-		return db.insert(CurrenciesTable.TABLE_NAME, null, values);
+		return db.insert(TABLE_NAME, null, values);
 	}
 
 	@Override
 	public void delete(long id) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-		db.delete(CurrenciesTable.TABLE_NAME, CurrenciesTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+		db.delete(TABLE_NAME, COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 	}
 
 	@Override
@@ -105,8 +101,8 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 
 	private ContentValues createContentValues(Currency currency) {
 		ContentValues values = new ContentValues();
-		values.put(CurrenciesTable.COLUMN_NAME, currency.getName());
-		values.put(CurrenciesTable.COLUMN_SYMBOL, currency.getSymbol());
+		values.put(COLUMN_NAME, currency.getName());
+		values.put(COLUMN_SYMBOL, currency.getSymbol());
 		return values;
 	}
 
@@ -116,9 +112,9 @@ public class CurrenciesDS extends DictionaryDS<Currency> {
 		}
 
 		public Currency getEntity() {
-			long id = getLong(getColumnIndex(CurrenciesTable.COLUMN_ID));
-			String name = getString(getColumnIndex(CurrenciesTable.COLUMN_NAME));
-			String symbol = getString(getColumnIndex(CurrenciesTable.COLUMN_SYMBOL));
+			long id = getLong(getColumnIndex(COLUMN_ID));
+			String name = getString(getColumnIndex(COLUMN_NAME));
+			String symbol = getString(getColumnIndex(COLUMN_SYMBOL));
 
 			return new Currency(id, name, symbol);
 		}

@@ -8,23 +8,35 @@ import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import ru.android.ainege.shoppinglist.db.ITable;
+import ru.android.ainege.shoppinglist.db.ITable.IItemData;
+import ru.android.ainege.shoppinglist.db.ITable.IShoppingLists;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
-import ru.android.ainege.shoppinglist.db.tables.ItemDataTable;
-import ru.android.ainege.shoppinglist.db.tables.ShoppingListTable;
 
-public class CategoriesDS extends DictionaryDS<Category> {
+public class CategoriesDS extends DictionaryDS<Category> implements ITable.ICategories{
 
 	public CategoriesDS(Context context) {
 		super(context);
 	}
 
+	public static HashMap<String, Category> getCategories(SQLiteDatabase db) {
+		ArrayList<Category> categoriesDB = getAll(db).getEntities();
+		HashMap<String, Category> unit = new HashMap<>();
+
+		for (Category c : categoriesDB) {
+			unit.put(c.getName(), c);
+		}
+
+		return unit;
+	}
+
 	public static CategoryCursor getAll(SQLiteDatabase db) {
-		Cursor cursor = db.query(CategoriesTable.TABLE_NAME, null, null,
-				null, null, null, CategoriesTable.COLUMN_NAME);
+		Cursor cursor = db.query(TABLE_NAME, null, null,
+				null, null, null, COLUMN_NAME);
 		return new CategoryCursor(cursor);
 	}
 
@@ -35,11 +47,11 @@ public class CategoriesDS extends DictionaryDS<Category> {
 
 	public CategoryCursor getAllForSpinner() {
 		SQLiteDatabase  db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(CategoriesTable.TABLE_NAME, null, null,
-				null, null, null, CategoriesTable.COLUMN_NAME);
+		Cursor cursor = db.query(TABLE_NAME, null, null,
+				null, null, null, COLUMN_NAME);
 
-		MatrixCursor extras = new MatrixCursor(new String[] { CategoriesTable.COLUMN_ID,
-				CategoriesTable.COLUMN_NAME, CategoriesTable.COLUMN_COLOR });
+		MatrixCursor extras = new MatrixCursor(new String[] { COLUMN_ID,
+				COLUMN_NAME, COLUMN_COLOR });
 		extras.addRow(new String[] { "-1", "Добавить", "0" });
 		Cursor[] cursors = { extras, cursor };
 
@@ -49,22 +61,22 @@ public class CategoriesDS extends DictionaryDS<Category> {
 	@Override
 	public CategoryCursor getAll(long withoutId) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(CategoriesTable.TABLE_NAME, null, CategoriesTable.COLUMN_ID + " != " + withoutId,
-				null, null, null, CategoriesTable.COLUMN_NAME);
+		Cursor cursor = db.query(TABLE_NAME, null, COLUMN_ID + " != " + withoutId,
+				null, null, null, COLUMN_NAME);
 		return new CategoryCursor(cursor);
 	}
 
 	public CategoryCursor getCategoriesInList(long idList) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		String selectQuery = "SELECT " + CategoriesTable.TABLE_NAME + ".*" +
-				" FROM " + CategoriesTable.TABLE_NAME +
-				" INNER JOIN " + ItemDataTable.TABLE_NAME +
-				" ON " + CategoriesTable.TABLE_NAME + "." + CategoriesTable.COLUMN_ID + " = " + ItemDataTable.TABLE_NAME + "." + ItemDataTable.COLUMN_ID_CATEGORY +
-				" INNER JOIN " + ShoppingListTable.TABLE_NAME +
-				" ON " + ItemDataTable.TABLE_NAME + "." + ItemDataTable.COLUMN_ID + " = " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_DATA +
-				" WHERE " + ShoppingListTable.TABLE_NAME + "." + ShoppingListTable.COLUMN_ID_LIST + " = ?" +
-				" GROUP BY " + CategoriesTable.TABLE_NAME + "." + CategoriesTable.COLUMN_NAME +
-				" ORDER BY " + CategoriesTable.COLUMN_NAME;
+		String selectQuery = "SELECT " + TABLE_NAME + ".*" +
+				" FROM " + TABLE_NAME +
+				" INNER JOIN " + IItemData.TABLE_NAME +
+				" ON " + TABLE_NAME + "." + COLUMN_ID + " = " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID_CATEGORY +
+				" INNER JOIN " + IShoppingLists.TABLE_NAME +
+				" ON " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID + " = " + IShoppingLists.TABLE_NAME + "." + IShoppingLists.COLUMN_ID_DATA +
+				" WHERE " + IShoppingLists.TABLE_NAME + "." + IShoppingLists.COLUMN_ID_LIST + " = ?" +
+				" GROUP BY " + TABLE_NAME + "." + COLUMN_NAME +
+				" ORDER BY " + COLUMN_NAME;
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(idList)});
 		return new CategoryCursor(cursor);
 	}
@@ -72,7 +84,7 @@ public class CategoriesDS extends DictionaryDS<Category> {
 	@Override
 	public boolean isUsed(long idCategory) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(ItemDataTable.TABLE_NAME, null, ItemDataTable.COLUMN_ID_CATEGORY + " = " + idCategory,
+		Cursor cursor = db.query(IItemData.TABLE_NAME, null, IItemData.COLUMN_ID_CATEGORY + " = " + idCategory,
 				null, null, null, null);
 		boolean result = cursor.getCount() > 0;
 		cursor.close();
@@ -83,7 +95,7 @@ public class CategoriesDS extends DictionaryDS<Category> {
 	public int update(Category category) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(category);
-		return db.update(CategoriesTable.TABLE_NAME, values, CategoriesTable.COLUMN_ID + " = ?",
+		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?",
 				new String[]{String.valueOf(category.getId())});
 	}
 
@@ -91,13 +103,13 @@ public class CategoriesDS extends DictionaryDS<Category> {
 	public long add(Category category) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(category);
-		return db.insert(CategoriesTable.TABLE_NAME, null, values);
+		return db.insert(TABLE_NAME, null, values);
 	}
 
 	@Override
 	public void delete(long id) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-		db.delete(CategoriesTable.TABLE_NAME, CategoriesTable.COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+		db.delete(TABLE_NAME, COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 	}
 
 	@Override
@@ -116,8 +128,8 @@ public class CategoriesDS extends DictionaryDS<Category> {
 
 	private ContentValues createContentValues(Category category) {
 		ContentValues values = new ContentValues();
-		values.put(CategoriesTable.COLUMN_NAME, category.getName());
-		values.put(CategoriesTable.COLUMN_COLOR, category.getColor());
+		values.put(COLUMN_NAME, category.getName());
+		values.put(COLUMN_COLOR, category.getColor());
 		return values;
 	}
 
@@ -137,9 +149,9 @@ public class CategoriesDS extends DictionaryDS<Category> {
 		}
 
 		public Category getEntity() {
-			long id = getLong(getColumnIndex(CategoriesTable.COLUMN_ID));
-			String name = getString(getColumnIndex(CategoriesTable.COLUMN_NAME));
-			int color = getInt(getColumnIndex(CategoriesTable.COLUMN_COLOR));
+			long id = getLong(getColumnIndex(COLUMN_ID));
+			String name = getString(getColumnIndex(COLUMN_NAME));
+			int color = getInt(getColumnIndex(COLUMN_COLOR));
 
 			Category category = new Category(id, name, color);
 

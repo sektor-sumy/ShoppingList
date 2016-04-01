@@ -12,6 +12,9 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.ITable.IUnits;
+import ru.android.ainege.shoppinglist.db.ITable.ICurrencies;
+import ru.android.ainege.shoppinglist.db.ITable.ICategories;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
@@ -20,9 +23,6 @@ import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
-import ru.android.ainege.shoppinglist.db.tables.CategoriesTable;
-import ru.android.ainege.shoppinglist.db.tables.CurrenciesTable;
-import ru.android.ainege.shoppinglist.db.tables.UnitsTable;
 
 public class DeleteDialogFragment extends DialogFragment {
 	public static final String POSITION = "position";
@@ -88,7 +88,7 @@ public class DeleteDialogFragment extends DialogFragment {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				android.R.layout.simple_spinner_item,
 				new UnitsDS(getActivity()).getAll(id),
-				new String[]{UnitsTable.COLUMN_NAME},
+				new String[]{IUnits.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		return spinnerAdapter;
@@ -98,7 +98,7 @@ public class DeleteDialogFragment extends DialogFragment {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				android.R.layout.simple_spinner_item,
 				new CategoriesDS(getActivity()).getAll(id),
-				new String[]{CategoriesTable.COLUMN_NAME},
+				new String[]{ICategories.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		return spinnerAdapter;
@@ -108,7 +108,7 @@ public class DeleteDialogFragment extends DialogFragment {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				android.R.layout.simple_spinner_item,
 				new CurrenciesDS(getActivity()).getAll(id),
-				new String[]{CurrenciesTable.COLUMN_NAME},
+				new String[]{ICurrencies.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		return spinnerAdapter;
