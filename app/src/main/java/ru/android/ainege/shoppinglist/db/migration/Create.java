@@ -34,6 +34,7 @@ public class Create {
 
 		initialUnit();
 		initialCurrency();
+		initialCategory();
 		initialList();
 		initialItem();
 	}
@@ -56,6 +57,17 @@ public class Create {
 			contentValue.put(Migration3.CurrencyT.COLUMN_NAME, currencyData[Migration3.CurrencyT.INIT_DATA_NAME]);
 			contentValue.put(Migration3.CurrencyT.COLUMN_SYMBOL, currencyData[Migration3.CurrencyT.INIT_DATA_SYMBOL]);
 			mDb.insert(Migration3.CurrencyT.TABLE_NAME, null, contentValue);
+		}
+	}
+
+	private void initialCategory() {
+		String[][] initData = ShoppingListSQLiteHelper.parseInitData(mCtx.getResources().getStringArray(R.array.categories));
+
+		for (String[] category : initData) {
+			ContentValues contentValue = new ContentValues();
+			contentValue.put(Migration3.CategoryT.COLUMN_NAME, category[Migration3.CategoryT.INIT_DATA_NAME]);
+			contentValue.put(Migration3.CategoryT.COLUMN_COLOR, category[Migration3.CategoryT.INIT_DATA_COLOR]);
+			mDb.insert(Migration3.CategoryT.TABLE_NAME, null, contentValue);
 		}
 	}
 
