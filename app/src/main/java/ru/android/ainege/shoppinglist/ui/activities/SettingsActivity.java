@@ -3,7 +3,9 @@ package ru.android.ainege.shoppinglist.ui.activities;
 import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -21,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+
+import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
 
@@ -57,6 +61,8 @@ public class SettingsActivity extends SingleFragmentActivity {
 				actionBar.setHomeButtonEnabled(true);
 				actionBar.setDisplayHomeAsUpEnabled(true);
 			}
+
+			showNew();
 
 			startSettingByKey(getString(R.string.settings_key_currency));
 			startSettingByKey(getString(R.string.settings_key_unit));
@@ -114,7 +120,7 @@ public class SettingsActivity extends SingleFragmentActivity {
 				TypedValue tv = new TypedValue();
 				if (getActivity().getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
 					height = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-				}else{
+				} else {
 					height = toolbar.getHeight();
 				}
 
@@ -133,6 +139,33 @@ public class SettingsActivity extends SingleFragmentActivity {
 					dialog.dismiss();
 				}
 			});
+		}
+
+		private void showNew() {
+			SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.settings_shared_preferences), Context.MODE_PRIVATE);
+			ArrayList<String> keys = new ArrayList<>();
+
+			if (sp.getBoolean("v3", false)) {
+				keys.add(getString(R.string.settings_key_sort_type));
+				keys.add(getString(R.string.settings_key_transition_screen));
+				keys.add(getString(R.string.settings_key_text_selection_screen));
+				keys.add(getString(R.string.settings_key_collapse_category));
+				keys.add(getString(R.string.settings_key_category));
+
+				sp.edit().remove("v3").apply();
+			}
+
+			for (String key : keys) {
+				markAsNew(key);
+			}
+		}
+
+		private void markAsNew(String key) {
+			Preference preference = findPreference(key);
+
+			if (preference != null) {
+				preference.setWidgetLayoutResource(R.layout.setting_new);
+			}
 		}
 
 		private void startSettingByKey(final String key) {

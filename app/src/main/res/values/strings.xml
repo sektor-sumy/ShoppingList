@@ -98,7 +98,8 @@
 	<string name="error_failed_get_file">Не удалось получить файл</string>
 
 	<!--settings-->
-	<string name="showcase_settings">Новинки</string>
+	<string name="settings_new">NEW!</string>
+	<string name="settings_shared_preferences">new_setting</string>
 	<string name="settings">Настройки</string>
 	<string name="settings_key_sort_is_bought">sort_is_bought</string>
 	<string name="settings_list">Настройки списков</string>
