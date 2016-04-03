@@ -137,9 +137,22 @@
 	<string name="settings_title_text_selection_comment">Коментарий</string>
 
 	<string name="settings_category_data_item">Настройка данных по умолчанию</string>
-	<string name="settings_key_sort_is_default_data">sort_is_default_data</string>
-	<string name="settings_title_sort_is_default_data">Автозаполнение</string>
-	<string name="settings_summary_sort_is_default_data">Заполнение полей, используя последние данные о товаре: количество, цена и тд.</string>
+	<string name="settings_key_auto_complete_data">auto_complete_data</string>
+	<string name="settings_title_auto_complete_data">Автозаполнение</string>
+	<string name="settings_summary_auto_complete_data">Заполнение полей, используя последние данные о товаре: количество, цена и тд.</string>
+	<string name="settings_key_auto_complete_screen">auto_complete_screen</string>
+	<string name="settings_title_auto_complete_screen">Настройка автозаполения</string>
+	<string name="settings_summary_auto_complete_screen">Чтото...</string>
+	<string name="settings_key_auto_complete_amount">auto_complete_amount</string>
+	<string name="settings_title_auto_complete_amount">Количество</string>
+	<string name="settings_key_auto_complete_unit">auto_complete_unit</string>
+	<string name="settings_title_auto_complete_unit">Единица измерения</string>
+	<string name="settings_key_auto_complete_price">auto_complete_price</string>
+	<string name="settings_title_auto_complete_price">Цена</string>
+	<string name="settings_key_auto_complete_category">auto_complete_category</string>
+	<string name="settings_title_auto_complete_category">Категория</string>
+	<string name="settings_key_auto_complete_comment">auto_complete_comment</string>
+	<string name="settings_title_auto_complete_comment">Коментарий</string>
 
 	<string name="settings_category_other">Другое</string>
 	<string name="settings_key_currency">settings_key_summary</string>

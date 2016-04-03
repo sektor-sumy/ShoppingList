@@ -62,12 +62,20 @@ public class SettingsActivity extends SingleFragmentActivity {
 				actionBar.setDisplayHomeAsUpEnabled(true);
 			}
 
+			Preference useCategory = findPreference(getString(R.string.settings_key_use_category));
+			useCategory.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					findPreference(getString(R.string.settings_key_auto_complete_category)).setEnabled((Boolean) newValue);
+					return true;
+				}
+			});
+
 			showNew();
 
 			startSettingByKey(getString(R.string.settings_key_currency));
 			startSettingByKey(getString(R.string.settings_key_unit));
 			startSettingByKey(getString(R.string.settings_key_category));
-
 		}
 
 		@Override
@@ -149,8 +157,10 @@ public class SettingsActivity extends SingleFragmentActivity {
 				keys.add(getString(R.string.settings_key_sort_type));
 				keys.add(getString(R.string.settings_key_transition_screen));
 				keys.add(getString(R.string.settings_key_text_selection_screen));
+				keys.add(getString(R.string.settings_key_use_category));
 				keys.add(getString(R.string.settings_key_collapse_category));
 				keys.add(getString(R.string.settings_key_category));
+				keys.add(getString(R.string.settings_key_auto_complete_screen));
 
 				sp.edit().remove("v3").apply();
 			}

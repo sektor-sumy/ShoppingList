@@ -122,7 +122,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private boolean mIsOpenedKeyboard = false;
 	private boolean mIsExpandedAppbar;
 
-	private SharedPreferences mPrefs;
+	protected SharedPreferences mPrefs;
 	private boolean mIsUseCategory;
 	private boolean mIsUseNewItemInSpinner;
 

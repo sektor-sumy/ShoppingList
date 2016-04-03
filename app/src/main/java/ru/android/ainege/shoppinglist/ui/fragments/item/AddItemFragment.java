@@ -63,8 +63,7 @@ public class AddItemFragment extends ItemFragment {
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		mIsUseDefaultData = prefs.getBoolean(getString(R.string.settings_key_sort_is_default_data), true);
+		mIsUseDefaultData = mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_data), true);
 	}
 
 	@Override
@@ -196,17 +195,25 @@ public class AddItemFragment extends ItemFragment {
 						loadImage();
 					}
 
-					if (item.getAmount() != 0) {
+					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_amount), true) && item.getAmount() != 0) {
 						mAmount.setText(new DecimalFormat("#.######").format(item.getAmount()));
 					}
-					mUnit.setSelection(getPosition(mUnit, item.getIdUnit()));
 
-					if (item.getPrice() != 0) {
+					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_unit), true)) {
+						mUnit.setSelection(getPosition(mUnit, item.getIdUnit()));
+					}
+
+					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_price), true) && item.getPrice() != 0) {
 						mPrice.setText(String.format("%.2f", item.getPrice()));
 					}
 
-					mCategory.setSelection(getPosition(mCategory, item.getIdCategory()));
-					mComment.setText(item.getComment());
+					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_category), true)) {
+						mCategory.setSelection(getPosition(mCategory, item.getIdCategory()));
+					}
+
+					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_comment), true)) {
+						mComment.setText(item.getComment());
+					}
 				}
 			}
 		};
