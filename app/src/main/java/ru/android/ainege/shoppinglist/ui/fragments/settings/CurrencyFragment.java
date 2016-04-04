@@ -128,9 +128,13 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 		@Override
 		public void removeItem(int position) {
-			super.removeItem(position);
+			Currency c = mDictionary.get(position);
 
-			saveCurrencySetting(-1);
+			if (c.getId() == mIdSelected) {
+				saveCurrencySetting(-1);
+			}
+
+			super.removeItem(position);
 		}
 
 		@Override
