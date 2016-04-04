@@ -1,10 +1,8 @@
 package ru.android.ainege.shoppinglist.ui.fragments.item;
 
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -126,14 +124,14 @@ public class AddItemFragment extends ItemFragment {
 						setImage(itemInList.getItem());
 					} else {
 						mInfo.setVisibility(View.GONE);
+						mItemInList.setIdItem(0);
+
 						if (mIsProposedItem) {
 							ItemCursor cursorItem = mItemDS.getByName(s.toString().trim());
 							if (cursorItem.moveToFirst()) {
 								setImage(cursorItem.getEntity());
 							}
 							cursorItem.close();
-						} else {
-							mItemInList.setIdItem(0);
 						}
 					}
 					cursor.close();
@@ -258,7 +256,7 @@ public class AddItemFragment extends ItemFragment {
 
 	@Override
 	protected void updatedItem() {
-		if (mItemInList.getIdItem() == 0) {
+		if (mItemInList.getItem().isNew()) { //if (mItemInList.getIdItem() == 0) {
 			String image = mItemInList.getItem().getImagePath();
 			String defaultImage = mItemInList.getItem().getDefaultImagePath();
 
@@ -275,7 +273,7 @@ public class AddItemFragment extends ItemFragment {
 
 	@Override
 	protected void resetImage() {
-		if (mItemInList.getIdItem() != 0 && mItemInList.getItem().getDefaultImagePath() != null) {
+		if (!mItemInList.getItem().isNew() && mItemInList.getItem().getDefaultImagePath() != null) {
 			mItemInList.getItem().setImagePath(mItemInList.getItem().getDefaultImagePath());
 			loadImage();
 		} else {
