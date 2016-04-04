@@ -45,11 +45,11 @@ public class Migration2 {
 		HashMap<String, Unit> unitHM = UnitsDS.getUnit(mDb);
 
 		Cursor itemDB = getAll(mDb);
-		HashMap<String, Cursor> itemHM = new HashMap<>();
+		HashMap<String, Integer> itemHM = new HashMap<>();
 
 		if (itemDB.moveToFirst()) {
 			do {
-				itemHM.put(itemDB.getString(itemDB.getColumnIndex(Migration2.ItemT.COLUMN_NAME)).toLowerCase(), itemDB);
+				itemHM.put(itemDB.getString(itemDB.getColumnIndex(Migration2.ItemT.COLUMN_NAME)).toLowerCase(), itemDB.getPosition());
 			} while (itemDB.moveToNext());
 
 			String[][] initData = ShoppingListSQLiteHelper.parseInitData(mCtx.getResources().getStringArray(R.array.items));
@@ -59,18 +59,18 @@ public class Migration2 {
 				String image = Image.ITEM_IMAGE_PATH + itemData[ItemT.INIT_DATA_IMAGE];
 
 				if (itemHM.containsKey(name)) {
-					Cursor item = itemHM.get(name);
+					itemDB.moveToPosition(itemHM.get(name));
 
-					if (!item.getString(item.getColumnIndex(ItemT.COLUMN_DEFAULT_IMAGE_PATH)).equals(image)) {
+					if (!itemDB.getString(itemDB.getColumnIndex(ItemT.COLUMN_DEFAULT_IMAGE_PATH)).equals(image)) {
 						ContentValues contentValue = new ContentValues();
 						contentValue.put(ItemT.COLUMN_DEFAULT_IMAGE_PATH, image);
 
-						if (item.getString(item.getColumnIndex(ItemT.COLUMN_IMAGE_PATH)).startsWith(Image.CHARACTER_IMAGE_PATH)) {
+						if (itemDB.getString(itemDB.getColumnIndex(ItemT.COLUMN_IMAGE_PATH)).startsWith(Image.CHARACTER_IMAGE_PATH)) {
 							contentValue.put(ItemT.COLUMN_IMAGE_PATH, image);
 						}
 
 						mDb.update(ItemT.TABLE_NAME, contentValue, ItemT.COLUMN_ID + " = ?",
-								new String[]{String.valueOf(item.getLong(item.getColumnIndex(ItemT.COLUMN_ID)))});
+								new String[]{String.valueOf(itemDB.getLong(itemDB.getColumnIndex(ItemT.COLUMN_ID)))});
 					}
 				} else {
 					ContentValues contentValue = new ContentValues();
