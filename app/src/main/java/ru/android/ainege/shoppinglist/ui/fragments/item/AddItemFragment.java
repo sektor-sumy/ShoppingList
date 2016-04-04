@@ -285,12 +285,16 @@ public class AddItemFragment extends ItemFragment {
 	}
 
 	private int getPosition(Spinner spinner, String name) {
-		int index = 0;
+		int index = -1;
 		for (int i = 0; i < spinner.getCount(); i++) {
 			if (((GenericDS.EntityCursor<Dictionary>) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
 				index = i;
 				break;
 			}
+		}
+
+		if (index == -1) {
+			index = mIsUseNewItemInSpinner ? 1 : 0;
 		}
 		return index;
 	}

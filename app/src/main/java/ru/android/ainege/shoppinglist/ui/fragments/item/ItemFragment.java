@@ -123,8 +123,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private boolean mIsExpandedAppbar;
 
 	protected SharedPreferences mPrefs;
+	protected boolean mIsUseNewItemInSpinner;
 	private boolean mIsUseCategory;
-	private boolean mIsUseNewItemInSpinner;
 
 	protected abstract TextWatcher getNameChangedListener();
 
