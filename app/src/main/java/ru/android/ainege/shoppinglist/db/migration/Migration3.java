@@ -27,7 +27,6 @@ public class Migration3 extends UpgradeDB {
 	public void run() {
 		upgradeDB();
 		updateShowcase();
-		showNewPreference();
 	}
 
 	//<editor-fold desc="UpgradeDB">
@@ -245,10 +244,6 @@ public class Migration3 extends UpgradeDB {
 
 		File file = new File(mCtx.getFilesDir().getParent() + "/shared_prefs/showcase_internal.xml");
 		file.delete();
-	}
-
-	private void showNewPreference() {
-		mCtx.getSharedPreferences(mCtx.getString(R.string.settings_shared_preferences), Context.MODE_PRIVATE).edit().putBoolean("v3", true).apply();
 	}
 
 	public class UnitT {

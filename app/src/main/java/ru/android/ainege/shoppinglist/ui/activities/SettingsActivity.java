@@ -3,9 +3,7 @@ package ru.android.ainege.shoppinglist.ui.activities;
 import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -24,8 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-
-import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
 
@@ -73,8 +69,6 @@ public class SettingsActivity extends SingleFragmentActivity {
 					return true;
 				}
 			});
-
-			showNew();
 
 			startSettingByKey(getString(R.string.settings_key_currency));
 			startSettingByKey(getString(R.string.settings_key_unit));
@@ -150,35 +144,6 @@ public class SettingsActivity extends SingleFragmentActivity {
 					dialog.dismiss();
 				}
 			});
-		}
-
-		private void showNew() {
-			SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.settings_shared_preferences), Context.MODE_PRIVATE);
-			ArrayList<String> keys = new ArrayList<>();
-
-			if (sp.getBoolean("v3", false)) {
-				keys.add(getString(R.string.settings_key_sort_type));
-				keys.add(getString(R.string.settings_key_transition_screen));
-				keys.add(getString(R.string.settings_key_text_selection_screen));
-				keys.add(getString(R.string.settings_key_use_category));
-				keys.add(getString(R.string.settings_key_collapse_category));
-				keys.add(getString(R.string.settings_key_category));
-				keys.add(getString(R.string.settings_key_auto_complete_screen));
-
-				sp.edit().remove("v3").apply();
-			}
-
-			for (String key : keys) {
-				markAsNew(key);
-			}
-		}
-
-		private void markAsNew(String key) {
-			Preference preference = findPreference(key);
-
-			if (preference != null) {
-				preference.setWidgetLayoutResource(R.layout.setting_new);
-			}
 		}
 
 		private void startSettingByKey(final String key) {
