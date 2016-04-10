@@ -15,13 +15,9 @@
 	<string name="bought">Куплено&#160;</string>
 	<string name="of">&#160;из&#160;</string>
 	<string name="list_image">Изображение списка</string>
-	<string name="showcase_create_list">Создание списка</string>
 	<string name="showcase_create_list_desc">Нажмите на \"плюсик\", чтобы создать новый список</string>
-	<string name="showcase_manage_list">Управление списком</string>
 	<string name="showcase_manage_list_desc">Нажмите на \"карандаш\" для изменения списка, а на \"корзину\" - для его удаления</string>
-	<string name="showcase_open_list">Просмотр списка</string>
-	<string name="showcase_open_list_desc">Нажмите на список для его просмотра</string>
-	<string name="showcase_setting">Настройте приложение как вам удобно</string>
+	<string name="showcase_open_list_desc">Нажмите на карточку списка для его просмотра</string>
 	<!--menu-->
 	<string name="take_photo">"Сделать снимок</string>
 	<string name="select_from_gallery">Выбрать из галереи</string>
@@ -34,21 +30,17 @@
 
 	<!--ShoppingListFragment-->
 	<string name="ask_delete_list">Удалить список?</string>
-	<string name="showcase_create_item">Добавление товара в список</string>
-	<string name="showcase_create_item_desc">Нажмите на \"плюсик\", чтобы добавить новый товар</string>
-	<string name="showcase_edit_item">Просмотр и изменение товара</string>
-	<string name="showcase_edit_item_desc">Нажмите на товар, чтобы открыть детали</string>
-	<string name="showcase_swipe_item">Отметить товар купленым</string>
-	<string name="showcase_swipe_item_desc">Вычеркните товар, проведя по нему слева направо</string>
+	<string name="showcase_create_item">Нажмите на \"плюсик\", чтобы добавить новый товар</string>
+	<string name="showcase_edit_item">Нажмите на строку товара, для просмотра информации о нем</string>
+	<string name="showcase_swipe_item_1">Вычеркните товар, проведя по нему слева направо</string>
+	<string name="showcase_unswipe_item_1">Для отмены покупки, вычеркните товар повторно</string>
+	<string name="showcase_swipe_item_2">Для отмены покупки, вычеркните товар проведя по нему слева направо</string>
+	<string name="showcase_unswipe_item_2">Вычеркните товар и он отметится как купленый</string>
+	<string name="showcase_delete_item">Зажмите строку товара для перехода в режим удаления</string>
 	<string name="showcase_spent_sum">Следите сколько Вы уже потратили</string>
-	<string name="showcase_total_sum">Ваша итоговая сумма покупки</string>
-	<string name="showcase_unswipe_item">Отметить вычеркивание товара</string>
-	<string name="showcase_unswipe_item_desc">Для отмены, вычеркните товар повторно</string>
-	<string name="showcase_delete_item">Удаление товара</string>
-	<string name="showcase_delete_item_desc">Зажмите строку товара для перехода в режим удаления</string>
-	<string name="showcase_category_desc">Группируйте Ваши покупки по категориям</string>
-	<string name="showcase_sum_category_desc">Отслеживайте сумму покупки по каждой категории</string>
-	<string name="showcase_collapse_category_desc">Сворачивайте категории как Вам удобно, кликнув по ним</string>
+	<string name="showcase_category">Группируйте Ваши покупки по категориям</string>
+	<string name="showcase_sum_category">Отслеживайте сумму покупок по каждой категории</string>
+	<string name="showcase_collapse_category">Для удобства просмотра, Вы можете свернуть категорию, кликнув по ней</string>
 	<!--layout-->
 	<string name="spent_money">Потрачено</string>
 	<string name="all_money">Всего</string>
@@ -65,10 +57,8 @@
 	<string name="wait_load_image">Подождите загрузки картинки</string>
 	<string name="ask_save_item">Сохранить изменения?</string>
 	<string name="item_image">Изображение товара</string>
-	<string name="showcase_update_image_item">Изображение товара</string>
-	<string name="showcase_update_image_item_desc">Нажмите на картинку для смены изображения</string>
-	<string name="showcase_bought_item">Уже купили товар?</string>
-	<string name="showcase_bought_item_desc">Отметьте это при создании или изменении товара</string>
+	<string name="showcase_update_image_item">Нажмите на картинку для смены изображения</string>
+	<string name="showcase_bought_item">Уже купили? \nОтметьте это при создании или изменении товара</string>
 	<!--item menu-->
 	<string name="delete_list">Удалить список</string>
 	<string name="update_list">Изменить список</string>
@@ -101,48 +91,30 @@
 	<string name="settings_new">NEW!</string>
 	<string name="settings_shared_preferences">new_setting</string>
 	<string name="settings">Настройки</string>
-	<string name="settings_key_sort_is_bought">sort_is_bought</string>
-	<string name="settings_list">Настройки списков</string>
-	<string name="settings_title_sort_is_bought">Купленые в конец списка</string>
-	<string name="settings_summary_sort_is_bought">Перенести купленные товары в конец списка</string>
+	<string name="settings_list">Списки</string>
+	<string name="settings_key_open_last_list">open_last_list</string>
+	<string name="settings_title_open_last_list">Открывать последний список</string>
+	<string name="settings_summary_open_last_list">Запускать приложение на последнем активном списке</string>
 	<string name="settings_key_sort_type">sort_type</string>
 	<string name="settings_title_sort_type">Порядок сортировки</string>
 	<string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
 	<string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
-	<string name="settings_key_transition_screen">transition_screen</string>
-	<string name="settings_title_transition_screen">Быстрое редактирование</string>
-	<string name="settings_summary_transition_screen">Что-то будет...</string>
-	<string name="settings_key_transition">transition</string>
-	<string name="settings_title_transition">Переход в настройки</string>
-	<string name="settings_summary_transition">Что-то будет...</string>
-	<string name="settings_key_fast_edit">fast_edit</string>
-	<string name="settings_title_fast_edit">Быстрое добавление</string>
-	<string name="settings_summary_fast_edit">Что-то будет...</string>
+	<string name="settings_key_sort_is_bought">sort_is_bought</string>
+	<string name="settings_title_sort_is_bought">Купленые внизу</string>
+	<string name="settings_summary_sort_is_bought">Отображать вверху еще не купленые товары</string>
 	<string name="settings_key_use_category">use_category</string>
 	<string name="settings_title_use_category">Использование категорий</string>
 	<string name="settings_summary_use_category">Разбивать товары по категориям в списке</string>
 	<string name="settings_key_collapse_category">collapse_category</string>
 	<string name="settings_title_collapse_category">Схлопование категорий</string>
-	<string name="settings_summary_collapse_category">Сваричаивает товары в категории при клике</string>
-	<string name="settings_key_text_selection_screen">text_selection_screen</string>
-	<string name="settings_title_text_selection_screen">Выделение текста</string>
-	<string name="settings_summary_text_selection_screen">Выделять весь текст для быстрого редактирования покупки</string>
-	<string name="settings_key_text_selection_name">text_selection_name</string>
-	<string name="settings_title_text_selection_name">Название</string>
-	<string name="settings_key_text_selection_amount">text_selection_amount</string>
-	<string name="settings_title_text_selection_amount">Количество</string>
-	<string name="settings_key_text_selection_price">text_selection_price</string>
-	<string name="settings_title_text_selection_price">Цена</string>
-	<string name="settings_key_text_selection_comment">text_selection_comment</string>
-	<string name="settings_title_text_selection_comment">Коментарий</string>
+	<string name="settings_summary_collapse_category">Скрывать/показывать товары при нажатии на категорию</string>
 
-	<string name="settings_category_data_item">Настройка данных по умолчанию</string>
+	<string name="settings_category_data_item">Детали товара</string>
 	<string name="settings_key_auto_complete_data">auto_complete_data</string>
 	<string name="settings_title_auto_complete_data">Автозаполнение</string>
-	<string name="settings_summary_auto_complete_data">Заполнение полей, используя последние данные о товаре: количество, цена и тд.</string>
+	<string name="settings_summary_auto_complete_data">Заполнять выбранные поля, используя последние данные о товаре</string>
 	<string name="settings_key_auto_complete_screen">auto_complete_screen</string>
-	<string name="settings_title_auto_complete_screen">Настройка автозаполения</string>
-	<string name="settings_summary_auto_complete_screen">Чтото...</string>
+	<string name="settings_title_auto_complete_screen">Поля для автозаполения</string>
 	<string name="settings_key_auto_complete_amount">auto_complete_amount</string>
 	<string name="settings_title_auto_complete_amount">Количество</string>
 	<string name="settings_key_auto_complete_unit">auto_complete_unit</string>
@@ -153,27 +125,32 @@
 	<string name="settings_title_auto_complete_category">Категория</string>
 	<string name="settings_key_auto_complete_comment">auto_complete_comment</string>
 	<string name="settings_title_auto_complete_comment">Коментарий</string>
+	<string name="settings_key_text_selection_screen">text_selection_screen</string>
+	<string name="settings_title_text_selection_screen">Выделение текста при фокусе</string>
+	<string name="settings_key_text_selection_name">text_selection_name</string>
+	<string name="settings_title_text_selection_name">Название</string>
+	<string name="settings_key_text_selection_amount">text_selection_amount</string>
+	<string name="settings_title_text_selection_amount">Количество</string>
+	<string name="settings_key_text_selection_price">text_selection_price</string>
+	<string name="settings_title_text_selection_price">Цена</string>
+	<string name="settings_key_text_selection_comment">text_selection_comment</string>
+	<string name="settings_title_text_selection_comment">Коментарий</string>
+	<string name="settings_key_transition_screen">transition_screen</string>
+	<string name="settings_title_transition_screen">Редактирование каталогов</string>
+	<string name="settings_key_transition">transition</string>
+	<string name="settings_title_transition">Переход в настройки</string>
+	<string name="settings_summary_transition">Добавить кнопку перехода в каталог</string>
+	<string name="settings_key_fast_edit">fast_edit</string>
+	<string name="settings_title_fast_edit">Быстрое добавление</string>
+	<string name="settings_summary_fast_edit">Вначале выпадающего списка появится пункт \"Добавить\"</string>
 
-	<string name="settings_category_other">Другое</string>
+	<string name="settings_category_other">Каталоги</string>
 	<string name="settings_key_currency">settings_key_summary</string>
 	<string name="settings_title_currency">Валюты</string>
 
-	<string name="settings_key_open_last_list">open_last_list</string>
-	<string name="settings_title_open_last_list">Открывать последний список</string>
-	<string name="settings_summary_open_last_list">Запускать приложение на последнем активном списке</string>
-
-	<string name="sort_order_alphabet">алфавиту</string>
-	<string name="sort_order_adding">порядку добавления</string>
-	<string name="sort_order_up_price">возрастанию цены за единицу измерения</string>
-	<string name="sort_order_down_price">убыванию цены за единицу измерения</string>
-	<string name="sort_order_up_purchase_price">возрастанию цены за покупку</string>
-	<string name="sort_order_down_purchase_price">убыванию цены за покупку</string>
-
-
 	<string name="name">Название</string>
 	<string name="currency_symbol">Символ или сокращение</string>
-	<string name="showcase_default_currency">Валюта по умолчанию</string>
-	<string name="showcase_default_currency_desc">Текущая валюта по умолчанию отмечена цветом, для ее изменения нажмите на \"звездочку\" нужной валюты</string>
+	<string name="showcase_default_currency">Валюта по умолчанию отмечена цветом, для ее изменения нажмите на \"звездочку\" нужной валюты</string>
 
 	<string name="error_empty">Не может быть пустым</string>
 	<string name="error_one_item">Что-то должно остаться</string>
@@ -189,4 +166,11 @@
 	<string name="settings_key_category">setting_key_category</string>
 	<string name="settings_title_category">Категории товаров</string>
 	<string name="category_info">Категория товаров</string>
+
+	<string name="sort_order_alphabet">алфавиту</string>
+	<string name="sort_order_adding">порядку добавления</string>
+	<string name="sort_order_up_price">возрастанию цены за единицу измерения</string>
+	<string name="sort_order_down_price">убыванию цены за единицу измерения</string>
+	<string name="sort_order_up_purchase_price">возрастанию цены за покупку</string>
+	<string name="sort_order_down_purchase_price">убыванию цены за покупку</string>
 </resources>

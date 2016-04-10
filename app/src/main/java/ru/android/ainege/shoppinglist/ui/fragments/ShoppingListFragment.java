@@ -721,7 +721,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		sequence.setConfig(new ShowcaseConfig());
 
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mFAB,
-				getString(R.string.showcase_create_item_desc)).build());
+				getString(R.string.showcase_create_item)).build());
 
 		sequence.start();
 
@@ -772,37 +772,20 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private void showcaseItem(final MaterialShowcaseSequence sequence, final ShoppingListAdapter.ItemViewHolder holder) {
 		sequence.setConfig(new ShowcaseConfig());
 
-		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
-				getString(R.string.showcase_edit_item_desc))
-				.withRectangleShape(true)
-				.build());
+		showcase(sequence, holder.itemView, getString(R.string.showcase_edit_item));
 
+		String swipe1, swipe2;
 		if (holder.mIsBought.getVisibility() == View.GONE) {
-			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
-					getString(R.string.showcase_swipe_item_desc))
-					.withRectangleShape(true)
-					.build());
-
-			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
-					getString(R.string.showcase_unswipe_item_desc))
-					.withRectangleShape(true)
-					.build());
+			swipe1 = getString(R.string.showcase_swipe_item_1);
+			swipe2 = getString(R.string.showcase_unswipe_item_1);
 		} else {
-			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
-					getString(R.string.showcase_unswipe_item_desc))
-					.withRectangleShape(true)
-					.build());
-
-			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
-					getString(R.string.showcase_swipe_item_desc))
-					.withRectangleShape(true)
-					.build());
+			swipe1 = getString(R.string.showcase_swipe_item_2);
+			swipe2 = getString(R.string.showcase_unswipe_item_2);
 		}
 
-		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
-				getString(R.string.showcase_delete_item_desc))
-				.withRectangleShape(true)
-				.build());
+		showcase(sequence, holder.itemView, swipe1);
+		showcase(sequence, holder.itemView, swipe2);
+		showcase(sequence, holder.itemView, getString(R.string.showcase_delete_item));
 
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mSpentMoney,
 				getString(R.string.showcase_spent_sum)).build());
@@ -825,16 +808,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		});
 	}
 
+	private void showcase(MaterialShowcaseSequence sequence, View item, String text) {
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), item,
+				text)
+				.withRectangleShape(true)
+				.build());
+	}
 	private void showcaseCategory(final MaterialShowcaseSequence sequence, ShoppingListAdapter.CategoryViewHolder holder) {
 		sequence.setConfig(new ShowcaseConfig());
 
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mCategoryContainer,
-				getString(R.string.showcase_category_desc))
+				getString(R.string.showcase_category))
 				.withRectangleShape(true)
 				.build());
 
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mSumCategory,
-				getString(R.string.showcase_sum_category_desc)).build());
+				getString(R.string.showcase_sum_category)).build());
 
 		sequence.start();
 
@@ -850,7 +839,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private void showcaseCollapseCategory(ShoppingListAdapter.CategoryViewHolder holder) {
 		Showcase.createShowcase(getActivity(), holder.mCategoryContainer,
-				getString(R.string.showcase_collapse_category_desc))
+				getString(R.string.showcase_collapse_category))
 				.withRectangleShape(true)
 				.singleUse(Showcase.SHOT_CATEGORY_COLLAPSE)
 				.show();

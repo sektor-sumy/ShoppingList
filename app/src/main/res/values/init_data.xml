@@ -4,50 +4,51 @@
 		<!--Хлебо-булочные-->
 		<item>Хлеб—шт—bread.jpg—Хлебный</item>
 		<item>Батон—шт—baton.jpg—Хлебный</item>
-		<item>Пирожное—шт—cake.jpg—Хлебный</item>
-		<item>Торт—шт—big cake.jpg—Хлебный</item>
+		<item>Пирожное—шт—cake.jpg—Кондитерский</item>
+		<item>Торт—шт—big cake.jpg—Кондитерский</item>
 		<!--Кондитерская-->
 		<item>Конфеты—кг—candies.jpg—Кондитерский</item>
 		<item>Шоколадка—шт—chocolate.jpg—Кондитерский</item>
 		<item>Вафли—кг—wafer.jpg—Кондитерский</item>
 		<item>Зефир—кг—zephyr.jpg—Кондитерский</item>
+		<item>Печенье—кг—biscuit.jpg—Кондитерский</item>
+		<item>Халва—кг—halva.jpg—Кондитерский</item>
+		<item>Желе—упак—jelly.jpg—Кондитерский</item>
 		<!--Сладости-->
 		<item>Мёд—банка—honey.jpg—Бакалея</item>
 		<item>Варенье—банка—jam.jpg—Бакалея</item>
 		<item>Джем—банка—jam.jpg—Бакалея</item>
-		<item>Халва—кг—halva.jpg—Бакалея</item>
-		<item>Печенье—кг—biscuit.jpg—Бакалея</item>
-		<item>Желе—упак—jelly.jpg—Бакалея</item>
+		<item>Сгущенка—шт—condensed milk.jpg—Бакалея</item>
 		<!--Чай/кофе-->
 		<item>Черный чай—упак—tea.jpg—Бакалея</item>
 		<item>Зеленый чай—упак—green tea.jpg—Бакалея</item>
 		<item>Кофе—упак—coffee.jpg—Бакалея</item>
 		<!--Замороженная продукция-->
-		<item>Рыба—кг—fish.jpg—Замороженое</item>
+		<item>Рыбный—кг—fish.jpg—Замороженое</item>
 		<item>Креветки—кг—shrimp.jpg—Замороженое</item>
 		<item>Тесто—упак—dough.jpg—Замороженое</item>
 		<item>Слоеное тесто—упак—puff pastry.jpg—Замороженое</item>
 		<item>Пельмени—кг—dumplings.jpg—Замороженое</item>
 		<item>Вареники—кг—vareniki.jpg—Замороженое</item>
 		<!--Рыбное-->
-		<item>Лосось—кг—fish.jpg—Рыба</item>
-		<item>Форель—кг—fish.jpg—Рыба</item>
-		<item>Горбуша—кг—fish.jpg—Рыба</item>
-		<item>Нерка—кг—fish.jpg—Рыба</item>
-		<item>Мидии—кг—mussels.jpg—Рыба</item>
-		<item>Кальмары—кг—squids.jpg—Рыба</item>
-		<item>Красная Икра—банка—red caviar.jpg—Рыба</item>
-		<item>Черная Икра—банка—black caviar.jpg—Рыба</item>
-		<item>Крабовые палочки—кг—crab sticks.jpg—Рыба</item>
-		<item>Крабовое мясо—кг—crab meat.jpg—Рыба</item>
-		<item>Селедка—кг—herring.jpg—Рыба</item>
-		<!--Мясо-->
-		<item>Колбаса—кг—sausage.jpg—Мясо</item>
-		<item>Сосиски—кг—frankfurters.jpg—Мясо</item>
-		<item>Мясо—кг—meat.jpg—Мясо</item>
-		<item>Свинина—кг—meat.jpg—Мясо</item>
-		<item>Говядина—кг—meat.jpg—Мясо</item>
-		<item>Курица—кг—chicken.jpg—Мясо</item>
+		<item>Лосось—кг—fish.jpg—Рыбный</item>
+		<item>Форель—кг—fish.jpg—Рыбный</item>
+		<item>Горбуша—кг—fish.jpg—Рыбный</item>
+		<item>Нерка—кг—fish.jpg—Рыбный</item>
+		<item>Мидии—кг—mussels.jpg—Рыбный</item>
+		<item>Кальмары—кг—squids.jpg—Рыбный</item>
+		<item>Красная Икра—банка—red caviar.jpg—Рыбный</item>
+		<item>Черная Икра—банка—black caviar.jpg—Рыбный</item>
+		<item>Крабовые палочки—кг—crab sticks.jpg—Рыбный</item>
+		<item>Крабовое Мясной—кг—crab meat.jpg—Рыбный</item>
+		<item>Селедка—кг—herring.jpg—Рыбный</item>
+		<!--Мясной-->
+		<item>Колбаса—кг—sausage.jpg—Мясной</item>
+		<item>Сосиски—кг—frankfurters.jpg—Мясной</item>
+		<item>Мясной—кг—meat.jpg—Мясной</item>
+		<item>Свинина—кг—meat.jpg—Мясной</item>
+		<item>Говядина—кг—meat.jpg—Мясной</item>
+		<item>Курица—кг—chicken.jpg—Мясной</item>
 		<!--Молочное-->
 		<item>Сыр—кг—cheese.jpg—Молочное</item>
 		<item>Молоко—л—milk.jpg—Молочное</item>
@@ -55,10 +56,9 @@
 		<item>Сметана—упак—sour cream.jpg—Молочное</item>
 		<item>Кефир—л—kefir.jpg—Молочное</item>
 		<item>Сливочное масло—упак—butter.jpg—Молочное</item>
-		<item>Сгущенка—шт—condensed milk.jpg—Молочное</item>
 		<item>Мороженое—шт—ice cream.jpg—Молочное</item>
 		<item>Йогурт—упак—yogurt.jpg—Молочное</item>
-		<item>Яйца—упак—eggs.jpg—Молочное</item>
+		<item>Яйца—упак—eggs.jpg—Другое</item>
 		<!--Овощи-->
 		<item>Картофель—кг—potato.jpg—Овощи</item>
 		<item>Капуста—кг—cabbage.jpg—Овощи</item>
@@ -102,8 +102,8 @@
 		<item>Водка—бут—vodka.jpg—Алкоголь</item>
 		<item>Коньяк—бут—cognac.jpg—Алкоголь</item>
 		<item>Шампанское—бут—champagne.jpg—Алкоголь</item>
-		<item>Минеральная вода—л—water.jpg—Алкоголь</item>
-		<item>Сок—л—juice.jpg—Алкоголь</item>
+		<item>Минеральная вода—л—water.jpg—Напитки</item>
+		<item>Сок—л—juice.jpg—Напитки</item>
 		<!--Специи и соусы-->
 		<item>Майонез—шт—mayonnaise.jpg—Бакалея</item>
 		<item>Кетчуп—шт—ketchup.jpg—Бакалея</item>
@@ -163,31 +163,31 @@
 		<item>Чипсы—упак—chips.jpg—Бакалея</item>
 		<!--Химия-->
 		<item>Стиральный порошок—кг—powder.jpg—Бытовая химия</item>
-		<item>Зубная паста—шт—toothpaste.jpg—Бытовая химия</item>
-		<item>Шампунь—шт—shampoo.jpg—Бытовая химия</item>
-		<item>Мыло—шт—soap.jpg—Бытовая химия</item>
-		<item>Гель для душа—шт—shower gel.jpg—Бытовая химия</item>
+		<item>Зубная паста—шт—toothpaste.jpg—Косметика и гигиена</item>
+		<item>Шампунь—шт—shampoo.jpg—Косметика и гигиена</item>
+		<item>Мыло—шт—soap.jpg—Косметика и гигиена</item>
+		<item>Гель для душа—шт—shower gel.jpg—Косметика и гигиена</item>
 		<item>Моющее средство—шт—cleanser.jpg—Бытовая химия</item>
-		<item>Дезодорант—шт—deodorant.jpg—Бытовая химия</item>
-		<item>Гель для бритья—шт—shaving gel.jpg—Бытовая химия</item>
-		<item>Пенка для бритья—шт—shaving gel.jpg—Бытовая химия</item>
-		<item>Лосьон после бритья—шт—shaving lotion.jpg—Бытовая химия</item>
-		<item>Крем после бритья—шт—shaving lotion.jpg—Бытовая химия</item>
-		<item>Прокладки—упак—gaskets.jpg—Бытовая химия</item>
-		<item>Ежедневные прокладки—упак—gaskets.jpg—Бытовая химия</item>
-		<item>Тампоны—упак—tampons.jpg—Бытовая химия</item>
-		<item>Презервативы—упак—condoms.jpg—Бытовая химия</item>
-		<item>Лак для волос—шт—heir lac.jpg—Бытовая химия</item>
-		<item>Мусс для волос—шт—heir lac.jpg—Бытовая химия</item>
-		<item>Бальзам для волос—шт—heir lotion.jpg—Бытовая химия</item>
-		<item>Кондиционер для волос—шт—heir lotion.jpg—Бытовая химия</item>
-		<item>Краска для волос—упак—hair color.jpg—Бытовая химия</item>
-		<item>Крем для лица—шт—cream.jpg—Бытовая химия</item>
-		<item>Крем для тела—шт—cream.jpg—Бытовая химия</item>
-		<item>Крем для глаз—шт—cream.jpg—Бытовая химия</item>
-		<item>Крем для рук—шт—cream.jpg—Бытовая химия</item>
-		<item>Ватные палочки—упак—cotton buds.jpg—Бытовая химия</item>
-		<item>Ватные диски—упак—cotton pads.jpg—Бытовая химия</item>
+		<item>Дезодорант—шт—deodorant.jpg—Косметика и гигиена</item>
+		<item>Гель для бритья—шт—shaving gel.jpg—Косметика и гигиена</item>
+		<item>Пенка для бритья—шт—shaving gel.jpg—Косметика и гигиена</item>
+		<item>Лосьон после бритья—шт—shaving lotion.jpg—Косметика и гигиена</item>
+		<item>Крем после бритья—шт—shaving lotion.jpg—Косметика и гигиена</item>
+		<item>Прокладки—упак—gaskets.jpg—Косметика и гигиена</item>
+		<item>Ежедневные прокладки—упак—gaskets.jpg—Косметика и гигиена</item>
+		<item>Тампоны—упак—tampons.jpg—Косметика и гигиена</item>
+		<item>Презервативы—упак—condoms.jpg—Косметика и гигиена</item>
+		<item>Лак для волос—шт—heir lac.jpg—Косметика и гигиена</item>
+		<item>Мусс для волос—шт—heir lac.jpg—Косметика и гигиена</item>
+		<item>Бальзам для волос—шт—heir lotion.jpg—Косметика и гигиена</item>
+		<item>Кондиционер для волос—шт—heir lotion.jpg—Косметика и гигиена</item>
+		<item>Краска для волос—упак—hair color.jpg—Косметика и гигиена</item>
+		<item>Крем для лица—шт—cream.jpg—Косметика и гигиена</item>
+		<item>Крем для тела—шт—cream.jpg—Косметика и гигиена</item>
+		<item>Крем для глаз—шт—cream.jpg—Косметика и гигиена</item>
+		<item>Крем для рук—шт—cream.jpg—Косметика и гигиена</item>
+		<item>Ватные палочки—упак—cotton buds.jpg—Косметика и гигиена</item>
+		<item>Ватные диски—упак—cotton pads.jpg—Косметика и гигиена</item>
 		<item>Освежитель воздуха—шт—air freshener.jpg—Бытовая химия</item>
 		<item>Чистящие средства—шт—cleaners.jpg—Бытовая химия</item>
 		<item>Губки для мытья—упак—sponges.jpg—Бытовая химия</item>
@@ -228,19 +228,21 @@
 	</string-array>
 
 	<string-array name="categories">
-		<item>Другое—0xFF444444</item>
-		<item>Алкоголь—0xFF888888</item>
-		<item>Молочное—0xFFFF0000</item>
-		<item>Бакалея—0xFF00FF00</item>
-		<item>Овощи—0xFF00FF00</item>
-		<item>Фрукты—0xFFFF0000</item>
-		<item>Зелень—0xFFFF0000</item>
-		<item>Хлебный—0xFFFFFF00</item>
-		<item>Кондитерский—0xFFFFFF00</item>
-		<item>Замороженое—0xFF0000FF</item>
-		<item>Рыба—0xFFFF0000</item>
-		<item>Мясо—0xFFFF0000</item>
-		<item>Суши—0xFF00FF00</item>
-		<item>Бытовая химия—0xFFCCCCCC</item>
+		<item>Другое—1885430113</item>
+		<item>Алкоголь—-858793764</item>
+		<item>Молочное—-16778812</item>
+		<item>Бакалея—-1250222942</item>
+		<item>Овощи—-689408</item>
+		<item>Фрукты—1860531059</item>
+		<item>Зелень—-11882673</item>
+		<item>Хлебный—-1660957377</item>
+		<item>Кондитерский—-638558062</item>
+		<item>Замороженое—1662517247</item>
+		<item>Рыбный—-13746529</item>
+		<item>Мясной—-2937555</item>
+		<item>Суши—-1369620682</item>
+		<item>Бытовая химия—-5262295</item>
+		<item>Косметика и гигиена—-16541785</item>
+		<item>Напитки—-5054501</item>
 	</string-array>
 </resources>

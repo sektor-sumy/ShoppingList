@@ -196,12 +196,12 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		sequence.setConfig(new ShowcaseConfig());
 
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mAppBarImage,
-				getString(R.string.showcase_update_image_item_desc))
+				getString(R.string.showcase_update_image_item))
 				.withRectangleShape(true)
 				.build());
 
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mIsBought,
-				getString(R.string.showcase_bought_item_desc)).build());
+				getString(R.string.showcase_bought_item)).build());
 
 		sequence.start();
 	}

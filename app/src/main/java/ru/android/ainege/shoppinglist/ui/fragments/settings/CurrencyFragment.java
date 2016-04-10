@@ -31,7 +31,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		}
 
 		Showcase.createShowcase(getActivity(), holder.mDefaultCurrency,
-				getString(R.string.showcase_default_currency_desc))
+				getString(R.string.showcase_default_currency))
 				.withRectangleShape(true)
 				.singleUse(Showcase.SHOT_CURRENCY)
 				.show();
