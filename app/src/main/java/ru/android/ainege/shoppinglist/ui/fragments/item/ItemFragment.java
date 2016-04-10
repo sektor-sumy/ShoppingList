@@ -78,7 +78,7 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCursor;
 
 public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, ItemActivity.OnBackPressedInterface {
-	private static final String ID_ITEM = "idItem";
+	public static final String ID_ITEM = "idItem";
 	private static final int TAKE_PHOTO = 0;
 	private static final int LOAD_IMAGE = 1;
 	private static final int IS_SAVE_CHANGES = 2;
@@ -500,6 +500,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 	protected void loadImage() {
 		Image.create().insertImageToView(getActivity(), mItemInList.getItem().getImagePath(), mAppBarImage);
+		mCollapsingToolbarLayout.setTitle("");
 	}
 
 	protected SimpleCursorAdapter getCompleteTextAdapter(FilterQueryProvider provider) {

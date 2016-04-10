@@ -49,6 +49,7 @@ import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
+import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -78,6 +79,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private double mSaveSpentMoney = 0;
 	private double mSaveTotalMoney = 0;
+	private long mItemDetailsId = -1;
 
 	private CollapsingToolbarLayout mToolbarLayout;
 	private ImageView mListImage;
@@ -108,9 +110,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			mFAB.setVisibility(View.GONE);
+			if (mActionMode != null) {
+				return false;
+			}
 
+			mFAB.setVisibility(View.GONE);
 			mAdapterRV.extendAllCategory();
+
 			return true;
 		}
 
@@ -312,10 +318,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		switch (requestCode) {
 			case ADD_ITEM:
 			case EDIT_ITEM:
+				mItemDetailsId = data.getLongExtra(ItemFragment.ID_ITEM, -1);
 			case SETTINGS:
 				mIsUpdateData = true;
-				getList(getArguments().getLong(ID_LIST));
-				updateSums(mSaveSpentMoney, mSaveTotalMoney);
 				break;
 			case IS_DELETE_LIST:
 				mListsDS.delete(mList.getId());
@@ -328,7 +333,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				getList(getArguments().getLong(ID_LIST));
 				setListData();
 				updateSums(mSaveSpentMoney, mSaveTotalMoney);
-				//mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
+				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
 				break;
 		}
 	}
@@ -371,7 +376,19 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						}
 					}
 
+					ShoppingList item  = getDetailsItem(categories);
+
+					if (item != null) {
+						mAdapterRV.setCollapseCategoryStates(item.getIdCategory(), false);
+					}
+
 					mAdapterRV.setData(categories, mList.getCurrency().getSymbol(), mIsUseCategory, mIsCollapsedCategory);     //update data in adapter
+
+					if (item != null) {
+						int itemPosition = mAdapterRV.mItemList.indexOf(item);
+						int position = itemPosition != -1 ? itemPosition : mAdapterRV.mItemList.indexOf(item.getCategory());
+						mItemsListRV.scrollToPosition(position);
+					}
 
 					updateSums();
 					hideEmptyStates();
@@ -506,6 +523,23 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		editor.apply();
 	}
 
+	private ShoppingList getDetailsItem(ArrayList<Category> categories) {
+		if (mItemDetailsId != -1) {
+			for (Category c : categories) {
+				for (ShoppingList item : c.getItemsByCategoryInList()) {
+					if (item.getIdItem() == mItemDetailsId) {
+						mItemDetailsId = -1;
+						return item;
+					}
+				}
+			}
+
+			mItemDetailsId = -1;
+		}
+
+		return null;
+	}
+
 	private void showEmptyStates() {
 		mListContainer.setVisibility(View.GONE);
 		mEmptyImage.setVisibility(View.VISIBLE);
@@ -572,6 +606,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			return;
 		}
 
+		ShoppingListAdapter.ItemViewHolder holder = (ShoppingListAdapter.ItemViewHolder) mItemsListRV.findViewHolderForAdapterPosition(position);
 		int categoryPosition = mAdapterRV.mItemList.indexOf(itemInList.getCategory());
 		Category category = itemInList.getCategory();
 		boolean isBought = !itemInList.isBought();
@@ -581,7 +616,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		//update adapter
 		itemInList.setBought(isBought);
-		mAdapterRV.notifyItemChanged(position);
+		holder.markBought(isBought);
 
 		//if set bought items in the end of list - refresh position
 		if (mIsBoughtEndInList) {
@@ -749,9 +784,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					.build());
 
 			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
-							getString(R.string.showcase_unswipe_item_desc))
-							.withRectangleShape(true)
-							.build());
+					getString(R.string.showcase_unswipe_item_desc))
+					.withRectangleShape(true)
+					.build());
 		} else {
 			sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
 					getString(R.string.showcase_unswipe_item_desc))
@@ -765,9 +800,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
-						getString(R.string.showcase_delete_item_desc))
-						.withRectangleShape(true)
-						.build());
+				getString(R.string.showcase_delete_item_desc))
+				.withRectangleShape(true)
+				.build());
 
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mSpentMoney,
 				getString(R.string.showcase_spent_sum)).build());
@@ -820,6 +855,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				.singleUse(Showcase.SHOT_CATEGORY_COLLAPSE)
 				.show();
 	}
+	//</editor-fold>
 
 	private static class ItemsInListCursorLoader extends CursorLoader {
 		private final Context mContext;

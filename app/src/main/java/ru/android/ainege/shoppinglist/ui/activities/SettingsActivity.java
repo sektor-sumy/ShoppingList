@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
@@ -62,11 +63,13 @@ public class SettingsActivity extends SingleFragmentActivity {
 				actionBar.setDisplayHomeAsUpEnabled(true);
 			}
 
-			Preference useCategory = findPreference(getString(R.string.settings_key_use_category));
+			CheckBoxPreference useCategory = (CheckBoxPreference) findPreference(getString(R.string.settings_key_use_category));
+			final CheckBoxPreference autoCompleteCategory = (CheckBoxPreference) findPreference(getString(R.string.settings_key_auto_complete_category));
+			autoCompleteCategory.setEnabled(useCategory.isChecked());
 			useCategory.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					findPreference(getString(R.string.settings_key_auto_complete_category)).setEnabled((Boolean) newValue);
+					autoCompleteCategory.setEnabled((Boolean) newValue);
 					return true;
 				}
 			});

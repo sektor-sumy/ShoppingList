@@ -168,7 +168,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					showEmptyStates();
 				}
 
-				deleteSaveListFromSettings();
+				deleteSaveListFromSettings(list.getId());
 				break;
 		}
 	}
@@ -228,10 +228,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mEmptyImage.setVisibility(View.GONE);
 	}
 
-	private void deleteSaveListFromSettings() {
+	private void deleteSaveListFromSettings(long id) {
 		SharedPreferences mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 
-		if (mLists.get(mPositionForDelete).getId() == mSettings.getLong(APP_PREFERENCES_ID, -1)) {
+		if (id == mSettings.getLong(APP_PREFERENCES_ID, -1)) {
 			SharedPreferences.Editor editor = mSettings.edit();
 			editor.remove(APP_PREFERENCES_ID);
 			editor.apply();
