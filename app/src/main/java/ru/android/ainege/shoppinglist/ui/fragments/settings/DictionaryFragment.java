@@ -239,7 +239,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 					@Override
 					public void onClick(View v) {
 						if (mDictionary.size() == 1) {
-							Toast.makeText(getActivity(), getString(R.string.error_one_item), Toast.LENGTH_SHORT).show();
+							Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_one_item), Toast.LENGTH_SHORT).show();
 						} else {
 							int itemPosition = getAdapterPosition();
 							T d = mDictionary.get(itemPosition);

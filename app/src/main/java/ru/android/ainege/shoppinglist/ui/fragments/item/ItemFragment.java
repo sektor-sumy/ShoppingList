@@ -229,7 +229,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
 					startActivityForResult(cameraIntent, TAKE_PHOTO);
 				} else {
-					Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 				}
 				return true;
 			case R.id.select_from_gallery:
@@ -290,7 +290,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 						mItemInList.getItem().setImagePath(mPhotoPath);
 					} else {
-						Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -692,7 +692,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		if (saveData()) {
 			getActivity().finish();
 		} else {
-			Toast.makeText(getActivity(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
+			Toast.makeText(getActivity().getApplicationContext(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
 		}
 	}
 

@@ -229,7 +229,7 @@ public class AddItemFragment extends ItemFragment {
 		}
 
 		if (!mIsImageLoaded) {
-			Toast.makeText(getActivity(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
 			return false;
 		}
 

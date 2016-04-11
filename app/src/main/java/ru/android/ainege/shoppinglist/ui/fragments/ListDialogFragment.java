@@ -178,7 +178,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
 					startActivityForResult(cameraIntent, TAKE_PHOTO);
 				} else {
-					Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 				}
 				break;
 			case R.id.select_from_gallery:
@@ -227,7 +227,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 
 						mImagePath = mPhotoPath;
 					} else {
-						Toast.makeText(getActivity(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -306,7 +306,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		}
 
 		if (!mIsImageLoad) {
-			Toast.makeText(getActivity(), "Подождите загрузке картинки", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity().getApplicationContext(), "Подождите загрузке картинки", Toast.LENGTH_SHORT).show();
 			return false;
 		}
 
