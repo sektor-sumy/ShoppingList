@@ -154,7 +154,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		if (itemInList.getAmount() == 0) {
 			holder.mAmount.setText("-");
 		} else {
-			String amount = NumberFormat.getInstance().format(itemInList.getAmount()) // TODO: 17.02.2016 почему нет приведение к локальным значениям? 
+			String amount = NumberFormat.getInstance().format(itemInList.getAmount())
 					+ " " + itemInList.getUnit().getName();
 			holder.mAmount.setText(amount);
 		}

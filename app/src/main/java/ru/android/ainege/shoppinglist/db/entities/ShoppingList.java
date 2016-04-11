@@ -67,9 +67,6 @@ public class ShoppingList extends ItemData {
 				}
 
 				switch (mType) {
-					case ALPHABET:
-						result = lhs.getItem().getName().compareToIgnoreCase(rhs.getItem().getName());
-						break;
 					case ORDER_ADDING:
 						result = (int) (lhs.getDate().getTime() - rhs.getDate().getTime());
 						break;
@@ -85,6 +82,9 @@ public class ShoppingList extends ItemData {
 					case DOWN_PURCHASE_PRICE:
 						result = (int) (getSum(rhs) - getSum(lhs));
 						break;
+					case ALPHABET:
+					default:
+						result = lhs.getItem().getName().compareToIgnoreCase(rhs.getItem().getName());
 				}
 
 				return result;

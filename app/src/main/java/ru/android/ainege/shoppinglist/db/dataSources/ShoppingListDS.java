@@ -55,9 +55,12 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements IShopping
 				IItems.COLUMN_NAME + ", " +
 				IItems.COLUMN_DEFAULT_IMAGE_PATH + ", " +
 				IItems.COLUMN_IMAGE_PATH + ", " +
+				IItemData.COLUMN_ID_CATEGORY + " AS " + IItemData.COLUMN_ID_CATEGORY + "Item , " +
 				IItems.TABLE_NAME + "." + IItems.COLUMN_ID_DATA + " AS " + DEFAULT_ITEM_DATA +
 				" FROM " + TABLE_NAME + " INNER JOIN " + IItems.TABLE_NAME +
 				" ON " + TABLE_NAME + "." + COLUMN_ID_ITEM + " = " + IItems.TABLE_NAME + "." + IItems.COLUMN_ID +
+				" INNER JOIN " + IItemData.TABLE_NAME +
+				" ON " + IItems.TABLE_NAME + "." + IItems.COLUMN_ID + " = " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID +
 				" WHERE " + IItems.COLUMN_NAME + " LIKE '" + name +
 				"' AND " + COLUMN_ID_LIST + " = " + idList, null);
 		return new ShoppingListCursor(cursor);
@@ -138,7 +141,11 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements IShopping
 				String image = getString(getColumnIndex(IItems.COLUMN_IMAGE_PATH));
 				long idItemData = getLong(getColumnIndex(DEFAULT_ITEM_DATA));
 
-				shoppingList.setItem(new Item(idItem, nameItem, defaultImage, image, idItemData));
+				Item item = new Item(idItem, nameItem, defaultImage, image, idItemData);
+				if (getColumnIndex(IItemData.COLUMN_ID_CATEGORY + "Item") != -1) {
+					item.setIdCategory(getLong(getColumnIndex(IItemData.COLUMN_ID_CATEGORY + "Item")));
+				}
+				shoppingList.setItem(item);
 			}
 
 			if (getColumnIndex(IItemData.COLUMN_AMOUNT) != -1) {

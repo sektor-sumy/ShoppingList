@@ -39,7 +39,6 @@ import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
-import uk.co.deanwild.materialshowcaseview.IShowcaseListener;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
@@ -408,15 +407,18 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					public void onClick(View v) {
 						mIsUpdateData = true;
 						int itemPosition = getAdapterPosition();
-						List list = mLists.get(itemPosition);
 
-						Intent i = new Intent(getActivity(), ShoppingListActivity.class);
-						i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, list.getId());
+						if (itemPosition != RecyclerView.NO_POSITION) {
+							List list = mLists.get(itemPosition);
 
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-						} else {
-							startActivity(i);
+							Intent i = new Intent(getActivity(), ShoppingListActivity.class);
+							i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, list.getId());
+
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+								startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+							} else {
+								startActivity(i);
+							}
 						}
 					}
 				});

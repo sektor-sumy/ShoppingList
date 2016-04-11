@@ -107,7 +107,7 @@ public class EditItemFragment extends ItemFragment {
 					showInfo(cursor.moveToFirst() && !cursor.getEntity().getItem().getName().equals(mItemInList.getItem().getName()));
 					cursor.close();
 					if (mIsProposedItem) {
-						ItemCursor cursorItem = mItemDS.getByName(s.toString().trim());
+						ItemCursor cursorItem = mItemDS.getWithData(s.toString().trim());
 						showInfo(cursorItem.moveToFirst() && !cursorItem.getEntity().getName().equals(mItemInList.getItem().getName()));
 						cursorItem.close();
 					}

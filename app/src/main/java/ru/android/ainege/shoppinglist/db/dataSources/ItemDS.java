@@ -23,8 +23,18 @@ public class ItemDS extends GenericDS<Item> implements ITable.IItems {
 	}
 
 	public ItemCursor getWithData(long id) {
+		Cursor cursor = getFullData(" WHERE " + TABLE_NAME + "." + COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
+		return new ItemCursor(cursor);
+	}
+
+	public ItemCursor getWithData(String name) {
+		Cursor cursor = getFullData(" WHERE " + TABLE_NAME + "." + COLUMN_NAME + " like ?", new String[]{name});
+		return new ItemCursor(cursor);
+	}
+
+	private Cursor getFullData(String where, String[] params) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		String selectQuery = "SELECT " + TABLE_NAME + ".*, " +
+		return db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
 				IItemData.COLUMN_AMOUNT + ", " +
 				IItemData.COLUMN_ID_UNIT + ", " +
 				IItemData.COLUMN_PRICE + ", " +
@@ -32,16 +42,7 @@ public class ItemDS extends GenericDS<Item> implements ITable.IItems {
 				IItemData.COLUMN_COMMENT +
 				" FROM " + TABLE_NAME + " INNER JOIN " + IItemData.TABLE_NAME + " ON " +
 				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID +
-				" WHERE " + TABLE_NAME + "." + COLUMN_ID + " = ? ";
-		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
-		return new ItemCursor(cursor);
-	}
-
-	public ItemCursor getByName(String name) {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME + " like ?",
-				new String[]{name}, null, null, null);
-		return new ItemCursor(cursor);
+				where, params);
 	}
 
 	public Cursor getNames(String substring) {

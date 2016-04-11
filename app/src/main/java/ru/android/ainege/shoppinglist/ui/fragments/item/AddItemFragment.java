@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments.item;
 
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -117,19 +118,20 @@ public class AddItemFragment extends ItemFragment {
 					ShoppingListCursor cursor = mItemsInListDS.getByName(s.toString().trim(), getIdList());
 					if (cursor.moveToFirst()) {
 						mInfo.setText(R.string.info_exit_item_in_list);
+						mInfo.setTextColor(Color.RED);
 						mInfo.setVisibility(View.VISIBLE);
 
 						ShoppingList itemInList = cursor.getEntity();
 						mItemInList.setIdItemData(itemInList.getIdItemData());
-						setImage(itemInList.getItem());
+						setDefaultData(itemInList.getItem());
 					} else {
 						mInfo.setVisibility(View.GONE);
 						mItemInList.setIdItem(0);
 
 						if (mIsProposedItem) {
-							ItemCursor cursorItem = mItemDS.getByName(s.toString().trim());
+							ItemCursor cursorItem = mItemDS.getWithData(s.toString().trim());
 							if (cursorItem.moveToFirst()) {
-								setImage(cursorItem.getEntity());
+								setDefaultData(cursorItem.getEntity());
 							}
 							cursorItem.close();
 						}
@@ -138,12 +140,13 @@ public class AddItemFragment extends ItemFragment {
 				}
 			}
 
-			private void setImage(Item item) {
+			private void setDefaultData(Item item) {
 				mItemInList.setIdItem(item.getId());
 
 				mItemInList.getItem().setImagePath(item.getImagePath());
 				mItemInList.getItem().setDefaultImagePath(item.getDefaultImagePath());
 				mItemInList.getItem().setIdItemData(item.getIdItemData());
+				mCategory.setSelection(getPosition(mCategory, item.getIdCategory()));
 				loadImage();
 			}
 		};
@@ -205,9 +208,7 @@ public class AddItemFragment extends ItemFragment {
 						mPrice.setText(String.format("%.2f", item.getPrice()));
 					}
 
-					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_category), true)) {
-						mCategory.setSelection(getPosition(mCategory, item.getIdCategory()));
-					}
+					mCategory.setSelection(getPosition(mCategory, item.getIdCategory()));
 
 					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_comment), true)) {
 						mComment.setText(item.getComment());
