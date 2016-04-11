@@ -35,7 +35,7 @@
 	<string name="showcase_swipe_item_1">Вычеркните товар, проведя по нему слева направо</string>
 	<string name="showcase_unswipe_item_1">Для отмены покупки, вычеркните товар повторно</string>
 	<string name="showcase_swipe_item_2">Для отмены покупки, вычеркните товар проведя по нему слева направо</string>
-	<string name="showcase_unswipe_item_2">Вычеркните товар и он отметится как купленый</string>
+	<string name="showcase_unswipe_item_2">Вычеркните товар и он отметится как купленный</string>
 	<string name="showcase_delete_item">Зажмите строку товара для перехода в режим удаления</string>
 	<string name="showcase_spent_sum">Следите сколько Вы уже потратили</string>
 	<string name="showcase_category">Группируйте Ваши покупки по категориям</string>
@@ -44,9 +44,12 @@
 	<!--layout-->
 	<string name="spent_money">Потрачено</string>
 	<string name="all_money">Всего</string>
+	<!--menu-->
+	<string name="expanded_all">Развернуть все</string>
+	<string name="collapsed_all">Свернуть все</string>
 
 	<!--ItemFragment-->
-	<string name="info_exit_item">Нельзя переименовать в уже существующий товар. Удалите этот и добавте жалаемый</string>
+	<string name="info_exit_item">Нельзя переименовать в уже существующий товар. Удалите этот и добавьте желаемый</string>
 	<string name="info_wrong_value">Проверьте ввод данных</string>
 	<string name="info_data_is_save">Данные сохранены</string>
 	<string name="info_exit_item_in_list">Товар есть в списке и будет перезаписан</string>
@@ -67,13 +70,13 @@
 	<!--CAB menu-->
 	<string name="delete">Удалить</string>
 	<string name="move">Переместить</string>
-	<string name="select_bought">Все купленые</string>
-	<string name="select_not_bought">Все не купленые</string>
+	<string name="select_bought">Все купленные</string>
+	<string name="select_not_bought">Все не купленные</string>
 	<!--Layout-->
 	<string name="amount">Количество</string>
 	<string name="price">Цена</string>
 	<string name="category">Категория</string>
-	<string name="comment">Коментарий</string>
+	<string name="comment">Комментарий</string>
 	<string name="in_card">В корзину</string>
 
 	<!--Dialog-->
@@ -100,8 +103,8 @@
 	<string name="settings_summary_sort_type">Выберите как будут отсортированы товары</string>
 	<string name="settings_dialog_title_sort_type">Выберите порядок сортировки по ...</string>
 	<string name="settings_key_sort_is_bought">sort_is_bought</string>
-	<string name="settings_title_sort_is_bought">Купленые внизу</string>
-	<string name="settings_summary_sort_is_bought">Отображать вверху еще не купленые товары</string>
+	<string name="settings_title_sort_is_bought">Купленные внизу</string>
+	<string name="settings_summary_sort_is_bought">Отображать вверху еще не купленные товары</string>
 	<string name="settings_key_use_category">use_category</string>
 	<string name="settings_title_use_category">Использование категорий</string>
 	<string name="settings_summary_use_category">Разбивать товары по категориям в списке</string>
@@ -124,7 +127,7 @@
 	<string name="settings_key_auto_complete_category">auto_complete_category</string>
 	<string name="settings_title_auto_complete_category">Категория</string>
 	<string name="settings_key_auto_complete_comment">auto_complete_comment</string>
-	<string name="settings_title_auto_complete_comment">Коментарий</string>
+	<string name="settings_title_auto_complete_comment">Комментарий</string>
 	<string name="settings_key_text_selection_screen">text_selection_screen</string>
 	<string name="settings_title_text_selection_screen">Выделение текста при фокусе</string>
 	<string name="settings_key_text_selection_name">text_selection_name</string>
@@ -134,7 +137,7 @@
 	<string name="settings_key_text_selection_price">text_selection_price</string>
 	<string name="settings_title_text_selection_price">Цена</string>
 	<string name="settings_key_text_selection_comment">text_selection_comment</string>
-	<string name="settings_title_text_selection_comment">Коментарий</string>
+	<string name="settings_title_text_selection_comment">Комментарий</string>
 	<string name="settings_key_transition_screen">transition_screen</string>
 	<string name="settings_title_transition_screen">Редактирование каталогов</string>
 	<string name="settings_key_transition">transition</string>

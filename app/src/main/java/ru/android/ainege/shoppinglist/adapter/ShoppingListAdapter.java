@@ -104,9 +104,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 		Object listItem = getListItem(position);
 		if (listItem instanceof Category) {
-			CategoryViewHolder categoryViewHolder = (CategoryViewHolder) holder;
-			categoryViewHolder.setCollapsed(mCollapseCategoryStates.get(((Category) listItem).getId()));
-			onBindCategoryViewHolder(categoryViewHolder, position, (Category) listItem);
+			onBindCategoryViewHolder((CategoryViewHolder) holder, position, (Category) listItem);
 		} else if (listItem instanceof ShoppingList) {
 			onBindItemViewHolder((ItemViewHolder) holder, position, (ShoppingList) listItem);
 		} else {
@@ -194,16 +192,13 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	}
 
 	//<editor-fold desc="Extend/collapse category">
-	public void setOnClick(RecyclerView.ViewHolder holder, int position) {
-		CategoryViewHolder categoryHolder = (CategoryViewHolder) holder;
+	public void setOnClick(int position) {
 		Category category = (Category) getListItem(position);
 
-		if (categoryHolder.isCollapsed()) {
-			categoryHolder.setCollapsed(false);
+		if (mCollapseCategoryStates.get(category.getId())) {
 			setCollapseCategoryStates(category.getId(), false);
 			extendCategory(category, position);
 		} else {
-			categoryHolder.setCollapsed(true);
 			setCollapseCategoryStates(category.getId(), true);
 			collapseCategory(category, position);
 		}
@@ -232,10 +227,26 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		}
 	}
 
-	public void extendAllCategory() {
+	public void extendAllCategory(boolean isSave) {
 		for (int i = 0; i < mItemList.size(); i++) {
 			if (mItemList.get(i) instanceof Category && mCollapseCategoryStates.get(((Category) mItemList.get(i)).getId())) {
 				extendCategory((Category) mItemList.get(i), i);
+
+				if (isSave){
+					setCollapseCategoryStates(((Category) mItemList.get(i)).getId(), false);
+				}
+			}
+		}
+	}
+
+	public void collapseAllCategory(boolean isSave) {
+		for (int i = 0; i < mItemList.size(); i++) {
+			if (mItemList.get(i) instanceof Category && !mCollapseCategoryStates.get(((Category) mItemList.get(i)).getId())) {
+				collapseCategory((Category) mItemList.get(i), i);
+
+				if (isSave){
+					setCollapseCategoryStates(((Category) mItemList.get(i)).getId(), true);
+				}
 			}
 		}
 	}
@@ -367,22 +378,12 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		public TextView mCategory;
 		public TextView mSumCategory;
 
-		private boolean mIsCollapsed = false;
-
 		public CategoryViewHolder(View v) {
 			super(v);
 			mCategoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
 			mColor = (TextView) v.findViewById(R.id.color);
 			mCategory = (TextView) v.findViewById(R.id.category);
 			mSumCategory = (TextView) v.findViewById(R.id.sum_category);
-		}
-
-		public boolean isCollapsed() {
-			return mIsCollapsed;
-		}
-
-		public void setCollapsed(boolean collapsed) {
-			mIsCollapsed = collapsed;
 		}
 	}
 

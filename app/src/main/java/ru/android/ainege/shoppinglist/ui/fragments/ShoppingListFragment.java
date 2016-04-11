@@ -17,6 +17,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
@@ -29,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -86,6 +88,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private FloatingActionButton mFAB;
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
+	private ImageButton mSLMenu;
 	private ImageView mEmptyImage;
 	private FrameLayout mFrameLayout;
 	private LinearLayout mListContainer;
@@ -115,7 +118,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 
 			mFAB.setVisibility(View.GONE);
-			mAdapterRV.extendAllCategory();
+			mAdapterRV.extendAllCategory(false);
 
 			return true;
 		}
@@ -218,6 +221,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
 		mTotalMoney = (TextView) v.findViewById(R.id.total_money);
 
+		mSLMenu = (ImageButton) v.findViewById(R.id.sl_menu);
+		mSLMenu.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showPopupMenu(v);
+			}
+		});
+		updateMenu();
+
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 		mAdapterRV = new ShoppingListAdapter(getActivity(), this);
@@ -308,6 +320,37 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private void showPopupMenu(View v) {
+		PopupMenu popupMenu = new PopupMenu(getActivity(), v);
+		popupMenu.inflate(R.menu.shopping_list_menu);
+
+		popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				switch (item.getItemId()) {
+					case R.id.collapse_all:
+						mAdapterRV.collapseAllCategory(true);
+						return true;
+					case R.id.expanded_all:
+						mAdapterRV.extendAllCategory(true);
+						return true;
+					default:
+						return false;
+				}
+			}
+		});
+
+		popupMenu.show();
+	}
+
+	private void updateMenu() {
+		if (mIsUseCategory && mIsCollapsedCategory) {
+			mSLMenu.setVisibility(View.VISIBLE);
+		} else {
+			mSLMenu.setVisibility(View.GONE);
 		}
 	}
 
@@ -428,8 +471,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				readIsBoughtSetting();
 			} else if (key.equals(getString(R.string.settings_key_use_category))) {
 				readCategorySetting();
+				updateMenu();
 			} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
 				readCollapseCategorySetting();
+				updateMenu();
 			} else if (key.equals(getString(R.string.settings_key_sort_type))) {
 				readSortTypeSetting();
 			}
@@ -575,7 +620,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		if (mIsCollapsedCategory) {
-			mAdapterRV.setOnClick(mItemsListRV.findViewHolderForAdapterPosition(position), position);
+			mAdapterRV.setOnClick(position);
 		}
 	}
 

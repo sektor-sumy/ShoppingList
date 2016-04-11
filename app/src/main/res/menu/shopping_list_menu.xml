@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item
+		android:id="@+id/collapse_all"
+		android:title="@string/collapsed_all"/>
+	<item
+		android:id="@+id/expanded_all"
+		android:title="@string/expanded_all"/>
+</menu>
