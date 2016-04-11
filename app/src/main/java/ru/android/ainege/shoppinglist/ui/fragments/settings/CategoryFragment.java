@@ -55,6 +55,10 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 				if (data.moveToFirst()) {
 					mDictionary = ((CategoryCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
+
+					if (mLastEditId != -1) {
+						mDictionaryRV.scrollToPosition(getPosition(mLastEditId));
+					}
 				}
 
 				data.close();

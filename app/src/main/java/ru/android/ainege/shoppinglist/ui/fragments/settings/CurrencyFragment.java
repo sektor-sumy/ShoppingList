@@ -76,6 +76,10 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 				if (data.moveToFirst()) {
 					mDictionary = ((CurrenciesDS.CurrencyCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
+
+					if (mLastEditId != -1) {
+						mDictionaryRV.scrollToPosition(getPosition(mLastEditId));
+					}
 				}
 				data.close();
 				break;

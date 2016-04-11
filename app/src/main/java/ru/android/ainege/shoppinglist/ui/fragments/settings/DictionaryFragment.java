@@ -45,7 +45,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	protected RecyclerViewAdapter mAdapterRV;
 	protected RecyclerView mDictionaryRV;
 
-	protected long lastEditId = -1;
+	protected long mLastEditId = -1;
 
 	protected abstract String getTitle();
 
@@ -109,7 +109,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, lastEditId));
+				getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, mLastEditId));
 				getActivity().finish();
 				return true;
 			default:
@@ -145,11 +145,11 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 		switch (requestCode) {
 			case ADD:
-				lastEditId = data.getLongExtra(GeneralDialogFragment.ID_ITEM, -1);
+				mLastEditId = data.getLongExtra(GeneralDialogFragment.ID_ITEM, -1);
 				updateData();
 				break;
 			case EDIT:
-				lastEditId = data.getLongExtra(GeneralDialogFragment.ID_ITEM, -1);
+				mLastEditId = data.getLongExtra(GeneralDialogFragment.ID_ITEM, -1);
 				updateData();
 				break;
 			case DELETE:
@@ -171,6 +171,18 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 			mAdapterRV.removeItem(position);
 		}
+	}
+
+	protected int getPosition(long id) {
+		int position = 0;
+
+		for (T t : mDictionary) {
+			if (t.getId() == id) {
+				position = mDictionary.indexOf(t);
+			}
+		}
+
+		return position;
 	}
 
 	private static class DataCursorLoader extends CursorLoader {

@@ -52,6 +52,10 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 				if (data.moveToFirst()) {
 					mDictionary = ((UnitsDS.UnitCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
+
+					if (mLastEditId != -1) {
+						mDictionaryRV.scrollToPosition(getPosition(mLastEditId));
+					}
 				}
 				data.close();
 				break;
