@@ -72,8 +72,12 @@ public class AddItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected void setupView(View v) {
-		super.setupView(v);
+	protected void setupView(View v, Bundle savedInstanceState) {
+		super.setupView(v, savedInstanceState);
+
+		if (savedInstanceState != null) {
+			loadImage(dataFragment.getImagePath());
+		}
 
 		mUnit.setSelection(getPosition(mUnit, getActivity().getResources().getStringArray(R.array.units)[0]));
 		mCategory.setSelection(getPosition(mCategory, (getActivity().getResources().getStringArray(R.array.categories)[0]).split("—")[0]));
@@ -143,11 +147,10 @@ public class AddItemFragment extends ItemFragment {
 			private void setDefaultData(Item item) {
 				mItemInList.setIdItem(item.getId());
 
-				mItemInList.getItem().setImagePath(item.getImagePath());
 				mItemInList.getItem().setDefaultImagePath(item.getDefaultImagePath());
 				mItemInList.getItem().setIdItemData(item.getIdItemData());
 				mCategory.setSelection(getPosition(mCategory, item.getIdCategory()));
-				loadImage();
+				loadImage(item.getImagePath());
 			}
 		};
 	}
@@ -190,10 +193,9 @@ public class AddItemFragment extends ItemFragment {
 					mItemName = item.getName();
 
 					if (mInfo.getVisibility() == View.GONE) {
-						mItemInList.getItem().setImagePath(item.getImagePath());
 						mItemInList.getItem().setDefaultImagePath(item.getDefaultImagePath());
 						mItemInList.getItem().setIdItemData(item.getIdItemData());
-						loadImage();
+						loadImage(item.getImagePath());
 					}
 
 					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_amount), true) && item.getAmount() != 0) {
@@ -228,7 +230,7 @@ public class AddItemFragment extends ItemFragment {
 			mNameInputLayout.setError(getString(R.string.error_length_name));
 		}
 
-		if (!mIsImageLoaded) {
+		if (dataFragment.isLoading()) {
 			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
 			return false;
 		}
@@ -275,8 +277,7 @@ public class AddItemFragment extends ItemFragment {
 	@Override
 	protected void resetImage() {
 		if (!mItemInList.getItem().isNew() && mItemInList.getItem().getDefaultImagePath() != null) {
-			mItemInList.getItem().setImagePath(mItemInList.getItem().getDefaultImagePath());
-			loadImage();
+			loadImage(mItemInList.getItem().getDefaultImagePath());
 		} else {
 			mItemInList.getItem().setImagePath(null);
 			mAppBarImage.setImageResource(android.R.color.transparent);

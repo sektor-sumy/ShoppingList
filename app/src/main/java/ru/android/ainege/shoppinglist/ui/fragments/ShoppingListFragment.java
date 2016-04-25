@@ -439,7 +439,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					showEmptyStates();
 				}
 
-				data.close();
 				break;
 			default:
 				break;

@@ -14,6 +14,8 @@ import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 
 public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
+	private static final String STATE_COLOR = "state_color";
+
 	private LobsterPicker mLobsterPicker;
 
 	public static CategoryDialogFragment newInstance(Category category) {
@@ -24,6 +26,13 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 		fragment.setArguments(args);
 
 		return fragment;
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putInt(STATE_COLOR, mLobsterPicker.getColor());
 	}
 
 	@Override
@@ -53,10 +62,17 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 	}
 
 	@Override
-	protected void setDataToView() {
-		super.setDataToView();
+	protected void setDataToView(Bundle savedInstanceState) {
+		super.setDataToView(savedInstanceState);
+		int color;
 
-		mLobsterPicker.setColor(mEditItem.getColor());
+		if (savedInstanceState == null) {
+			color = mEditItem.getColor();
+		} else {
+			color = savedInstanceState.getInt(STATE_COLOR);
+		}
+
+		mLobsterPicker.setColor(color);
 	}
 
 

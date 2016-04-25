@@ -1,5 +1,5 @@
 package ru.android.ainege.shoppinglist.ui;
 
 public interface ImageFragmentInterface {
-	void updateImage();
+	void updateImage(String path);
 }

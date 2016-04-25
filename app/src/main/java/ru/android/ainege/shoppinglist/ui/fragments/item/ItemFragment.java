@@ -3,6 +3,7 @@ package ru.android.ainege.shoppinglist.ui.fragments.item;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -60,10 +61,10 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.CategoryDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.GeneralDialogFragment;
@@ -77,7 +78,7 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCursor;
 
-public abstract class ItemFragment extends Fragment implements ImageFragmentInterface, ItemActivity.OnBackPressedInterface {
+public abstract class ItemFragment extends Fragment implements ItemActivity.OnBackPressedInterface {
 	public static final String ID_ITEM = "idItem";
 	private static final int TAKE_PHOTO = 0;
 	private static final int LOAD_IMAGE = 1;
@@ -89,6 +90,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private static final String IS_SAVE_CHANGES_DATE = "answerDialog";
 	protected static final String UNIT_ADD_DATE = "addItemDialog";
 	protected static final String CATEGORY_ADD_DATE = "addItemDialog";
+	private static final String RETAINED_FRAGMENT = "retained_fragment_item";
 
 	protected ImageView mAppBarImage;
 	protected CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -109,12 +111,10 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	private CoordinatorLayout mCoordinatorLayout;
 	private AppBarLayout mAppBarLayout;
 
-	protected boolean mIsImageLoaded = true;
 	protected boolean mIsProposedItem = false;
 
 	private String mCurrencyList;
 	private File mFile;
-	private String mPhotoPath;
 	private TextView mFinishPrice;
 	private long mUnitPosition;
 	private long mCategoryPosition;
@@ -125,6 +125,8 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	protected SharedPreferences mPrefs;
 	protected boolean mIsUseNewItemInSpinner;
 	private boolean mIsUseCategory;
+
+	protected RetainedFragment dataFragment;
 
 	protected abstract TextWatcher getNameChangedListener();
 
@@ -185,10 +187,31 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 			}
 		});
 
-		setupView(v);
+		FragmentManager fm = getFragmentManager();
+		dataFragment = (RetainedFragment) fm.findFragmentByTag(RETAINED_FRAGMENT);
+
+		if (dataFragment == null || savedInstanceState == null) {
+			dataFragment = new RetainedFragment();
+			fm.beginTransaction().add(dataFragment, RETAINED_FRAGMENT).commit();
+		}
+
+		dataFragment.setOnLoadedFinish(new RetainedFragment.ImageLoad() {
+			@Override
+			public void finish(String path) {
+				loadImage(path);
+			}
+		});
+
+		setupView(v, savedInstanceState);
 		showCaseViews();
 
 		return v;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		dataFragment.setImagePath(mItemInList.getItem().getImagePath());
 	}
 
 	private void showCaseViews() {
@@ -219,21 +242,18 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.take_photo:
-				mIsImageLoaded = false;
 				Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
 				mFile = Image.create().createImageFile();
-				if (mFile != null) {
-					mPhotoPath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
 
+				if (mFile != null) {
 					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
 					startActivityForResult(cameraIntent, TAKE_PHOTO);
 				} else {
 					Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 				}
+
 				return true;
 			case R.id.select_from_gallery:
-				mIsImageLoaded = false;
 				Intent galleryIntent = new Intent(Intent.ACTION_PICK,
 						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				startActivityForResult(galleryIntent, LOAD_IMAGE);
@@ -249,8 +269,6 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) {
-			mIsImageLoaded = true;
-
 			switch (requestCode) {
 				case IS_SAVE_CHANGES:
 					getActivity().finish();
@@ -271,30 +289,24 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 
 		switch (requestCode) {
 			case TAKE_PHOTO:
-				mItemInList.getItem().setImagePath(mPhotoPath);
 				deletePhotoFromGallery();
-				new Image.BitmapWorkerTask(mFile, metrics.widthPixels - 30, this).execute();
+				dataFragment.execute(mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
-				Uri selectedImage = data.getData();
-
 				try {
-					Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
-
-					Image image = Image.create();
-					File file = image.createImageFile();
+					File file = Image.create().createImageFile();
 
 					if (file != null) {
-						mPhotoPath = Image.PATH_PROTOCOL + file.getAbsolutePath();
-						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, this).execute();
-
-						mItemInList.getItem().setImagePath(mPhotoPath);
+						Uri selectedImage = data.getData();
+						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
+						dataFragment.execute(file, bitmap, metrics.widthPixels - 30);
 					} else {
 						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+
 				break;
 			case IS_SAVE_CHANGES:
 				saveItem();
@@ -321,12 +333,6 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 	}
 
 	@Override
-	public void updateImage() {
-		mIsImageLoaded = true;
-		loadImage();
-	}
-
-	@Override
 	public void onBackPressed() {
 		if (mName.length() != 0) {
 			QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_save_item));
@@ -337,7 +343,7 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		}
 	}
 
-	protected void setupView(View v) {
+	protected void setupView(View v, Bundle savedInstanceState) {
 		mCoordinatorLayout = (CoordinatorLayout) v.findViewById(R.id.coordinatorLayout);
 		mCoordinatorLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
@@ -498,8 +504,10 @@ public abstract class ItemFragment extends Fragment implements ImageFragmentInte
 		}
 	}
 
-	protected void loadImage() {
-		Image.create().insertImageToView(getActivity(), mItemInList.getItem().getImagePath(), mAppBarImage);
+	protected void loadImage(String path) {
+		mItemInList.getItem().setImagePath(path);
+
+		Image.create().insertImageToView(getActivity(), path, mAppBarImage);
 		mCollapsingToolbarLayout.setTitle("");
 	}
 

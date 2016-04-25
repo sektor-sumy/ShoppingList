@@ -50,8 +50,8 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 					}
 				});
 
-		if (getArguments() != null) {
-			setDataToView();
+		if (getArguments() != null || savedInstanceState != null) {
+			setDataToView(savedInstanceState);
 		}
 
 		return builder.create();
@@ -89,10 +89,13 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 		return v;
 	}
 
-	protected void setDataToView() {
-		mEditItem = (T) getArguments().getSerializable(ITEM);
+	protected void setDataToView(Bundle savedInstanceState) {
+		if (savedInstanceState == null) {
+			mEditItem = (T) getArguments().getSerializable(ITEM);
 
-		mName.setText(mEditItem != null ? mEditItem.getName() : null);
+			mName.setText(mEditItem != null ? mEditItem.getName() : null);
+		}
+
 		mName.setSelection(mName.getText().length());
 	}
 

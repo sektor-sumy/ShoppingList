@@ -57,7 +57,7 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 						mDictionaryRV.scrollToPosition(getPosition(mLastEditId));
 					}
 				}
-				data.close();
+
 				break;
 			default:
 				break;

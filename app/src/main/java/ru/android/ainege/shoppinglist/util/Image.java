@@ -260,7 +260,7 @@ public class Image {
 		@Override
 		protected void onPostExecute(Boolean isSuccess) {
 			if (isSuccess) {
-				mFragment.updateImage();
+				mFragment.updateImage(Image.PATH_PROTOCOL + mFile.getAbsolutePath());
 			}
 		}
 	}

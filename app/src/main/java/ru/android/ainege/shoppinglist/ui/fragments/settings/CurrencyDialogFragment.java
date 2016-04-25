@@ -40,10 +40,12 @@ public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 	}
 
 	@Override
-	protected void setDataToView() {
-		super.setDataToView();
+	protected void setDataToView(Bundle savedInstanceState) {
+		super.setDataToView(savedInstanceState);
 
-		mSymbol.setText(mEditItem.getSymbol());
+		if (savedInstanceState == null) {
+			mSymbol.setText(mEditItem.getSymbol());
+		}
 	}
 
 	protected boolean saveData() {

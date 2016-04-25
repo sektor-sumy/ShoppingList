@@ -57,13 +57,18 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected void setupView(View v) {
-		super.setupView(v);
-		setDataToView();
+	protected void setupView(View v, Bundle savedInstanceState) {
+		super.setupView(v, savedInstanceState);
+
+		if (savedInstanceState == null) {
+			setDataToView();
+		} else {
+			loadImage(dataFragment.getImagePath());
+		}
 	}
 
 	private void setDataToView() {
-		loadImage();
+		loadImage(mItemInList.getItem().getImagePath());
 
 		mName.setText(mItemInList.getItem().getName());
 
@@ -149,7 +154,7 @@ public class EditItemFragment extends ItemFragment {
 			mNameInputLayout.setError(getString(R.string.error_length_name));
 		}
 
-		if (!mIsImageLoaded) {
+		if (dataFragment.isLoading()) {
 			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
 			return false;
 		}
@@ -187,8 +192,7 @@ public class EditItemFragment extends ItemFragment {
 	@Override
 	protected void resetImage() {
 		if (!mItemInList.getItem().getImagePath().equals(mItemInList.getItem().getDefaultImagePath())) {
-			mItemInList.getItem().setImagePath(mItemInList.getItem().getDefaultImagePath());
-			loadImage();
+			loadImage(mItemInList.getItem().getDefaultImagePath());
 		}
 	}
 

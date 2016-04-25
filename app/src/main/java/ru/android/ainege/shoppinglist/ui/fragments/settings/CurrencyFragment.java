@@ -81,7 +81,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 						mDictionaryRV.scrollToPosition(getPosition(mLastEditId));
 					}
 				}
-				data.close();
+
 				break;
 			default:
 				break;

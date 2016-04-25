@@ -61,7 +61,6 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 					}
 				}
 
-				data.close();
 				break;
 			default:
 				break;

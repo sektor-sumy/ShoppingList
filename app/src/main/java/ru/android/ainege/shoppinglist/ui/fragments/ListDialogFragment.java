@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,13 +39,13 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.util.Image;
-import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
 
-public class ListDialogFragment extends DialogFragment implements ImageFragmentInterface {
+public class ListDialogFragment extends DialogFragment {
 	private static final String ID_LIST = "idList";
 	private static final String LIST = "list";
+	private static final String RETAINED_FRAGMENT = "retained_fragment_list";
 	private static final int TAKE_PHOTO = 0;
 	private static final int LOAD_IMAGE = 1;
 
@@ -56,9 +57,8 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	private List mEditList;
 	private File mFile;
 	private String mImagePath;
-	private String mPhotoPath;
 
-	private boolean mIsImageLoad = true;
+	private RetainedFragment dataFragment;
 
 	public static ListDialogFragment newInstance(List list) {
 		Bundle args = new Bundle();
@@ -105,12 +105,32 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 					}
 				});
 
-		if (getArguments() != null) {
-			mEditList = (List) getArguments().getSerializable(LIST);
-			setDataToView();
+
+
+
+		FragmentManager fm = getFragmentManager();
+		dataFragment = (RetainedFragment) fm.findFragmentByTag(RETAINED_FRAGMENT);
+
+		if (dataFragment == null || savedInstanceState == null) {
+			dataFragment = new RetainedFragment();
+			fm.beginTransaction().add(dataFragment, RETAINED_FRAGMENT).commit();
+
+			if (getArguments() != null) {
+				mEditList = (List) getArguments().getSerializable(LIST);
+				setDataToView();
+			} else {
+				setRandomImage();
+			}
 		} else {
-			setRandomImage();
+			loadImage(dataFragment.getImagePath());
 		}
+
+		dataFragment.setOnLoadedFinish(new RetainedFragment.ImageLoad() {
+			@Override
+			public void finish(String path) {
+				loadImage(path);
+			}
+		});
 
 		return builder.create();
 	}
@@ -145,6 +165,12 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	}
 
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		dataFragment.setImagePath(mImagePath);
+	}
+
+	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 
@@ -168,21 +194,18 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.take_photo:
-				mIsImageLoad = false;
 				Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
 				mFile = Image.create().createImageFile();
-				if (mFile != null) {
-					mPhotoPath = Image.PATH_PROTOCOL + mFile.getAbsolutePath();
 
+				if (mFile != null) {
 					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
 					startActivityForResult(cameraIntent, TAKE_PHOTO);
 				} else {
 					Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 				}
+
 				break;
 			case R.id.select_from_gallery:
-				mIsImageLoad = false;
 				Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				startActivityForResult(galleryIntent, LOAD_IMAGE);
 				break;
@@ -198,8 +221,6 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != Activity.RESULT_OK) {
-			mIsImageLoad = true;
-
 			return;
 		}
 
@@ -208,43 +229,30 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 
 		switch (requestCode) {
 			case TAKE_PHOTO:
-				mImagePath = mPhotoPath;
 				deletePhotoFromGallery();
-				new Image.BitmapWorkerTask(mFile, metrics.widthPixels - 30, this).execute();
+				dataFragment.execute(mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
-				Uri selectedImage = data.getData();
-
 				try {
-					Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
-
-					Image image = Image.create();
-					File file = image.createImageFile();
+					File file = Image.create().createImageFile();
 
 					if (file != null) {
-						mPhotoPath = Image.PATH_PROTOCOL + file.getAbsolutePath();
-						new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, this).execute();
-
-						mImagePath = mPhotoPath;
+						Uri selectedImage = data.getData();
+						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
+						dataFragment.execute(file, bitmap, metrics.widthPixels - 30);
 					} else {
 						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+
 				break;
 		}
 	}
 
-	@Override
-	public void updateImage() {
-		mIsImageLoad = true;
-		loadImage();
-	}
-
 	private void setDataToView() {
-		mImagePath = mEditList.getImagePath();
-		loadImage();
+		loadImage(mEditList.getImagePath());
 
 		mName.setText(mEditList.getName());
 		mName.setSelection(mName.getText().length());
@@ -279,7 +287,8 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 		return index;
 	}
 
-	private void loadImage() {
+	private void loadImage(String imagePath) {
+		mImagePath = imagePath;
 		Image.create().insertImageToView(getActivity(), mImagePath, mImageList);
 	}
 
@@ -290,8 +299,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 			path = Image.LIST_IMAGE_PATH + "random_list_" + new Random().nextInt(9) + ".png";
 		} while (path.equals(mImagePath));
 
-		mImagePath = path;
-		loadImage();
+		loadImage(path);
 	}
 
 	private boolean saveData() {
@@ -305,7 +313,7 @@ public class ListDialogFragment extends DialogFragment implements ImageFragmentI
 			mNameInputLayout.setErrorEnabled(false);
 		}
 
-		if (!mIsImageLoad) {
+		if (dataFragment.isLoading()) {
 			Toast.makeText(getActivity().getApplicationContext(), "Подождите загрузке картинки", Toast.LENGTH_SHORT).show();
 			return false;
 		}

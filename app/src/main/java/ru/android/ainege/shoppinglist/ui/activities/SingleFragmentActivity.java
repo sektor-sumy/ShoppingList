@@ -18,7 +18,9 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
 		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
-		injectFragment(getFragment(), getDefaultContainer());
+		if (savedInstanceState == null) {
+			injectFragment(getFragment(), getDefaultContainer());
+		}
 	}
 
 	protected int getDefaultContainer() {

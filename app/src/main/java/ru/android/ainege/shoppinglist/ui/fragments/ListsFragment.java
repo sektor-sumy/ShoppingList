@@ -201,7 +201,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					showEmptyStates();
 				}
 
-				data.close();
 				break;
 			default:
 				break;
