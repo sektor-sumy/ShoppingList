@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<!--settings-->
+	<dimen name="toolbar_size">48dp</dimen>
+	<dimen name="toolbar_size_x2">96dp</dimen>
+	<dimen name="card_view_toolbar_spacer">42dp</dimen>
+
+</resources>

@@ -7,20 +7,22 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,13 +74,6 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 		}
 
 		setHasOptionsMenu(true);
-		ActionBar appBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-
-		if (appBar != null) {
-			appBar.setTitle(getTitle());
-			appBar.setHomeButtonEnabled(true);
-			appBar.setDisplayHomeAsUpEnabled(true);
-		}
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
@@ -87,8 +82,28 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_dictionary, container, false);
 
-		Button add = (Button) v.findViewById(R.id.add);
-		add.setOnClickListener(getAddHandler());
+		Toolbar toolbar = (Toolbar) v.findViewById(R.id.main_toolbar);
+		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+		toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getActivity().onBackPressed();
+			}
+		});
+
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			Toolbar cardToolbar = (Toolbar) v.findViewById(R.id.toolbar);
+			cardToolbar.setTitle(getTitle());
+		} else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+			if (actionBar != null) {
+				actionBar.setTitle(getTitle());
+			}
+		}
+
+		FloatingActionButton mFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
+		mFAB.setOnClickListener(getAddHandler());
 
 		mDictionaryRV = (RecyclerView) v.findViewById(R.id.list);
 		mDictionaryRV.setLayoutManager(new LinearLayoutManager(getActivity()));

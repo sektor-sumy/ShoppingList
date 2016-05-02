@@ -3,29 +3,27 @@ package ru.android.ainege.shoppinglist.ui.activities;
 import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import ru.android.ainege.shoppinglist.R;
 
 public class SettingsActivity extends SingleFragmentActivity {
 	private static final String IS_OPENED_DICTIONARY = "isOpenedDictionary";
+	private static final String STATE_SCREEN = "state_screen";
 
 	@Override
 	protected int getDefaultContainer() {
@@ -38,6 +36,7 @@ public class SettingsActivity extends SingleFragmentActivity {
 	}
 
 	public static class MyPreferenceFragment extends PreferenceFragment {
+		private PreferenceScreen mNestedScreen;
 
 		@Override
 		public void onCreate(final Bundle savedInstanceState) {
@@ -51,22 +50,50 @@ public class SettingsActivity extends SingleFragmentActivity {
 			}
 
 			setHasOptionsMenu(true);
-			ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
-			if (actionBar != null) {
-				actionBar.setHomeButtonEnabled(true);
-				actionBar.setDisplayHomeAsUpEnabled(true);
-			}
+			nestedScreen(getString(R.string.settings_key_auto_complete_screen));
+			nestedScreen(getString(R.string.settings_key_text_selection_screen));
+			nestedScreen(getString(R.string.settings_key_transition_screen));
 
 			startSettingByKey(getString(R.string.settings_key_currency));
 			startSettingByKey(getString(R.string.settings_key_unit));
 			startSettingByKey(getString(R.string.settings_key_category));
+
+			if (savedInstanceState != null && savedInstanceState.get(STATE_SCREEN) != null) {
+				mNestedScreen = (PreferenceScreen) findPreference(savedInstanceState.get(STATE_SCREEN).toString());
+			}
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			View v = super.onCreateView(inflater, container, savedInstanceState);
+			addToolbar(v);
+
+			return v;
+		}
+
+		@Override
+		public void onStart() {
+			super.onStart();
+
+			if (mNestedScreen != null) {
+				addToolbarToNestedScreen(mNestedScreen);
+			}
 		}
 
 		@Override
 		public void onPause() {
 			super.onPause();
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+		}
+
+		@Override
+		public void onSaveInstanceState(Bundle outState) {
+			super.onSaveInstanceState(outState);
+
+			if (mNestedScreen != null) {
+				outState.putString(STATE_SCREEN, mNestedScreen.getKey());
+			}
 		}
 
 		@Override
@@ -78,60 +105,6 @@ public class SettingsActivity extends SingleFragmentActivity {
 				default:
 					return super.onOptionsItemSelected(item);
 			}
-		}
-
-		@Override
-		public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-			super.onPreferenceTreeClick(preferenceScreen, preference);
-
-			// If the user has clicked on a preference screen, set up the screen
-			if (preference instanceof PreferenceScreen) {
-				setUpNestedScreen((PreferenceScreen) preference);
-			}
-
-			return false;
-		}
-
-		public void setUpNestedScreen(PreferenceScreen preferenceScreen) {
-			final Dialog dialog = preferenceScreen.getDialog();
-
-			Toolbar toolbar;
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-				LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
-				toolbar = (Toolbar) LayoutInflater.from(getActivity()).inflate(R.layout.toolbar, root, false);
-				root.addView(toolbar, 0); // insert at top
-			} else {
-				ViewGroup root = (ViewGroup) dialog.findViewById(android.R.id.content);
-				ListView content = (ListView) root.getChildAt(0);
-
-				root.removeAllViews();
-
-				toolbar = (Toolbar) LayoutInflater.from(getActivity()).inflate(R.layout.toolbar, root, false);
-
-				int height;
-				TypedValue tv = new TypedValue();
-				if (getActivity().getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
-					height = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-				} else {
-					height = toolbar.getHeight();
-				}
-
-				content.setPadding(0, height, 0, 0);
-
-				root.addView(content);
-				root.addView(toolbar);
-			}
-
-
-			toolbar.setTitle(preferenceScreen.getTitle());
-			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dialog.dismiss();
-				}
-			});
 		}
 
 		private void startSettingByKey(final String key) {
@@ -150,6 +123,63 @@ public class SettingsActivity extends SingleFragmentActivity {
 
 					sendResult(true);
 					return true;
+				}
+			});
+		}
+
+		private void nestedScreen(String key) {
+			final PreferenceScreen categorySettings = (PreferenceScreen) findPreference(key);
+			categorySettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					mNestedScreen = ((PreferenceScreen) preference);
+					addToolbarToNestedScreen(mNestedScreen);
+					return true;
+				}
+			});
+		}
+
+		private void addToolbar(View view) {
+			LinearLayout root = (LinearLayout) view.findViewById(android.R.id.list).getParent();
+			Toolbar toolbar = (Toolbar) LayoutInflater.from(getActivity()).inflate(R.layout.toolbar, root, false);
+			root.addView(toolbar, 0); // insert at top
+
+			toolbar.setTitle(getString(R.string.settings));
+			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					getActivity().onBackPressed();
+				}
+			});
+		}
+
+		private void addToolbarToNestedScreen(PreferenceScreen preference) {
+			final Dialog dialog = preference.getDialog();
+			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+				@Override
+				public void onDismiss(DialogInterface dialog) {
+					mNestedScreen = null;
+				}
+			});
+
+			LinearLayout root;
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
+			} else {
+				root = (LinearLayout) dialog.findViewById(android.R.id.content).getParent();
+			}
+
+			Toolbar toolbar = (Toolbar) LayoutInflater.from(getActivity()).inflate(R.layout.toolbar, root, false);
+			root.addView(toolbar, 0); // insert at top
+
+			toolbar.setTitle(preference.getTitle().toString());
+			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
 				}
 			});
 		}

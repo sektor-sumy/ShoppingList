@@ -8,6 +8,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -20,11 +21,13 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -91,6 +94,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	protected static final String UNIT_ADD_DATE = "addItemDialog";
 	protected static final String CATEGORY_ADD_DATE = "addItemDialog";
 	private static final String RETAINED_FRAGMENT = "retained_fragment_item";
+	private static final String STATE_FILE = "state_file";
 
 	protected ImageView mAppBarImage;
 	protected CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -120,11 +124,12 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	private long mCategoryPosition;
 
 	private boolean mIsOpenedKeyboard = false;
-	private boolean mIsExpandedAppbar;
+	private boolean mIsExpandedAppbar = true;
 
 	protected SharedPreferences mPrefs;
 	protected boolean mIsUseNewItemInSpinner;
 	private boolean mIsUseCategory;
+	private boolean mIsPortraitOrientation;
 
 	protected RetainedFragment dataFragment;
 
@@ -143,7 +148,6 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		AndroidBug5497Workaround.assistActivity(getActivity());
 		setHasOptionsMenu(true);
 
 		mItemDS = new ItemDS(getActivity());
@@ -152,11 +156,40 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mIsUseCategory = mPrefs.getBoolean(getString(R.string.settings_key_use_category), true);
 		mIsUseNewItemInSpinner = mPrefs.getBoolean(getString(R.string.settings_key_fast_edit), false);
+
+		if (savedInstanceState != null) {
+			mFile = (File) savedInstanceState.getSerializable(STATE_FILE);
+		}
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_item, container, false);
+
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			mIsPortraitOrientation = false;
+		} else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+			mIsPortraitOrientation = true;
+			AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboard() {
+				@Override
+				public void isOpen() {
+					mIsOpenedKeyboard = true;
+
+					if (mIsExpandedAppbar) {
+						mAppBarLayout.setExpanded(false);
+					}
+				}
+
+				@Override
+				public void isClose() {
+					mIsOpenedKeyboard = false;
+
+					if (mIsExpandedAppbar) {
+						mAppBarLayout.setExpanded(true);
+					}
+				}
+			});
+		}
 
 		setCurrency();
 
@@ -209,9 +242,23 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+
+		mAppBarLayout.setExpanded(true);
+	}
+
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		dataFragment.setImagePath(mItemInList.getItem().getImagePath());
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putSerializable(STATE_FILE, mFile);
 	}
 
 	private void showCaseViews() {
@@ -345,35 +392,22 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 	protected void setupView(View v, Bundle savedInstanceState) {
 		mCoordinatorLayout = (CoordinatorLayout) v.findViewById(R.id.coordinatorLayout);
-		mCoordinatorLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-			@Override
-			public void onGlobalLayout() {
-				int heightDiff = mCoordinatorLayout.getRootView().getHeight() - mCoordinatorLayout.getHeight();
-				if (heightDiff > 100 && !mIsOpenedKeyboard) { // 99% of the time the height diff will be due to a keyboard.
-					mIsOpenedKeyboard = true;
-
-					if (mIsExpandedAppbar) {
-						mAppBarLayout.setExpanded(false);
-					}
-				} else if (heightDiff <= 100 && mIsOpenedKeyboard) {
-					mIsOpenedKeyboard = false;
-
-					if (mIsExpandedAppbar) {
-						mAppBarLayout.setExpanded(true);
-					}
-				}
-			}
-		});
-
 		mAppBarLayout = (AppBarLayout) v.findViewById(R.id.appbar);
-		mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-			@Override
-			public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-				if (!mIsOpenedKeyboard) {
-					mIsExpandedAppbar = (verticalOffset == 0);
+
+		if (mIsPortraitOrientation) {
+			mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+				@Override
+				public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+					if (!mIsOpenedKeyboard) {
+						mIsExpandedAppbar = (verticalOffset == 0);
+					}
 				}
+			});
+		} else {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.primary_dark));
 			}
-		});
+		}
 
 		mCollapsingToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.collapsing_toolbar);
 

@@ -78,7 +78,7 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 
 		@Override
 		public CategoryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._settings_dictionary, parent, false);
+			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_dictionaries_item, parent, false);
 			return new CategoryHolder(v);
 		}
 

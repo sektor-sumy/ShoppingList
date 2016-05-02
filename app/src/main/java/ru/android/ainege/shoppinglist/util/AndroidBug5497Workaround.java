@@ -9,9 +9,21 @@ import android.widget.FrameLayout;
 public class AndroidBug5497Workaround {
 	// For more information, see https://code.google.com/p/android/issues/detail?id=5497
 
-	public static void assistActivity (Activity activity) {
-		new AndroidBug5497Workaround(activity);
+	public static AndroidBug5497Workaround assistActivity (Activity activity) {
+		return new AndroidBug5497Workaround(activity);
 	}
+
+	OnOpenKeyboard mOnOpenKeyboard;
+
+	public interface OnOpenKeyboard {
+		void isOpen();
+		void isClose();
+	}
+
+	public void setOnOpenKeyboard(OnOpenKeyboard onOpenKeyboard) {
+		mOnOpenKeyboard = onOpenKeyboard;
+	}
+
 	private View mChildOfContent;
 	private int usableHeightPrevious;
 	private FrameLayout.LayoutParams frameLayoutParams;
@@ -36,9 +48,17 @@ public class AndroidBug5497Workaround {
 			int heightDifference = usableHeightSansKeyboard - usableHeightNow;
 			if (heightDifference > (usableHeightSansKeyboard/4)) {
 				// keyboard probably just became visible
+				if (mOnOpenKeyboard != null) {
+					mOnOpenKeyboard.isOpen();
+				}
+
 				frameLayoutParams.height = usableHeightSansKeyboard - heightDifference;
 			} else {
 				// keyboard probably just became hidden
+				if (mOnOpenKeyboard != null) {
+					mOnOpenKeyboard.isClose();
+				}
+
 				frameLayoutParams.height = usableHeightSansKeyboard;
 			}
 			mChildOfContent.requestLayout();

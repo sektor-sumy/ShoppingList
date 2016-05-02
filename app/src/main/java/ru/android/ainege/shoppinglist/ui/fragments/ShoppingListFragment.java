@@ -9,10 +9,12 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +40,7 @@ import android.widget.TextView;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.adapter.ShoppingListAdapter;
@@ -66,6 +69,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
 	private static final String ID_LIST = "idList";
+	private static final String STATE_COLLAPSE = "state_collapse";
 
 	private static final int ADD_ITEM = 0;
 	private static final int EDIT_ITEM = 1;
@@ -267,6 +271,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		}));
 
+		if (savedInstanceState != null) {
+			mAdapterRV.setCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_COLLAPSE));
+		}
+
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			((AppBarLayout) v.findViewById(R.id.appbar)).setExpanded(false);
+		}
+
 		showCaseView();
 		setListData();
 
@@ -287,6 +299,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public void onPause() {
 		super.onPause();
 		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putSerializable(STATE_COLLAPSE, mAdapterRV.getCollapseCategoryStates());
 	}
 
 	@Override

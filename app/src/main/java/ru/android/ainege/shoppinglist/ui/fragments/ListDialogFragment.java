@@ -48,6 +48,7 @@ public class ListDialogFragment extends DialogFragment {
 	private static final String RETAINED_FRAGMENT = "retained_fragment_list";
 	private static final int TAKE_PHOTO = 0;
 	private static final int LOAD_IMAGE = 1;
+	private static final String STATE_FILE = "state_file";
 
 	private ImageView mImageList;
 	private TextInputLayout mNameInputLayout;
@@ -132,6 +133,10 @@ public class ListDialogFragment extends DialogFragment {
 			}
 		});
 
+		if (savedInstanceState != null) {
+			mFile = (File) savedInstanceState.getSerializable(STATE_FILE);
+		}
+
 		return builder.create();
 	}
 
@@ -168,6 +173,13 @@ public class ListDialogFragment extends DialogFragment {
 	public void onDestroy() {
 		super.onDestroy();
 		dataFragment.setImagePath(mImagePath);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putSerializable(STATE_FILE, mFile);
 	}
 
 	@Override

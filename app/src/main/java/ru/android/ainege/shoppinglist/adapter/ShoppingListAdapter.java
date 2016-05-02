@@ -91,12 +91,12 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	}
 
 	public CategoryViewHolder onCreateCategoryViewHolder(ViewGroup parent) {
-		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._shopping_list_category, parent, false);
+		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_shopping_lists_category, parent, false);
 		return new CategoryViewHolder(v);
 	}
 
 	public ItemViewHolder onCreateItemViewHolder(ViewGroup parent) {
-		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._shopping_list_item, parent, false);
+		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_shopping_lists_item, parent, false);
 		return new ItemViewHolder(v);
 	}
 
@@ -267,6 +267,16 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	public void setCollapseCategoryStates(long idCategory, boolean isCollapsed) {
 		mCollapseCategoryStates.put(idCategory, isCollapsed);
 	}
+
+	public void setCollapseCategoryStates(HashMap<Long, Boolean> collapseState) {
+		mCollapseCategoryStates = collapseState;
+	}
+
+
+	public HashMap<Long, Boolean> getCollapseCategoryStates() {
+		return mCollapseCategoryStates;
+	}
+
 	//</editor-fold>
 
 	//Converts the source list on the list to work with the adapter

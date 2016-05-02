@@ -5,7 +5,9 @@
 	android:layout_height="48dp"
 	android:orientation="horizontal"
 	android:paddingTop="@dimen/padding_4dp"
-	android:paddingBottom="@dimen/padding_4dp">
+	android:paddingBottom="@dimen/padding_4dp"
+	android:paddingLeft="@dimen/padding_16dp"
+	android:paddingRight="@dimen/padding_16dp">
 
 	<TextView
 		android:id="@+id/color"

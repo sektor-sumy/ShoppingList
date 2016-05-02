@@ -35,4 +35,10 @@
 	<dimen name="dialog_item_price_weight">100dp</dimen>
 
 	<dimen name="shape_padding">10dp</dimen>
+
+	<!--settings-->
+	<dimen name="toolbar_size">56dp</dimen>
+	<dimen name="toolbar_size_x2">112dp</dimen>
+	<dimen name="card_view_margin">-3dp</dimen>
+	<dimen name="card_view_margin_top">53dp</dimen>
 </resources>

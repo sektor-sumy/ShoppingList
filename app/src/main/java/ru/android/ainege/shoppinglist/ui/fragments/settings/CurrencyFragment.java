@@ -114,7 +114,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 		@Override
 		public CurrencyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout._settings_dictionary, parent, false);
+			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_dictionaries_item, parent, false);
 			return new CurrencyHolder(v);
 		}
 

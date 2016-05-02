@@ -32,7 +32,7 @@
 			android:id="@+id/item_name_list"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_weight="1"
+			android:layout_weight="0.45"
 			android:textColor="@android:color/black"
 			android:textSize="16sp"
 			android:maxLines="2"
@@ -41,8 +41,10 @@
 
 		<TextView
 			android:id="@+id/item_amount_list"
-			android:layout_width="@dimen/column_amount_wight"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
+			android:layout_weight="0.22"
+			android:minWidth="@dimen/column_amount_wight"
 			android:textColor="@android:color/black"
 			android:textSize="16sp"
 			android:singleLine="true"
@@ -52,8 +54,10 @@
 
 		<TextView
 			android:id="@+id/item_price_list"
-			android:layout_width="@dimen/column_price_wight"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
+			android:layout_weight="0.33"
+			android:minWidth="@dimen/column_price_wight"
 			android:textColor="@android:color/black"
 			android:textSize="16sp"
 			android:singleLine="true"

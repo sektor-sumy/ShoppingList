@@ -259,7 +259,7 @@ public class AddItemFragment extends ItemFragment {
 
 	@Override
 	protected void updatedItem() {
-		if (mItemInList.getItem().isNew()) { //if (mItemInList.getIdItem() == 0) {
+		if (mItemInList.getItem().isNew()) {
 			String image = mItemInList.getItem().getImagePath();
 			String defaultImage = mItemInList.getItem().getDefaultImagePath();
 

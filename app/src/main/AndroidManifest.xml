@@ -39,12 +39,12 @@
 		<activity
 			android:name=".ui.activities.SettingsActivity"
 			android:label="@string/settings"
-			android:theme="@style/AppTheme">
+			android:theme="@style/AppTheme.NoActionBar">
 		</activity>
 		<activity
 			android:name=".ui.activities.SettingsDictionaryActivity"
 			android:label=""
-			android:theme="@style/AppTheme">
+			android:theme="@style/AppTheme.NoActionBar">
 			<intent-filter>
 				<action android:name="ru.android.ainege.shoppinglist.SettingsDataActivity"/>
 

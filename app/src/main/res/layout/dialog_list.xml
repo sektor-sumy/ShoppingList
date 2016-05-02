@@ -3,7 +3,7 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:layout_marginBottom="24dp">
+	android:paddingBottom="@dimen/padding_16dp">
 
 	<ImageView
 		android:id="@+id/image"
@@ -49,7 +49,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:gravity="center"
-		android:layout_marginRight="24dp"
+		android:layout_marginRight="@dimen/padding_24dp"
 		android:layout_toRightOf="@+id/currency_label"
 		android:layout_alignTop="@+id/currency_label"
 		android:layout_alignParentRight="true"
