@@ -75,7 +75,7 @@ public class AddItemFragment extends ItemFragment {
 	protected void setupView(View v, Bundle savedInstanceState) {
 		super.setupView(v, savedInstanceState);
 
-		if (savedInstanceState != null) {
+		if (savedInstanceState != null && dataFragment.getImagePath() != null) {
 			loadImage(dataFragment.getImagePath());
 		}
 
@@ -102,9 +102,7 @@ public class AddItemFragment extends ItemFragment {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if (s.length() == 0) {
-					mNameInputLayout.setError(getString(R.string.error_name));
-				} else if (s.toString().equals(s.toString().trim())) {
+				if (s.length() > 0 && s.toString().equals(s.toString().trim())) {
 					disableError(mNameInputLayout);
 					//If selected a existent item and default data are used,
 					//when changing item, fill in the data that have been previously introduced
@@ -267,7 +265,7 @@ public class AddItemFragment extends ItemFragment {
 				defaultImage = image = Image.CHARACTER_IMAGE_PATH + (int) getName().toUpperCase().charAt(0) + ".png";
 			}
 
-			mItemInList.setItem(new Item(getName(), defaultImage == null ?  image : defaultImage, image));
+			mItemInList.setItem(new Item(getName(), defaultImage == null ? image : defaultImage, image));
 		} else {
 			mItemInList.getItem().setName(getName());
 		}
@@ -287,6 +285,7 @@ public class AddItemFragment extends ItemFragment {
 
 	private int getPosition(Spinner spinner, String name) {
 		int index = -1;
+
 		for (int i = 0; i < spinner.getCount(); i++) {
 			if (((GenericDS.EntityCursor<Dictionary>) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
 				index = i;
@@ -297,6 +296,7 @@ public class AddItemFragment extends ItemFragment {
 		if (index == -1) {
 			index = mIsUseNewItemInSpinner ? 1 : 0;
 		}
+
 		return index;
 	}
 }
