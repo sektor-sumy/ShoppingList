@@ -74,6 +74,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final String STATE_ITEMS = "state_items";
 	private static final String STATE_SPENT_SUM = "state_spent_sum";
 	private static final String STATE_TOTAL_SUM = "state_total_sum";
+	private static final String STATE_ACTION_MODE = "state_action_mode";
+	private static final String STATE_ACTION_DATA = "state_action_data";
 
 	private static final int ADD_ITEM = 0;
 	private static final int EDIT_ITEM = 1;
@@ -88,6 +90,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private List mList;
 
 	private java.util.List<Object> mSaveListRotate;
+	private boolean mIsStartActionMode;
 	private double mSaveSpentMoney = 0;
 	private double mSaveTotalMoney = 0;
 	private long mItemDetailsId = -1;
@@ -127,7 +130,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 
 			mFAB.setVisibility(View.GONE);
-			mAdapterRV.extendAllCategory(false);
+			if (!mIsStartActionMode) {
+				mAdapterRV.extendAllCategory(false);
+			}
 
 			return true;
 		}
@@ -153,6 +158,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		public void onDestroyActionMode(ActionMode mode) {
 			mFAB.setVisibility(View.VISIBLE);
 			mActionMode = null;
+			mIsStartActionMode = false;
 
 			mAdapterRV.recoveryCollapseAllCategory();
 			mAdapterRV.clearSelections();
@@ -192,6 +198,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			mSaveListRotate = (java.util.List<Object>) savedInstanceState.getSerializable(STATE_ITEMS);
 			mSaveSpentMoney = savedInstanceState.getDouble(STATE_SPENT_SUM);
 			mSaveTotalMoney = savedInstanceState.getDouble(STATE_TOTAL_SUM);
+
+			if (savedInstanceState.getBoolean(STATE_ACTION_MODE)) {
+				mIsStartActionMode = true;
+				mAdapterRV.setSelectedItems((ArrayList<ShoppingList>) savedInstanceState.getSerializable(STATE_ACTION_DATA));
+			}
 		}
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
@@ -300,6 +311,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		if (mIsUpdateData) {
 			updateData();
 			mIsUpdateData = false;
+		} else if (mIsStartActionMode) {
+			mActionMode = getActivity().startActionMode(mActionModeCallback);
 		}
 	}
 
@@ -317,6 +330,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		outState.putSerializable(STATE_ITEMS, (Serializable) mAdapterRV.getItemList());
 		outState.putDouble(STATE_SPENT_SUM, mSaveSpentMoney);
 		outState.putDouble(STATE_TOTAL_SUM, mSaveTotalMoney);
+		outState.putBoolean(STATE_ACTION_MODE, mActionMode != null);
+		outState.putSerializable(STATE_ACTION_DATA, mAdapterRV.getSelectedItems());
 	}
 
 	@Override

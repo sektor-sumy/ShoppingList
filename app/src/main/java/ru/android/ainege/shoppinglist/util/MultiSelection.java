@@ -22,6 +22,10 @@ public class MultiSelection {
 		return mSelectedItems;
 	}
 
+	public void setSelectedItems(ArrayList<ShoppingList> selectedItems) {
+		mSelectedItems = selectedItems;
+	}
+
 	public boolean isContains(ShoppingList item) {
 		return mSelectedItems.contains(item);
 	}

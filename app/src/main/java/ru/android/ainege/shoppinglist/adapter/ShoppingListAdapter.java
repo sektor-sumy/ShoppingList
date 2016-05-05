@@ -338,6 +338,14 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	}
 
 	//<editor-fold desc="Selection">
+	public ArrayList<ShoppingList> getSelectedItems() {
+		return MultiSelection.getInstance().getSelectedItems();
+	}
+
+	public void setSelectedItems(ArrayList<ShoppingList> selectedItems) {
+		MultiSelection.getInstance().setSelectedItems(selectedItems);
+	}
+
 	public void selectItem(ShoppingList item) {
 		MultiSelection.getInstance().toggleSelection(item);
 		notifyItemChanged(mItemList.indexOf(item));

@@ -9,10 +9,10 @@
 		android:id="@+id/select_bought"
 		android:title="@string/select_bought"
 		android:icon="@drawable/ic_check_box_white_24dp"
-		android:showAsAction="ifRoom|withText"/>
+		android:showAsAction="ifRoom"/>
 	<item
 		android:id="@+id/select_not_bought"
 		android:title="@string/select_not_bought"
 		android:icon="@drawable/ic_check_box_outline_blank_white_24dp"
-		android:showAsAction="ifRoom|withText"/>
+		android:showAsAction="ifRoom"/>
 </menu>
