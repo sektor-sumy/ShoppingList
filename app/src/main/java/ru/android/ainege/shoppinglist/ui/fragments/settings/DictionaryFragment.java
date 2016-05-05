@@ -42,8 +42,10 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	protected static final int DATA_LOADER = 0;
 	private static final int DELETE = 3;
 	private static final String DELETE_DATE = "answerListDialog";
+	private static final String STATE_LIST = "state_list";
 
-	protected ArrayList<T> mDictionary = new ArrayList<>();
+	protected ArrayList<T> mDictionary;
+	protected ArrayList<T> mSaveListRotate;
 	protected RecyclerViewAdapter mAdapterRV;
 	protected RecyclerView mDictionaryRV;
 
@@ -74,6 +76,11 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 		}
 
 		setHasOptionsMenu(true);
+		mAdapterRV = getAdapter();
+
+		if (savedInstanceState != null) {
+			mSaveListRotate = (ArrayList<T>) savedInstanceState.getSerializable(STATE_LIST);
+		}
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
@@ -107,8 +114,6 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 		mDictionaryRV = (RecyclerView) v.findViewById(R.id.list);
 		mDictionaryRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-		mAdapterRV = getAdapter();
 		mDictionaryRV.setAdapter(mAdapterRV);
 
 		return v;
@@ -118,6 +123,13 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	public void onPause() {
 		super.onPause();
 		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putSerializable(STATE_LIST, mDictionary);
 	}
 
 	@Override
@@ -151,6 +163,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	}
 
 	private void updateData() {
+		mSaveListRotate = null;
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
@@ -223,7 +236,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 		@Override
 		public int getItemCount() {
-			return mDictionary.size();
+			return mDictionary != null ? mDictionary.size() : 0;
 		}
 
 		public void removeItem(int position) {

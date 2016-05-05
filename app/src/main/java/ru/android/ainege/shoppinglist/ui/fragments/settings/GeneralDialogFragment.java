@@ -90,9 +90,9 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 	}
 
 	protected void setDataToView(Bundle savedInstanceState) {
-		if (savedInstanceState == null) {
-			mEditItem = (T) getArguments().getSerializable(ITEM);
+		mEditItem = (T) getArguments().getSerializable(ITEM);
 
+		if (savedInstanceState == null) {
 			mName.setText(mEditItem != null ? mEditItem.getName() : null);
 		}
 

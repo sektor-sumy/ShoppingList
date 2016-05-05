@@ -73,7 +73,10 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		switch (loader.getId()) {
 			case DATA_LOADER:
-				if (data.moveToFirst()) {
+				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
+					mDictionary = mSaveListRotate;
+					mAdapterRV.notifyDataSetChanged();
+				} else if (mSaveListRotate == null && data.moveToFirst()) {
 					mDictionary = ((CurrenciesDS.CurrencyCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
 

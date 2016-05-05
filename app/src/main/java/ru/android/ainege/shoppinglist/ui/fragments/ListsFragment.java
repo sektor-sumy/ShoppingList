@@ -48,6 +48,7 @@ import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
+	private static final String STATE_LISTS = "state_lists";
 
 	private static final int ADD_LIST = 1;
 	private static final int EDIT_LIST = 2;
@@ -57,7 +58,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
 	private static final int DATA_LOADER = 0;
 
-	private ArrayList<List> mLists = new ArrayList<>();
+	private ArrayList<List> mLists;
+	private ArrayList<List> mSaveListRotate;
 	private ListsDS mListsDS;
 	private int mPositionForDelete;
 	private boolean mIsUpdateData = false;
@@ -74,6 +76,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		setHasOptionsMenu(true);
 
 		mListsDS = new ListsDS(getActivity());
+		mAdapterRV = new ListsAdapter();
+
+		if (savedInstanceState != null) {
+			mSaveListRotate = (ArrayList<List>) savedInstanceState.getSerializable(STATE_LISTS);
+		}
+
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
 
@@ -103,7 +111,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		mListsRV = (RecyclerView) v.findViewById(R.id.lists);
 		mListsRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-		mAdapterRV = new ListsAdapter();
 		mListsRV.setAdapter(mAdapterRV);
 
 		showcaseView();
@@ -119,6 +126,13 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			updateData();
 			mIsUpdateData = false;
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putSerializable(STATE_LISTS, mLists);
 	}
 
 	@Override
@@ -193,7 +207,11 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					mProgressBar.setVisibility(View.GONE);
 				}
 
-				if (data.moveToFirst()) {
+				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
+					mLists = mSaveListRotate;
+					mAdapterRV.setDate();
+					hideEmptyStates();
+				} else if (mSaveListRotate == null && data.moveToFirst()) {
 					mLists = ((ListCursor) data).getEntities();
 					mAdapterRV.setDate();
 					hideEmptyStates();
@@ -213,6 +231,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	private void updateData() {
+		mSaveListRotate = null;
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
@@ -315,7 +334,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		@Override
 		public int getItemCount() {
-			return mLists.size();
+			return mLists != null ? mLists.size() : 0;
 		}
 
 		@Override

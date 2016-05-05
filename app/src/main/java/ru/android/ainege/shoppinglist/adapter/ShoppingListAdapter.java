@@ -30,13 +30,12 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	private static final int TYPE_CATEGORY = 0;
 	private static final int TYPE_ITEM = 1;
 
-	public List<Object> mItemList = new ArrayList<>();
+	public List<Object> mItemList;
 	private HashMap<Long, Boolean> mCollapseCategoryStates = new HashMap<>();
 
 	private Activity mActivity;
 	private String mCurrency;
 	private boolean mIsUseCategory;
-	private boolean mIsCollapsedCategory;
 
 	private ShowcaseListener mShowcaseListener;
 	private boolean mIsShowShowcase = false;
@@ -51,10 +50,16 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	}
 
 	public void setData(List<Category> categoryList, String currency, boolean isUseCategory, boolean isCollapsedCategory) {
+		mIsUseCategory = isUseCategory;
+		List<Object> items = generateParentChildItemList(categoryList, isCollapsedCategory);
+
+		setData(items, currency, isUseCategory);
+	}
+
+	public void setData(List<Object> categoryList, String currency, boolean isUseCategory) {
 		mCurrency = currency;
 		mIsUseCategory = isUseCategory;
-		mIsCollapsedCategory = isCollapsedCategory;
-		mItemList = generateParentChildItemList(categoryList);
+		mItemList = categoryList;
 
 		if (new MaterialShowcaseSequence(mActivity, Showcase.SHOT_ADD_ITEM).hasFired()) {
 			mIsShowShowcase = true;
@@ -165,7 +170,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 	@Override
 	public int getItemCount() {
-		return mItemList.size();
+		return mItemList != null ? mItemList.size() : 0;
 	}
 
 	public Object getListItem(int position) {
@@ -280,7 +285,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	//</editor-fold>
 
 	//Converts the source list on the list to work with the adapter
-	private List<Object> generateParentChildItemList(List<Category> categoryList) {
+	private List<Object> generateParentChildItemList(List<Category> categoryList, boolean isCollapsedCategory) {
 		List<Object> list = new ArrayList<>();
 		Category category;
 
@@ -290,11 +295,11 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 				list.add(category);
 				boolean isCollapsed = true;
 
-				if (!mIsCollapsedCategory ||
-						(mIsCollapsedCategory &&
+				if (!isCollapsedCategory ||
+						(isCollapsedCategory &&
 								!mCollapseCategoryStates.containsKey(category.getId()) &&
 								!isAllItemsBoughtInCategory(category)) ||
-						(mIsCollapsedCategory &&
+						(isCollapsedCategory &&
 								mCollapseCategoryStates.containsKey(category.getId()) &&
 								!mCollapseCategoryStates.get(category.getId()))) {
 					isCollapsed = false;

@@ -38,6 +38,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,6 +71,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final String APP_PREFERENCES_ID = "idList";
 	private static final String ID_LIST = "idList";
 	private static final String STATE_COLLAPSE = "state_collapse";
+	private static final String STATE_ITEMS = "state_items";
+	private static final String STATE_SPENT_SUM = "state_spent_sum";
+	private static final String STATE_TOTAL_SUM = "state_total_sum";
 
 	private static final int ADD_ITEM = 0;
 	private static final int EDIT_ITEM = 1;
@@ -83,6 +87,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private ListsDS mListsDS;
 	private List mList;
 
+	private java.util.List<Object> mSaveListRotate;
 	private double mSaveSpentMoney = 0;
 	private double mSaveTotalMoney = 0;
 	private long mItemDetailsId = -1;
@@ -180,6 +185,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		saveId(mList.getId());
 
 		readSettings();
+		mAdapterRV = new ShoppingListAdapter(getActivity(), this);
+
+		if (savedInstanceState != null) {
+			mAdapterRV.setCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_COLLAPSE));
+			mSaveListRotate = (java.util.List<Object>) savedInstanceState.getSerializable(STATE_ITEMS);
+			mSaveSpentMoney = savedInstanceState.getDouble(STATE_SPENT_SUM);
+			mSaveTotalMoney = savedInstanceState.getDouble(STATE_TOTAL_SUM);
+		}
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
@@ -236,7 +249,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
 		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-		mAdapterRV = new ShoppingListAdapter(getActivity(), this);
 		mItemsListRV.setAdapter(mAdapterRV);
 		mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
 			@Override
@@ -271,10 +283,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		}));
 
-		if (savedInstanceState != null) {
-			mAdapterRV.setCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_COLLAPSE));
-		}
-
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			((AppBarLayout) v.findViewById(R.id.appbar)).setExpanded(false);
 		}
@@ -306,6 +314,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		super.onSaveInstanceState(outState);
 
 		outState.putSerializable(STATE_COLLAPSE, mAdapterRV.getCollapseCategoryStates());
+		outState.putSerializable(STATE_ITEMS, (Serializable) mAdapterRV.getItemList());
+		outState.putDouble(STATE_SPENT_SUM, mSaveSpentMoney);
+		outState.putDouble(STATE_TOTAL_SUM, mSaveTotalMoney);
 	}
 
 	@Override
@@ -422,22 +433,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					mProgressBar.setVisibility(View.GONE);
 				}
 
-				if (data.moveToFirst()) {
-					ArrayList<Category> categories = new ArrayList<>();
+				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
+					mAdapterRV.setData(mSaveListRotate, mList.getCurrency().getSymbol(), mIsUseCategory);
 
-					if (mIsUseCategory) {
-						categories = ((CategoryCursor) data).getEntities();
-					} else {
-						ArrayList<ShoppingList> itemsInList = ((CategoryCursor) data).getItemsInListCursor().getEntities();
-						ShoppingList.sort(itemsInList);
-
-						categories.add(new Category(itemsInList));
-
-						for (ShoppingList item : itemsInList) {
-							item.getCategory().setItemsByCategoryInList(itemsInList);
-						}
-					}
-
+					updateSums(mSaveSpentMoney, mSaveTotalMoney);
+					hideEmptyStates();
+				} else if (mSaveListRotate == null && data.moveToFirst()) {
+					ArrayList<Category> categories = getItemsList((CategoryCursor) data); //create array for adapter
 					ShoppingList item  = getDetailsItem(categories);
 
 					if (item != null) {
@@ -475,7 +477,44 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void updateData() {
+		mSaveListRotate = null;
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
+	}
+
+	private ArrayList<Category> getItemsList(CategoryCursor data) {
+		ArrayList<Category> categories = new ArrayList<>();
+
+		if (mIsUseCategory) {
+			categories = data.getEntities();
+		} else {
+			ArrayList<ShoppingList> itemsInList = data.getItemsInListCursor().getEntities();
+			ShoppingList.sort(itemsInList);
+
+			categories.add(new Category(itemsInList));
+
+			for (ShoppingList item : itemsInList) {
+				item.getCategory().setItemsByCategoryInList(itemsInList);
+			}
+		}
+
+		return categories;
+	}
+
+	private ShoppingList getDetailsItem(ArrayList<Category> categories) {
+		if (mItemDetailsId != -1) {
+			for (Category c : categories) {
+				for (ShoppingList item : c.getItemsByCategoryInList()) {
+					if (item.getIdItem() == mItemDetailsId) {
+						mItemDetailsId = -1;
+						return item;
+					}
+				}
+			}
+
+			mItemDetailsId = -1;
+		}
+
+		return null;
 	}
 	//</editor-fold>
 
@@ -584,23 +623,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		editor.apply();
-	}
-
-	private ShoppingList getDetailsItem(ArrayList<Category> categories) {
-		if (mItemDetailsId != -1) {
-			for (Category c : categories) {
-				for (ShoppingList item : c.getItemsByCategoryInList()) {
-					if (item.getIdItem() == mItemDetailsId) {
-						mItemDetailsId = -1;
-						return item;
-					}
-				}
-			}
-
-			mItemDetailsId = -1;
-		}
-
-		return null;
 	}
 
 	private void showEmptyStates() {

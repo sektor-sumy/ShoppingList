@@ -123,6 +123,10 @@ public class ListDialogFragment extends DialogFragment {
 				setRandomImage();
 			}
 		} else {
+			if (getArguments() != null) {
+				mEditList = (List) getArguments().getSerializable(LIST);
+			}
+
 			loadImage(dataFragment.getImagePath());
 		}
 
