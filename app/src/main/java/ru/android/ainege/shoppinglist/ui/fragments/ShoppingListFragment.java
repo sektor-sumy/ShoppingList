@@ -53,7 +53,7 @@ import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
-import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
+import ru.android.ainege.shoppinglist.ui.activities.ListsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.util.Image;
@@ -77,9 +77,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final String STATE_ACTION_MODE = "state_action_mode";
 	private static final String STATE_ACTION_DATA = "state_action_data";
 
-	private static final int ADD_ITEM = 0;
-	private static final int EDIT_ITEM = 1;
-	private static final int EDIT_LIST = 3;
+	public static final int ADD_ITEM = 0;
+	public static final int EDIT_ITEM = 1;
+	public static final int EDIT_LIST = 3;
 	private static final int IS_DELETE_LIST = 4;
 	private static final int SETTINGS = 5;
 	private static final String EDIT_ITEM_DATE = "editListDialog";
@@ -89,6 +89,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private ListsDS mListsDS;
 	private List mList;
 
+	private OnUpdateListListener mUpdateListListener;
+	private OnListChangeListener mListChangeListener;
 	private java.util.List<Object> mSaveListRotate;
 	private boolean mIsStartActionMode;
 	private double mSaveSpentMoney = 0;
@@ -175,6 +177,26 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		return fragment;
 	}
 
+	public interface OnUpdateListListener {
+		void onUpgradeList();
+	}
+
+	public interface OnListChangeListener {
+		void onAddItem(long id);
+		void onItemSelected(ShoppingList item);
+	}
+
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+
+		if (getActivity() instanceof ListsActivity) {
+			mUpdateListListener = (OnUpdateListListener) getActivity();
+		}
+
+		mListChangeListener = (OnListChangeListener) getActivity();
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -187,7 +209,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		mListsDS = new ListsDS(getActivity());
-		getList(getArguments().getLong(ID_LIST));
+		setList(getArguments().getLong(ID_LIST));
 		saveId(mList.getId());
 
 		readSettings();
@@ -230,14 +252,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent i = new Intent(getActivity(), ItemActivity.class);
-				i.putExtra(ItemActivity.EXTRA_ID_LIST, mList.getId());
-
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					startActivityForResult(i, ADD_ITEM, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-				} else {
-					startActivityForResult(i, ADD_ITEM);
-				}
+				mListChangeListener.onAddItem(mList.getId());
 			}
 		});
 
@@ -320,6 +335,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public void onPause() {
 		super.onPause();
 		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mUpdateListListener = null;
+		mListChangeListener = null;
 	}
 
 	@Override
@@ -418,10 +440,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				getActivity().onBackPressed();
 				break;
 			case EDIT_LIST:
-				getList(getArguments().getLong(ID_LIST));
+				setList(getArguments().getLong(ID_LIST));
 				setListData();
 				updateSums(mSaveSpentMoney, mSaveTotalMoney);
 				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
+
+				mUpdateListListener.onUpgradeList();
 				break;
 		}
 	}
@@ -491,8 +515,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	}
 
-	private void updateData() {
+	public void updateData() {
 		mSaveListRotate = null;
+		mUpdateListListener.onUpgradeList();
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
@@ -601,7 +626,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	//</editor-fold>
 
 	//<editor-fold desc="Customize the list">
-	private void getList(long idList) {
+	private void setList(long idList) {
 		ListCursor cursor = mListsDS.get(idList);
 
 		if (cursor.moveToFirst()) {
@@ -658,14 +683,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			return;
 		}
 
-		Intent i = new Intent(getActivity(), ItemActivity.class);
-		i.putExtra(ItemActivity.EXTRA_ITEM, itemInList);
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			startActivityForResult(i, EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-		} else {
-			startActivityForResult(i, EDIT_ITEM);
-		}
+		mListChangeListener.onItemSelected(itemInList);
 	}
 
 	private void onItemClick(Category category, int position) {
@@ -751,6 +769,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		updateSpentSum(mSaveSpentMoney);
 		mAdapterRV.notifyItemChanged(categoryPosition);
+
+		mUpdateListListener.onUpgradeList();
 	}
 
 	private void deleteSelectedItems() {
@@ -762,6 +782,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		} else {
 			showEmptyStates();
 		}
+
+		mUpdateListListener.onUpgradeList();
 	}
 
 	//<editor-fold desc="Counting the amount of list">

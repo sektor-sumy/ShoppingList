@@ -14,7 +14,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_fragment);
+		setContentView(getLayout());
 
 		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
@@ -23,11 +23,15 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 		}
 	}
 
+	protected int getLayout() {
+		return R.layout.activity_fragment;
+	}
+
 	protected int getDefaultContainer() {
 		return R.id.fragment_container;
 	}
 
-	private void injectFragment(Fragment fragment, Integer container) {
+	protected void injectFragment(Fragment fragment, Integer container) {
 		FragmentManager fm = getFragmentManager();
 		fm.beginTransaction().replace(container, fragment).commit();
 	}

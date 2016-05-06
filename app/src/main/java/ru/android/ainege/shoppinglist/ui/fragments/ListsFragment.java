@@ -36,7 +36,6 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
-import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -58,6 +57,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
 	private static final int DATA_LOADER = 0;
 
+	private OnListsChangeListener mListsChangeListener;
+
 	private ArrayList<List> mLists;
 	private ArrayList<List> mSaveListRotate;
 	private ListsDS mListsDS;
@@ -69,6 +70,16 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private FloatingActionButton mAddItemFAB;
 	private ProgressBar mProgressBar;
 	private ImageView mEmptyImage;
+
+	public interface OnListsChangeListener {
+		void onListSelected(long id);
+	}
+
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		mListsChangeListener = (OnListsChangeListener) getActivity();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -126,6 +137,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			updateData();
 			mIsUpdateData = false;
 		}
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mListsChangeListener = null;
 	}
 
 	@Override
@@ -230,7 +247,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	}
 
-	private void updateData() {
+	public void updateData() {
 		mSaveListRotate = null;
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
@@ -428,15 +445,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 						if (itemPosition != RecyclerView.NO_POSITION) {
 							List list = mLists.get(itemPosition);
-
-							Intent i = new Intent(getActivity(), ShoppingListActivity.class);
-							i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, list.getId());
-
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-								startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-							} else {
-								startActivity(i);
-							}
+							mListsChangeListener.onListSelected(list.getId());
 						}
 					}
 				});
