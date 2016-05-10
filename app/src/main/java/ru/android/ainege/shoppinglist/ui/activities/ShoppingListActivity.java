@@ -12,7 +12,7 @@ import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.AddItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.EditItemFragment;
 
-public class ShoppingListActivity extends SingleFragmentActivity implements ShoppingListFragment.OnListChangeListener {
+public class ShoppingListActivity extends SingleFragmentActivity implements ShoppingListFragment.OnListChangeListener, ShoppingListFragment.OnUpdateListListener {
 	public final static String EXTRA_ID_LIST = "idList";
 	public final static String EXTRA_ITEM = "item";
 
@@ -49,6 +49,19 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 	}
 
 	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode != RESULT_OK) return;
+
+		switch (requestCode) {
+			case ShoppingListFragment.ADD_ITEM:
+			case ShoppingListFragment.EDIT_ITEM:
+				ShoppingListFragment fragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
+				fragment.onActivityResult(requestCode, resultCode, data);
+				break;
+		}
+	}
+
+	@Override
 	public void onAddItem(long id) {
 		if (findViewById(R.id.right_fragment_container) == null) {
 			Intent i = new Intent(this, ItemActivity.class);
@@ -80,5 +93,10 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 			Fragment newDetail = EditItemFragment.newInstance(item);
 			injectFragment(newDetail, R.id.right_fragment_container);
 		}
+	}
+
+	@Override
+	public void onUpgradeList() {
+
 	}
 }

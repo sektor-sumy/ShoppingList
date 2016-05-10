@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
@@ -186,15 +187,24 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		void onItemSelected(ShoppingList item);
 	}
 
+	@TargetApi(23)
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
 
-		if (getActivity() instanceof ListsActivity) {
-			mUpdateListListener = (OnUpdateListListener) getActivity();
-		}
-
+		mUpdateListListener = (OnUpdateListListener) getActivity();
 		mListChangeListener = (OnListChangeListener) getActivity();
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			mUpdateListListener = (OnUpdateListListener) getActivity();
+			mListChangeListener = (OnListChangeListener) getActivity();
+		}
 	}
 
 	@Override

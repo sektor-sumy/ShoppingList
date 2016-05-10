@@ -1,6 +1,5 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.content.Context;
@@ -44,7 +43,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode != Activity.RESULT_OK) return;
+		if (resultCode != RESULT_OK) return;
 
 		switch (requestCode) {
 			case ITEM:
@@ -140,16 +139,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 	@Override
 	public void onAddItem(long id) {
-		if (findViewById(R.id.right_fragment_container) == null) {
-			Intent i = new Intent(this, ItemActivity.class);
-			i.putExtra(ItemActivity.EXTRA_ID_LIST, id);
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				startActivityForResult(i, ShoppingListFragment.ADD_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-			} else {
-				startActivityForResult(i, ShoppingListFragment.ADD_ITEM);
-			}
-		} else {
+		if (findViewById(R.id.right_fragment_container) != null) {
 			Intent i = new Intent(this, ShoppingListActivity.class);
 			i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
 			startActivityForResult(i, ITEM);
@@ -158,16 +148,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 	@Override
 	public void onItemSelected(ShoppingList item) {
-		if (findViewById(R.id.right_fragment_container) == null) {
-			Intent i = new Intent(this, ItemActivity.class);
-			i.putExtra(ItemActivity.EXTRA_ITEM, item);
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				startActivityForResult(i, ShoppingListFragment.EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-			} else {
-				startActivityForResult(i, ShoppingListFragment.EDIT_ITEM);
-			}
-		} else {
+		if (findViewById(R.id.right_fragment_container) != null) {
 			Intent i = new Intent(this, ShoppingListActivity.class);
 			i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, item.getIdList());
 			i.putExtra(ShoppingListActivity.EXTRA_ITEM, item);
