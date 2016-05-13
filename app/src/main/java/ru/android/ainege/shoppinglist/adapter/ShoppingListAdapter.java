@@ -346,6 +346,16 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		MultiSelection.getInstance().setSelectedItems(selectedItems);
 	}
 
+	public boolean isContainsInSelected(long id) {
+		for (ShoppingList item : getSelectedItems()) {
+			if (item.getIdItem() == id) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public void selectItem(ShoppingList item) {
 		MultiSelection.getInstance().toggleSelection(item);
 		notifyItemChanged(mItemList.indexOf(item));

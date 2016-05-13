@@ -54,7 +54,6 @@ import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
-import ru.android.ainege.shoppinglist.ui.activities.ListsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.util.Image;
@@ -92,6 +91,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private OnUpdateListListener mUpdateListListener;
 	private OnListChangeListener mListChangeListener;
+	private long mLastOpenItem;
+
 	private java.util.List<Object> mSaveListRotate;
 	private boolean mIsStartActionMode;
 	private double mSaveSpentMoney = 0;
@@ -179,12 +180,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	public interface OnUpdateListListener {
-		void onUpgradeList();
+		void onShoppingListUpdate();
 	}
 
 	public interface OnListChangeListener {
 		void onAddItem(long id);
 		void onItemSelected(ShoppingList item);
+		void onDeleteShoppingList();
 	}
 
 	@TargetApi(23)
@@ -447,17 +449,25 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				Image.deleteFile(mList.getImagePath());
 
 				saveId(-1);
-				getActivity().onBackPressed();
+
+				mListChangeListener.onDeleteShoppingList();
 				break;
 			case EDIT_LIST:
-				setList(getArguments().getLong(ID_LIST));
-				setListData();
-				updateSums(mSaveSpentMoney, mSaveTotalMoney);
-				mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
-
-				mUpdateListListener.onUpgradeList();
+				updateList();
+				mUpdateListListener.onShoppingListUpdate();
 				break;
 		}
+	}
+
+	public void updateList() {
+		setList(getArguments().getLong(ID_LIST));
+		setListData();
+		updateSums(mSaveSpentMoney, mSaveTotalMoney);
+		mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
+	}
+
+	public void setLastOpenItem(long id) {
+		mLastOpenItem = id;
 	}
 
 	//<editor-fold desc="Work with loader">
@@ -527,7 +537,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	public void updateData() {
 		mSaveListRotate = null;
-		mUpdateListListener.onUpgradeList();
+		mUpdateListListener.onShoppingListUpdate();
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
@@ -693,6 +703,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			return;
 		}
 
+		mLastOpenItem = itemInList.getIdItem();
 		mListChangeListener.onItemSelected(itemInList);
 	}
 
@@ -780,20 +791,32 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		updateSpentSum(mSaveSpentMoney);
 		mAdapterRV.notifyItemChanged(categoryPosition);
 
-		mUpdateListListener.onUpgradeList();
+		mUpdateListListener.onShoppingListUpdate();
+
+		if (mLastOpenItem == itemInList.getIdItem()) {
+			mListChangeListener.onItemSelected(itemInList);
+		}
 	}
 
 	private void deleteSelectedItems() {
+		boolean isDeleteOpenItem = mAdapterRV.isContainsInSelected(mLastOpenItem);
 		mAdapterRV.removeSelected();
 
 		if (mAdapterRV.getItemCount() > 0) {
 			updateSums();
 			hideEmptyStates();
+
+			if (isDeleteOpenItem) {
+				ShoppingList item = (ShoppingList) (mIsUseCategory ? mAdapterRV.getListItem(1) : mAdapterRV.getListItem(0));
+				mLastOpenItem = item.getIdItem();
+				mListChangeListener.onItemSelected(item);
+			}
 		} else {
 			showEmptyStates();
+			mActionMode.finish();
 		}
 
-		mUpdateListListener.onUpgradeList();
+		mUpdateListListener.onShoppingListUpdate();
 	}
 
 	//<editor-fold desc="Counting the amount of list">

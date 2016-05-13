@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments.item;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
@@ -27,13 +28,11 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -65,6 +64,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
+import ru.android.ainege.shoppinglist.ui.activities.ListsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
@@ -132,6 +132,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	private boolean mIsPortraitOrientation;
 
 	protected RetainedFragment dataFragment;
+	private OnItemChangeListener mItemChangeListener;
 
 	protected abstract TextWatcher getNameChangedListener();
 
@@ -144,6 +145,30 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	protected abstract void updatedItem();
 
 	protected abstract void resetImage();
+
+	public interface OnItemChangeListener {
+		void onItemSave(long id);
+	}
+
+	@TargetApi(23)
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+
+		if (getActivity() instanceof ListsActivity) {
+			mItemChangeListener = (OnItemChangeListener) getActivity();
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && getActivity() instanceof ListsActivity) {
+			mItemChangeListener = (OnItemChangeListener) getActivity();
+		}
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -732,7 +757,11 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 	private void saveItem() {
 		if (saveData()) {
-			getActivity().finish();
+			if (mItemChangeListener != null) {
+				mItemChangeListener.onItemSave(mItemInList.getIdItem());
+			} else {
+				getActivity().finish();
+			}
 		} else {
 			Toast.makeText(getActivity().getApplicationContext(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
 		}

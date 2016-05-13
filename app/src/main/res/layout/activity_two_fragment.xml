@@ -10,12 +10,16 @@
 		android:id="@+id/fragment_container"
 		android:layout_width="0dp"
 		android:layout_height="match_parent"
-		android:layout_weight="0.33" />
+		android:layout_weight="1"/>
 
 	<FrameLayout
-		android:id="@+id/right_fragment_container"
+		android:id="@+id/list_fragment_container"
 		android:layout_width="0dp"
-		android:layout_height="match_parent"
-		android:layout_weight="0.67" />
+		android:layout_height="match_parent"/>
+
+	<FrameLayout
+		android:id="@+id/item_fragment_container"
+		android:layout_width="0dp"
+		android:layout_height="match_parent"/>
 
 </LinearLayout>

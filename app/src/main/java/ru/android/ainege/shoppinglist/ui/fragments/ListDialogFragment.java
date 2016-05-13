@@ -43,7 +43,7 @@ import ru.android.ainege.shoppinglist.util.Image;
 import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
 
 public class ListDialogFragment extends DialogFragment {
-	private static final String ID_LIST = "idList";
+	public static final String ID_LIST = "idList";
 	private static final String LIST = "list";
 	private static final String RETAINED_FRAGMENT = "retained_fragment_list";
 	private static final int TAKE_PHOTO = 0;
