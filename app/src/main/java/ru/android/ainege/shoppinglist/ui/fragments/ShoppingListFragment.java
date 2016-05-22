@@ -91,7 +91,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private OnUpdateListListener mUpdateListListener;
 	private OnListChangeListener mListChangeListener;
-	private long mLastOpenItem;
 
 	private java.util.List<Object> mSaveListRotate;
 	private boolean mIsStartActionMode;
@@ -180,13 +179,16 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	public interface OnUpdateListListener {
-		void onShoppingListUpdate();
+		void onListUpdate();
+		void onListDelete();
 	}
 
 	public interface OnListChangeListener {
-		void onAddItem(long id);
-		void onItemSelected(ShoppingList item);
-		void onDeleteShoppingList();
+		void onItemAdd(long id);
+		void onItemSelect(ShoppingList item);
+		void onItemUpdate(ShoppingList item);
+		void onItemDelete();
+		long getLastSelectedItemId();
 	}
 
 	@TargetApi(23)
@@ -264,7 +266,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mListChangeListener.onAddItem(mList.getId());
+				mListChangeListener.onItemAdd(mList.getId());
 			}
 		});
 
@@ -449,12 +451,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				Image.deleteFile(mList.getImagePath());
 
 				saveId(-1);
-
-				mListChangeListener.onDeleteShoppingList();
+				mUpdateListListener.onListDelete();
 				break;
 			case EDIT_LIST:
 				updateList();
-				mUpdateListListener.onShoppingListUpdate();
+				mUpdateListListener.onListUpdate();
 				break;
 		}
 	}
@@ -464,10 +465,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		setListData();
 		updateSums(mSaveSpentMoney, mSaveTotalMoney);
 		mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
-	}
-
-	public void setLastOpenItem(long id) {
-		mLastOpenItem = id;
 	}
 
 	//<editor-fold desc="Work with loader">
@@ -537,7 +534,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	public void updateData() {
 		mSaveListRotate = null;
-		mUpdateListListener.onShoppingListUpdate();
+		mUpdateListListener.onListUpdate();
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
@@ -703,8 +700,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			return;
 		}
 
-		mLastOpenItem = itemInList.getIdItem();
-		mListChangeListener.onItemSelected(itemInList);
+		mListChangeListener.onItemSelect(itemInList);
 	}
 
 	private void onItemClick(Category category, int position) {
@@ -791,15 +787,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		updateSpentSum(mSaveSpentMoney);
 		mAdapterRV.notifyItemChanged(categoryPosition);
 
-		mUpdateListListener.onShoppingListUpdate();
-
-		if (mLastOpenItem == itemInList.getIdItem()) {
-			mListChangeListener.onItemSelected(itemInList);
-		}
+		mUpdateListListener.onListUpdate();
+		mListChangeListener.onItemUpdate(itemInList);
 	}
 
 	private void deleteSelectedItems() {
-		boolean isDeleteOpenItem = mAdapterRV.isContainsInSelected(mLastOpenItem);
+		boolean isDeleteOpenItem = mAdapterRV.isContainsInSelected(mListChangeListener.getLastSelectedItemId());
 		mAdapterRV.removeSelected();
 
 		if (mAdapterRV.getItemCount() > 0) {
@@ -808,15 +801,16 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			if (isDeleteOpenItem) {
 				ShoppingList item = (ShoppingList) (mIsUseCategory ? mAdapterRV.getListItem(1) : mAdapterRV.getListItem(0));
-				mLastOpenItem = item.getIdItem();
-				mListChangeListener.onItemSelected(item);
+				mListChangeListener.onItemSelect(item);
 			}
 		} else {
 			showEmptyStates();
 			mActionMode.finish();
+
+			mListChangeListener.onItemDelete();
 		}
 
-		mUpdateListListener.onShoppingListUpdate();
+		mUpdateListListener.onListUpdate();
 	}
 
 	//<editor-fold desc="Counting the amount of list">

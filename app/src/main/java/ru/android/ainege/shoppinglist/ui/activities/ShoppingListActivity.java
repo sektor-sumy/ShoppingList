@@ -13,14 +13,8 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 	public final static String EXTRA_ID_LIST = "idList";
 
 	@Override
-	protected int getLayout() {
-		return R.layout.activity_main;
-	}
-
-	@Override
 	protected Fragment getFragment() {
-		Intent intent = getIntent();
-		long idList = intent.getLongExtra(EXTRA_ID_LIST, -1);
+		long idList = getIntent().getLongExtra(EXTRA_ID_LIST, -1);
 
 		return ShoppingListFragment.newInstance(idList);
 	}
@@ -39,40 +33,51 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 	}
 
 	@Override
-	public void onAddItem(long id) {
-		if (findViewById(R.id.list_fragment_container) == null) {
-			Intent i = new Intent(this, ItemActivity.class);
-			i.putExtra(ItemActivity.EXTRA_ID_LIST, id);
+	public void onItemAdd(long id) {
+		Intent i = new Intent(this, ItemActivity.class);
+		i.putExtra(ItemActivity.EXTRA_ID_LIST, id);
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				startActivityForResult(i, ShoppingListFragment.ADD_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-			} else {
-				startActivityForResult(i, ShoppingListFragment.ADD_ITEM);
-			}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			startActivityForResult(i, ShoppingListFragment.ADD_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+		} else {
+			startActivityForResult(i, ShoppingListFragment.ADD_ITEM);
 		}
 	}
 
 	@Override
-	public void onItemSelected(ShoppingList item) {
-		if (findViewById(R.id.list_fragment_container) == null) {
-			Intent i = new Intent(this, ItemActivity.class);
-			i.putExtra(ItemActivity.EXTRA_ITEM, item);
+	public void onItemSelect(ShoppingList item) {
+		Intent i = new Intent(this, ItemActivity.class);
+		i.putExtra(ItemActivity.EXTRA_ITEM, item);
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				startActivityForResult(i, ShoppingListFragment.EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-			} else {
-				startActivityForResult(i, ShoppingListFragment.EDIT_ITEM);
-			}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			startActivityForResult(i, ShoppingListFragment.EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+		} else {
+			startActivityForResult(i, ShoppingListFragment.EDIT_ITEM);
 		}
 	}
 
 	@Override
-	public void onDeleteShoppingList() {
+	public void onItemUpdate(ShoppingList item) {
 
 	}
 
 	@Override
-	public void onShoppingListUpdate() {
+	public void onItemDelete() {
+
+	}
+
+	@Override
+	public long getLastSelectedItemId() {
+		return 0;
+	}
+
+	@Override
+	public void onListDelete() {
+		onBackPressed();
+	}
+
+	@Override
+	public void onListUpdate() {
 
 	}
 }

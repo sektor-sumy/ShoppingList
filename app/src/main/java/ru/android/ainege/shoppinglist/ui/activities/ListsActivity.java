@@ -28,31 +28,59 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		ItemFragment.OnItemChangeListener {
 	public static final String APP_PREFERENCES = "shopping_list_settings";
 	public static final String APP_PREFERENCES_ID = "idList";
+	private static final String STATE_SCREEN = "state_screen";
+
+	private static final float LISTS_WEIGHT_LS = 1;
+	private static final float LISTS_WEIGHT_SLS = 0.33f;
+	private static final float SHOPPING_LIST_WEIGHT_SLS = 0.67f;
+	private static final float SHOPPING_LIST_WEIGHT_IS = 0.5f;
+	private static final float ITEM_WEIGHT_IS = 0.5f;
+
+	private static final int HANDSET = -1;
+	private static final int LISTS_SCREEN = 1;
+	private static final int SHOPPING_LIST_SCREEN = 2;
+	private static final int ITEM_SCREEN = 3;
 
 	private FrameLayout mListsLayout;
 	private FrameLayout mShoppingListLayout;
 	private FrameLayout mItemLayout;
 
-	private ViewWeightAnimationWrapper mListsWrapper;
-	private ViewWeightAnimationWrapper mShoppingListWrapper;
-	private ViewWeightAnimationWrapper mItemWrapper;
+	private boolean mIsTablet = false;
+	private int mCurrentScreen = HANDSET;
+	private long mLastSelectedListId = -1;
+	private long mLastSelectedItemId = -1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (savedInstanceState == null && shouldOpenLastList()) {
-			openLastList();
+		mListsLayout = (FrameLayout) findViewById(R.id.fragment_container);
+		mShoppingListLayout = (FrameLayout) findViewById(R.id.list_fragment_container);
+		mIsTablet = mShoppingListLayout != null;
+
+		if (mIsTablet) {
+			mItemLayout = (FrameLayout) findViewById(R.id.item_fragment_container);
+			mCurrentScreen = LISTS_SCREEN;
 		}
 
-		if (findViewById(R.id.list_fragment_container) != null) {
-			mListsLayout = (FrameLayout) findViewById(R.id.fragment_container);
-			mShoppingListLayout = (FrameLayout) findViewById(R.id.list_fragment_container);
-			mItemLayout = (FrameLayout) findViewById(R.id.item_fragment_container);
+		if (savedInstanceState == null && shouldOpenLastList()) {
+			openLastList();
+		} else if (savedInstanceState != null) {
+			mCurrentScreen = savedInstanceState.getInt(STATE_SCREEN);
 
-			mListsWrapper = new ViewWeightAnimationWrapper(mListsLayout);
-			mShoppingListWrapper = new ViewWeightAnimationWrapper(mShoppingListLayout);
-			mItemWrapper = new ViewWeightAnimationWrapper(mItemLayout);
+			switch (mCurrentScreen) {
+				case ITEM_SCREEN:
+					new ViewWeightAnimationWrapper(mListsLayout).setWeight(0);
+					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(SHOPPING_LIST_WEIGHT_IS);
+					new ViewWeightAnimationWrapper(mItemLayout).setWeight(ITEM_WEIGHT_IS);
+					break;
+				case SHOPPING_LIST_SCREEN:
+					new ViewWeightAnimationWrapper(mListsLayout).setWeight(LISTS_WEIGHT_SLS);
+					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(SHOPPING_LIST_WEIGHT_SLS);
+					new ViewWeightAnimationWrapper(mItemLayout).setWeight(0);
+					break;
+				default:
+			}
 		}
 	}
 
@@ -68,34 +96,123 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		return new ListsFragment();
 	}
 
-	private boolean shouldOpenLastList() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean isShould = false;
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
 
-		if (prefs.getBoolean(getString(R.string.settings_key_open_last_list), false)) {
-			SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-			isShould = mSettings.contains(APP_PREFERENCES_ID);
-		}
-
-		return isShould;
+		outState.putInt(STATE_SCREEN, mCurrentScreen);
 	}
 
-	private void openLastList() {
-		SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-		long id = mSettings.getLong(APP_PREFERENCES_ID, -1);
+	@Override
+	public void onBackPressed() {
+		switch (mCurrentScreen) {
+			case ITEM_SCREEN:
+				updateList();
+				toShoppingListScreen();
+				break;
+			case SHOPPING_LIST_SCREEN:
+				toListsScreen();
+				break;
+			default:
+				super.onBackPressed();
+		}
+	}
 
-		if (id != -1) {
-			if (findViewById(R.id.list_fragment_container) == null) {
-				Intent i = new Intent(this, ShoppingListActivity.class);
-				i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
-				startActivity(i);
+	@Override
+	public void onListSelect(long id) {
+		if (mIsTablet && mLastSelectedListId != id) {
+			mLastSelectedListId = id;
+			injectFragment(ShoppingListFragment.newInstance(id), R.id.list_fragment_container);
+			toShoppingListScreen();
+		} else if (!mIsTablet) {
+			Intent i = new Intent(this, ShoppingListActivity.class);
+			i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				startActivity(i, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
 			} else {
-				Fragment newDetail = ShoppingListFragment.newInstance(id);
-				injectFragment(newDetail, R.id.list_fragment_container);
-
-				mListsWrapper.setWeight(0.33f);
-				mShoppingListWrapper.setWeight(0.67f);
+				startActivity(i);
 			}
+		}
+	}
+
+	@Override
+	public void onListUpdate(long id) {
+		if (mCurrentScreen == SHOPPING_LIST_SCREEN && mLastSelectedListId == id) {
+			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.list_fragment_container);
+			listFragment.updateList();
+		}
+	}
+
+	@Override
+	public void onListDelete(long id) {
+		if (mCurrentScreen == SHOPPING_LIST_SCREEN && mLastSelectedListId == id) {
+			onBackPressed();
+		}
+	}
+
+	@Override
+	public void onListUpdate() {
+		if (mCurrentScreen == SHOPPING_LIST_SCREEN) {
+			updateList();
+		}
+	}
+
+	@Override
+	public void onListDelete() {
+		if (mIsTablet) {
+			updateList();
+
+			if (mCurrentScreen == SHOPPING_LIST_SCREEN) {
+				onBackPressed();
+			} else if (mCurrentScreen == ITEM_SCREEN) {
+				toListsScreen();
+			}
+		}
+	}
+
+	@Override
+	public void onItemAdd(long id) {
+		if (mIsTablet) {
+			mLastSelectedItemId = 0;
+			openItem(AddItemFragment.newInstance(id));
+		}
+	}
+
+	@Override
+	public void onItemSelect(ShoppingList item) {
+		if (mIsTablet && mLastSelectedItemId != item.getIdItem()) {
+			mLastSelectedItemId = item.getIdItem();
+			openItem(EditItemFragment.newInstance(item));
+		}
+	}
+
+	@Override
+	public void onItemUpdate(ShoppingList item) {
+		if (mCurrentScreen == ITEM_SCREEN && mLastSelectedItemId == item.getIdItem()) {
+			mLastSelectedItemId = item.getIdItem();
+			openItem(EditItemFragment.newInstance(item));
+		}
+	}
+
+	@Override
+	public void onItemDelete() {
+		if (mCurrentScreen == ITEM_SCREEN) {
+			onBackPressed();
+		}
+	}
+
+	@Override
+	public long getLastSelectedItemId() {
+		return mLastSelectedItemId;
+	}
+
+	@Override
+	public void onItemSave(long id) {
+		if (mIsTablet) {
+			mLastSelectedItemId = id;
+			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.list_fragment_container);
+			listFragment.updateData();
 		}
 	}
 
@@ -131,88 +248,33 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
-		if (mShoppingListLayout != null) {
-			if (mListsWrapper.getWeight() > 0 && mShoppingListWrapper.getWeight() > 0) { //from lists/shoppingList to lists
-				toLists();
-			} else if (mListsWrapper.getWeight() == 0) { //from shoppingList/item to lists/shoppingList
-				updateList();
-				toShoppingList();
-			} else {
-				super.onBackPressed();
-			}
-		} else {
-			super.onBackPressed();
+	private boolean shouldOpenLastList() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean isShould = false;
+
+		if (prefs.getBoolean(getString(R.string.settings_key_open_last_list), false)) {
+			SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+			isShould = mSettings.contains(APP_PREFERENCES_ID);
 		}
+
+		return isShould;
 	}
 
-	@Override
-	public void onListSelected(long id) {
-		if (mShoppingListLayout == null) {
-			Intent i = new Intent(this, ShoppingListActivity.class);
-			i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
+	private void openLastList() {
+		SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		long id = mSettings.getLong(APP_PREFERENCES_ID, -1);
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				startActivity(i, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+		if (id != -1) {
+			if (mIsTablet) {
+				injectFragment(ShoppingListFragment.newInstance(id), R.id.list_fragment_container);
+
+				new ViewWeightAnimationWrapper(mListsLayout).setWeight(LISTS_WEIGHT_SLS);
+				new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(SHOPPING_LIST_WEIGHT_SLS);
 			} else {
+				Intent i = new Intent(this, ShoppingListActivity.class);
+				i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
 				startActivity(i);
 			}
-		} else {
-			Fragment newDetail = ShoppingListFragment.newInstance(id);
-			injectFragment(newDetail, R.id.list_fragment_container);
-
-			toShoppingList();
-		}
-	}
-
-	@Override
-	public void onListUpdate() {
-		if (mShoppingListLayout != null && mShoppingListWrapper.getWeight() > 0) {
-			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.list_fragment_container);
-			listFragment.updateList();
-		}
-	}
-
-	@Override
-	public void onShoppingListUpdate() {
-		if (mListsLayout != null && mListsWrapper.getWeight() > 0) {
-			updateList();
-		}
-	}
-
-	@Override
-	public void onAddItem(long id) {
-		openItem( AddItemFragment.newInstance(id));
-	}
-
-	@Override
-	public void onItemSelected(ShoppingList item) {
-		if (item != null && mItemWrapper.getWeight() > 0) {
-			openItem(EditItemFragment.newInstance(item));
-		}
-	}
-
-	@Override
-	public void onDeleteShoppingList() {
-		if (mShoppingListLayout != null) {
-			if (mListsWrapper.getWeight() > 0) {
-				onBackPressed();
-			} else {
-				updateList();
-				toLists();
-			}
-
-			onShoppingListUpdate();
-		}
-	}
-
-	@Override
-	public void onItemSave(long id) {
-		if (mShoppingListLayout != null) {
-			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.list_fragment_container);
-			listFragment.updateData();
-			listFragment.setLastOpenItem(id);
 		}
 	}
 
@@ -222,39 +284,46 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	}
 
 	private void openItem(Fragment fragment) {
-		if (mShoppingListLayout != null) {
-			injectFragment(fragment, R.id.item_fragment_container);
-
-			toItem();
-		}
+		injectFragment(fragment, R.id.item_fragment_container);
+		toItemScreen();
 	}
 
-	private void toLists() {
-		animation(1, 0, 0);
+	private void toListsScreen() {
+		mCurrentScreen = LISTS_SCREEN;
+		mLastSelectedListId = -1;
+
+		animation(LISTS_WEIGHT_LS, 0, 0);
 	}
 
-	private void toShoppingList() {
-		animation(0.33f, 0.67f, 0);
+	private void toShoppingListScreen() {
+		mCurrentScreen = SHOPPING_LIST_SCREEN;
+		mLastSelectedItemId = -1;
+
+		animation(LISTS_WEIGHT_SLS, SHOPPING_LIST_WEIGHT_SLS, 0);
 	}
 
-	private void toItem() {
-		animation(0, 0.5f, 0.5f);
+	private void toItemScreen() {
+		mCurrentScreen = ITEM_SCREEN;
+		animation(0, SHOPPING_LIST_WEIGHT_IS, ITEM_WEIGHT_IS);
 	}
 
 	private void animation(float lists, float list, float item) {
-		ObjectAnimator listsAnim = ObjectAnimator.ofFloat(mListsWrapper,
+		ViewWeightAnimationWrapper listsWrapper = new ViewWeightAnimationWrapper(mListsLayout);
+		ObjectAnimator listsAnim = ObjectAnimator.ofFloat(listsWrapper,
 				"weight",
-				mListsWrapper.getWeight(),
+				listsWrapper.getWeight(),
 				lists);
 
-		ObjectAnimator shoppingListAnim = ObjectAnimator.ofFloat(mShoppingListWrapper,
+		ViewWeightAnimationWrapper shoppingListWrapper = new ViewWeightAnimationWrapper(mShoppingListLayout);
+		ObjectAnimator shoppingListAnim = ObjectAnimator.ofFloat(shoppingListWrapper,
 				"weight",
-				mShoppingListWrapper.getWeight(),
+				shoppingListWrapper.getWeight(),
 				list);
 
-		ObjectAnimator itemAnim = ObjectAnimator.ofFloat(mItemWrapper,
+		ViewWeightAnimationWrapper itemWrapper = new ViewWeightAnimationWrapper(mItemLayout);
+		ObjectAnimator itemAnim = ObjectAnimator.ofFloat(itemWrapper,
 				"weight",
-				mItemWrapper.getWeight(),
+				itemWrapper.getWeight(),
 				item);
 
 		AnimatorSet an = new AnimatorSet();

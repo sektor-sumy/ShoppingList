@@ -59,7 +59,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final int DATA_LOADER = 0;
 
 	private OnListsChangeListener mListsChangeListener;
-	private long mLastSelectedList;
 
 	private ArrayList<List> mLists;
 	private ArrayList<List> mSaveListRotate;
@@ -74,8 +73,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ImageView mEmptyImage;
 
 	public interface OnListsChangeListener {
-		void onListSelected(long id);
-		void onListUpdate();
+		void onListSelect(long id);
+		void onListUpdate(long id);
+		void onListDelete(long id);
 	}
 
 	@TargetApi(23)
@@ -197,14 +197,13 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		switch (requestCode) {
 			case ADD_LIST:
 				updateData();
-				mListsChangeListener.onListSelected(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
+
+				mIsUpdateData = true;
+				mListsChangeListener.onListSelect(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
 				break;
 			case EDIT_LIST:
 				updateData();
-
-				if (mLastSelectedList == data.getLongExtra(ListDialogFragment.ID_LIST, -1)) {
-					mListsChangeListener.onListUpdate();
-				}
+				mListsChangeListener.onListUpdate(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
 				break;
 			case IS_DELETE_LIST:
 				List list = mLists.get(mPositionForDelete);
@@ -215,20 +214,11 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 				if (mLists.size() > 0) {
 					hideEmptyStates();
-
-					if (mLastSelectedList == list.getId()) {
-						getActivity().onBackPressed();
-						mLastSelectedList = -1;
-					}
 				} else {
 					showEmptyStates();
-
-					if (mLastSelectedList == list.getId()) {
-						getActivity().onBackPressed();
-						mLastSelectedList = -1;
-					}
 				}
 
+				mListsChangeListener.onListDelete(list.getId());
 				deleteSaveListFromSettings(list.getId());
 				break;
 		}
@@ -476,8 +466,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 						if (itemPosition != RecyclerView.NO_POSITION) {
 							List list = mLists.get(itemPosition);
-							mListsChangeListener.onListSelected(list.getId());
-							mLastSelectedList = list.getId();
+							mListsChangeListener.onListSelect(list.getId());
 						}
 					}
 				});
