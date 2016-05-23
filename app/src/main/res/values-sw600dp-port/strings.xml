@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="lists_weight_ls">1</string>
+	<string name="shopping_list_weight_ls">0</string>
+	<string name="item_weight_ls">0</string>
+
+	<string name="lists_weight_sls">0</string>
+	<string name="shopping_list_weight_sls">1</string>
+	<string name="item_weight_sls">0</string>
+
+	<string name="lists_weight_is">0</string>
+	<string name="shopping_list_weight_is">0</string>
+	<string name="item_weight_is">1</string>
+</resources>

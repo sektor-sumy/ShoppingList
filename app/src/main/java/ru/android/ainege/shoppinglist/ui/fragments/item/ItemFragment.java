@@ -224,7 +224,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				getActivity().finish();
+				getActivity().onBackPressed();
 			}
 		});
 

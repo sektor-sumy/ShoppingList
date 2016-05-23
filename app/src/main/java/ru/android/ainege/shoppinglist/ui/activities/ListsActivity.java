@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -29,12 +30,6 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	public static final String APP_PREFERENCES = "shopping_list_settings";
 	public static final String APP_PREFERENCES_ID = "idList";
 	private static final String STATE_SCREEN = "state_screen";
-
-	private static final float LISTS_WEIGHT_LS = 1;
-	private static final float LISTS_WEIGHT_SLS = 0.33f;
-	private static final float SHOPPING_LIST_WEIGHT_SLS = 0.67f;
-	private static final float SHOPPING_LIST_WEIGHT_IS = 0.5f;
-	private static final float ITEM_WEIGHT_IS = 0.5f;
 
 	private static final int HANDSET = -1;
 	private static final int LISTS_SCREEN = 1;
@@ -70,16 +65,22 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 			switch (mCurrentScreen) {
 				case ITEM_SCREEN:
-					new ViewWeightAnimationWrapper(mListsLayout).setWeight(0);
-					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(SHOPPING_LIST_WEIGHT_IS);
-					new ViewWeightAnimationWrapper(mItemLayout).setWeight(ITEM_WEIGHT_IS);
+					new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_is)));
+					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_is)));
+					new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_is)));
 					break;
 				case SHOPPING_LIST_SCREEN:
-					new ViewWeightAnimationWrapper(mListsLayout).setWeight(LISTS_WEIGHT_SLS);
-					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(SHOPPING_LIST_WEIGHT_SLS);
-					new ViewWeightAnimationWrapper(mItemLayout).setWeight(0);
+					new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
+					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
+					new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_sls)));
+					break;
+				case LISTS_SCREEN:
+					new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_ls)));
+					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_ls)));
+					new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_ls)));
 					break;
 				default:
+					break;
 			}
 		}
 	}
@@ -213,6 +214,10 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			mLastSelectedItemId = id;
 			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.list_fragment_container);
 			listFragment.updateData();
+
+			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+				onBackPressed();
+			}
 		}
 	}
 
@@ -268,8 +273,8 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			if (mIsTablet) {
 				injectFragment(ShoppingListFragment.newInstance(id), R.id.list_fragment_container);
 
-				new ViewWeightAnimationWrapper(mListsLayout).setWeight(LISTS_WEIGHT_SLS);
-				new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(SHOPPING_LIST_WEIGHT_SLS);
+				new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
+				new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
 			} else {
 				Intent i = new Intent(this, ShoppingListActivity.class);
 				i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
@@ -292,19 +297,25 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		mCurrentScreen = LISTS_SCREEN;
 		mLastSelectedListId = -1;
 
-		animation(LISTS_WEIGHT_LS, 0, 0);
+		animation(Float.valueOf(getString(R.string.lists_weight_ls)),
+				Float.valueOf(getString(R.string.shopping_list_weight_ls)),
+				Float.valueOf(getString(R.string.item_weight_ls)));
 	}
 
 	private void toShoppingListScreen() {
 		mCurrentScreen = SHOPPING_LIST_SCREEN;
 		mLastSelectedItemId = -1;
 
-		animation(LISTS_WEIGHT_SLS, SHOPPING_LIST_WEIGHT_SLS, 0);
+		animation(Float.valueOf(getString(R.string.lists_weight_sls)),
+				Float.valueOf(getString(R.string.shopping_list_weight_sls)),
+				Float.valueOf(getString(R.string.item_weight_sls)));
 	}
 
 	private void toItemScreen() {
 		mCurrentScreen = ITEM_SCREEN;
-		animation(0, SHOPPING_LIST_WEIGHT_IS, ITEM_WEIGHT_IS);
+		animation(Float.valueOf(getString(R.string.lists_weight_is)),
+				Float.valueOf(getString(R.string.shopping_list_weight_is)),
+				Float.valueOf(getString(R.string.item_weight_is)));
 	}
 
 	private void animation(float lists, float list, float item) {
