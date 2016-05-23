@@ -57,7 +57,7 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 	}
 
 	@Override
-	public void onItemUpdate(ShoppingList item) {
+	public void onItemSetBought(ShoppingList item) {
 
 	}
 

@@ -84,8 +84,7 @@ public class EditItemFragment extends ItemFragment {
 		mCategory.setSelection(getPosition(mCategory, mItemInList.getCategory().getId()));
 		mComment.setText(mItemInList.getComment());
 
-
-		mIsBought.setChecked(mItemInList.isBought());
+		setIsBought(mItemInList.isBought());
 	}
 
 	@Override

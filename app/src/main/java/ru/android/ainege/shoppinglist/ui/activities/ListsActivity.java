@@ -189,10 +189,10 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	}
 
 	@Override
-	public void onItemUpdate(ShoppingList item) {
+	public void onItemSetBought(ShoppingList item) {
 		if (mCurrentScreen == ITEM_SCREEN && mLastSelectedItemId == item.getIdItem()) {
-			mLastSelectedItemId = item.getIdItem();
-			openItem(EditItemFragment.newInstance(item));
+			ItemFragment itemFragment = (ItemFragment) getFragmentManager().findFragmentById(R.id.item_fragment_container);
+			itemFragment.setIsBought(item.isBought());
 		}
 	}
 

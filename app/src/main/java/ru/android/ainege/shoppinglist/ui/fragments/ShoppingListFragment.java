@@ -186,7 +186,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public interface OnListChangeListener {
 		void onItemAdd(long id);
 		void onItemSelect(ShoppingList item);
-		void onItemUpdate(ShoppingList item);
+		void onItemSetBought(ShoppingList item);
 		void onItemDelete();
 		long getLastSelectedItemId();
 	}
@@ -788,7 +788,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mAdapterRV.notifyItemChanged(categoryPosition);
 
 		mUpdateListListener.onListUpdate();
-		mListChangeListener.onItemUpdate(itemInList);
+		mListChangeListener.onItemSetBought(itemInList);
 	}
 
 	private void deleteSelectedItems() {

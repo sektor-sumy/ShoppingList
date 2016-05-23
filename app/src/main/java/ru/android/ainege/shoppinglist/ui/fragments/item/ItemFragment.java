@@ -108,11 +108,10 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	protected EditText mPrice;
 	protected Spinner mCategory;
 	protected EditText mComment;
-	protected ToggleButton mIsBought;
 	protected ItemDS mItemDS;
 	protected ShoppingListDS mItemsInListDS;
 	protected ShoppingList mItemInList;
-	private CoordinatorLayout mCoordinatorLayout;
+	private ToggleButton mIsBought;
 	private AppBarLayout mAppBarLayout;
 
 	protected boolean mIsProposedItem = false;
@@ -415,8 +414,11 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		}
 	}
 
+	public void setIsBought(boolean isBought) {
+		mIsBought.setChecked(isBought);
+	}
+
 	protected void setupView(View v, Bundle savedInstanceState) {
-		mCoordinatorLayout = (CoordinatorLayout) v.findViewById(R.id.coordinatorLayout);
 		mAppBarLayout = (AppBarLayout) v.findViewById(R.id.appbar);
 
 		if (mIsPortraitOrientation) {
