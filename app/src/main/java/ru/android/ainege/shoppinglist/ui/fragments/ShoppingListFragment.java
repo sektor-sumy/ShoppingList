@@ -467,6 +467,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
 	}
 
+	public void notOpenActionMode(){
+		mIsStartActionMode = false;
+		mAdapterRV.clearSelections();
+	}
+
 	//<editor-fold desc="Work with loader">
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
