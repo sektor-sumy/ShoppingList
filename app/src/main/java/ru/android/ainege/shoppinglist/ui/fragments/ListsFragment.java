@@ -135,8 +135,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mEmptyImage = (ImageView) v.findViewById(R.id.empty_lists);
 
 		mListsRV = (RecyclerView) v.findViewById(R.id.lists);
-		mListsRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 		mListsRV.setAdapter(mAdapterRV);
+		LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+		llm.setAutoMeasureEnabled(false);
+		mListsRV.setLayoutManager(llm);
 
 		showcaseView();
 

@@ -288,8 +288,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		updateMenu();
 
 		mItemsListRV = (RecyclerView) v.findViewById(R.id.items_list);
-		mItemsListRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 		mItemsListRV.setAdapter(mAdapterRV);
+		LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+		llm.setAutoMeasureEnabled(false);
+		mItemsListRV.setLayoutManager(llm);
 		mItemsListRV.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), mItemsListRV, new RecyclerItemClickListener.OnItemClickListener() {
 			@Override
 			public void onClick(int position) {
