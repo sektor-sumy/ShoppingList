@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -114,6 +115,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		switch (mCurrentScreen) {
 			case ITEM_SCREEN:
 				updateList();
+				closeKeyboard();
 				toShoppingListScreen();
 				break;
 			case SHOPPING_LIST_SCREEN:
@@ -285,6 +287,15 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
 				startActivity(i);
 			}
+		}
+	}
+
+	private void closeKeyboard() {
+		View view = this.getCurrentFocus();
+
+		if (view != null) {
+			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
 	}
 
