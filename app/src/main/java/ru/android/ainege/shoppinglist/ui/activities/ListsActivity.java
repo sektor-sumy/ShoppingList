@@ -128,11 +128,11 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 	@Override
 	public void onListSelect(long id) {
-		if (mIsTablet && mLastSelectedListId != id) {
+		if (mIsTablet) {
 			mLastSelectedListId = id;
 			injectFragment(ShoppingListFragment.newInstance(id), R.id.list_fragment_container);
 			toShoppingListScreen();
-		} else if (!mIsTablet) {
+		} else {
 			Intent i = new Intent(this, ShoppingListActivity.class);
 			i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
 
@@ -157,6 +157,15 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		if (mCurrentScreen == SHOPPING_LIST_SCREEN && mLastSelectedListId == id) {
 			onBackPressed();
 		}
+	}
+
+	@Override
+	public boolean isLandscapeTablet() {
+		if (mIsTablet && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -189,7 +198,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 	@Override
 	public void onItemSelect(ShoppingList item) {
-		if (mIsTablet && mLastSelectedItemId != item.getIdItem()) {
+		if (mIsTablet) {
 			mLastSelectedItemId = item.getIdItem();
 			openItem(EditItemFragment.newInstance(item));
 		}

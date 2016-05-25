@@ -76,6 +76,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		void onListSelect(long id);
 		void onListUpdate(long id);
 		void onListDelete(long id);
+		boolean isLandscapeTablet();
 	}
 
 	@TargetApi(23)
@@ -199,9 +200,11 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		switch (requestCode) {
 			case ADD_LIST:
 				updateData();
-
 				mIsUpdateData = true;
-				mListsChangeListener.onListSelect(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
+
+				if (mListsChangeListener.isLandscapeTablet()) {
+					mListsChangeListener.onListSelect(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
+				}
 				break;
 			case EDIT_LIST:
 				updateData();
