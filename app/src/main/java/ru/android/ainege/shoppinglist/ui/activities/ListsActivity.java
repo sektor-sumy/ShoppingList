@@ -287,6 +287,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 		if (id != -1) {
 			if (mIsTablet) {
+				mCurrentScreen = SHOPPING_LIST_SCREEN;
 				injectFragment(ShoppingListFragment.newInstance(id), R.id.list_fragment_container);
 
 				new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));

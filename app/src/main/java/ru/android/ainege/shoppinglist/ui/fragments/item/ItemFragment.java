@@ -147,6 +147,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 	public interface OnItemChangeListener {
 		void onItemSave(long id);
+		boolean isLandscapeTablet();
 	}
 
 	@TargetApi(23)
@@ -172,7 +173,6 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
 
 		mItemDS = new ItemDS(getActivity());
 		mItemsInListDS = new ShoppingListDS(getActivity());
@@ -218,14 +218,16 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		setCurrency();
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-		toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getActivity().onBackPressed();
-			}
-		});
+
+		if (mItemChangeListener == null || !mItemChangeListener.isLandscapeTablet()) {
+			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					getActivity().onBackPressed();
+				}
+			});
+		}
 
 		Button save = (Button) v.findViewById(R.id.save_item);
 		save.setOnClickListener(new View.OnClickListener() {

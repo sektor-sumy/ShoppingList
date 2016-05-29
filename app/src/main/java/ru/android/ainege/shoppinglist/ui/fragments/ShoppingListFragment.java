@@ -214,7 +214,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
@@ -251,7 +250,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.collapsing_toolbar);
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 		toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
 		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 			@Override
@@ -259,6 +257,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				getActivity().onBackPressed();
 			}
 		});
+		toolbar.inflateMenu(R.menu.items_in_list_menu);
+		toolbar.setOnMenuItemClickListener(onMenuItemClickListener());
 
 		mListImage = (ImageView) v.findViewById(R.id.appbar_image);
 
@@ -372,38 +372,36 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		outState.putSerializable(STATE_ACTION_DATA, mAdapterRV.getSelectedItems());
 	}
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.items_in_list_menu, menu);
-	}
+	private Toolbar.OnMenuItemClickListener onMenuItemClickListener () {
+		return new Toolbar.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				switch (item.getItemId()) {
+					case R.id.delete_list:
+						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list));
+						dialogFrag.setTargetFragment(ShoppingListFragment.this, IS_DELETE_LIST);
+						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
+						return true;
+					case R.id.update_list:
+						ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
+						editListDialog.setTargetFragment(ShoppingListFragment.this, EDIT_LIST);
+						editListDialog.show(getFragmentManager(), EDIT_ITEM_DATE);
+						return true;
+					case R.id.settings:
+						Intent i = new Intent(getActivity(), SettingsActivity.class);
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.delete_list:
-				QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list));
-				dialogFrag.setTargetFragment(ShoppingListFragment.this, IS_DELETE_LIST);
-				dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
-				return true;
-			case R.id.update_list:
-				ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
-				editListDialog.setTargetFragment(ShoppingListFragment.this, EDIT_LIST);
-				editListDialog.show(getFragmentManager(), EDIT_ITEM_DATE);
-				return true;
-			case R.id.settings:
-				Intent i = new Intent(getActivity(), SettingsActivity.class);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+						} else {
+							startActivityForResult(i, SETTINGS);
+						}
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-				} else {
-					startActivityForResult(i, SETTINGS);
+						return true;
+					default:
+						return false;
 				}
-
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
+			}
+		};
 	}
 
 	private void showPopupMenu(View v) {

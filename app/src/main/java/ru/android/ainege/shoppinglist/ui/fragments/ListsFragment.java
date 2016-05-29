@@ -99,7 +99,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
 
 		mListsDS = new ListsDS(getActivity());
 		mAdapterRV = new ListsAdapter();
@@ -116,11 +115,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		View v = inflater.inflate(R.layout.fragment_lists, container, false);
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-		ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-		if (actionBar != null) {
-			actionBar.setTitle(R.string.you_lists);
-		}
+		toolbar.inflateMenu(R.menu.list_of_lists_menu);
+		toolbar.setOnMenuItemClickListener(onMenuItemClickListener());
+		toolbar.setTitle(R.string.you_lists);
 
 		mAddItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
 		mAddItemFAB.setOnClickListener(new View.OnClickListener() {
@@ -169,28 +166,26 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		outState.putSerializable(STATE_LISTS, mLists);
 	}
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.list_of_lists_menu, menu);
-	}
+	private Toolbar.OnMenuItemClickListener onMenuItemClickListener (){
+		return new Toolbar.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				switch (item.getItemId()) {
+					case R.id.settings:
+						Intent i = new Intent(getActivity(), SettingsActivity.class);
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.settings:
-				Intent i = new Intent(getActivity(), SettingsActivity.class);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+						} else {
+							startActivity(i);
+						}
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-				} else {
-					startActivity(i);
+						return true;
+					default:
+						return false;
 				}
-
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
+			}
+		};
 	}
 
 	@Override
