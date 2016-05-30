@@ -14,14 +14,10 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,13 +68,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ProgressBar mProgressBar;
 	private ImageView mEmptyImage;
 
-	public interface OnListsChangeListener {
-		void onListSelect(long id);
-		void onListUpdate(long id);
-		void onListDelete(long id);
-		boolean isLandscapeTablet();
-	}
-
 	@TargetApi(23)
 	@Override
 	public void onAttach(Context context) {
@@ -123,11 +112,13 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mAddItemFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				ListDialogFragment addListDialog = new ListDialogFragment();
-				addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
-				addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
+				onAddList();
 			}
 		});
+
+		if (mListsChangeListener.isLandscapeTablet()) {
+			mAddItemFAB.setVisibility(View.GONE);
+		}
 
 		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
 		mEmptyImage = (ImageView) v.findViewById(R.id.empty_lists);
@@ -164,28 +155,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		super.onSaveInstanceState(outState);
 
 		outState.putSerializable(STATE_LISTS, mLists);
-	}
-
-	private Toolbar.OnMenuItemClickListener onMenuItemClickListener (){
-		return new Toolbar.OnMenuItemClickListener() {
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				switch (item.getItemId()) {
-					case R.id.settings:
-						Intent i = new Intent(getActivity(), SettingsActivity.class);
-
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-						} else {
-							startActivity(i);
-						}
-
-						return true;
-					default:
-						return false;
-				}
-			}
-		};
 	}
 
 	@Override
@@ -273,6 +242,37 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
+	private Toolbar.OnMenuItemClickListener onMenuItemClickListener() {
+		return new Toolbar.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				switch (item.getItemId()) {
+					case R.id.add_list:
+						onAddList();
+						return true;
+					case R.id.settings:
+						Intent i = new Intent(getActivity(), SettingsActivity.class);
+
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+						} else {
+							startActivity(i);
+						}
+
+						return true;
+					default:
+						return false;
+				}
+			}
+		};
+	}
+
+	private void onAddList() {
+		ListDialogFragment addListDialog = new ListDialogFragment();
+		addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
+		addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
+	}
+
 	private void showEmptyStates() {
 		mListsRV.setVisibility(View.GONE);
 		mEmptyImage.setVisibility(View.VISIBLE);
@@ -328,6 +328,16 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				getString(R.string.showcase_open_list_desc)).build());
 
 		sequence.start();
+	}
+
+	public interface OnListsChangeListener {
+		void onListSelect(long id);
+
+		void onListUpdate(long id);
+
+		void onListDelete(long id);
+
+		boolean isLandscapeTablet();
 	}
 	//</editor-fold>
 

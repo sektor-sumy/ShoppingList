@@ -19,6 +19,7 @@
 	<string name="showcase_manage_list_desc">Нажмите на \"карандаш\" для изменения списка, а на \"корзину\" - для его удаления</string>
 	<string name="showcase_open_list_desc">Нажмите на карточку списка для его просмотра</string>
 	<!--menu-->
+	<string name="add_list">"Добавить</string>
 	<string name="take_photo">"Сделать снимок</string>
 	<string name="select_from_gallery">Выбрать из галереи</string>
 	<string name="random_image">Случайное</string>

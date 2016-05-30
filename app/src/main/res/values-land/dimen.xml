@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<!--fragment_lists-->
+	<dimen name="card_margin_left">30dp</dimen>
+	<dimen name="card_margin_right">30dp</dimen>
 
 	<!--settings-->
 	<dimen name="toolbar_size">48dp</dimen>

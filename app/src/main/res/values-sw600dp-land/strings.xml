@@ -4,8 +4,8 @@
 	<string name="shopping_list_weight_ls">0</string>
 	<string name="item_weight_ls">0</string>
 
-	<string name="lists_weight_sls">0.33</string>
-	<string name="shopping_list_weight_sls">0.67</string>
+	<string name="lists_weight_sls">0.35</string>
+	<string name="shopping_list_weight_sls">0.65</string>
 	<string name="item_weight_sls">0</string>
 
 	<string name="lists_weight_is">0</string>
