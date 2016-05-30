@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<dimen name="app_bar_height">350dp</dimen>
+
 	<!--fragment_lists-->
 	<dimen name="card_margin_left">10dp</dimen>
 	<dimen name="card_margin_right">10dp</dimen>
 
 	<!--fragment_shopping_list-->
 	<dimen name="shopping_list_padding">0dp</dimen>
+
+	<!--fragment_item-->
+	<dimen name="item_app_bar_height">350dp</dimen>
+	<dimen name="item_padding">0dp</dimen>
 </resources>

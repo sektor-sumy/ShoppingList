@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
+	android:id="@+id/coordinatorLayout"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:id="@+id/coordinatorLayout"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
@@ -67,8 +67,8 @@
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
 			android:layout_weight="0.4"
-			android:scaleType="centerCrop"
-			android:background="?attr/colorPrimary"/>
+			android:background="?attr/colorPrimary"
+			android:scaleType="centerCrop"/>
 
 		<ScrollView
 			android:id="@+id/scrollView2"
@@ -79,11 +79,11 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:focusableInTouchMode="true"
 				android:orientation="vertical"
 				android:paddingLeft="@dimen/padding_16dp"
 				android:paddingRight="@dimen/padding_16dp"
-				android:paddingTop="10dp"
-				android:focusableInTouchMode="true">
+				android:paddingTop="10dp">
 
 				<android.support.design.widget.TextInputLayout
 					android:id="@+id/name_input_layout"
@@ -140,9 +140,9 @@
 							android:layout_height="wrap_content"
 							android:digits="0123456789.,"
 							android:gravity="center"
+							android:imeOptions="flagNoFullscreen|flagNoExtractUi"
 							android:inputType="numberDecimal"
-							android:singleLine="true"
-							android:imeOptions="flagNoFullscreen|flagNoExtractUi"/>
+							android:singleLine="true"/>
 
 					</android.support.design.widget.TextInputLayout>
 
@@ -193,9 +193,9 @@
 							android:layout_height="wrap_content"
 							android:digits="0123456789.,"
 							android:gravity="center"
+							android:imeOptions="flagNoFullscreen|flagNoExtractUi"
 							android:inputType="numberDecimal"
-							android:singleLine="true"
-							android:imeOptions="flagNoFullscreen|flagNoExtractUi"/>
+							android:singleLine="true"/>
 
 					</android.support.design.widget.TextInputLayout>
 
@@ -263,10 +263,10 @@
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:hint="@string/comment"
+						android:imeOptions="flagNoFullscreen|flagNoExtractUi"
 						android:inputType="textCapSentences|textMultiLine"
 						android:maxLength="210"
-						android:maxLines="5"
-						android:imeOptions="flagNoFullscreen|flagNoExtractUi"/>
+						android:maxLines="5"/>
 
 				</android.support.design.widget.TextInputLayout>
 

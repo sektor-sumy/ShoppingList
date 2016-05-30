@@ -9,6 +9,6 @@
 	<string name="item_weight_sls">0</string>
 
 	<string name="lists_weight_is">0</string>
-	<string name="shopping_list_weight_is">0.5</string>
-	<string name="item_weight_is">0.5</string>
+	<string name="shopping_list_weight_is">0.57</string>
+	<string name="item_weight_is">0.43</string>
 </resources>

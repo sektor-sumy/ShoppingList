@@ -15,4 +15,12 @@
 	<item name="column_name_weight" format="float" type="dimen">0.55</item>
 	<item name="column_amount_weight" format="float" type="dimen">0.18</item>
 	<item name="column_price_weight" format="float" type="dimen">0.27</item>
+
+	<!--fragment_item-->
+	<dimen name="item_app_bar_height">380dp</dimen>
+	<dimen name="item_padding">30dp</dimen>
+	<dimen name="column_left">85dp</dimen>
+	<dimen name="margin_spinner">8dp</dimen>
+	<dimen name="width_spinner">105dp</dimen>
+	<dimen name="width_currency">80dp</dimen>
 </resources>
