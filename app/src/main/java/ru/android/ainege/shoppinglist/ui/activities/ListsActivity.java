@@ -1,5 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
@@ -344,29 +346,42 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				Float.valueOf(getString(R.string.item_weight_is)));
 	}
 
-	private void animation(float lists, float list, float item) {
-		ViewWeightAnimationWrapper listsWrapper = new ViewWeightAnimationWrapper(mListsLayout);
+	private void animation(final float lists, final float list, final float item) {
+		final ViewWeightAnimationWrapper listsWrapper = new ViewWeightAnimationWrapper(mListsLayout);
 		ObjectAnimator listsAnim = ObjectAnimator.ofFloat(listsWrapper,
 				"weight",
 				listsWrapper.getWeight(),
 				lists);
 
-		ViewWeightAnimationWrapper shoppingListWrapper = new ViewWeightAnimationWrapper(mShoppingListLayout);
+		final ViewWeightAnimationWrapper shoppingListWrapper = new ViewWeightAnimationWrapper(mShoppingListLayout);
 		ObjectAnimator shoppingListAnim = ObjectAnimator.ofFloat(shoppingListWrapper,
 				"weight",
 				shoppingListWrapper.getWeight(),
 				list);
 
-		ViewWeightAnimationWrapper itemWrapper = new ViewWeightAnimationWrapper(mItemLayout);
+		final ViewWeightAnimationWrapper itemWrapper = new ViewWeightAnimationWrapper(mItemLayout);
 		ObjectAnimator itemAnim = ObjectAnimator.ofFloat(itemWrapper,
 				"weight",
 				itemWrapper.getWeight(),
 				item);
 
-		AnimatorSet an = new AnimatorSet();
+		final AnimatorSet an = new AnimatorSet();
 		an.playTogether(listsAnim, shoppingListAnim, itemAnim);
 		an.setDuration(300);
 		an.start();
+
+		an.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				super.onAnimationEnd(animation);
+
+				if (listsWrapper.getWeight() < lists ||
+						shoppingListWrapper.getWeight() < list ||
+						itemWrapper.getWeight() < item) {
+					animation(lists, list, item);
+				}
+			}
+		});
 	}
 
 	public class ViewWeightAnimationWrapper {
