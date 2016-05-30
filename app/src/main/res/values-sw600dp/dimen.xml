@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<dimen name="app_bar_height">300dp</dimen>
+
 	<!--fragment_lists-->
 	<dimen name="card_margin_left">30dp</dimen>
 	<dimen name="card_margin_right">30dp</dimen>
@@ -7,4 +9,10 @@
 	<dimen name="column2_margin_bottom">@dimen/padding_8dp</dimen>
 	<dimen name="column2_margin_left">@dimen/padding_24dp</dimen>
 	<dimen name="line_margin_bottom">@dimen/padding_4dp</dimen>
+
+	<!--fragment_shopping_list-->
+	<dimen name="shopping_list_padding">10dp</dimen>
+	<item name="column_name_weight" format="float" type="dimen">0.55</item>
+	<item name="column_amount_weight" format="float" type="dimen">0.18</item>
+	<item name="column_price_weight" format="float" type="dimen">0.27</item>
 </resources>

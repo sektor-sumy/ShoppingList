@@ -4,6 +4,11 @@
 	<dimen name="card_margin_left">30dp</dimen>
 	<dimen name="card_margin_right">30dp</dimen>
 
+	<!--fragment_shopping_list-->
+	<item name="column_name_weight" format="float" type="dimen">0.5</item>
+	<item name="column_amount_weight" format="float" type="dimen">0.2</item>
+	<item name="column_price_weight" format="float" type="dimen">0.3</item>
+
 	<!--settings-->
 	<dimen name="toolbar_size">48dp</dimen>
 	<dimen name="toolbar_size_x2">96dp</dimen>

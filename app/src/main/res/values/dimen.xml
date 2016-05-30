@@ -16,9 +16,6 @@
 	<dimen name="scrim_height">90dp</dimen>
 	<dimen name="floating_button_margin">24dp</dimen>
 
-	<dimen name="column_amount_wight">60dp</dimen>
-	<dimen name="column_price_wight">80dp</dimen>
-
 	<!--fragment_lists-->
 	<dimen name="rv_padding_bottom">52dp</dimen>
 	<dimen name="card_margin_left">10dp</dimen>
@@ -28,6 +25,14 @@
 	<dimen name="column2_margin_bottom">@dimen/padding_4dp</dimen>
 	<dimen name="column2_margin_left">@dimen/padding_16dp</dimen>
 	<dimen name="line_margin_bottom">2dp</dimen>
+
+	<!--fragment_shopping_list-->
+	<dimen name="column_amount_wight">60dp</dimen>
+	<dimen name="column_price_wight">80dp</dimen>
+	<dimen name="shopping_list_padding">0dp</dimen>
+	<item name="column_name_weight" format="float" type="dimen">0.45</item>
+	<item name="column_amount_weight" format="float" type="dimen">0.22</item>
+	<item name="column_price_weight" format="float" type="dimen">0.33</item>
 
 	<!--fragment_item-->
 	<dimen name="column_left">80dp</dimen>
@@ -51,4 +56,5 @@
 	<dimen name="toolbar_size_x2">112dp</dimen>
 	<dimen name="card_view_margin">-3dp</dimen>
 	<dimen name="card_view_margin_top">53dp</dimen>
+	<dimen name="card_view_toolbar_spacer">42dp</dimen>
 </resources>
