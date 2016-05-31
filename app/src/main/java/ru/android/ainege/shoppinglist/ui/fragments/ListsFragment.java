@@ -13,6 +13,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -53,8 +55,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final String EDIT_LIST_DATE = "editListDialog";
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
 	private static final int DATA_LOADER = 0;
+	private static final int HANDLER_LOAD_FINISHED = 1;
 
 	private OnListsChangeListener mListsChangeListener;
+	private OnListsLoadFinishedListener mOnListsLoadFinishedListener;
 
 	private ArrayList<List> mLists;
 	private ArrayList<List> mSaveListRotate;
@@ -67,6 +71,27 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private FloatingActionButton mAddItemFAB;
 	private ProgressBar mProgressBar;
 	private ImageView mEmptyImage;
+
+	private Handler mHandler = new Handler()  {
+		@Override
+		public void handleMessage(Message msg) {
+			if (msg.what == HANDLER_LOAD_FINISHED && mOnListsLoadFinishedListener != null) {
+				mOnListsLoadFinishedListener.onLoadFinished(mLists);
+			}
+		}
+	};
+
+
+	public interface OnListsChangeListener {
+		void onListSelect(long id);
+		void onListUpdate(long id);
+		void onListDelete(long idDeletedList, long idNewList);
+		boolean isLandscapeTablet();
+	}
+
+	public interface OnListsLoadFinishedListener {
+		void onLoadFinished(ArrayList<List> lists);
+	}
 
 	@TargetApi(23)
 	@Override
@@ -187,7 +212,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					showEmptyStates();
 				}
 
-				mListsChangeListener.onListDelete(list.getId());
+				mListsChangeListener.onListDelete(list.getId(), mLists.size() > 0 ? mLists.get(0).getId() : -1);
 				deleteSaveListFromSettings(list.getId());
 				break;
 		}
@@ -214,14 +239,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					mProgressBar.setVisibility(View.GONE);
 				}
 
-				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
-					mLists = mSaveListRotate;
-					mAdapterRV.setDate();
-					hideEmptyStates();
-				} else if (mSaveListRotate == null && data.moveToFirst()) {
-					mLists = ((ListCursor) data).getEntities();
-					mAdapterRV.setDate();
-					hideEmptyStates();
+				if (mSaveListRotate == null && data.moveToFirst()) {
+					setLists(((ListCursor) data).getEntities());
+				} else if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
+					setLists(mSaveListRotate);
 				} else {
 					showEmptyStates();
 				}
@@ -240,6 +261,14 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	public void updateData() {
 		mSaveListRotate = null;
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
+	}
+
+	public ArrayList<List> getLists() {
+		return mLists;
+	}
+
+	public void setOnListsLoadListener(OnListsLoadFinishedListener listener) {
+		mOnListsLoadFinishedListener = listener;
 	}
 
 	private Toolbar.OnMenuItemClickListener onMenuItemClickListener() {
@@ -271,6 +300,16 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		ListDialogFragment addListDialog = new ListDialogFragment();
 		addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
 		addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
+	}
+
+	private void setLists(ArrayList<List> lists) {
+		mLists = lists;
+		mAdapterRV.setDate();
+		hideEmptyStates();
+
+		if (mOnListsLoadFinishedListener != null) {
+			mHandler.sendEmptyMessage(HANDLER_LOAD_FINISHED);
+		}
 	}
 
 	private void showEmptyStates() {
@@ -328,16 +367,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				getString(R.string.showcase_open_list_desc)).build());
 
 		sequence.start();
-	}
-
-	public interface OnListsChangeListener {
-		void onListSelect(long id);
-
-		void onListUpdate(long id);
-
-		void onListDelete(long id);
-
-		boolean isLandscapeTablet();
 	}
 	//</editor-fold>
 

@@ -180,7 +180,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	public interface OnUpdateListListener {
 		void onListUpdate();
-		void onListDelete();
+		void onListDelete(long idDeletedList);
 	}
 
 	public interface OnListChangeListener {
@@ -189,6 +189,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		void onItemSetBought(ShoppingList item);
 		void onItemDelete();
 		long getLastSelectedItemId();
+		boolean isLandscapeTablet();
 	}
 
 	@TargetApi(23)
@@ -250,15 +251,18 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.collapsing_toolbar);
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-		toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getActivity().onBackPressed();
-			}
-		});
 		toolbar.inflateMenu(R.menu.items_in_list_menu);
 		toolbar.setOnMenuItemClickListener(onMenuItemClickListener());
+
+		if (!mListChangeListener.isLandscapeTablet()) {
+			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					getActivity().onBackPressed();
+				}
+			});
+		}
 
 		mListImage = (ImageView) v.findViewById(R.id.appbar_image);
 
@@ -451,7 +455,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				Image.deleteFile(mList.getImagePath());
 
 				saveId(-1);
-				mUpdateListListener.onListDelete();
+				mUpdateListListener.onListDelete(mList.getId());
 				break;
 			case EDIT_LIST:
 				updateList();

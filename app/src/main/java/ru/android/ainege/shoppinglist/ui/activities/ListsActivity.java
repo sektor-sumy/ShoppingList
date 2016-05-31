@@ -18,8 +18,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
+
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
+import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
@@ -33,17 +36,25 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	public static final String APP_PREFERENCES = "shopping_list_settings";
 	public static final String APP_PREFERENCES_ID = "idList";
 	private static final String STATE_SCREEN = "state_screen";
+	private static final String STATE_LAST_LIST_ID = "state_last_list_id";
+	private static final String STATE_LAST_ITEM_ID = "state_last_item_id";
+
+	private static final String SHOPPING_LIST_TAG = "shopping_list_tag";
+	private static final String ITEM_TAG = "item_tag";
 
 	private static final int HANDSET = -1;
 	private static final int LISTS_SCREEN = 1;
 	private static final int SHOPPING_LIST_SCREEN = 2;
 	private static final int ITEM_SCREEN = 3;
 
+	private ListsFragment mListsFragment;
+
 	private FrameLayout mListsLayout;
 	private FrameLayout mShoppingListLayout;
 	private FrameLayout mItemLayout;
 
 	private boolean mIsTablet = false;
+	private boolean mIsLandscapeTablet = false;
 	private int mCurrentScreen = HANDSET;
 	private long mLastSelectedListId = -1;
 	private long mLastSelectedItemId = -1;
@@ -59,12 +70,20 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		if (mIsTablet) {
 			mItemLayout = (FrameLayout) findViewById(R.id.item_fragment_container);
 			mCurrentScreen = LISTS_SCREEN;
+			mIsLandscapeTablet = isLandscapeTablet();
 		}
 
-		if (savedInstanceState == null && shouldOpenLastList()) {
-			openLastList();
+		if (savedInstanceState == null) {
+			if (mIsLandscapeTablet) {
+				openList();
+			} else if (shouldOpenLastList()){
+				openLastList();
+			}
 		} else if (savedInstanceState != null) {
 			mCurrentScreen = savedInstanceState.getInt(STATE_SCREEN);
+			mLastSelectedListId = savedInstanceState.getLong(STATE_LAST_LIST_ID);
+			mLastSelectedItemId = savedInstanceState.getLong(STATE_LAST_ITEM_ID);
+			mListsFragment = (ListsFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
 
 			switch (mCurrentScreen) {
 				case ITEM_SCREEN:
@@ -72,7 +91,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_is)));
 					new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_is)));
 
-					if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+					if (!mIsLandscapeTablet) {
 						ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.list_fragment_container);
 						listFragment.notOpenActionMode();
 					}
@@ -83,9 +102,9 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 					new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_sls)));
 					break;
 				case LISTS_SCREEN:
-					new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_ls)));
-					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_ls)));
-					new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_ls)));
+					if (mIsLandscapeTablet) {
+						openList();
+					}
 					break;
 				default:
 					break;
@@ -101,8 +120,9 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	@Override
 	protected Fragment getFragment() {
 		init();
+		mListsFragment = new ListsFragment();
 
-		return new ListsFragment();
+		return mListsFragment;
 	}
 
 	@Override
@@ -110,6 +130,8 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		super.onSaveInstanceState(outState);
 
 		outState.putInt(STATE_SCREEN, mCurrentScreen);
+		outState.putLong(STATE_LAST_LIST_ID, mLastSelectedListId);
+		outState.putLong(STATE_LAST_ITEM_ID, mLastSelectedItemId);
 	}
 
 	@Override
@@ -119,9 +141,14 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				updateList();
 				closeKeyboard();
 				toShoppingListScreen();
+				removeFragment(ITEM_TAG);
 				break;
 			case SHOPPING_LIST_SCREEN:
-				toListsScreen();
+				if (mIsLandscapeTablet) {
+					super.onBackPressed();
+				} else {
+					toListsScreen();
+				}
 				break;
 			default:
 				super.onBackPressed();
@@ -131,8 +158,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	@Override
 	public void onListSelect(long id) {
 		if (mIsTablet) {
-			mLastSelectedListId = id;
-			injectFragment(ShoppingListFragment.newInstance(id), R.id.list_fragment_container);
+			openList(id);
 			toShoppingListScreen();
 		} else {
 			Intent i = new Intent(this, ShoppingListActivity.class);
@@ -149,15 +175,19 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	@Override
 	public void onListUpdate(long id) {
 		if (mCurrentScreen == SHOPPING_LIST_SCREEN && mLastSelectedListId == id) {
-			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.list_fragment_container);
+			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
 			listFragment.updateList();
 		}
 	}
 
 	@Override
-	public void onListDelete(long id) {
-		if (mCurrentScreen == SHOPPING_LIST_SCREEN && mLastSelectedListId == id) {
-			onBackPressed();
+	public void onListDelete(long idDeletedList, long idNewList) {
+		if (mCurrentScreen == SHOPPING_LIST_SCREEN && mLastSelectedListId == idDeletedList) {
+			if (idNewList == -1) {
+				toListsScreen();
+			} else {
+				openList(idNewList);
+			}
 		}
 	}
 
@@ -178,38 +208,60 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	}
 
 	@Override
-	public void onListDelete() {
+	public void onListDelete(long idDeletedList) {
 		if (mIsTablet) {
-			updateList();
-
 			if (mCurrentScreen == SHOPPING_LIST_SCREEN) {
-				onBackPressed();
+				if (mIsLandscapeTablet) {
+					ArrayList<List>  lists = mListsFragment.getLists();
+
+					if (lists.size() == 1) { // it was last list
+						toListsScreen();
+					} else { //open first list
+						long id = lists.get(0).getId();
+						openList(id != idDeletedList ? id : lists.get(1).getId());
+					}
+				} else {
+					onBackPressed();
+				}
 			} else if (mCurrentScreen == ITEM_SCREEN) {
-				toListsScreen();
+				ArrayList<List>  lists = mListsFragment.getLists();
+
+				if (lists.size() == 1) { // it was last list
+					toListsScreen();
+				} else { //open first list
+					long id = lists.get(0).getId();
+					openList(id != idDeletedList ? id : lists.get(1).getId());
+
+					toShoppingListScreen();
+				}
+
+				closeKeyboard();
+				removeFragment(ITEM_TAG);
+				mLastSelectedItemId = -1;
 			}
+
+			updateList();
 		}
 	}
 
 	@Override
 	public void onItemAdd(long id) {
 		if (mIsTablet) {
-			mLastSelectedItemId = 0;
-			openItem(AddItemFragment.newInstance(id));
+			openItem(0, AddItemFragment.newInstance(id));
 		}
 	}
 
 	@Override
 	public void onItemSelect(ShoppingList item) {
 		if (mIsTablet) {
-			mLastSelectedItemId = item.getIdItem();
-			openItem(EditItemFragment.newInstance(item));
+			openItem(item.getIdItem(), EditItemFragment.newInstance(item));
 		}
 	}
 
 	@Override
 	public void onItemSetBought(ShoppingList item) {
 		if (mCurrentScreen == ITEM_SCREEN && mLastSelectedItemId == item.getIdItem()) {
-			ItemFragment itemFragment = (ItemFragment) getFragmentManager().findFragmentById(R.id.item_fragment_container);
+			ItemFragment itemFragment = (ItemFragment) getFragmentManager().findFragmentByTag(ITEM_TAG);
 			itemFragment.setIsBought(item.isBought());
 		}
 	}
@@ -230,10 +282,10 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	public void onItemSave(long id) {
 		if (mIsTablet) {
 			mLastSelectedItemId = id;
-			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.list_fragment_container);
+			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
 			listFragment.updateData();
 
-			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			if (!mIsLandscapeTablet) {
 				onBackPressed();
 			}
 		}
@@ -283,23 +335,61 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		return isShould;
 	}
 
-	private void openLastList() {
+	private boolean openLastList() {
 		SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 		long id = mSettings.getLong(APP_PREFERENCES_ID, -1);
+		boolean result = false;
 
 		if (id != -1) {
 			if (mIsTablet) {
-				mCurrentScreen = SHOPPING_LIST_SCREEN;
-				injectFragment(ShoppingListFragment.newInstance(id), R.id.list_fragment_container);
-
-				new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
-				new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
+				openList(id);
 			} else {
 				Intent i = new Intent(this, ShoppingListActivity.class);
 				i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
 				startActivity(i);
 			}
+
+			result = true;
 		}
+
+		return result;
+	}
+
+	private void openList() {
+		mCurrentScreen = SHOPPING_LIST_SCREEN;
+		new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
+		new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
+
+		if (!openLastList()) {  //if not open last opened list, open first in list
+			ArrayList<List> lists = mListsFragment.getLists();
+
+			if (lists == null) {
+				mListsFragment.setOnListsLoadListener(new ListsFragment.OnListsLoadFinishedListener() {
+					@Override
+					public void onLoadFinished(ArrayList<List> lists) {
+						openList(lists.get(0).getId());
+						mListsFragment.setOnListsLoadListener(null);
+					}
+				});
+			} else {
+				openList(lists.get(0).getId());
+			}
+		}
+	}
+
+	private void openList(long id) {
+		mLastSelectedListId = id;
+		injectFragment(R.id.list_fragment_container, ShoppingListFragment.newInstance(id), SHOPPING_LIST_TAG);
+	}
+
+	private void updateList() {
+		mListsFragment.updateData();
+	}
+
+	private void openItem(long idItem, Fragment fragment) {
+		mLastSelectedItemId = idItem;
+		injectFragment(R.id.item_fragment_container, fragment, ITEM_TAG);
+		toItemScreen();
 	}
 
 	private void closeKeyboard() {
@@ -311,19 +401,11 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		}
 	}
 
-	private void updateList() {
-		ListsFragment listFragment = (ListsFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
-		listFragment.updateData();
-	}
-
-	private void openItem(Fragment fragment) {
-		injectFragment(fragment, R.id.item_fragment_container);
-		toItemScreen();
-	}
-
+	//<editor-fold desc="Animation">
 	private void toListsScreen() {
 		mCurrentScreen = LISTS_SCREEN;
 		mLastSelectedListId = -1;
+		removeFragment(SHOPPING_LIST_TAG);
 
 		animation(Float.valueOf(getString(R.string.lists_weight_ls)),
 				Float.valueOf(getString(R.string.shopping_list_weight_ls)),
@@ -383,6 +465,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			}
 		});
 	}
+	//</editor-fold>
 
 	public class ViewWeightAnimationWrapper {
 

@@ -19,7 +19,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
 		if (savedInstanceState == null) {
-			injectFragment(getFragment(), getDefaultContainer());
+			injectFragment(getDefaultContainer(), getFragment());
 		}
 	}
 
@@ -31,8 +31,20 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 		return R.id.fragment_container;
 	}
 
-	protected void injectFragment(Fragment fragment, Integer container) {
+	protected void injectFragment(Integer container, Fragment fragment) {
 		FragmentManager fm = getFragmentManager();
 		fm.beginTransaction().replace(container, fragment).commit();
+	}
+
+	protected void injectFragment(Integer container, Fragment fragment, String tag) {
+		FragmentManager fm = getFragmentManager();
+		fm.beginTransaction().replace(container, fragment, tag).commit();
+	}
+
+	protected void removeFragment(String tag) {
+		FragmentManager fm = getFragmentManager();
+		fm.beginTransaction()
+				.remove(fm.findFragmentByTag(tag))
+				.commit();
 	}
 }

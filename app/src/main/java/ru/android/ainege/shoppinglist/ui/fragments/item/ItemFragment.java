@@ -219,15 +219,18 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 
-		if (mItemChangeListener == null || !mItemChangeListener.isLandscapeTablet()) {
+		if (mItemChangeListener != null && mItemChangeListener.isLandscapeTablet()) {
+			toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
+		} else {
 			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					getActivity().onBackPressed();
-				}
-			});
 		}
+
+		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getActivity().onBackPressed();
+			}
+		});
 
 		Button save = (Button) v.findViewById(R.id.save_item);
 		save.setOnClickListener(new View.OnClickListener() {
