@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<item type="bool" name="fitsSystemWindows">false</item>
+	<bool name="fitsSystemWindows">false</bool>
 </resources>

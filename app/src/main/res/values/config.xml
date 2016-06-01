@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<item name="fitsSystemWindows" type="bool">true</item>
-	<item name="menu_add_list_visibility" type="bool">false</item>
+	<bool name="fitsSystemWindows">true</bool>
+	<bool name="menu_add_list_visibility">false</bool>
 </resources>
