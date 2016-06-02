@@ -490,8 +490,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					@Override
 					public void onClick(View v) {
 						mPositionForDelete = getAdapterPosition();
+						List list = mLists.get(mPositionForDelete);
 
-						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list));
+						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + list.getName() + "\"?");
 						dialogFrag.setTargetFragment(ListsFragment.this, IS_DELETE_LIST);
 						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
 					}

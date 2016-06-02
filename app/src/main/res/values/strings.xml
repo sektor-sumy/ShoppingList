@@ -30,7 +30,7 @@
 	<string name="empty_list">В списке нет ни одного товара</string>
 
 	<!--ShoppingListFragment-->
-	<string name="ask_delete_list">Удалить список?</string>
+	<string name="ask_delete_list">Удалить список</string>
 	<string name="showcase_create_item">Нажмите на \"плюсик\", чтобы добавить новый товар</string>
 	<string name="showcase_edit_item">Нажмите на строку товара, для просмотра информации о нем</string>
 	<string name="showcase_swipe_item_1">Вычеркните товар, проведя по нему слева направо</string>
