@@ -2,4 +2,5 @@
 <resources>
 	<bool name="fitsSystemWindows">true</bool>
 	<bool name="menu_add_list_visibility">false</bool>
+	<bool name="isTablet">false</bool>
 </resources>

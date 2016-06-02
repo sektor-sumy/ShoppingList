@@ -19,4 +19,7 @@
 	<dimen name="margin_spinner">4dp</dimen>
 	<dimen name="width_spinner">125dp</dimen>
 	<dimen name="width_currency">85dp</dimen>
+
+	<!--settings-->
+	<dimen name="card_view_toolbar_spacer">90dp</dimen>
 </resources>

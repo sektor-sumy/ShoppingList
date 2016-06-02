@@ -23,4 +23,9 @@
 	<dimen name="margin_spinner">8dp</dimen>
 	<dimen name="width_spinner">105dp</dimen>
 	<dimen name="width_currency">80dp</dimen>
+
+	<!--settings-->
+	<dimen name="toolbar_size">64dp</dimen>
+	<dimen name="toolbar_size_x2">128dp</dimen>
+	<dimen name="card_view_toolbar_spacer">75dp</dimen>
 </resources>

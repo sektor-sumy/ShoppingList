@@ -100,10 +100,13 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 			}
 		});
 
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+		int orientation = getResources().getConfiguration().orientation;
+		boolean isTablet = getResources().getBoolean(R.bool.isTablet);
+
+		if (isTablet || (!isTablet && orientation == Configuration.ORIENTATION_LANDSCAPE)) {
 			Toolbar cardToolbar = (Toolbar) v.findViewById(R.id.toolbar);
 			cardToolbar.setTitle(getTitle());
-		} else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 			ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 			if (actionBar != null) {
 				actionBar.setTitle(getTitle());

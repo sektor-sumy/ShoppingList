@@ -12,4 +12,7 @@
 	<!--fragment_item-->
 	<dimen name="item_app_bar_height">350dp</dimen>
 	<dimen name="item_padding">0dp</dimen>
+
+	<!--settings-->
+	<dimen name="card_view_toolbar_spacer">180dp</dimen>
 </resources>
