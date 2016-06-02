@@ -360,6 +360,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 		if (id != -1) {
 			if (mIsTablet) {
+				setShoppingListScreen();
 				openList(id, false);
 			} else {
 				Intent i = new Intent(this, ShoppingListActivity.class);
@@ -374,10 +375,6 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	}
 
 	private void openList() {
-		mCurrentScreen = SHOPPING_LIST_SCREEN;
-		new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
-		new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
-
 		if (!openLastList()) {  //if not open last opened list, open first in list
 			ArrayList<List> lists = mListsFragment.getLists();
 
@@ -385,14 +382,22 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				mListsFragment.setOnListsLoadListener(new ListsFragment.OnListsLoadFinishedListener() {
 					@Override
 					public void onLoadFinished(ArrayList<List> lists) {
+						setShoppingListScreen();
 						openList(lists.get(0).getId(), true);
 						mListsFragment.setOnListsLoadListener(null);
 					}
 				});
 			} else {
+				setShoppingListScreen();
 				openList(lists.get(0).getId(), true);
 			}
 		}
+	}
+
+	private void setShoppingListScreen() {
+		mCurrentScreen = SHOPPING_LIST_SCREEN;
+		new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
+		new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
 	}
 
 	private void openList(long id, boolean isScrollToList) {
