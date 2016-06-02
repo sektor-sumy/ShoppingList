@@ -65,6 +65,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ListsDS mListsDS;
 	private int mPositionForDelete;
 	private boolean mIsUpdateData = false;
+	private boolean mIsLandscapeTablet;
+	private long mAddIdList = -1;
 
 	private RecyclerView mListsRV;
 	private ListsAdapter mAdapterRV;
@@ -86,7 +88,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		void onListSelect(long id);
 		void onListUpdate(long id);
 		void onListDelete(long idDeletedList, long idNewList);
-		boolean isLandscapeTablet();
+		long getLastSelectedListId();
 	}
 
 	public interface OnListsLoadFinishedListener {
@@ -117,6 +119,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mListsDS = new ListsDS(getActivity());
 		mAdapterRV = new ListsAdapter();
 
+		mIsLandscapeTablet = getResources().getBoolean(R.bool.isLandscapeTablet);
+
 		if (savedInstanceState != null) {
 			mSaveListRotate = (ArrayList<List>) savedInstanceState.getSerializable(STATE_LISTS);
 		}
@@ -141,7 +145,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			}
 		});
 
-		if (mListsChangeListener.isLandscapeTablet()) {
+		if (mIsLandscapeTablet) {
 			mAddItemFAB.setVisibility(View.GONE);
 		}
 
@@ -190,9 +194,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			case ADD_LIST:
 				updateData();
 				mIsUpdateData = true;
+				mAddIdList = data.getLongExtra(ListDialogFragment.ID_LIST, -1);
 
-				if (mListsChangeListener.isLandscapeTablet()) {
-					mListsChangeListener.onListSelect(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
+				if (mIsLandscapeTablet) {
+					mListsChangeListener.onListSelect(mAddIdList);
 				}
 				break;
 			case EDIT_LIST:
@@ -258,6 +263,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	}
 
+	public void scrollToList(long id) {
+		if (id != -1) {
+			mListsRV.scrollToPosition(getPosition(id));
+		}
+	}
+
 	public void updateData() {
 		mSaveListRotate = null;
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
@@ -307,6 +318,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mAdapterRV.setDate();
 		hideEmptyStates();
 
+		if (mIsLandscapeTablet) {
+			scrollToList(mListsChangeListener.getLastSelectedListId());
+		} else {
+			scrollToList(mAddIdList);
+		}
+
 		if (mOnListsLoadFinishedListener != null) {
 			mHandler.sendEmptyMessage(HANDLER_LOAD_FINISHED);
 		}
@@ -330,6 +347,19 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			editor.remove(APP_PREFERENCES_ID);
 			editor.apply();
 		}
+	}
+
+	private int getPosition(long id) {
+		int index = 1;
+
+		for (int i = 0; i < mLists.size(); i++) {
+			if (mLists.get(i).getId() == id) {
+				index = i;
+				break;
+			}
+		}
+
+		return index;
 	}
 
 	//<editor-fold desc="work with showcases">

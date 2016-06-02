@@ -82,11 +82,6 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 	}
 
 	@Override
-	public boolean isLandscapeTablet() {
-		return false;
-	}
-
-	@Override
 	public void onListDelete(long id) {
 		onBackPressed();
 	}

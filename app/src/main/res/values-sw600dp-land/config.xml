@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<bool name="menu_add_list_visibility">true</bool>
+	<bool name="isLandscapeTablet">true</bool>
 </resources>

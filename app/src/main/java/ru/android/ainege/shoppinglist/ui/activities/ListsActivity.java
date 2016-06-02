@@ -65,13 +65,14 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		super.onCreate(savedInstanceState);
 
 		mListsLayout = (FrameLayout) findViewById(R.id.fragment_container);
-		mShoppingListLayout = (FrameLayout) findViewById(R.id.list_fragment_container);
-		mIsTablet = mShoppingListLayout != null;
+		mIsTablet = getResources().getBoolean(R.bool.isTablet);
 
 		if (mIsTablet) {
+			mShoppingListLayout = (FrameLayout) findViewById(R.id.list_fragment_container);
 			mItemLayout = (FrameLayout) findViewById(R.id.item_fragment_container);
+
 			mCurrentScreen = LISTS_SCREEN;
-			mIsLandscapeTablet = isLandscapeTablet();
+			mIsLandscapeTablet = getResources().getBoolean(R.bool.isLandscapeTablet);
 		}
 
 		if (savedInstanceState == null) {
@@ -164,7 +165,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	@Override
 	public void onListSelect(long id) {
 		if (mIsTablet) {
-			openList(id);
+			openList(id, false);
 			toShoppingListScreen();
 		} else {
 			Intent i = new Intent(this, ShoppingListActivity.class);
@@ -192,18 +193,14 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			if (idNewList == -1) {
 				toListsScreen();
 			} else {
-				openList(idNewList);
+				openList(idNewList, true);
 			}
 		}
 	}
 
 	@Override
-	public boolean isLandscapeTablet() {
-		if (mIsTablet && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			return true;
-		}
-
-		return false;
+	public long getLastSelectedListId() {
+		return mLastSelectedListId;
 	}
 
 	@Override
@@ -224,7 +221,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 						toListsScreen();
 					} else { //open first list
 						long id = lists.get(0).getId();
-						openList(id != idDeletedList ? id : lists.get(1).getId());
+						openList(id != idDeletedList ? id : lists.get(1).getId(), true);
 					}
 				} else {
 					onBackPressed();
@@ -236,7 +233,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 					toListsScreen();
 				} else { //open first list
 					long id = lists.get(0).getId();
-					openList(id != idDeletedList ? id : lists.get(1).getId());
+					openList(id != idDeletedList ? id : lists.get(1).getId(), true);
 
 					toShoppingListScreen();
 				}
@@ -363,7 +360,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 		if (id != -1) {
 			if (mIsTablet) {
-				openList(id);
+				openList(id, false);
 			} else {
 				Intent i = new Intent(this, ShoppingListActivity.class);
 				i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
@@ -388,19 +385,23 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				mListsFragment.setOnListsLoadListener(new ListsFragment.OnListsLoadFinishedListener() {
 					@Override
 					public void onLoadFinished(ArrayList<List> lists) {
-						openList(lists.get(0).getId());
+						openList(lists.get(0).getId(), true);
 						mListsFragment.setOnListsLoadListener(null);
 					}
 				});
 			} else {
-				openList(lists.get(0).getId());
+				openList(lists.get(0).getId(), true);
 			}
 		}
 	}
 
-	private void openList(long id) {
+	private void openList(long id, boolean isScrollToList) {
 		mLastSelectedListId = id;
 		injectFragment(R.id.list_fragment_container, ShoppingListFragment.newInstance(id), SHOPPING_LIST_TAG);
+
+		if (isScrollToList) {
+			mListsFragment.scrollToList(id);
+		}
 	}
 
 	private void updateList() {

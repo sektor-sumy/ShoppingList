@@ -189,7 +189,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		void onItemDelete();
 		void updateItem(String setting);
 		long getLastSelectedItemId();
-		boolean isLandscapeTablet();
 	}
 
 	@TargetApi(23)
@@ -254,7 +253,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		toolbar.inflateMenu(R.menu.items_in_list_menu);
 		toolbar.setOnMenuItemClickListener(onMenuItemClickListener());
 
-		if (!mListChangeListener.isLandscapeTablet()) {
+		if (!getResources().getBoolean(R.bool.isLandscapeTablet)) {
 			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
 			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 				@Override
