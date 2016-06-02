@@ -11,12 +11,18 @@ import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 public class ItemActivity extends SingleFragmentActivity {
 	public final static String EXTRA_ID_LIST = "idList";
 	public final static String EXTRA_ITEM = "item";
+	private final static String FRAGMENT_TAG = "item_activity_tag";
 
 	private OnBackPressedInterface mOnBackPressedListener;
 
 	@Override
 	protected Fragment getFragment() {
 		return createFragment();
+	}
+
+	@Override
+	protected String getTag() {
+		return FRAGMENT_TAG;
 	}
 
 	@Override

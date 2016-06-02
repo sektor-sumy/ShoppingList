@@ -39,6 +39,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	private static final String STATE_LAST_LIST_ID = "state_last_list_id";
 	private static final String STATE_LAST_ITEM_ID = "state_last_item_id";
 
+	private static final String LISTS_TAG = "lists_tag";
 	private static final String SHOPPING_LIST_TAG = "shopping_list_tag";
 	private static final String ITEM_TAG = "item_tag";
 
@@ -83,7 +84,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			mCurrentScreen = savedInstanceState.getInt(STATE_SCREEN);
 			mLastSelectedListId = savedInstanceState.getLong(STATE_LAST_LIST_ID);
 			mLastSelectedItemId = savedInstanceState.getLong(STATE_LAST_ITEM_ID);
-			mListsFragment = (ListsFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
+			mListsFragment = (ListsFragment) getFragmentManager().findFragmentByTag(LISTS_TAG);
 
 			switch (mCurrentScreen) {
 				case ITEM_SCREEN:
@@ -123,6 +124,11 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		mListsFragment = new ListsFragment();
 
 		return mListsFragment;
+	}
+
+	@Override
+	protected String getTag() {
+		return LISTS_TAG;
 	}
 
 	@Override
@@ -270,6 +276,21 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	public void onItemDelete() {
 		if (mCurrentScreen == ITEM_SCREEN) {
 			onBackPressed();
+		}
+	}
+
+	@Override
+	public void updateItem(String setting) {
+		if (mIsLandscapeTablet && mCurrentScreen == ITEM_SCREEN) {
+			ItemFragment fr = (ItemFragment) getFragmentManager().findFragmentByTag(ITEM_TAG);
+
+			if (setting.equals(getString(R.string.settings_key_transition))) {
+				fr.setTransitionButtons();
+			} else if (setting.equals(getString(R.string.settings_key_fast_edit))) {
+				fr.updateSpinners();
+			} else if (setting.equals(getString(R.string.settings_key_use_category))) {
+				fr.setCategory();
+			}
 		}
 	}
 

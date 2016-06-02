@@ -10,6 +10,7 @@ import ru.android.ainege.shoppinglist.R;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
 	protected abstract Fragment getFragment();
+	protected abstract String getTag();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -19,7 +20,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
 		if (savedInstanceState == null) {
-			injectFragment(getDefaultContainer(), getFragment());
+			injectFragment(getDefaultContainer(), getFragment(), getTag());
 		}
 	}
 
@@ -29,11 +30,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
 	protected int getDefaultContainer() {
 		return R.id.fragment_container;
-	}
-
-	protected void injectFragment(Integer container, Fragment fragment) {
-		FragmentManager fm = getFragmentManager();
-		fm.beginTransaction().replace(container, fragment).commit();
 	}
 
 	protected void injectFragment(Integer container, Fragment fragment, String tag) {

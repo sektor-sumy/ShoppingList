@@ -2,6 +2,7 @@ package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.CategoryFragment;
@@ -10,6 +11,22 @@ import ru.android.ainege.shoppinglist.ui.fragments.settings.UnitFragment;
 
 public class SettingsDictionaryActivity extends SingleFragmentActivity {
 	public final static String EXTRA_TYPE = "type";
+	private final static String FRAGMENT_TAG = "settings_dictionary_tag";
+
+	private OnBackPressedInterface mOnBackPressedListener;
+
+	public interface OnBackPressedInterface {
+		void onBackPressed();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		if (savedInstanceState != null) {
+			mOnBackPressedListener = (OnBackPressedInterface) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+		}
+	}
 
 	@Override
 	protected Fragment getFragment() {
@@ -25,6 +42,22 @@ public class SettingsDictionaryActivity extends SingleFragmentActivity {
 			fragment = new CategoryFragment();
 		}
 
+		mOnBackPressedListener = (OnBackPressedInterface) fragment;
+
 		return fragment;
+	}
+
+	@Override
+	protected String getTag() {
+		return FRAGMENT_TAG;
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (mOnBackPressedListener != null) {
+			mOnBackPressedListener.onBackPressed();
+		} else {
+			super.onBackPressed();
+		}
 	}
 }

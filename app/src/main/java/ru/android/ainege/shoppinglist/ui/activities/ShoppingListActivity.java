@@ -5,12 +5,12 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Build;
 
-import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 
 public class ShoppingListActivity extends SingleFragmentActivity implements ShoppingListFragment.OnListChangeListener, ShoppingListFragment.OnUpdateListListener {
 	public final static String EXTRA_ID_LIST = "idList";
+	private static final String SHOPPING_LIST_TAG = "shopping_list_tag_activity";
 
 	@Override
 	protected Fragment getFragment() {
@@ -20,13 +20,18 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 	}
 
 	@Override
+	protected String getTag() {
+		return SHOPPING_LIST_TAG;
+	}
+
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != RESULT_OK) return;
 
 		switch (requestCode) {
 			case ShoppingListFragment.ADD_ITEM:
 			case ShoppingListFragment.EDIT_ITEM:
-				ShoppingListFragment fragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
+				ShoppingListFragment fragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
 				fragment.onActivityResult(requestCode, resultCode, data);
 				break;
 		}
@@ -63,6 +68,11 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 
 	@Override
 	public void onItemDelete() {
+
+	}
+
+	@Override
+	public void updateItem(String setting) {
 
 	}
 

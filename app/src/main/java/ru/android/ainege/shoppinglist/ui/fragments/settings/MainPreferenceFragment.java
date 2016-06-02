@@ -21,7 +21,6 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 
 public class MainPreferenceFragment extends android.preference.PreferenceFragment {
-	private static final String IS_OPENED_DICTIONARY = "isOpenedDictionary";
 	private static final String STATE_SCREEN = "state_screen";
 
 	private PreferenceScreen mNestedScreen;
@@ -109,7 +108,6 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 					startActivity(i);
 				}
 
-				sendResult(true);
 				return true;
 			}
 		});
@@ -170,9 +168,5 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 				dialog.dismiss();
 			}
 		});
-	}
-
-	void sendResult(boolean isOpenedDictionary) {
-		getActivity().setResult(android.app.Activity.RESULT_OK, new Intent().putExtra(IS_OPENED_DICTIONARY, isOpenedDictionary));
 	}
 }

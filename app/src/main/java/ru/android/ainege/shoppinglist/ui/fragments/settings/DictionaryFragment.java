@@ -20,7 +20,6 @@ import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -32,8 +31,9 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
+import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 
-public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SettingsDictionaryActivity.OnBackPressedInterface {
 	public static final String LAST_EDIT = "lastEdit";
 	protected static final int ADD = 1;
 	protected static final int EDIT = 2;
@@ -43,6 +43,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	private static final int DELETE = 3;
 	private static final String DELETE_DATE = "answerListDialog";
 	private static final String STATE_LIST = "state_list";
+	private static final String STATE_LAST_EDIT_ID = "state_last_edit_id";
 
 	protected ArrayList<T> mDictionary;
 	protected ArrayList<T> mSaveListRotate;
@@ -75,11 +76,11 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}
 
-		setHasOptionsMenu(true);
 		mAdapterRV = getAdapter();
 
 		if (savedInstanceState != null) {
 			mSaveListRotate = (ArrayList<T>) savedInstanceState.getSerializable(STATE_LIST);
+			mLastEditId = savedInstanceState.getLong(STATE_LAST_EDIT_ID);
 		}
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
@@ -130,18 +131,13 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 		super.onSaveInstanceState(outState);
 
 		outState.putSerializable(STATE_LIST, mDictionary);
+		outState.putLong(STATE_LAST_EDIT_ID, mLastEditId);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, mLastEditId));
-				getActivity().finish();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
+	public void onBackPressed() {
+		getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, mLastEditId));
+		getActivity().finish();
 	}
 
 	@Override

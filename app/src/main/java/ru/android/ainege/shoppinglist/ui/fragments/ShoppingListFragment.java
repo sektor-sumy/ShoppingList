@@ -81,7 +81,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public static final int EDIT_ITEM = 1;
 	public static final int EDIT_LIST = 3;
 	private static final int IS_DELETE_LIST = 4;
-	private static final int SETTINGS = 5;
 	private static final String EDIT_ITEM_DATE = "editListDialog";
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
 	private static final int DATA_LOADER = 0;
@@ -188,6 +187,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		void onItemSelect(ShoppingList item);
 		void onItemSetBought(ShoppingList item);
 		void onItemDelete();
+		void updateItem(String setting);
 		long getLastSelectedItemId();
 		boolean isLandscapeTablet();
 	}
@@ -395,9 +395,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						Intent i = new Intent(getActivity(), SettingsActivity.class);
 
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 						} else {
-							startActivityForResult(i, SETTINGS);
+							startActivity(i);
 						}
 
 						return true;
@@ -447,7 +447,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			case ADD_ITEM:
 			case EDIT_ITEM:
 				mItemDetailsId = data.getLongExtra(ItemFragment.ID_ITEM, -1);
-			case SETTINGS:
 				mIsUpdateData = true;
 				break;
 			case IS_DELETE_LIST:
@@ -588,18 +587,25 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		if (isAdded()) {
-			mIsUpdateData = true;
-
-			if (key.equals(getString(R.string.settings_key_sort_is_bought))) {
+			if (key.equals(getString(R.string.settings_key_sort_type))) {
+				mIsUpdateData = true;
+				readSortTypeSetting();
+			} else if (key.equals(getString(R.string.settings_key_sort_is_bought))) {
+				mIsUpdateData = true;
 				readIsBoughtSetting();
 			} else if (key.equals(getString(R.string.settings_key_use_category))) {
+				mIsUpdateData = true;
 				readCategorySetting();
 				updateMenu();
+				mListChangeListener.updateItem(getString(R.string.settings_key_use_category));
 			} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
+				mIsUpdateData = true;
 				readCollapseCategorySetting();
 				updateMenu();
-			} else if (key.equals(getString(R.string.settings_key_sort_type))) {
-				readSortTypeSetting();
+			} else if (key.equals(getString(R.string.settings_key_transition))) {
+				mListChangeListener.updateItem(getString(R.string.settings_key_transition));
+			} else if (key.equals(getString(R.string.settings_key_fast_edit))) {
+				mListChangeListener.updateItem(getString(R.string.settings_key_fast_edit));
 			}
 		}
 	}

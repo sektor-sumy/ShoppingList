@@ -20,10 +20,8 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -52,9 +50,9 @@ import java.io.IOException;
 import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.ITable.ICategories;
 import ru.android.ainege.shoppinglist.db.ITable.IItems;
 import ru.android.ainege.shoppinglist.db.ITable.IUnits;
-import ru.android.ainege.shoppinglist.db.ITable.ICategories;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
@@ -83,6 +81,8 @@ import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCurs
 
 public abstract class ItemFragment extends Fragment implements ItemActivity.OnBackPressedInterface {
 	public static final String ID_ITEM = "idItem";
+	protected static final String UNIT_ADD_DATE = "addItemDialog";
+	protected static final String CATEGORY_ADD_DATE = "addItemDialog";
 	private static final int TAKE_PHOTO = 0;
 	private static final int LOAD_IMAGE = 1;
 	private static final int IS_SAVE_CHANGES = 2;
@@ -91,8 +91,6 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	private static final int UNIT_ADD = 5;
 	private static final int CATEGORY_ADD = 6;
 	private static final String IS_SAVE_CHANGES_DATE = "answerDialog";
-	protected static final String UNIT_ADD_DATE = "addItemDialog";
-	protected static final String CATEGORY_ADD_DATE = "addItemDialog";
 	private static final String RETAINED_FRAGMENT = "retained_fragment_item";
 	private static final String STATE_FILE = "state_file";
 
@@ -111,26 +109,25 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	protected ItemDS mItemDS;
 	protected ShoppingListDS mItemsInListDS;
 	protected ShoppingList mItemInList;
+	protected boolean mIsProposedItem = false;
+	protected SharedPreferences mPrefs;
+	protected boolean mIsUseNewItemInSpinner;
+	protected RetainedFragment dataFragment;
 	private ToggleButton mIsBought;
 	private AppBarLayout mAppBarLayout;
-
-	protected boolean mIsProposedItem = false;
-
+	private TextView mCurrency;
+	private ImageButton mCategorySettings;
+	private ImageButton mUnitSettings;
+	private LinearLayout mCategoryContainer;
 	private String mCurrencyList;
 	private File mFile;
 	private TextView mFinishPrice;
 	private long mUnitPosition;
 	private long mCategoryPosition;
-
 	private boolean mIsOpenedKeyboard = false;
 	private boolean mIsExpandedAppbar = true;
-
-	protected SharedPreferences mPrefs;
-	protected boolean mIsUseNewItemInSpinner;
 	private boolean mIsUseCategory;
 	private boolean mIsPortraitOrientation;
-
-	protected RetainedFragment dataFragment;
 	private OnItemChangeListener mItemChangeListener;
 
 	protected abstract TextWatcher getNameChangedListener();
@@ -178,7 +175,6 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		mItemsInListDS = new ShoppingListDS(getActivity());
 
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		mIsUseCategory = mPrefs.getBoolean(getString(R.string.settings_key_use_category), true);
 		mIsUseNewItemInSpinner = mPrefs.getBoolean(getString(R.string.settings_key_fast_edit), false);
 
 		if (savedInstanceState != null) {
@@ -192,7 +188,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			mIsPortraitOrientation = false;
-		} else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+		} else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			mIsPortraitOrientation = true;
 			AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboard() {
 				@Override
@@ -423,7 +419,36 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		mIsBought.setChecked(isBought);
 	}
 
-	protected void setupView(View v, Bundle savedInstanceState) {
+	public void updateSpinners() {
+		mIsUseNewItemInSpinner = mPrefs.getBoolean(getString(R.string.settings_key_fast_edit), false);
+
+		long idUnit = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
+		mUnit.setAdapter(getUnitsAdapter());
+		mUnit.setSelection(getPosition(mUnit, idUnit));
+
+		long idCategory = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
+		mCategory.setAdapter(getCategoriesAdapter());
+		mCategory.setSelection(getPosition(mCategory, idCategory));
+	}
+
+	public void setTransitionButtons() {
+		if (mPrefs.getBoolean(getString(R.string.settings_key_transition), false)) {
+			mUnitSettings.setVisibility(View.VISIBLE);
+			mCategorySettings.setVisibility(View.VISIBLE);
+			mCurrency.getLayoutParams().width = getResources().getDimensionPixelOffset(R.dimen.width_currency);
+		} else {
+			mUnitSettings.setVisibility(View.GONE);
+			mCategorySettings.setVisibility(View.GONE);
+			mCurrency.getLayoutParams().width = getResources().getDimensionPixelOffset(R.dimen.width_spinner);
+		}
+	}
+
+	public void setCategory() {
+		mIsUseCategory = mPrefs.getBoolean(getString(R.string.settings_key_use_category), true);
+		mCategoryContainer.setVisibility(mIsUseCategory ? View.VISIBLE : View.GONE);
+	}
+
+	protected void setupView(View v, final Bundle savedInstanceState) {
 		mAppBarLayout = (AppBarLayout) v.findViewById(R.id.appbar);
 
 		if (mIsPortraitOrientation) {
@@ -472,24 +497,34 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 		mUnit = (Spinner) v.findViewById(R.id.amount_unit);
 		mUnit.setAdapter(getUnitsAdapter());
-		mUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				if (position == 0 && id == -1) {
-					GeneralDialogFragment addItemDialog = new UnitDialogFragment();
-					addItemDialog.setTargetFragment(ItemFragment.this, UNIT_ADD);
-					addItemDialog.show(getFragmentManager(), UNIT_ADD_DATE);
-				} else {
-					mUnitPosition = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
-				}
-			}
+		mUnit.post(new Runnable() {
+			public void run() {
+				mUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+					@Override
+					public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+						if (position == 0 && id == -1) {
+							GeneralDialogFragment addItemDialog = new UnitDialogFragment();
+							addItemDialog.setTargetFragment(ItemFragment.this, UNIT_ADD);
+							addItemDialog.show(getFragmentManager(), UNIT_ADD_DATE);
+						} else {
+							mUnitPosition = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
+						}
+					}
 
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
+					@Override
+					public void onNothingSelected(AdapterView<?> parent) {
 
+					}
+				});
 			}
 		});
-		ImageButton unitSettings = (ImageButton) v.findViewById(R.id.unit_settings);
+		mUnitSettings = (ImageButton) v.findViewById(R.id.unit_settings);
+		mUnitSettings.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				settingOnClickListener(getString(R.string.settings_key_unit), UNIT_SETTINGS);
+			}
+		});
 
 		mPriceInputLayout = (TextInputLayout) v.findViewById(R.id.price_input_layout);
 		mPrice = (EditText) v.findViewById(R.id.new_item_price);
@@ -506,33 +541,41 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 			mPrice.setSelectAllOnFocus(true);
 		}
 
-		TextView mCurrency = (TextView) v.findViewById(R.id.currency);
+		mCurrency = (TextView) v.findViewById(R.id.currency);
 		mCurrency.setText(mCurrencyList);
 
 		mCategory = (Spinner) v.findViewById(R.id.category);
 		mCategory.setAdapter(getCategoriesAdapter());
-		mCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				if (position == 0 && id == -1) {
-					GeneralDialogFragment addItemDialog = new CategoryDialogFragment();
-					addItemDialog.setTargetFragment(ItemFragment.this, CATEGORY_ADD);
-					addItemDialog.show(getFragmentManager(), CATEGORY_ADD_DATE);
-				} else {
-					mCategoryPosition = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
-				}
-			}
+		mCategory.post(new Runnable() {
+			public void run() {
+				mCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+					@Override
+					public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+						if (position == 0 && id == -1) {
+							GeneralDialogFragment addItemDialog = new CategoryDialogFragment();
+							addItemDialog.setTargetFragment(ItemFragment.this, CATEGORY_ADD);
+							addItemDialog.show(getFragmentManager(), CATEGORY_ADD_DATE);
+						} else {
+							mCategoryPosition = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
+						}
+					}
 
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
+					@Override
+					public void onNothingSelected(AdapterView<?> parent) {
 
+					}
+				});
 			}
 		});
-		ImageButton categorySettings = (ImageButton) v.findViewById(R.id.category_settings);
-		if (!mIsUseCategory) {
-			LinearLayout categoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
-			categoryContainer.setVisibility(View.GONE);
-		}
+		mCategorySettings = (ImageButton) v.findViewById(R.id.category_settings);
+		mCategorySettings.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				settingOnClickListener(getString(R.string.settings_key_category), CATEGORY_SETTINGS);
+			}
+		});
+		mCategoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
+		setCategory();
 
 		mComment = (EditText) v.findViewById(R.id.comment);
 		mComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -549,25 +592,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 		mIsBought = (ToggleButton) v.findViewById(R.id.is_bought);
 
-		if (mPrefs.getBoolean(getString(R.string.settings_key_transition), false)) {
-			unitSettings.setVisibility(View.VISIBLE);
-			unitSettings.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					settingOnClickListener(getString(R.string.settings_key_unit), UNIT_SETTINGS);
-				}
-			});
-
-			categorySettings.setVisibility(View.VISIBLE);
-			categorySettings.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					settingOnClickListener(getString(R.string.settings_key_category), CATEGORY_SETTINGS);
-				}
-			});
-
-			mCurrency.getLayoutParams().width = getResources().getDimensionPixelOffset(R.dimen.width_currency);
-		}
+		setTransitionButtons();
 	}
 
 	protected void loadImage(String path) {

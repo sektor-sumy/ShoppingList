@@ -14,4 +14,9 @@ public class SettingsActivity extends SingleFragmentActivity {
 	protected Fragment getFragment() {
 		return new MainPreferenceFragment();
 	}
+
+	@Override
+	protected String getTag() {
+		return null;
+	}
 }
