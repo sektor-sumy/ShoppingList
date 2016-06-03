@@ -248,9 +248,9 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	}
 
 	@Override
-	public void onItemAdd(long id) {
+	public void onItemAdd(long idList) {
 		if (mIsTablet) {
-			openItem(0, AddItemFragment.newInstance(id));
+			openItem(0, AddItemFragment.newInstance(idList));
 		}
 	}
 
@@ -299,11 +299,13 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	@Override
 	public void onItemSave(long id) {
 		if (mIsTablet) {
-			mLastSelectedItemId = id;
+			closeKeyboard();
 			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
 			listFragment.updateData();
 
-			if (!mIsLandscapeTablet) {
+			if (mIsLandscapeTablet) {
+				onItemAdd(mLastSelectedListId);
+			} else {
 				onBackPressed();
 			}
 		}
