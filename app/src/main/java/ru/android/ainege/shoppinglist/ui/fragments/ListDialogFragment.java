@@ -1,22 +1,23 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -105,9 +106,6 @@ public class ListDialogFragment extends DialogFragment {
 						dialog.cancel();
 					}
 				});
-
-
-
 
 		FragmentManager fm = getFragmentManager();
 		dataFragment = (RetainedFragment) fm.findFragmentByTag(RETAINED_FRAGMENT);
@@ -210,20 +208,18 @@ public class ListDialogFragment extends DialogFragment {
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.take_photo:
-				Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				mFile = Image.create().createImageFile();
-
-				if (mFile != null) {
-					cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
-					startActivityForResult(cameraIntent, TAKE_PHOTO);
+				if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+					takePhoto();
 				} else {
-					Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+					requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, TAKE_PHOTO);
 				}
-
 				break;
 			case R.id.select_from_gallery:
-				Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-				startActivityForResult(galleryIntent, LOAD_IMAGE);
+				if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+					selectFromGallery();
+				} else {
+					requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, LOAD_IMAGE);
+				}
 				break;
 			case R.id.random_image:
 				setRandomImage();
@@ -245,7 +241,7 @@ public class ListDialogFragment extends DialogFragment {
 
 		switch (requestCode) {
 			case TAKE_PHOTO:
-				deletePhotoFromGallery();
+				Image.create().deletePhotoFromGallery(getActivity(), mFile);
 				dataFragment.execute(mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
@@ -263,6 +259,27 @@ public class ListDialogFragment extends DialogFragment {
 					e.printStackTrace();
 				}
 
+				break;
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+		switch (requestCode) {
+			case TAKE_PHOTO:
+				if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+					takePhoto();
+				}
+				break;
+			case LOAD_IMAGE:
+				if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+					selectFromGallery();
+				}
+				break;
+
+			default:
 				break;
 		}
 	}
@@ -362,21 +379,24 @@ public class ListDialogFragment extends DialogFragment {
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, new Intent().putExtra(ID_LIST, id));
 	}
 
-	private void deletePhotoFromGallery() {
-		String[] projection = {BaseColumns._ID, MediaStore.Images.ImageColumns.DATE_TAKEN};
+	private boolean hasPermission(String permission){
+		return ContextCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
+	}
 
-		Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-				projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+	private void takePhoto(){
+		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		mFile = Image.create().createImageFile();
 
-		if ((cursor != null) && (cursor.moveToFirst())) {
-			String id = cursor.getString(cursor.getColumnIndex(BaseColumns._ID));
-			long date = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN));
-
-			if (Math.abs(date - mFile.lastModified()) < 30000) {
-				ContentResolver cr = getActivity().getContentResolver();
-				cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, BaseColumns._ID + "=" + id, null);
-			}
-			cursor.close();
+		if (mFile != null) {
+			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
+			startActivityForResult(cameraIntent, TAKE_PHOTO);
+		} else {
+			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 		}
+	}
+
+	private void selectFromGallery() {
+		Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		startActivityForResult(galleryIntent, LOAD_IMAGE);
 	}
 }

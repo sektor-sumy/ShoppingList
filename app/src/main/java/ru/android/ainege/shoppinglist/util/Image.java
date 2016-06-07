@@ -1,11 +1,16 @@
 package ru.android.ainege.shoppinglist.util;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.provider.BaseColumns;
+import android.provider.MediaStore;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -52,17 +57,17 @@ public class Image {
 		return result;
 	}
 
+	public Image insertImageToView(Context context, String path, ImageView image) {
+		insertImageToView(context, Uri.parse(path), image);
+		return this;
+	}
+
 	public Image insertImageToView(Context context, Uri path, ImageView image) {
 		Picasso.with(context)
 				.load(path)
 				.placeholder(mLoadingImage)
 				.error(mDefaultImage)
 				.into(image);
-		return this;
-	}
-
-	public Image insertImageToView(Context context, String path, ImageView image) {
-		insertImageToView(context, Uri.parse(path), image);
 		return this;
 	}
 
@@ -92,28 +97,39 @@ public class Image {
 		}
 	}
 
+	public void deletePhotoFromGallery(Activity activity, File file) {
+		String[] projection = {BaseColumns._ID, MediaStore.Images.ImageColumns.DATE_TAKEN};
+
+		Cursor cursor = activity.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+
+		if ((cursor != null) && (cursor.moveToFirst())) {
+			String id = cursor.getString(cursor.getColumnIndex(BaseColumns._ID));
+			long date = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN));
+
+			if (Math.abs(date - file.lastModified()) < 30000) {
+				ContentResolver cr = activity.getContentResolver();
+				cr.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, BaseColumns._ID + "=" + id, null);
+			}
+			cursor.close();
+		}
+	}
+
 	public boolean postProcessingToFile(File file, int widthImageView) {
 		if (!isExternalStorageReadable()) {
 			return false;
 		}
 
-		return postProcessingToFile(file, BitmapFactory.decodeFile(file.getAbsolutePath()), widthImageView);
+		Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+		if (bitmap == null) {
+			return false;
+		}
+
+		return postProcessingToFile(file, bitmap, widthImageView);
 	}
 
 	public boolean postProcessingToFile(File file, Bitmap bitmap, int widthImageView) {
 		return saveImageToFile(file, postProcessing(bitmap, widthImageView));
-	}
-
-	private Bitmap postProcessing(Bitmap bitmap, int widthImageView) {
-		if (isNeedCrop(bitmap)) {
-			bitmap = crop(bitmap);
-		}
-
-		if (isNeedScale(bitmap, widthImageView)) {
-			bitmap = scale(bitmap, widthImageView);
-		}
-
-		return bitmap;
 	}
 
 	public boolean saveImageToFile(File file, Bitmap bitmap) {
@@ -163,21 +179,22 @@ public class Image {
 		return mediaStorageDir;
 	}
 
+	private Bitmap postProcessing(Bitmap bitmap, int widthImageView) {
+		if (isNeedCrop(bitmap)) {
+			bitmap = crop(bitmap);
+		}
+
+		if (isNeedScale(bitmap, widthImageView)) {
+			bitmap = scale(bitmap, widthImageView);
+		}
+
+		return bitmap;
+	}
+
 	private boolean isNeedCrop(Bitmap bitmap) {
 		double ratio = getRatio(bitmap);
 
 		return ratio < MIN_RATIO || ratio > MAX_RATIO;
-	}
-
-	private boolean isNeedScale(Bitmap bitmap, int screenWidth) {
-		return bitmap.getWidth() > screenWidth;
-	}
-
-	private double getRatio(Bitmap bitmap) {
-		double width = bitmap.getWidth();
-		double height = bitmap.getHeight();
-
-		return width / height;
 	}
 
 	private Bitmap crop(Bitmap originalBmp) {
@@ -216,6 +233,10 @@ public class Image {
 		return bitmap;
 	}
 
+	private boolean isNeedScale(Bitmap bitmap, int screenWidth) {
+		return bitmap.getWidth() > screenWidth;
+	}
+
 	private Bitmap scale(Bitmap originalBmp, int width) {
 		double ratio = getRatio(originalBmp);
 
@@ -227,21 +248,28 @@ public class Image {
 		return bitmap;
 	}
 
+	private double getRatio(Bitmap bitmap) {
+		double width = bitmap.getWidth();
+		double height = bitmap.getHeight();
+
+		return width / height;
+	}
+
 	public static class BitmapWorkerTask extends AsyncTask<Integer, Void, Boolean> {
 		private File mFile;
 		private Bitmap mBitmap;
 		private int mWidthImageView;
 		private ImageFragmentInterface mFragment;
 
+		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, ImageFragmentInterface fragment) {
+			this(file, widthImageView, fragment);
+			mBitmap = bitmap;
+		}
+
 		public BitmapWorkerTask(File file, int widthImageView, ImageFragmentInterface fragment) {
 			mFile = file;
 			mWidthImageView = widthImageView;
 			mFragment = fragment;
-		}
-
-		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, ImageFragmentInterface fragment) {
-			this(file, widthImageView, fragment);
-			mBitmap = bitmap;
 		}
 
 		@Override
@@ -259,9 +287,7 @@ public class Image {
 
 		@Override
 		protected void onPostExecute(Boolean isSuccess) {
-			if (isSuccess) {
-				mFragment.updateImage(Image.PATH_PROTOCOL + mFile.getAbsolutePath());
-			}
+			mFragment.onImageLoaded(isSuccess, Image.PATH_PROTOCOL + mFile.getAbsolutePath());
 		}
 	}
 }

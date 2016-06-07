@@ -3,9 +3,11 @@ package ru.android.ainege.shoppinglist.ui.fragments;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import java.io.File;
 
+import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
 import ru.android.ainege.shoppinglist.util.Image;
 
@@ -48,12 +50,16 @@ public class RetainedFragment extends Fragment implements ImageFragmentInterface
 	}
 
 	@Override
-	public void updateImage(String path) {
-		mImagePath = path;
-		mIsLoading = false;
+	public void onImageLoaded(boolean isSuccess, String path) {
+		if (isSuccess) {
+			mImagePath = path;
+			mIsLoading = false;
 
-		if (loading != null) {
-			loading.finish(mImagePath);
+			if (loading != null) {
+				loading.finish(mImagePath);
+			}
+		} else {
+			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_bitmap), Toast.LENGTH_SHORT).show();
 		}
 	}
 
