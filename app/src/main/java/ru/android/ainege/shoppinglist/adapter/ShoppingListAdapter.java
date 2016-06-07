@@ -41,7 +41,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	private boolean mIsShowShowcase = false;
 
 	public interface ShowcaseListener {
-		void onAttached(String idActiveSequence);
+		void onAttachedAdapter(String idActiveSequence);
 	}
 
 	public ShoppingListAdapter(Activity activity, ShoppingListFragment fragment) {
@@ -190,7 +190,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 			holder.itemView.post(new Runnable() {
 				@Override
 				public void run() {
-					mShowcaseListener.onAttached(null);
+					mShowcaseListener.onAttachedAdapter(null);
 				}
 			});
 		}

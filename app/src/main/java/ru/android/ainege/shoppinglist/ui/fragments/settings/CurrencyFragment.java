@@ -24,17 +24,15 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CURRENCY);
 
 		if (!sequence.hasFired()) {
-			mDictionaryRV.scrollToPosition(7);
-			holder = (CurrencyAdapter.CurrencyHolder) mDictionaryRV.findViewHolderForLayoutPosition(7);
-		} else {
 			holder = (CurrencyAdapter.CurrencyHolder) mDictionaryRV.findViewHolderForLayoutPosition(0);
-		}
 
-		Showcase.createShowcase(getActivity(), holder.mDefaultCurrency,
-				getString(R.string.showcase_default_currency))
-				.withRectangleShape(true)
-				.singleUse(Showcase.SHOT_CURRENCY)
-				.show();
+			Showcase.createShowcase(getActivity(), holder.itemView,
+					getString(R.string.showcase_default_currency))
+					.withRectangleShape()
+					.setShapePadding(2)
+					.singleUse(Showcase.SHOT_CURRENCY)
+					.show();
+		}
 	}
 
 	@Override

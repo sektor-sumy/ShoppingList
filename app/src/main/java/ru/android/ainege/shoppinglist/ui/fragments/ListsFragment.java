@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,8 +24,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -70,7 +71,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	private RecyclerView mListsRV;
 	private ListsAdapter mAdapterRV;
-	private FloatingActionButton mAddItemFAB;
+	private ImageButton mAddButton;
 	private ProgressBar mProgressBar;
 	private ImageView mEmptyImage;
 
@@ -89,6 +90,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		void onListUpdate(long id);
 		void onListDelete(long idDeletedList, long idNewList);
 		long getLastSelectedListId();
+		void onShowCaseShown();
 	}
 
 	public interface OnListsLoadFinishedListener {
@@ -119,7 +121,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mListsDS = new ListsDS(getActivity());
 		mAdapterRV = new ListsAdapter();
 
-		mIsLandscapeTablet = getResources().getBoolean(R.bool.isLandscapeTablet);
+		mIsLandscapeTablet = getResources().getBoolean(R.bool.isTablet) && getResources().getBoolean(R.bool.isLandscape);
 
 		if (savedInstanceState != null) {
 			mSaveListRotate = (ArrayList<List>) savedInstanceState.getSerializable(STATE_LISTS);
@@ -137,17 +139,26 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		toolbar.setOnMenuItemClickListener(onMenuItemClickListener());
 		toolbar.setTitle(R.string.you_lists);
 
-		mAddItemFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
-		mAddItemFAB.setOnClickListener(new View.OnClickListener() {
+		mAddButton = (FloatingActionButton) v.findViewById(R.id.add_fab);
+
+		if (mIsLandscapeTablet) {
+			mAddButton.setVisibility(View.GONE);
+
+			mAddButton = (ImageButton) toolbar.getMenu().findItem(R.id.add_list).getActionView();
+			mAddButton.setImageResource(R.drawable.ic_add_white_24dp);
+			mAddButton.setBackgroundColor(Color.TRANSPARENT);
+		}
+
+		mAddButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onAddList();
+				ListDialogFragment addListDialog = new ListDialogFragment();
+				addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
+				addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
 			}
 		});
 
-		if (mIsLandscapeTablet) {
-			mAddItemFAB.setVisibility(View.GONE);
-		}
+
 
 		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
 		mEmptyImage = (ImageView) v.findViewById(R.id.empty_lists);
@@ -287,9 +298,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				switch (item.getItemId()) {
-					case R.id.add_list:
-						onAddList();
-						return true;
 					case R.id.settings:
 						Intent i = new Intent(getActivity(), SettingsActivity.class);
 
@@ -305,12 +313,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				}
 			}
 		};
-	}
-
-	private void onAddList() {
-		ListDialogFragment addListDialog = new ListDialogFragment();
-		addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
-		addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
 	}
 
 	private void setLists(ArrayList<List> lists) {
@@ -367,11 +369,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), String.valueOf(Showcase.SHOT_ADD_LIST));
 		sequence.setConfig(new ShowcaseConfig());
 
-		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mAddItemFAB,
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mAddButton,
 				getString(R.string.showcase_create_list_desc)).build());
-
-		sequence.start();
-
 		sequence.setOnItemDismissedListener(new MaterialShowcaseSequence.OnSequenceItemDismissedListener() {
 			@Override
 			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
@@ -384,6 +383,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				}
 			}
 		});
+
+		sequence.start();
 	}
 
 	private void showCaseList(ListsAdapter.ViewHolder holder) {
@@ -393,8 +394,19 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mButtonsContainer,
 				getString(R.string.showcase_manage_list_desc)).build());
 
-		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mImage,
-				getString(R.string.showcase_open_list_desc)).build());
+		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.itemView,
+				getString(R.string.showcase_open_list_desc))
+				.withRectangleShape()
+				.build());
+
+		sequence.setOnItemDismissedListener(new MaterialShowcaseSequence.OnSequenceItemDismissedListener() {
+			@Override
+			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
+				if (i == 1) {
+					mListsChangeListener.onShowCaseShown();
+				}
+			}
+		});
 
 		sequence.start();
 	}
@@ -415,12 +427,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	public class ListsAdapter extends RecyclerView.Adapter<ListsAdapter.ViewHolder> {
-		private boolean mIsShowShowcase = false;
 
 		public void setDate() {
-			if (new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_ADD_LIST).hasFired()) {
-				mIsShowShowcase = true;
-			}
 			notifyDataSetChanged();
 		}
 
@@ -448,8 +456,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		public void onViewAttachedToWindow(final ViewHolder holder) {
 			super.onViewAttachedToWindow(holder);
 
-			if (mIsShowShowcase) {
-				mIsShowShowcase = false;
+			if (!(new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_LIST).hasFired()) &&
+					new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_ADD_LIST).hasFired()) {
 				holder.itemView.post(new Runnable() {
 					@Override
 					public void run() {

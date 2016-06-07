@@ -29,6 +29,9 @@ import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.AddItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.EditItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
+import ru.android.ainege.shoppinglist.util.Showcase;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class ListsActivity extends SingleFragmentActivity implements ListsFragment.OnListsChangeListener,
 		ShoppingListFragment.OnUpdateListListener, ShoppingListFragment.OnListChangeListener,
@@ -72,7 +75,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			mItemLayout = (FrameLayout) findViewById(R.id.item_fragment_container);
 
 			mCurrentScreen = LISTS_SCREEN;
-			mIsLandscapeTablet = getResources().getBoolean(R.bool.isLandscapeTablet);
+			mIsLandscapeTablet = getResources().getBoolean(R.bool.isTablet) && getResources().getBoolean(R.bool.isLandscape);
 		}
 
 		if (savedInstanceState == null) {
@@ -94,14 +97,20 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 					new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_is)));
 
 					if (!mIsLandscapeTablet) {
-						ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentById(R.id.list_fragment_container);
+						ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
 						listFragment.notOpenActionMode();
 					}
 					break;
 				case SHOPPING_LIST_SCREEN:
-					new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
-					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
-					new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_sls)));
+					if (!(new MaterialShowcaseSequence(this, Showcase.SHOT_LIST).hasFired())) {
+						mCurrentScreen = LISTS_SCREEN;
+						break;
+					} else {
+						new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
+						new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
+						new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_sls)));
+					}
+
 					break;
 				case LISTS_SCREEN:
 					if (mIsLandscapeTablet) {
@@ -148,6 +157,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				updateList();
 				closeKeyboard();
 				toShoppingListScreen();
+				closeShowcase();
 				removeFragment(ITEM_TAG);
 				break;
 			case SHOPPING_LIST_SCREEN:
@@ -155,6 +165,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 					super.onBackPressed();
 				} else {
 					toListsScreen();
+					closeShowcase();
 				}
 				break;
 			default:
@@ -201,6 +212,14 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	@Override
 	public long getLastSelectedListId() {
 		return mLastSelectedListId;
+	}
+
+	@Override
+	public void onShowCaseShown() {
+		if (mCurrentScreen == SHOPPING_LIST_SCREEN) {
+			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
+			listFragment.showCaseView();
+		}
 	}
 
 	@Override
@@ -427,6 +446,15 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		if (view != null) {
 			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
+	}
+
+	private void closeShowcase() {
+		View v = findViewById(R.id.content_box);
+
+		if (v != null) {
+			MaterialShowcaseView v1 = (MaterialShowcaseView) v.getParent();
+			v1.removeFromWindow();
 		}
 	}
 

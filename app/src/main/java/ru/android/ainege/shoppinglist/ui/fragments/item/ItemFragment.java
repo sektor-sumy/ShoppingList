@@ -75,6 +75,7 @@ import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import ru.android.ainege.shoppinglist.util.Validation;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCursor;
@@ -213,8 +214,9 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		setCurrency();
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+		boolean isLandscapeTablet = getResources().getBoolean(R.bool.isTablet) && getResources().getBoolean(R.bool.isLandscape);
 
-		if (mItemChangeListener != null && getResources().getBoolean(R.bool.isLandscapeTablet)) {
+		if (mItemChangeListener != null && isLandscapeTablet) {
 			toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
 		} else {
 			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
@@ -289,10 +291,14 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_ITEM);
 		sequence.setConfig(new ShowcaseConfig());
 
-		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mAppBarImage,
-				getString(R.string.showcase_update_image_item))
-				.withRectangleShape(true)
-				.build());
+		MaterialShowcaseView.Builder builder = Showcase.createShowcase(getActivity(), mAppBarImage,
+				getString(R.string.showcase_update_image_item));
+
+		if (!getResources().getBoolean(R.bool.isLandscape)) {
+			builder.withRectangleShape(true);
+		}
+
+		sequence.addSequenceItem(builder.setShapePadding(0).build());
 
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mIsBought,
 				getString(R.string.showcase_bought_item)).build());

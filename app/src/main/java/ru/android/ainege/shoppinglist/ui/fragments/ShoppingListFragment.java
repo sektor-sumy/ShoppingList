@@ -18,7 +18,6 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -102,6 +101,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private FloatingActionButton mFAB;
 	private RecyclerView mItemsListRV;
 	private TextView mSpentMoney, mTotalMoney;
+	private LinearLayout mMoneyContainer;
 	private ImageButton mSLMenu;
 	private ImageView mEmptyImage;
 	private FrameLayout mFrameLayout;
@@ -114,6 +114,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private boolean mIsBoughtEndInList;
 	private boolean mIsUseCategory;
 	private boolean mIsCollapsedCategory = false;
+	private boolean mIsLandscapeTablet;
 
 	private android.view.ActionMode mActionMode;
 	private final ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -221,6 +222,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}
 
+		mIsLandscapeTablet = getResources().getBoolean(R.bool.isTablet) && getResources().getBoolean(R.bool.isLandscape);
 		mListsDS = new ListsDS(getActivity());
 		setList(getArguments().getLong(ID_LIST));
 		saveId(mList.getId());
@@ -253,7 +255,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		toolbar.inflateMenu(R.menu.items_in_list_menu);
 		toolbar.setOnMenuItemClickListener(onMenuItemClickListener());
 
-		if (!getResources().getBoolean(R.bool.isLandscapeTablet)) {
+		if (!mIsLandscapeTablet) {
 			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
 			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 				@Override
@@ -278,6 +280,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
 		mEmptyImage = (ImageView) v.findViewById(R.id.empty_list);
 
+		mMoneyContainer = (LinearLayout) v.findViewById(R.id.money_container);
 		mSpentMoney = (TextView) v.findViewById(R.id.spent_money);
 		mTotalMoney = (TextView) v.findViewById(R.id.total_money);
 
@@ -332,7 +335,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			((AppBarLayout) v.findViewById(R.id.appbar)).setExpanded(false);
 		}
 
-		showCaseView();
+		if (new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_LIST).hasFired()) {
+			showCaseView();
+		}
 		setListData();
 
 		return v;
@@ -879,7 +884,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	//</editor-fold>
 
 	//<editor-fold desc="Work with showcases">
-	private void showCaseView() {
+	public void showCaseView() {
 		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), String.valueOf(Showcase.SHOT_ADD_ITEM));
 		sequence.setConfig(new ShowcaseConfig());
 
@@ -892,14 +897,18 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			@Override
 			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
 				if (i == 0) {
-					onAttached(null);
+					onAttachedAdapter(null);
 				}
 			}
 		});
 	}
 
 	@Override
-	public void onAttached(String idActiveSequence) {
+	public void onAttachedAdapter(String idActiveSequence) {
+		if (getActivity() == null) {
+			return;
+		}
+
 		MaterialShowcaseSequence itemSequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_ITEM_IN_LIST);
 
 		if (!Showcase.SHOT_ITEM_IN_LIST.equals(idActiveSequence) && !itemSequence.hasFired()) {
@@ -949,9 +958,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		showcase(sequence, holder.itemView, swipe1);
 		showcase(sequence, holder.itemView, swipe2);
 		showcase(sequence, holder.itemView, getString(R.string.showcase_delete_item));
-
-		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), mSpentMoney,
-				getString(R.string.showcase_spent_sum)).build());
+		showcase(sequence,  mMoneyContainer, getString(R.string.showcase_spent_sum));
 
 		sequence.start();
 
@@ -964,7 +971,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						holder.mIsBought.setVisibility(holder.mIsBought.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
 						break;
 					case 4:
-						onAttached(Showcase.SHOT_ITEM_IN_LIST);
+						onAttachedAdapter(Showcase.SHOT_ITEM_IN_LIST);
 						break;
 				}
 			}
@@ -972,21 +979,24 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void showcase(MaterialShowcaseSequence sequence, View item, String text) {
-		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), item,
-				text)
-				.withRectangleShape(true)
-				.build());
+		MaterialShowcaseView.Builder builder = Showcase.createShowcase(getActivity(), item, text);
+
+		if (mIsLandscapeTablet) {
+			builder.withRectangleShape().setShapePadding(2);
+		} else {
+			builder.withRectangleShape(true);
+		}
+
+		sequence.addSequenceItem(builder.build());
 	}
+
 	private void showcaseCategory(final MaterialShowcaseSequence sequence, ShoppingListAdapter.CategoryViewHolder holder) {
 		sequence.setConfig(new ShowcaseConfig());
-
-		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mCategoryContainer,
-				getString(R.string.showcase_category))
-				.withRectangleShape(true)
-				.build());
-
+		showcase(sequence, holder.mCategoryContainer, getString(R.string.showcase_category));
 		sequence.addSequenceItem(Showcase.createShowcase(getActivity(), holder.mSumCategory,
-				getString(R.string.showcase_sum_category)).build());
+				getString(R.string.showcase_sum_category))
+				.withRectangleShape()
+				.build());
 
 		sequence.start();
 
@@ -994,18 +1004,23 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			@Override
 			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
 				if (i == 1) {
-					onAttached(Showcase.SHOT_CATEGORY);
+					onAttachedAdapter(Showcase.SHOT_CATEGORY);
 				}
 			}
 		});
 	}
 
 	private void showcaseCollapseCategory(ShoppingListAdapter.CategoryViewHolder holder) {
-		Showcase.createShowcase(getActivity(), holder.mCategoryContainer,
-				getString(R.string.showcase_collapse_category))
-				.withRectangleShape(true)
-				.singleUse(Showcase.SHOT_CATEGORY_COLLAPSE)
-				.show();
+		MaterialShowcaseView.Builder b = Showcase.createShowcase(getActivity(),
+				holder.mCategoryContainer, getString(R.string.showcase_collapse_category));
+
+		if (mIsLandscapeTablet) {
+			b.withRectangleShape().setShapePadding(2);
+		} else {
+			b.withRectangleShape(true).build();
+		}
+
+		b.singleUse(Showcase.SHOT_CATEGORY_COLLAPSE).show();
 	}
 	//</editor-fold>
 
