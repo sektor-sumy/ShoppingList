@@ -251,7 +251,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		dataFragment = (RetainedFragment) fm.findFragmentByTag(RETAINED_FRAGMENT);
 
 		if (dataFragment == null || savedInstanceState == null) {
-			dataFragment = new RetainedFragment();
+			dataFragment = new RetainedFragment(getActivity());
 			fm.beginTransaction().add(dataFragment, RETAINED_FRAGMENT).commit();
 		}
 
@@ -366,7 +366,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		switch (requestCode) {
 			case TAKE_PHOTO:
 				Image.create().deletePhotoFromGallery(getActivity(), mFile);
-				dataFragment.execute(mFile, metrics.widthPixels - 30);
+				dataFragment.execute(mAppBarImage, mItemInList.getItem().getImagePath(), mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
 				try {
@@ -375,7 +375,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 					if (file != null) {
 						Uri selectedImage = data.getData();
 						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
-						dataFragment.execute(file, bitmap, metrics.widthPixels - 30);
+						dataFragment.execute(mAppBarImage, mItemInList.getItem().getImagePath(), file, bitmap, metrics.widthPixels - 30);
 					} else {
 						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}

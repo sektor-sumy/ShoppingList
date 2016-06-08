@@ -37,7 +37,7 @@ public class Image {
 	private static final double MIN_RATIO = 1.25;
 	private static final double MAX_RATIO = 2;
 
-	protected int mLoadingImage = R.drawable.loader;
+	public static int mLoadingImage = R.drawable.loader;
 	private int mDefaultImage = R.drawable.load_error;
 
 	public static Image create() {

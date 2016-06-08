@@ -111,7 +111,7 @@ public class ListDialogFragment extends DialogFragment {
 		dataFragment = (RetainedFragment) fm.findFragmentByTag(RETAINED_FRAGMENT);
 
 		if (dataFragment == null || savedInstanceState == null) {
-			dataFragment = new RetainedFragment();
+			dataFragment = new RetainedFragment(getActivity());
 			fm.beginTransaction().add(dataFragment, RETAINED_FRAGMENT).commit();
 
 			if (getArguments() != null) {
@@ -242,7 +242,7 @@ public class ListDialogFragment extends DialogFragment {
 		switch (requestCode) {
 			case TAKE_PHOTO:
 				Image.create().deletePhotoFromGallery(getActivity(), mFile);
-				dataFragment.execute(mFile, metrics.widthPixels - 30);
+				dataFragment.execute(mImageList, mImagePath, mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
 				try {
@@ -251,7 +251,7 @@ public class ListDialogFragment extends DialogFragment {
 					if (file != null) {
 						Uri selectedImage = data.getData();
 						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
-						dataFragment.execute(file, bitmap, metrics.widthPixels - 30);
+						dataFragment.execute(mImageList, mImagePath, file, bitmap, metrics.widthPixels - 30);
 					} else {
 						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
