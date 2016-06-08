@@ -9,8 +9,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
-import android.transition.Slide;
-import android.view.Gravity;
+import android.transition.Fade;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +30,7 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 		addPreferencesFromResource(R.xml.settings);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
+			getActivity().getWindow().setEnterTransition(new Fade());
 		} else {
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}

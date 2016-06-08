@@ -7,8 +7,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.transition.Slide;
-import android.view.Gravity;
+import android.transition.Fade;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FilterQueryProvider;
@@ -57,7 +56,7 @@ public class AddItemFragment extends ItemFragment {
 		mItemInList = new ShoppingList(getIdList());
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
+			getActivity().getWindow().setEnterTransition(new Fade());
 		} else {
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}

@@ -22,9 +22,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.transition.Slide;
+import android.transition.Fade;
 import android.view.ActionMode;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -217,7 +216,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		super.onCreate(savedInstanceState);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
+			getActivity().getWindow().setEnterTransition(new Fade());
 		} else {
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}

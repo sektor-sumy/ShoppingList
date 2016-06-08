@@ -62,6 +62,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	private int mCurrentScreen = HANDSET;
 	private long mLastSelectedListId = -1;
 	private long mLastSelectedItemId = -1;
+	private String mFragmentTagForRemove;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -158,7 +159,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				closeKeyboard();
 				toShoppingListScreen();
 				closeShowcase();
-				removeFragment(ITEM_TAG);
+				mFragmentTagForRemove = ITEM_TAG;
 				break;
 			case SHOPPING_LIST_SCREEN:
 				if (mIsLandscapeTablet) {
@@ -258,7 +259,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				}
 
 				closeKeyboard();
-				removeFragment(ITEM_TAG);
+				mFragmentTagForRemove = ITEM_TAG;
 				mLastSelectedItemId = -1;
 			}
 
@@ -462,7 +463,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	private void toListsScreen() {
 		mCurrentScreen = LISTS_SCREEN;
 		mLastSelectedListId = -1;
-		removeFragment(SHOPPING_LIST_TAG);
+		mFragmentTagForRemove = SHOPPING_LIST_TAG;
 
 		animation(Float.valueOf(getString(R.string.lists_weight_ls)),
 				Float.valueOf(getString(R.string.shopping_list_weight_ls)),
@@ -480,6 +481,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 	private void toItemScreen() {
 		mCurrentScreen = ITEM_SCREEN;
+
 		animation(Float.valueOf(getString(R.string.lists_weight_is)),
 				Float.valueOf(getString(R.string.shopping_list_weight_is)),
 				Float.valueOf(getString(R.string.item_weight_is)));
@@ -518,6 +520,9 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 						shoppingListWrapper.getWeight() < list ||
 						itemWrapper.getWeight() < item) {
 					animation(lists, list, item);
+				} else if (mFragmentTagForRemove != null) {
+					removeFragment(mFragmentTagForRemove);
+					mFragmentTagForRemove = null;
 				}
 			}
 		});

@@ -5,8 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.transition.Slide;
-import android.view.Gravity;
+import android.transition.Fade;
 import android.view.View;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
@@ -44,7 +43,7 @@ public class EditItemFragment extends ItemFragment {
 		mOriginalIdItem = mItemInList.getIdItem();
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			getActivity().getWindow().setEnterTransition(new Slide(Gravity.BOTTOM));
+			getActivity().getWindow().setEnterTransition(new Fade());
 		} else {
 			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		}
