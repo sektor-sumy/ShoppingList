@@ -12,6 +12,7 @@
 
 	<!--fragment_shopping_list-->
 	<dimen name="shopping_list_padding">10dp</dimen>
+	<dimen name="empty_image_padding">150dp</dimen>
 	<item name="column_name_weight" format="float" type="dimen">0.55</item>
 	<item name="column_amount_weight" format="float" type="dimen">0.18</item>
 	<item name="column_price_weight" format="float" type="dimen">0.27</item>

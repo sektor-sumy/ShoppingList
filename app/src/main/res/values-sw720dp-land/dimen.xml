@@ -8,6 +8,7 @@
 
 	<!--fragment_shopping_list-->
 	<dimen name="shopping_list_padding">0dp</dimen>
+	<dimen name="empty_image_padding">75dp</dimen>
 
 	<!--fragment_item-->
 	<dimen name="item_app_bar_height">350dp</dimen>

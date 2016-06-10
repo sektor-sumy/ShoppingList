@@ -30,6 +30,7 @@
 	<dimen name="column_amount_wight">60dp</dimen>
 	<dimen name="column_price_wight">80dp</dimen>
 	<dimen name="shopping_list_padding">0dp</dimen>
+	<dimen name="empty_image_padding">0dp</dimen>
 	<item name="column_name_weight" format="float" type="dimen">0.45</item>
 	<item name="column_amount_weight" format="float" type="dimen">0.22</item>
 	<item name="column_price_weight" format="float" type="dimen">0.33</item>
