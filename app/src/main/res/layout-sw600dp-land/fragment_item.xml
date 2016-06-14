@@ -91,6 +91,7 @@
 		android:clipToPadding="false"
 		android:paddingLeft="@dimen/item_padding"
 		android:paddingRight="@dimen/item_padding"
+		android:paddingBottom="30dp"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 		<LinearLayout

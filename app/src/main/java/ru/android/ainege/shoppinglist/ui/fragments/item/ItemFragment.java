@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -129,8 +128,9 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	private boolean mIsOpenedKeyboard = false;
 	private boolean mIsExpandedAppbar = true;
 	private boolean mIsUseCategory;
-	private boolean mIsPortraitOrientation;
+	private boolean mIsCollapsedMode;
 	private OnItemChangeListener mItemChangeListener;
+	private int mScreenAppHeight;
 
 	protected abstract TextWatcher getNameChangedListener();
 
@@ -187,16 +187,19 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_item, container, false);
 
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			mIsPortraitOrientation = false;
-		} else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			mIsPortraitOrientation = true;
+		if (getResources().getBoolean(R.bool.isLandscape) && getResources().getBoolean(R.bool.isPhone)) {
+			mIsCollapsedMode = false;
+		} else {
+			mIsCollapsedMode = true;
 			AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboard() {
 				@Override
-				public void isOpen() {
+				public void isOpen(int screenAppHeight) {
 					mIsOpenedKeyboard = true;
+					mScreenAppHeight = screenAppHeight;
 
-					if (mIsExpandedAppbar) {
+					View v = getActivity().getCurrentFocus();
+
+					if (v != null && !isViewVisible(v)) {
 						mAppBarLayout.setExpanded(false);
 					}
 				}
@@ -474,22 +477,19 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	}
 
 	protected void setupView(View v, final Bundle savedInstanceState) {
-		mAppBarLayout = (AppBarLayout) v.findViewById(R.id.appbar);
-
-		if (mIsPortraitOrientation) {
-			mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-				@Override
-				public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-					if (!mIsOpenedKeyboard) {
-						mIsExpandedAppbar = (verticalOffset == 0);
-					}
-				}
-			});
-		} else {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.primary_dark));
-			}
+		if (!mIsCollapsedMode && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.primary_dark));
 		}
+
+		mAppBarLayout = (AppBarLayout) v.findViewById(R.id.appbar);
+		mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+			@Override
+			public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+				if (!mIsOpenedKeyboard) {
+					mIsExpandedAppbar = (verticalOffset == 0);
+				}
+			}
+		});
 
 		mCollapsingToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.collapsing_toolbar);
 
@@ -511,8 +511,8 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		mAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus && !mPrefs.getBoolean(getString(R.string.settings_key_text_selection_amount), false)) {
-					mAmount.setSelection(mAmount.getText().length());
+				if (hasFocus){
+					onElementFocused(mAmount, R.string.settings_key_text_selection_amount);
 				}
 			}
 		});
@@ -557,8 +557,8 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		mPrice.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus && !mPrefs.getBoolean(getString(R.string.settings_key_text_selection_price), false)) {
-					mPrice.setSelection(mPrice.getText().length());
+				if (hasFocus) {
+					onElementFocused(mPrice, R.string.settings_key_text_selection_price);
 				}
 			}
 		});
@@ -606,8 +606,8 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		mComment.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus && !mPrefs.getBoolean(getString(R.string.settings_key_text_selection_comment), false)) {
-					mComment.setSelection(mComment.getText().length());
+				if (hasFocus) {
+					onElementFocused(mComment, R.string.settings_key_text_selection_comment);
 				}
 			}
 		});
@@ -854,6 +854,24 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	private void selectFromGallery() {
 		Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		startActivityForResult(galleryIntent, LOAD_IMAGE);
+	}
+
+	private boolean isViewVisible(View v) {
+		int[] array = new int[2];
+		v.getLocationOnScreen(array);
+
+		int viewBottom = array[1] + v.getHeight();
+		return viewBottom < mScreenAppHeight;
+	}
+
+	private void onElementFocused(EditText v, int preff) {
+		if (!mPrefs.getBoolean(getString(preff), false)) {
+			v.setSelection(v.getText().length());
+		}
+
+		if (mIsOpenedKeyboard && !isViewVisible(v)) {
+			mAppBarLayout.setExpanded(false);
+		}
 	}
 
 	private class ColorAdapter extends SimpleCursorAdapter {

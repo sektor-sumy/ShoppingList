@@ -16,7 +16,7 @@ public class AndroidBug5497Workaround {
 	OnOpenKeyboard mOnOpenKeyboard;
 
 	public interface OnOpenKeyboard {
-		void isOpen();
+		void isOpen(int screenAppHeight);
 		void isClose();
 	}
 
@@ -27,6 +27,7 @@ public class AndroidBug5497Workaround {
 	private View mChildOfContent;
 	private int usableHeightPrevious;
 	private FrameLayout.LayoutParams frameLayoutParams;
+	private int defaultHeight;
 
 	private AndroidBug5497Workaround(Activity activity) {
 		FrameLayout content = (FrameLayout)  activity.findViewById(android.R.id.content);
@@ -38,6 +39,7 @@ public class AndroidBug5497Workaround {
 				}
 			});
 			frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
+			defaultHeight = frameLayoutParams.height;
 		}
 	}
 
@@ -46,21 +48,23 @@ public class AndroidBug5497Workaround {
 		if (usableHeightNow != usableHeightPrevious) {
 			int usableHeightSansKeyboard = mChildOfContent.getRootView().getHeight();
 			int heightDifference = usableHeightSansKeyboard - usableHeightNow;
+
 			if (heightDifference > (usableHeightSansKeyboard/4)) {
+				frameLayoutParams.height = usableHeightSansKeyboard - heightDifference;
+
 				// keyboard probably just became visible
 				if (mOnOpenKeyboard != null) {
-					mOnOpenKeyboard.isOpen();
+					mOnOpenKeyboard.isOpen(frameLayoutParams.height);
 				}
-
-				frameLayoutParams.height = usableHeightSansKeyboard - heightDifference;
 			} else {
+				frameLayoutParams.height = defaultHeight;
+
 				// keyboard probably just became hidden
 				if (mOnOpenKeyboard != null) {
 					mOnOpenKeyboard.isClose();
 				}
-
-				frameLayoutParams.height = usableHeightSansKeyboard;
 			}
+
 			mChildOfContent.requestLayout();
 			usableHeightPrevious = usableHeightNow;
 		}
@@ -69,6 +73,6 @@ public class AndroidBug5497Workaround {
 	private int computeUsableHeight() {
 		Rect r = new Rect();
 		mChildOfContent.getWindowVisibleDisplayFrame(r);
-		return (r.bottom - r.top);
+		return r.bottom;
 	}
 }
