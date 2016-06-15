@@ -81,7 +81,7 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements IShopping
 	}
 
 	public int update(ShoppingList shoppingList, long idOldItem) {
-		new ItemDataDS(mContext).update(new ItemData(shoppingList));
+		new ItemDataDS(mContext).update(shoppingList);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(shoppingList.isBought());
@@ -93,7 +93,7 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements IShopping
 
 	@Override
 	public long add(ShoppingList shoppingList) {
-		long idData = new ItemDataDS(mContext).add(new ItemData(shoppingList));
+		long idData = new ItemDataDS(mContext).add(shoppingList);
 		shoppingList.setIdItemData(idData);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();

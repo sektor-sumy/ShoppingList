@@ -62,17 +62,17 @@ public class ItemDS extends GenericDS<Item> implements ITable.IItems {
 
 	@Override
 	public int update(Item item) {
-		new ItemDataDS(mContext).update(new ItemData(item));
+		new ItemDataDS(mContext).update(item);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(item);
 		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?",
-				new String[]{String.valueOf(item.getIdItemData())});
+				new String[]{String.valueOf(item.getId())});
 	}
 
 	@Override
 	public long add(Item item) {
-		long idData = new ItemDataDS(mContext).add(new ItemData(item));
+		long idData = new ItemDataDS(mContext).add(item);
 		item.setIdItemData(idData);
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();

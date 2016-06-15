@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.Date;
 
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDataDS;
 
 public class ShoppingList extends ItemData {
 	public final static String ALPHABET = "alphabet";
@@ -173,11 +172,11 @@ public class ShoppingList extends ItemData {
 		mItem.setCategory(mCategory);
 		mItem.setComment(mComment);
 
-		if (!mItem.isNew()) {
-			new ItemDataDS(context).update(mItem);
-		} else {
+		if (mItem.isNew()) {
 			idItem = new ItemDS(context).add(mItem);
 			setIdItem(idItem);
+		} else {
+			new ItemDS(context).update(mItem);
 		}
 
 		return idItem;

@@ -15,7 +15,7 @@ import ru.android.ainege.shoppinglist.util.Image;
 
 public class RetainedFragment extends Fragment implements ImageFragmentInterface{
 	private Activity mActivity;
-	private ImageLoad loading;
+	private ImageLoad mLoadingListener;
 	private String mImagePath;
 	private boolean mIsLoading;
 	private ImageView mImageView;
@@ -40,7 +40,7 @@ public class RetainedFragment extends Fragment implements ImageFragmentInterface
 
 	public void setImagePath(String imagePath) {
 		mImagePath = imagePath;
-		loading = null;
+		mLoadingListener = null;
 	}
 
 	public boolean isLoading() {
@@ -62,12 +62,13 @@ public class RetainedFragment extends Fragment implements ImageFragmentInterface
 
 	@Override
 	public void onImageLoaded(boolean isSuccess, String path) {
+		mIsLoading = false;
+
 		if (isSuccess) {
 			mImagePath = path;
-			mIsLoading = false;
 
-			if (loading != null) {
-				loading.finish(mImagePath);
+			if (mLoadingListener != null) {
+				mLoadingListener.finish(mImagePath);
 			}
 		} else {
 			Image.create().insertImageToView(mActivity, mImagePath, mImageView);
@@ -76,6 +77,6 @@ public class RetainedFragment extends Fragment implements ImageFragmentInterface
 	}
 
 	public void setOnLoadedFinish(ImageLoad load){
-		loading = load;
+		mLoadingListener = load;
 	}
 }
