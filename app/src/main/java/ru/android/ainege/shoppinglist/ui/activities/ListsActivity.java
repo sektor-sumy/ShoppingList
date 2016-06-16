@@ -156,7 +156,6 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		switch (mCurrentScreen) {
 			case ITEM_SCREEN:
 				updateList();
-				closeKeyboard();
 				toShoppingListScreen();
 				closeShowcase();
 				mFragmentTagForRemove = ITEM_TAG;
@@ -258,7 +257,6 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 					toShoppingListScreen();
 				}
 
-				closeKeyboard();
 				mFragmentTagForRemove = ITEM_TAG;
 				mLastSelectedItemId = -1;
 			}
@@ -319,7 +317,6 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	@Override
 	public void onItemSave(long id) {
 		if (mIsTablet) {
-			closeKeyboard();
 			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
 			listFragment.updateData();
 
@@ -439,15 +436,6 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		mLastSelectedItemId = idItem;
 		injectFragment(R.id.item_fragment_container, fragment, ITEM_TAG);
 		toItemScreen();
-	}
-
-	private void closeKeyboard() {
-		View view = this.getCurrentFocus();
-
-		if (view != null) {
-			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-		}
 	}
 
 	private void closeShowcase() {

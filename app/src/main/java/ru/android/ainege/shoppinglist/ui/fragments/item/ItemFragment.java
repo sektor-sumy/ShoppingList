@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -197,10 +198,12 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 					mIsOpenedKeyboard = true;
 					mScreenAppHeight = screenAppHeight;
 
-					View v = getActivity().getCurrentFocus();
+					if (isAdded()) {
+						View v = getActivity().getCurrentFocus();
 
-					if (v != null && !isViewVisible(v)) {
-						mAppBarLayout.setExpanded(false);
+						if (v != null && !isViewVisible(v)) {
+							mAppBarLayout.setExpanded(false);
+						}
 					}
 				}
 
@@ -276,6 +279,13 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		super.onResume();
 
 		mAppBarLayout.setExpanded(true);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+
+		closeKeyboard();
 	}
 
 	@Override
@@ -871,6 +881,15 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 		if (mIsOpenedKeyboard && !isViewVisible(v)) {
 			mAppBarLayout.setExpanded(false);
+		}
+	}
+
+	private void closeKeyboard() {
+		View view = getActivity().getCurrentFocus();
+
+		if (view != null) {
+			InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
 	}
 
