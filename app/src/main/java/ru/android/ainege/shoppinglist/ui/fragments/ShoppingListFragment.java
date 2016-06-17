@@ -921,21 +921,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		}
 
-		MaterialShowcaseSequence categorySequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CATEGORY);
-		MaterialShowcaseSequence categoryCollapseSequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CATEGORY_COLLAPSE);
+		if (mIsUseCategory) {
+			MaterialShowcaseSequence categorySequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CATEGORY);
+			MaterialShowcaseSequence categoryCollapseSequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CATEGORY_COLLAPSE);
 
-		if (!Showcase.SHOT_CATEGORY.equals(idActiveSequence) && !categorySequence.hasFired()) {
-			RecyclerView.ViewHolder holder = mItemsListRV.findViewHolderForLayoutPosition(0);
+			if (!Showcase.SHOT_CATEGORY.equals(idActiveSequence) && !categorySequence.hasFired()) {
+				RecyclerView.ViewHolder holder = mItemsListRV.findViewHolderForLayoutPosition(0);
 
-			if (holder != null && holder instanceof ShoppingListAdapter.CategoryViewHolder) {
-				showcaseCategory(categorySequence, (ShoppingListAdapter.CategoryViewHolder) holder);
-				return;
-			}
-		} else if (mIsCollapsedCategory && !Showcase.SHOT_CATEGORY_COLLAPSE.equals(idActiveSequence) && !categoryCollapseSequence.hasFired()) {
-			RecyclerView.ViewHolder holder = mItemsListRV.findViewHolderForLayoutPosition(0);
+				if (holder != null && holder instanceof ShoppingListAdapter.CategoryViewHolder) {
+					showcaseCategory(categorySequence, (ShoppingListAdapter.CategoryViewHolder) holder);
+				}
+			} else if (mIsCollapsedCategory && !Showcase.SHOT_CATEGORY_COLLAPSE.equals(idActiveSequence) && !categoryCollapseSequence.hasFired()) {
+				RecyclerView.ViewHolder holder = mItemsListRV.findViewHolderForLayoutPosition(0);
 
-			if (holder != null && holder instanceof ShoppingListAdapter.CategoryViewHolder) {
-				showcaseCollapseCategory((ShoppingListAdapter.CategoryViewHolder) holder);
+				if (holder != null && holder instanceof ShoppingListAdapter.CategoryViewHolder) {
+					showcaseCollapseCategory((ShoppingListAdapter.CategoryViewHolder) holder);
+				}
 			}
 		}
 	}
@@ -959,8 +960,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		showcase(sequence, holder.itemView, getString(R.string.showcase_delete_item));
 		showcase(sequence,  mMoneyContainer, getString(R.string.showcase_spent_sum));
 
-		sequence.start();
-
 		sequence.setOnItemDismissedListener(new MaterialShowcaseSequence.OnSequenceItemDismissedListener() {
 			@Override
 			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
@@ -975,6 +974,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				}
 			}
 		});
+
+		sequence.start();
 	}
 
 	private void showcase(MaterialShowcaseSequence sequence, View item, String text) {
@@ -997,8 +998,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				.withRectangleShape()
 				.build());
 
-		sequence.start();
-
 		sequence.setOnItemDismissedListener(new MaterialShowcaseSequence.OnSequenceItemDismissedListener() {
 			@Override
 			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
@@ -1007,6 +1006,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				}
 			}
 		});
+
+		sequence.start();
 	}
 
 	private void showcaseCollapseCategory(ShoppingListAdapter.CategoryViewHolder holder) {

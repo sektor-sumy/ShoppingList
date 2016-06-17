@@ -9,12 +9,10 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -85,7 +83,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			} else if (shouldOpenLastList()){
 				openLastList();
 			}
-		} else if (savedInstanceState != null) {
+		} else {
 			mCurrentScreen = savedInstanceState.getInt(STATE_SCREEN);
 			mLastSelectedListId = savedInstanceState.getLong(STATE_LAST_LIST_ID);
 			mLastSelectedItemId = savedInstanceState.getLong(STATE_LAST_ITEM_ID);
@@ -93,9 +91,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 			switch (mCurrentScreen) {
 				case ITEM_SCREEN:
-					new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_is)));
-					new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_is)));
-					new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_is)));
+					setLayoutWeight(R.string.lists_weight_is, R.string.shopping_list_weight_is, R.string.item_weight_is);
 
 					if (!mIsLandscapeTablet) {
 						ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
@@ -105,11 +101,9 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				case SHOPPING_LIST_SCREEN:
 					if (!(new MaterialShowcaseSequence(this, Showcase.SHOT_LIST).hasFired())) {
 						mCurrentScreen = LISTS_SCREEN;
-						break;
+						removeFragment(SHOPPING_LIST_TAG);
 					} else {
-						new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
-						new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
-						new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(R.string.item_weight_sls)));
+						setLayoutWeight(R.string.lists_weight_sls, R.string.shopping_list_weight_sls, R.string.item_weight_sls);
 					}
 
 					break;
@@ -321,7 +315,18 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			listFragment.updateData();
 
 			if (mIsLandscapeTablet) {
-				onItemAdd(mLastSelectedListId);
+				SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+				boolean isItemShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_ITEM_IN_LIST).hasFired();
+				boolean isCategoryShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_CATEGORY).hasFired();
+				boolean isCollapseCategoryShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_CATEGORY_COLLAPSE).hasFired();
+
+				if (!isItemShowcaseFired ||
+						(!isCategoryShowcaseFired && sharedPref.getBoolean(getString(R.string.settings_key_use_category), true)) ||
+						(!isCollapseCategoryShowcaseFired && sharedPref.getBoolean(getString(R.string.settings_key_collapse_category), true))) {
+					onBackPressed();
+				} else {
+					onItemAdd(mLastSelectedListId);
+				}
 			} else {
 				onBackPressed();
 			}
@@ -415,8 +420,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 
 	private void setShoppingListScreen() {
 		mCurrentScreen = SHOPPING_LIST_SCREEN;
-		new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(R.string.lists_weight_sls)));
-		new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(R.string.shopping_list_weight_sls)));
+		setLayoutWeight(R.string.lists_weight_sls, R.string.shopping_list_weight_sls, R.string.item_weight_sls);
 	}
 
 	private void openList(long id, boolean isScrollToList) {
@@ -445,6 +449,12 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			MaterialShowcaseView v1 = (MaterialShowcaseView) v.getParent();
 			v1.removeFromWindow();
 		}
+	}
+
+	private void setLayoutWeight(int listsWeight, int shoppingListWeight, int itemWeight) {
+		new ViewWeightAnimationWrapper(mListsLayout).setWeight(Float.valueOf(getString(listsWeight)));
+		new ViewWeightAnimationWrapper(mShoppingListLayout).setWeight(Float.valueOf(getString(shoppingListWeight)));
+		new ViewWeightAnimationWrapper(mItemLayout).setWeight(Float.valueOf(getString(itemWeight)));
 	}
 
 	//<editor-fold desc="Animation">
