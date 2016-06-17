@@ -187,7 +187,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.fragment_item, container, false);
+		final View v = inflater.inflate(R.layout.fragment_item, container, false);
 
 		if (getResources().getBoolean(R.bool.isLandscape) && getResources().getBoolean(R.bool.isPhone)) {
 			mIsCollapsedMode = false;
@@ -200,9 +200,9 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 					mScreenAppHeight = screenAppHeight;
 
 					if (isAdded()) {
-						View v = getActivity().getCurrentFocus();
+						View focusedView = v.findFocus();
 
-						if (v != null && !isViewVisible(v)) {
+						if (focusedView != null && !isViewVisible(focusedView)) {
 							mAppBarLayout.setExpanded(false);
 						}
 					}
@@ -211,6 +211,11 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 				@Override
 				public void isClose() {
 					mIsOpenedKeyboard = false;
+					View focusedView = v.findFocus();
+
+					if (focusedView != null) {
+						focusedView.clearFocus();
+					}
 
 					if (mIsExpandedAppbar) {
 						mAppBarLayout.setExpanded(true);
