@@ -219,7 +219,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 			});
 		}
 
-		setCurrency();
+		getCurrencyFromDb();
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		boolean isLandscapeTablet = getResources().getBoolean(R.bool.isTablet) && getResources().getBoolean(R.bool.isLandscape);
@@ -487,6 +487,11 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		mCategoryContainer.setVisibility(mIsUseCategory ? View.VISIBLE : View.GONE);
 	}
 
+	public void setCurrency() {
+		getCurrencyFromDb();
+		mCurrency.setText(mCurrencyList);
+	}
+
 	protected void setupView(View v, final Bundle savedInstanceState) {
 		if (!mIsCollapsedMode && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.primary_dark));
@@ -704,7 +709,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		return index;
 	}
 
-	private void setCurrency() {
+	private void getCurrencyFromDb() {
 		CurrencyCursor cursor = new CurrenciesDS(getActivity()).getByList(getIdList());
 		if (cursor.moveToFirst()) {
 			mCurrencyList = cursor.getEntity().getSymbol();

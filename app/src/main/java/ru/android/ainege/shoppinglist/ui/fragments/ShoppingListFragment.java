@@ -469,6 +469,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			case EDIT_LIST:
 				updateList();
 				mUpdateListListener.onListUpdate();
+				mListChangeListener.updateItem(getString(R.string.settings_key_currency));
 				break;
 		}
 	}

@@ -328,6 +328,8 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 				fr.updateSpinners();
 			} else if (setting.equals(getString(R.string.settings_key_use_category))) {
 				fr.setCategory();
+			} else if (setting.equals(getString(R.string.settings_key_currency))) {
+				fr.setCurrency();
 			}
 		}
 	}
