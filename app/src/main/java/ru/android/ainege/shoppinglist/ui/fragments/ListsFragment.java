@@ -91,6 +91,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		void onListDelete(long idDeletedList, long idNewList);
 		long getLastSelectedListId();
 		void onShowCaseShown();
+		void onOpenDialog(long id);
+		void onCloseDialog();
 	}
 
 	public interface OnListsLoadFinishedListener {
@@ -155,6 +157,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				ListDialogFragment addListDialog = new ListDialogFragment();
 				addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
 				addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
+				mListsChangeListener.onOpenDialog(-1);
 			}
 		});
 
@@ -199,6 +202,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == ADD_LIST || requestCode == EDIT_LIST || requestCode == IS_DELETE_LIST) {
+			mListsChangeListener.onCloseDialog();
+		}
 		if (resultCode != Activity.RESULT_OK) return;
 
 		switch (requestCode) {
@@ -521,6 +527,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						ListDialogFragment editListDialog = ListDialogFragment.newInstance(list);
 						editListDialog.setTargetFragment(ListsFragment.this, EDIT_LIST);
 						editListDialog.show(getFragmentManager(), EDIT_LIST_DATE);
+						mListsChangeListener.onOpenDialog(list.getId());
 					}
 				});
 
@@ -533,6 +540,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + list.getName() + "\"?");
 						dialogFrag.setTargetFragment(ListsFragment.this, IS_DELETE_LIST);
 						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
+						mListsChangeListener.onOpenDialog(list.getId());
 					}
 				});
 

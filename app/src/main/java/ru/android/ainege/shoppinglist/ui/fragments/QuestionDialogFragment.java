@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.R;
@@ -27,24 +28,31 @@ public class QuestionDialogFragment extends DialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setMessage(getArguments().getString(MESSAGE))
-				.setCancelable(false)
+				.setCancelable(true)
 				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						if (getTargetFragment() != null) {
-							getTargetFragment().onActivityResult(getTargetRequestCode(),
-									Activity.RESULT_OK, null);
-						}
+						sendResult(Activity.RESULT_OK, null);
 					}
 				})
 				.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						if (getTargetFragment() != null) {
-							getTargetFragment().onActivityResult(getTargetRequestCode(),
-									Activity.RESULT_CANCELED, null);
-						}
+						sendResult(Activity.RESULT_CANCELED, null);
 					}
 				});
 
 		return builder.create();
+	}
+
+	@Override
+	public void onCancel(DialogInterface dialog) {
+		super.onCancel(dialog);
+		sendResult(Activity.RESULT_CANCELED, null);
+	}
+
+	private void sendResult(int resultCode, Intent intent) {
+		if (getTargetFragment() == null)
+			return;
+
+		getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
 	}
 }

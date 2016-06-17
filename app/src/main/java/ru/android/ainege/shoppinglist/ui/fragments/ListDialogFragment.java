@@ -172,6 +172,12 @@ public class ListDialogFragment extends DialogFragment {
 	}
 
 	@Override
+	public void onCancel(DialogInterface dialog) {
+		super.onCancel(dialog);
+		sendResult(Activity.RESULT_CANCELED, null);
+	}
+
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		dataFragment.setImagePath(mImagePath);
@@ -364,7 +370,7 @@ public class ListDialogFragment extends DialogFragment {
 				listDS.update(new List(id, name, idCurrency, mImagePath));
 			}
 
-			sendResult(id);
+			sendResult(Activity.RESULT_OK, new Intent().putExtra(ID_LIST, id));
 
 			isSave = true;
 		}
@@ -372,11 +378,11 @@ public class ListDialogFragment extends DialogFragment {
 		return isSave;
 	}
 
-	private void sendResult(long id) {
+	private void sendResult(int resultCode, Intent intent) {
 		if (getTargetFragment() == null)
 			return;
 
-		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, new Intent().putExtra(ID_LIST, id));
+		getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
 	}
 
 	private boolean hasPermission(String permission){

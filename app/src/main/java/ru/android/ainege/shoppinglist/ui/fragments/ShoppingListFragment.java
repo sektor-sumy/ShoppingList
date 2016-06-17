@@ -180,6 +180,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public interface OnUpdateListListener {
 		void onListUpdate();
 		void onListDelete(long idDeletedList);
+		void onOpenDialog(long id);
+		void onCloseDialog();
 	}
 
 	public interface OnListChangeListener {
@@ -388,11 +390,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + mList.getName() + "\"?");
 						dialogFrag.setTargetFragment(ShoppingListFragment.this, IS_DELETE_LIST);
 						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
+						mUpdateListListener.onOpenDialog(mList.getId());
 						return true;
 					case R.id.update_list:
 						ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
 						editListDialog.setTargetFragment(ShoppingListFragment.this, EDIT_LIST);
 						editListDialog.show(getFragmentManager(), EDIT_ITEM_DATE);
+						mUpdateListListener.onOpenDialog(mList.getId());
 						return true;
 					case R.id.settings:
 						Intent i = new Intent(getActivity(), SettingsActivity.class);
@@ -444,6 +448,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == EDIT_LIST || requestCode == IS_DELETE_LIST) {
+			mUpdateListListener.onCloseDialog();
+		}
 		if (resultCode != Activity.RESULT_OK) return;
 
 		switch (requestCode) {

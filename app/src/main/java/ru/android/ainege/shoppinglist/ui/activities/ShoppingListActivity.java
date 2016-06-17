@@ -87,6 +87,16 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 	}
 
 	@Override
+	public void onOpenDialog(long id) {
+
+	}
+
+	@Override
+	public void onCloseDialog() {
+
+	}
+
+	@Override
 	public void onListUpdate() {
 
 	}

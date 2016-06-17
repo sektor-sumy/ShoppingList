@@ -39,6 +39,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	private static final String STATE_SCREEN = "state_screen";
 	private static final String STATE_LAST_LIST_ID = "state_last_list_id";
 	private static final String STATE_LAST_ITEM_ID = "state_last_item_id";
+	private static final String STATE_SHOULD_BACK_PRESSED = "state_should_back_pressed";
 
 	private static final String LISTS_TAG = "lists_tag";
 	private static final String SHOPPING_LIST_TAG = "shopping_list_tag";
@@ -48,6 +49,10 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	private static final int LISTS_SCREEN = 1;
 	private static final int SHOPPING_LIST_SCREEN = 2;
 	private static final int ITEM_SCREEN = 3;
+
+	private static final int DIALOG_BEHAVIOUR_DEFAULT = 0;
+	private static final int DIALOG_BEHAVIOUR_LIST = 1;
+	private static final int DIALOG_BEHAVIOUR_ITEM = 2;
 
 	private ListsFragment mListsFragment;
 
@@ -61,6 +66,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	private long mLastSelectedListId = -1;
 	private long mLastSelectedItemId = -1;
 	private String mFragmentTagForRemove;
+	private int mShouldBackPressed;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -88,6 +94,13 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			mLastSelectedListId = savedInstanceState.getLong(STATE_LAST_LIST_ID);
 			mLastSelectedItemId = savedInstanceState.getLong(STATE_LAST_ITEM_ID);
 			mListsFragment = (ListsFragment) getFragmentManager().findFragmentByTag(LISTS_TAG);
+			mShouldBackPressed = savedInstanceState.getInt(STATE_SHOULD_BACK_PRESSED);
+
+			if (!mIsLandscapeTablet && mShouldBackPressed != DIALOG_BEHAVIOUR_DEFAULT) {
+				mCurrentScreen--;
+			} else if (mIsLandscapeTablet && mShouldBackPressed == DIALOG_BEHAVIOUR_ITEM) {
+				mCurrentScreen++;
+			}
 
 			switch (mCurrentScreen) {
 				case ITEM_SCREEN:
@@ -143,6 +156,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		outState.putInt(STATE_SCREEN, mCurrentScreen);
 		outState.putLong(STATE_LAST_LIST_ID, mLastSelectedListId);
 		outState.putLong(STATE_LAST_ITEM_ID, mLastSelectedItemId);
+		outState.putInt(STATE_SHOULD_BACK_PRESSED, mShouldBackPressed);
 	}
 
 	@Override
@@ -214,6 +228,21 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
 			listFragment.showCaseView();
 		}
+	}
+
+	@Override
+	public void onOpenDialog(long id) {
+		 if (mCurrentScreen == LISTS_SCREEN || //port
+				 (mCurrentScreen == SHOPPING_LIST_SCREEN && mLastSelectedListId != id)) { //land
+			 mShouldBackPressed = DIALOG_BEHAVIOUR_LIST;
+		 } else if (mCurrentScreen == ITEM_SCREEN) { //land
+			 mShouldBackPressed = DIALOG_BEHAVIOUR_ITEM;
+		 }
+	}
+
+	@Override
+	public void onCloseDialog() {
+		mShouldBackPressed = DIALOG_BEHAVIOUR_DEFAULT;
 	}
 
 	@Override
