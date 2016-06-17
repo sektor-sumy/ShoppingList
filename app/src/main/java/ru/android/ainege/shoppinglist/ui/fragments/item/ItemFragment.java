@@ -115,6 +115,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	protected SharedPreferences mPrefs;
 	protected boolean mIsUseNewItemInSpinner;
 	protected RetainedFragment dataFragment;
+	protected boolean mIsAdded = false;
 	private ToggleButton mIsBought;
 	private AppBarLayout mAppBarLayout;
 	private TextView mCurrency;
@@ -146,7 +147,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	protected abstract void resetImage();
 
 	public interface OnItemChangeListener {
-		void onItemSave(long id);
+		void onItemSave(boolean isAdded, long id);
 	}
 
 	@TargetApi(23)
@@ -825,7 +826,8 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	private void saveItem() {
 		if (saveData()) {
 			if (mItemChangeListener != null) {
-				mItemChangeListener.onItemSave(mItemInList.getIdItem());
+				closeKeyboard();
+				mItemChangeListener.onItemSave(mIsAdded, mItemInList.getIdItem());
 			} else {
 				getActivity().finish();
 			}

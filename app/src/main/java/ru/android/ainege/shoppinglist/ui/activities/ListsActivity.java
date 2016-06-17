@@ -338,23 +338,25 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	}
 
 	@Override
-	public void onItemSave(long id) {
+	public void onItemSave(boolean isAdded, long id) {
 		if (mIsTablet) {
 			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
 			listFragment.updateData();
 
 			if (mIsLandscapeTablet) {
-				SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-				boolean isItemShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_ITEM_IN_LIST).hasFired();
-				boolean isCategoryShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_CATEGORY).hasFired();
-				boolean isCollapseCategoryShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_CATEGORY_COLLAPSE).hasFired();
+				if (isAdded) {
+					SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+					boolean isItemShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_ITEM_IN_LIST).hasFired();
+					boolean isCategoryShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_CATEGORY).hasFired();
+					boolean isCollapseCategoryShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_CATEGORY_COLLAPSE).hasFired();
 
-				if (!isItemShowcaseFired ||
-						(!isCategoryShowcaseFired && sharedPref.getBoolean(getString(R.string.settings_key_use_category), true)) ||
-						(!isCollapseCategoryShowcaseFired && sharedPref.getBoolean(getString(R.string.settings_key_collapse_category), true))) {
-					onBackPressed();
-				} else {
-					onItemAdd(mLastSelectedListId);
+					if (!isItemShowcaseFired ||
+							(!isCategoryShowcaseFired && sharedPref.getBoolean(getString(R.string.settings_key_use_category), true)) ||
+							(!isCollapseCategoryShowcaseFired && sharedPref.getBoolean(getString(R.string.settings_key_collapse_category), true))) {
+						onBackPressed();
+					} else {
+						onItemAdd(mLastSelectedListId);
+					}
 				}
 			} else {
 				onBackPressed();

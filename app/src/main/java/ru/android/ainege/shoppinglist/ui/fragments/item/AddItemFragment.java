@@ -62,6 +62,7 @@ public class AddItemFragment extends ItemFragment {
 		}
 
 		mIsUseDefaultData = mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_data), true);
+		mIsAdded = true;
 	}
 
 	@Override
