@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments.settings;
 
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -21,6 +22,7 @@ import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 
 public class MainPreferenceFragment extends android.preference.PreferenceFragment {
 	private static final String STATE_SCREEN = "state_screen";
+	private static final int SETTINGS = 1;
 
 	private PreferenceScreen mNestedScreen;
 
@@ -93,6 +95,16 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 		}
 	}
 
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (requestCode == SETTINGS) {
+			long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
+			getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(DictionaryFragment.LAST_EDIT, modifyCatalog));
+		}
+	}
+
 	private void startSettingByKey(final String key) {
 		Preference categorySettings = findPreference(key);
 		categorySettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -102,9 +114,9 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 				i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, key);
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+					startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 				} else {
-					startActivity(i);
+					startActivityForResult(i, SETTINGS);
 				}
 
 				return true;

@@ -64,6 +64,7 @@
 	<string name="item_image">Изображение товара</string>
 	<string name="showcase_update_image_item">Нажмите на картинку для смены изображения</string>
 	<string name="showcase_bought_item">Уже купили? \nОтметьте это при создании или изменении товара</string>
+	<string name="data_save">Данные сохранены</string>
 	<!--item menu-->
 	<string name="delete_list">Удалить список</string>
 	<string name="update_list">Изменить список</string>

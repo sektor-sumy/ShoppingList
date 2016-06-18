@@ -36,6 +36,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -52,6 +53,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final int ADD_LIST = 1;
 	private static final int EDIT_LIST = 2;
 	private static final int IS_DELETE_LIST = 3;
+	private static final int SETTINGS = 4;
 	private static final String ADD_LIST_DATE = "addListDialog";
 	private static final String EDIT_LIST_DATE = "editListDialog";
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
@@ -61,7 +63,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private OnListsChangeListener mListsChangeListener;
 	private OnListsLoadFinishedListener mOnListsLoadFinishedListener;
 
-	private ArrayList<List> mLists;
+	private ArrayList<List> mLists = new ArrayList<>();
 	private ArrayList<List> mSaveListRotate;
 	private ListsDS mListsDS;
 	private int mPositionForDelete;
@@ -89,6 +91,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		void onListSelect(long id);
 		void onListUpdate(long id);
 		void onListDelete(long idDeletedList, long idNewList);
+		void updateCurrentList();
 		long getLastSelectedListId();
 		void onShowCaseShown();
 		void onOpenDialog(long id);
@@ -160,8 +163,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				mListsChangeListener.onOpenDialog(-1);
 			}
 		});
-
-
 
 		mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
 		mEmptyImage = (ImageView) v.findViewById(R.id.empty_lists);
@@ -237,6 +238,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				mListsChangeListener.onListDelete(list.getId(), mLists.size() > 0 ? mLists.get(0).getId() : -1);
 				deleteSaveListFromSettings(list.getId());
 				break;
+			case SETTINGS:
+				long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
+				if (modifyCatalog != -1) {
+					mListsChangeListener.updateCurrentList();
+				}
+				break;
 		}
 	}
 
@@ -308,9 +315,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						Intent i = new Intent(getActivity(), SettingsActivity.class);
 
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+							startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 						} else {
-							startActivity(i);
+							startActivityForResult(i, SETTINGS);
 						}
 
 						return true;

@@ -30,7 +30,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	private static final int TYPE_CATEGORY = 0;
 	private static final int TYPE_ITEM = 1;
 
-	public List<Object> mItemList;
+	public List<Object> mItemList = new ArrayList<>();
 	private HashMap<Long, Boolean> mCollapseCategoryStates = new HashMap<>();
 
 	private Activity mActivity;
@@ -67,9 +67,11 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		notifyDataSetChanged();
 	}
 
-	public void setCurrency(String currency) {
+	public void setCurrency(String currency, boolean withUpdate) {
 		mCurrency = currency;
-		notifyDataSetChanged();
+		if (withUpdate) {
+			notifyDataSetChanged();
+		}
 	}
 
 	@Override

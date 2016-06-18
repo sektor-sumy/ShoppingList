@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -218,6 +219,14 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	}
 
 	@Override
+	public void updateCurrentList() {
+		if (mCurrentScreen == SHOPPING_LIST_SCREEN || mCurrentScreen == ITEM_SCREEN) {
+			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
+			listFragment.updateData();
+		}
+	}
+
+	@Override
 	public long getLastSelectedListId() {
 		return mLastSelectedListId;
 	}
@@ -247,6 +256,12 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	@Override
 	public void onCloseDialog() {
 		mShouldBackPressed = DIALOG_BEHAVIOUR_DEFAULT;
+	}
+
+	@Override
+	public void onImageClick() {
+		ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
+		if (listFragment != null) listFragment.closeActionMode();
 	}
 
 	@Override
@@ -326,7 +341,11 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		if (mIsLandscapeTablet && mCurrentScreen == ITEM_SCREEN) {
 			ItemFragment fr = (ItemFragment) getFragmentManager().findFragmentByTag(ITEM_TAG);
 
-			if (setting.equals(getString(R.string.settings_key_transition))) {
+			if (setting == null) {
+				fr.setCurrency();
+				fr.setUnit(-1);
+				fr.setCategory(-1);
+			} else if (setting.equals(getString(R.string.settings_key_transition))) {
 				fr.setTransitionButtons();
 			} else if (setting.equals(getString(R.string.settings_key_fast_edit))) {
 				fr.updateSpinners();
@@ -347,9 +366,12 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	public void onItemSave(boolean isAdded, long id) {
 		if (mIsTablet) {
 			ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
+			listFragment.setItemDetailsId(id);
 			listFragment.updateData();
 
 			if (mIsLandscapeTablet) {
+				Toast.makeText(this, getString(R.string.data_save), Toast.LENGTH_SHORT).show();
+
 				if (isAdded) {
 					SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 					boolean isItemShowcaseFired = new MaterialShowcaseSequence(this, Showcase.SHOT_ITEM_IN_LIST).hasFired();
@@ -439,7 +461,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 		if (!openLastList()) {  //if not open last opened list, open first in list
 			ArrayList<List> lists = mListsFragment.getLists();
 
-			if (lists == null) {
+			if (lists == null || lists.isEmpty()) {
 				mListsFragment.setOnListsLoadListener(new ListsFragment.OnListsLoadFinishedListener() {
 					@Override
 					public void onLoadFinished(ArrayList<List> lists) {

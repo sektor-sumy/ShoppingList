@@ -54,6 +54,7 @@ import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -79,6 +80,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public static final int EDIT_ITEM = 1;
 	public static final int EDIT_LIST = 3;
 	private static final int IS_DELETE_LIST = 4;
+	private static final int SETTINGS = 5;
 	private static final String EDIT_ITEM_DATE = "editListDialog";
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
 	private static final int DATA_LOADER = 0;
@@ -404,9 +406,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						Intent i = new Intent(getActivity(), SettingsActivity.class);
 
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+							startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
 						} else {
-							startActivity(i);
+							startActivityForResult(i, SETTINGS);
 						}
 
 						return true;
@@ -473,6 +475,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mUpdateListListener.onListUpdate();
 				mListChangeListener.updateItem(getString(R.string.settings_key_currency));
 				break;
+			case SETTINGS:
+				long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
+				if (modifyCatalog != -1) {
+					setList(getArguments().getLong(ID_LIST));
+					mAdapterRV.setCurrency(mList.getCurrency().getSymbol(), false);
+					updateData();
+					mListChangeListener.updateItem(null);
+				}
+				break;
 		}
 	}
 
@@ -480,13 +491,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		setList(getArguments().getLong(ID_LIST));
 		setListData();
 		updateSums(mSaveSpentMoney, mSaveTotalMoney);
-		mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
+		mAdapterRV.setCurrency(mList.getCurrency().getSymbol(), true);
 	}
 
 	public void closeActionMode(){
 		if (mActionMode != null) {
 			mActionMode.finish();
 		}
+	}
+
+	public void setItemDetailsId(long id) {
+		mItemDetailsId = id;
 	}
 
 	//<editor-fold desc="Work with loader">
