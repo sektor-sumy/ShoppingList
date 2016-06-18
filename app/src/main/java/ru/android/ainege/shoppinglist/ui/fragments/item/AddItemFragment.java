@@ -278,7 +278,7 @@ public class AddItemFragment extends ItemFragment {
 			loadImage(mItemInList.getItem().getDefaultImagePath());
 		} else {
 			mItemInList.getItem().setImagePath(null);
-			mAppBarImage.setImageResource(android.R.color.transparent);
+			mAppBarImage.setImageResource(R.drawable.no_image);
 			mCollapsingToolbarLayout.setTitle(getString(R.string.add));
 		}
 	}
