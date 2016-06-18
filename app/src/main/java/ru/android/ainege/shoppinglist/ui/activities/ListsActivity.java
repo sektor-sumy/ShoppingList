@@ -105,11 +105,6 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			switch (mCurrentScreen) {
 				case ITEM_SCREEN:
 					setLayoutWeight(R.string.lists_weight_is, R.string.shopping_list_weight_is, R.string.item_weight_is);
-
-					if (!mIsLandscapeTablet) {
-						ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
-						listFragment.notOpenActionMode();
-					}
 					break;
 				case SHOPPING_LIST_SCREEN:
 					if (!(new MaterialShowcaseSequence(this, Showcase.SHOT_LIST).hasFired())) {
@@ -184,6 +179,11 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	@Override
 	public void onListSelect(long id) {
 		if (mIsTablet) {
+			if (mCurrentScreen == SHOPPING_LIST_SCREEN) {
+				ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
+				listFragment.closeActionMode();
+			}
+
 			openList(id, false);
 			toShoppingListScreen();
 		} else {
@@ -231,13 +231,17 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 	}
 
 	@Override
-	public void onOpenDialog(long id) {
-		 if (mCurrentScreen == LISTS_SCREEN || //port
-				 (mCurrentScreen == SHOPPING_LIST_SCREEN && mLastSelectedListId != id)) { //land
-			 mShouldBackPressed = DIALOG_BEHAVIOUR_LIST;
-		 } else if (mCurrentScreen == ITEM_SCREEN) { //land
-			 mShouldBackPressed = DIALOG_BEHAVIOUR_ITEM;
-		 }
+	public void onOpenDialog(long idList) {
+		//if screen of shopping list opened with delete mode and open dialog - close delete mode
+		ShoppingListFragment listFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
+		if (listFragment != null) listFragment.closeActionMode();
+
+		if (mCurrentScreen == LISTS_SCREEN || //port
+				(mCurrentScreen == SHOPPING_LIST_SCREEN && mLastSelectedListId != idList)) { //land
+			mShouldBackPressed = DIALOG_BEHAVIOUR_LIST;
+		} else if (mCurrentScreen == ITEM_SCREEN) { //land
+			mShouldBackPressed = DIALOG_BEHAVIOUR_ITEM;
+		}
 	}
 
 	@Override

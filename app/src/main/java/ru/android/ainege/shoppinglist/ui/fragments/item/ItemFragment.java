@@ -148,6 +148,8 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 	public interface OnItemChangeListener {
 		void onItemSave(boolean isAdded, long id);
+		void onOpenDialog(long idList);
+		void onCloseDialog();
 	}
 
 	@TargetApi(23)
@@ -199,12 +201,10 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 					mIsOpenedKeyboard = true;
 					mScreenAppHeight = screenAppHeight;
 
-					if (isAdded()) {
-						View focusedView = v.findFocus();
+					View focusedView = v.findFocus();
 
-						if (focusedView != null && !isViewVisible(focusedView)) {
-							mAppBarLayout.setExpanded(false);
-						}
+					if (focusedView != null && !isViewVisible(focusedView)) {
+						mAppBarLayout.setExpanded(false);
 					}
 				}
 
@@ -370,9 +370,11 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 					break;
 				case UNIT_ADD:
 					mUnit.setSelection(getPosition(mUnit, mUnitPosition));
+					mItemChangeListener.onCloseDialog();
 					break;
 				case CATEGORY_ADD:
 					mCategory.setSelection(getPosition(mCategory, mCategoryPosition));
+					mItemChangeListener.onCloseDialog();
 					break;
 			}
 
@@ -552,6 +554,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 							GeneralDialogFragment addItemDialog = new UnitDialogFragment();
 							addItemDialog.setTargetFragment(ItemFragment.this, UNIT_ADD);
 							addItemDialog.show(getFragmentManager(), UNIT_ADD_DATE);
+							mItemChangeListener.onOpenDialog(-1);
 						} else {
 							mUnitPosition = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
 						}
@@ -601,6 +604,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 							GeneralDialogFragment addItemDialog = new CategoryDialogFragment();
 							addItemDialog.setTargetFragment(ItemFragment.this, CATEGORY_ADD);
 							addItemDialog.show(getFragmentManager(), CATEGORY_ADD_DATE);
+							mItemChangeListener.onOpenDialog(-1);
 						} else {
 							mCategoryPosition = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
 						}

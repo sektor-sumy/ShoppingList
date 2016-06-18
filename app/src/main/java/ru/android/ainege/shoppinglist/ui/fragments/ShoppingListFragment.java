@@ -131,6 +131,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				return false;
 			}
 
+			mUpdateListListener.onOpenDialog(mList.getId());
 			mFAB.setVisibility(View.GONE);
 			if (!mIsStartActionMode) {
 				mAdapterRV.extendAllCategory(false);
@@ -164,6 +165,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			mAdapterRV.recoveryCollapseAllCategory();
 			mAdapterRV.clearSelections();
+			mUpdateListListener.onCloseDialog();
 		}
 	};
 
@@ -180,7 +182,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public interface OnUpdateListListener {
 		void onListUpdate();
 		void onListDelete(long idDeletedList);
-		void onOpenDialog(long id);
+		void onOpenDialog(long idList);
 		void onCloseDialog();
 	}
 
@@ -481,9 +483,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mAdapterRV.setCurrency(mList.getCurrency().getSymbol());
 	}
 
-	public void notOpenActionMode(){
-		mIsStartActionMode = false;
-		mAdapterRV.clearSelections();
+	public void closeActionMode(){
+		if (mActionMode != null) {
+			mActionMode.finish();
+		}
 	}
 
 	//<editor-fold desc="Work with loader">
