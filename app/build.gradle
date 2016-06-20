@@ -5,11 +5,11 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "ru.android.ainege.shoppinglist"
+        applicationId "ru.android.ainege.shoppinglist.dev"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 6
-        versionName "1.2"
+        versionCode 7
+        versionName "1.2.1"
     }
     buildTypes {
         release {
