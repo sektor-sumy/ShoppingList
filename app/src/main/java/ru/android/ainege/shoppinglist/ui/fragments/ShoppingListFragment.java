@@ -885,8 +885,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		double sum = 0;
 
 		for (Object obj : mAdapterRV.getItemList()) {
-			if (obj instanceof Category) {
-				sum += ((Category) obj).calculateTotalSum();
+			if (mIsUseCategory) {
+				if (obj instanceof Category) {
+					sum += ((Category) obj).calculateTotalSum();
+				}
+			} else {
+				sum += ((ShoppingList) obj).getCategory().calculateTotalSum();
+				break;
 			}
 		}
 
@@ -898,8 +903,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		double sum = 0;
 
 		for (Object obj : mAdapterRV.getItemList()) {
-			if (obj instanceof Category) {
-				sum += ((Category) obj).calculateSpentSum();
+			if (mIsUseCategory) {
+				if (obj instanceof Category) {
+					sum += ((Category) obj).calculateSpentSum();
+				}
+			} else {
+				sum += ((ShoppingList) obj).getCategory().calculateSpentSum();
+				break;
 			}
 		}
 
