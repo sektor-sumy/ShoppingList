@@ -18,9 +18,11 @@ import android.widget.Toast;
 import java.text.DecimalFormat;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.GenericDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
+import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
@@ -33,9 +35,9 @@ public class AddItemFragment extends ItemFragment {
 
 	private String mItemName = "";
 	private String mAddedAmount = "";
-	private int mAddedUnit = 0;
+	private long mIdAddedUnit;
 	private String mAddedPrice = "";
-	private int mAddedCategory = 0;
+	private long mIdAddedCategory;
 	private String mAddedComment = "";
 
 	private boolean mIsSelectedItem = false;
@@ -80,7 +82,14 @@ public class AddItemFragment extends ItemFragment {
 		}
 
 		mUnit.setSelection(getPosition(mUnit, getActivity().getResources().getStringArray(R.array.units)[0]));
-		mCategory.setSelection(getPosition(mCategory, (getActivity().getResources().getStringArray(R.array.categories)[0]).split("—")[0]));
+		mIdSelectedUnit = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
+
+		if (savedInstanceState != null && !mIsUseCategory) {
+			setSelectionCategory(savedInstanceState.getLong(STATE_CATEGORY_ID));
+		} else {
+			mCategory.setSelection(getPosition(mCategory, (getActivity().getResources().getStringArray(R.array.categories)[0]).split("—")[0]));
+			mIdSelectedCategory = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
+		}
 
 		mName.setOnItemClickListener(getOnNameClickListener());
 		mCollapsingToolbarLayout.setTitle(getString(R.string.add));
@@ -108,9 +117,9 @@ public class AddItemFragment extends ItemFragment {
 					//when changing item, fill in the data that have been previously introduced
 					if (mIsUseDefaultData && mIsSelectedItem && !mItemName.equals(s.toString().trim())) {
 						mAmount.setText(mAddedAmount);
-						mUnit.setSelection(mAddedUnit);
+						setSelectionUnit(mIdAddedUnit);
 						mPrice.setText(mAddedPrice);
-						mCategory.setSelection(mAddedCategory);
+						setSelectionCategory(mIdAddedCategory);
 						mComment.setText(mAddedComment);
 						mItemInList.setIdItem(0);
 						mIsSelectedItem = false;
@@ -147,7 +156,7 @@ public class AddItemFragment extends ItemFragment {
 
 				mItemInList.getItem().setDefaultImagePath(item.getDefaultImagePath());
 				mItemInList.getItem().setIdItemData(item.getIdItemData());
-				mCategory.setSelection(getPosition(mCategory, item.getIdCategory()));
+				setSelectionCategory(item.getIdCategory());
 				loadImage(item.getImagePath());
 			}
 		};
@@ -178,9 +187,9 @@ public class AddItemFragment extends ItemFragment {
 				// and save previously introduced data
 				if (mIsUseDefaultData) {
 					mAddedAmount = mAmount.getText().toString();
-					mAddedUnit = mUnit.getSelectedItemPosition();
+					mIdAddedUnit = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
 					mAddedPrice = mPrice.getText().toString();
-					mAddedCategory = mCategory.getSelectedItemPosition();
+					mIdAddedCategory = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
 					mAddedComment = mComment.getText().toString();
 
 					ItemCursor c = mItemDS.getWithData(mItemInList.getIdItem());
@@ -201,14 +210,14 @@ public class AddItemFragment extends ItemFragment {
 					}
 
 					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_unit), true)) {
-						mUnit.setSelection(getPosition(mUnit, item.getIdUnit()));
+						setSelectionUnit(item.getIdUnit());
 					}
 
 					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_price), true) && item.getPrice() != 0) {
 						mPrice.setText(String.format("%.2f", item.getPrice()));
 					}
 
-					mCategory.setSelection(getPosition(mCategory, item.getIdCategory()));
+					setSelectionCategory(item.getIdCategory());
 
 					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_comment), true)) {
 						mComment.setText(item.getComment());

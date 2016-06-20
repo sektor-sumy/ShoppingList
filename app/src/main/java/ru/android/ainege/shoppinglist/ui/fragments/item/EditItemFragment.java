@@ -60,13 +60,13 @@ public class EditItemFragment extends ItemFragment {
 		super.setupView(v, savedInstanceState);
 
 		if (savedInstanceState == null) {
-			setDataToView();
+			setDataToView(savedInstanceState);
 		} else {
 			loadImage(dataFragment.getImagePath());
 		}
 	}
 
-	private void setDataToView() {
+	private void setDataToView(Bundle savedInstanceState) {
 		loadImage(mItemInList.getItem().getImagePath());
 
 		mName.setText(mItemInList.getItem().getName());
@@ -74,15 +74,19 @@ public class EditItemFragment extends ItemFragment {
 		if (mItemInList.getAmount() != 0) {
 			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getAmount()));
 		}
-		mUnitPosition = mItemInList.getUnit().getId();
-		mUnit.setSelection(getPosition(mUnit, mUnitPosition));
+
+		setSelectionUnit(mItemInList.getUnit().getId());
 
 		if (mItemInList.getPrice() != 0) {
 			mPrice.setText(format("%.2f", mItemInList.getPrice()));
 		}
 
-		mCategoryPosition = mItemInList.getCategory().getId();
-		mCategory.setSelection(getPosition(mCategory, mCategoryPosition));
+		if (savedInstanceState != null && !mIsUseCategory) {
+			setSelectionCategory(savedInstanceState.getLong(STATE_CATEGORY_ID));
+		} else {
+			setSelectionCategory(mItemInList.getCategory().getId());
+		}
+
 		mComment.setText(mItemInList.getComment());
 
 		setIsBought(mItemInList.isBought());

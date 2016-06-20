@@ -95,6 +95,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	private static final String IS_SAVE_CHANGES_DATE = "answerDialog";
 	private static final String RETAINED_FRAGMENT = "retained_fragment_item";
 	private static final String STATE_FILE = "state_file";
+	protected static final String STATE_CATEGORY_ID = "state_category_id";
 
 	protected ImageView mAppBarImage;
 	protected CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -125,11 +126,11 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	private String mCurrencyList;
 	private File mFile;
 	private TextView mFinishPrice;
-	protected long mUnitPosition;
-	protected long mCategoryPosition;
+	protected long mIdSelectedUnit;
+	protected long mIdSelectedCategory;
 	private boolean mIsOpenedKeyboard = false;
 	private boolean mIsExpandedAppbar = true;
-	private boolean mIsUseCategory;
+	protected boolean mIsUseCategory;
 	private boolean mIsCollapsedMode;
 	private OnItemChangeListener mItemChangeListener;
 	private int mScreenAppHeight;
@@ -307,6 +308,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		super.onSaveInstanceState(outState);
 
 		outState.putSerializable(STATE_FILE, mFile);
+		outState.putLong(STATE_CATEGORY_ID, ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId());
 	}
 
 	private void showCaseViews() {
@@ -377,13 +379,13 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 					getActivity().finish();
 					break;
 				case UNIT_ADD:
-					mUnit.setSelection(getPosition(mUnit, mUnitPosition));
+					setSelectionUnit(-1);
 					if (mItemChangeListener != null) {
 						mItemChangeListener.onCloseDialog();
 					}
 					break;
 				case CATEGORY_ADD:
-					mCategory.setSelection(getPosition(mCategory, mCategoryPosition));
+					setSelectionCategory(-1);
 					if (mItemChangeListener != null) {
 						mItemChangeListener.onCloseDialog();
 					}
@@ -434,11 +436,11 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 				break;
 			case UNIT_ADD:
 				mUnit.setAdapter(getUnitsAdapter());
-				mUnit.setSelection(getPosition(mUnit, data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1)));
+				setSelectionUnit(data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1));
 				break;
 			case CATEGORY_ADD:
 				mCategory.setAdapter(getCategoriesAdapter());
-				mCategory.setSelection(getPosition(mCategory, data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1)));
+				setSelectionCategory(data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1));
 				break;
 		}
 	}
@@ -482,13 +484,8 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	public void updateSpinners() {
 		mIsUseNewItemInSpinner = mPrefs.getBoolean(getString(R.string.settings_key_fast_edit), false);
 
-		long idUnit = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
-		mUnit.setAdapter(getUnitsAdapter());
-		mUnit.setSelection(getPosition(mUnit, idUnit));
-
-		long idCategory = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
-		mCategory.setAdapter(getCategoriesAdapter());
-		mCategory.setSelection(getPosition(mCategory, idCategory));
+		setUnit(-1);
+		setCategory(-1);
 	}
 
 	public void setTransitionButtons() {
@@ -516,12 +513,12 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 	public void setUnit(long idUnit) {
 		mUnit.setAdapter(getUnitsAdapter());
-		mUnit.setSelection(idUnit == -1 ? getPosition(mUnit, mUnitPosition) : getPosition(mUnit, idUnit));
+		setSelectionUnit(idUnit);
 	}
 
 	public void setCategory(long idCategory) {
 		mCategory.setAdapter(getCategoriesAdapter());
-		mCategory.setSelection(idCategory == -1 ? getPosition(mCategory, mCategoryPosition) : getPosition(mCategory, idCategory));
+		setSelectionCategory(idCategory);
 	}
 
 	protected void setupView(View v, final Bundle savedInstanceState) {
@@ -583,7 +580,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 								mItemChangeListener.onOpenDialog(-1);
 							}
 						} else {
-							mUnitPosition = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
+							mIdSelectedUnit = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
 						}
 					}
 
@@ -635,7 +632,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 								mItemChangeListener.onOpenDialog(-1);
 							}
 						} else {
-							mCategoryPosition = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
+							mIdSelectedCategory = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
 						}
 					}
 
@@ -679,6 +676,22 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 		Image.create().insertImageToView(getActivity(), path, mAppBarImage);
 		mCollapsingToolbarLayout.setTitle("");
+	}
+
+	protected void setSelectionUnit(long idUnit) {
+		if (idUnit != -1) {
+			mIdSelectedUnit = idUnit;
+		}
+
+		mUnit.setSelection(getPosition(mUnit, mIdSelectedUnit));
+	}
+
+	protected void setSelectionCategory(long idCategory) {
+		if (idCategory != -1) {
+			mIdSelectedCategory = idCategory;
+		}
+
+		mCategory.setSelection(getPosition(mCategory, mIdSelectedCategory));
 	}
 
 	protected SimpleCursorAdapter getCompleteTextAdapter(FilterQueryProvider provider) {
