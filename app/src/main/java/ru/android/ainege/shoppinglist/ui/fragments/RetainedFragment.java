@@ -24,6 +24,10 @@ public class RetainedFragment extends Fragment implements ImageFragmentInterface
 		void finish(String path);
 	}
 
+	public RetainedFragment() {
+
+	}
+
 	public RetainedFragment(Activity activity) {
 		mActivity = activity;
 	}

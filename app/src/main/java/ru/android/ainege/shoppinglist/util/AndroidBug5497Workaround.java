@@ -2,6 +2,7 @@ package ru.android.ainege.shoppinglist.util;
 
 import android.app.Activity;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -75,6 +76,10 @@ public class AndroidBug5497Workaround {
 		Rect r = new Rect();
 		mChildOfContent.getWindowVisibleDisplayFrame(r);
 
-		return r.bottom - r.top;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			return r.bottom;
+		} else {
+			return r.bottom - r.top;
+		}
 	}
 }

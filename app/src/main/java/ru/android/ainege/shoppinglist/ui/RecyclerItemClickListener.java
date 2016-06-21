@@ -33,6 +33,10 @@ public class RecyclerItemClickListener extends RecyclerView.SimpleOnItemTouchLis
 
 			@Override
 			public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+				if (e1 == null || e2 == null) {
+					return false;
+				}
+
 				View childView = recyclerView.findChildViewUnder(e1.getX(), e1.getY());
 
 				if (childView != null && mListener != null) {
@@ -52,6 +56,10 @@ public class RecyclerItemClickListener extends RecyclerView.SimpleOnItemTouchLis
 
 	@Override
 	public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+		if (e == null) {
+			return false;
+		}
+
 		View childView = rv.findChildViewUnder(e.getX(), e.getY());
 
 		if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {

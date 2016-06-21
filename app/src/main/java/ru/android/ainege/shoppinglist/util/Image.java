@@ -119,9 +119,16 @@ public class Image {
 		if (!isExternalStorageReadable()) {
 			return false;
 		}
+		Bitmap bitmap;
 
-		Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-		if (bitmap == null) {
+		try {
+			bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+
+			if (bitmap == null) {
+				throw new NullPointerException("Bitmap is null");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 

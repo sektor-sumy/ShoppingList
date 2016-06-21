@@ -210,7 +210,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 					View focusedView = v.findFocus();
 
-					if (focusedView != null && !isViewVisible(focusedView)) {
+					if (focusedView != null && !(focusedView instanceof LinearLayout) && !isViewVisible(focusedView)) {
 						mAppBarLayout.setExpanded(false);
 					}
 				}

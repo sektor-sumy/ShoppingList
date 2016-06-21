@@ -90,7 +90,7 @@ public class ListsActivity extends SingleFragmentActivity implements ListsFragme
 			} else if (shouldOpenLastList()){
 				openLastList();
 			}
-		} else {
+		} else if (mIsTablet){
 			mCurrentScreen = savedInstanceState.getInt(STATE_SCREEN);
 			mLastSelectedListId = savedInstanceState.getLong(STATE_LAST_LIST_ID);
 			mLastSelectedItemId = savedInstanceState.getLong(STATE_LAST_ITEM_ID);
