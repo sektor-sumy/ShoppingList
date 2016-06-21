@@ -30,6 +30,13 @@ import ru.android.ainege.shoppinglist.util.Image;
 
 public class AddItemFragment extends ItemFragment {
 	private static final String ID_LIST = "idList";
+	private static final String STATE_ITEM_NAME = "state_item_name";
+	private static final String STATE_ADDED_AMOUNT = "state_added_amount";
+	private static final String STATE_ADDED_UNIT = "state_added_unit";
+	private static final String STATE_ADDED_PRICE = "state_added_price";
+	private static final String STATE_ADDED_CATEGORY = "state_added_category";
+	private static final String STATE_ADDED_COMMENT = "state_added_comment";
+	private static final String STATE_IS_SELECTED_ITEM = "state_is_selected_item";
 
 	private boolean mIsUseDefaultData = false;
 
@@ -65,12 +72,17 @@ public class AddItemFragment extends ItemFragment {
 
 		mIsUseDefaultData = mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_data), true);
 		mIsAdded = true;
-	}
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+		if (savedInstanceState != null) {
+			mItemName = savedInstanceState.getString(STATE_ITEM_NAME);
+			mAddedAmount = savedInstanceState.getString(STATE_ADDED_AMOUNT);
+			mIdAddedUnit = savedInstanceState.getLong(STATE_ADDED_UNIT);
+			mAddedPrice = savedInstanceState.getString(STATE_ADDED_PRICE);
+			mIdAddedCategory = savedInstanceState.getLong(STATE_ADDED_CATEGORY);
+			mAddedComment = savedInstanceState.getString(STATE_ADDED_COMMENT);
+
+			mIsSelectedItem = savedInstanceState.getBoolean(STATE_IS_SELECTED_ITEM);
+		}
 	}
 
 	@Override
@@ -94,6 +106,25 @@ public class AddItemFragment extends ItemFragment {
 		mName.setOnItemClickListener(getOnNameClickListener());
 		mCollapsingToolbarLayout.setTitle(getString(R.string.add));
 		mCollapsingToolbarLayout.setCollapsedTitleTextColor(ContextCompat.getColor(getActivity(), android.R.color.transparent));
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putString(STATE_ITEM_NAME, mItemName);
+		outState.putString(STATE_ADDED_AMOUNT, mAddedAmount);
+		outState.putLong(STATE_ADDED_UNIT, mIdAddedUnit);
+		outState.putString(STATE_ADDED_PRICE, mAddedPrice);
+		outState.putLong(STATE_ADDED_CATEGORY, mIdAddedCategory);
+		outState.putString(STATE_ADDED_COMMENT, mAddedComment);
+		outState.putBoolean(STATE_IS_SELECTED_ITEM, mIsSelectedItem);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 	}
 
 	@Override

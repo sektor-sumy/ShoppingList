@@ -11,12 +11,14 @@ import android.os.Bundle;
 import ru.android.ainege.shoppinglist.R;
 
 public class QuestionDialogFragment extends DialogFragment {
+	public static final String ID = "id";
 	private static final String MESSAGE = "message";
 	private static final String OK_CLICK = "okClick";
 
-	public static QuestionDialogFragment newInstance(String message) {
+	public static QuestionDialogFragment newInstance(String message, long id) {
 		Bundle args = new Bundle();
 		args.putString(MESSAGE, message);
+		args.putLong(ID, id);
 
 		QuestionDialogFragment fragment = new QuestionDialogFragment();
 		fragment.setArguments(args);
@@ -31,7 +33,7 @@ public class QuestionDialogFragment extends DialogFragment {
 				.setCancelable(true)
 				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						sendResult(Activity.RESULT_OK, null);
+						sendResult(Activity.RESULT_OK, new Intent().putExtra(ID, getArguments().getLong(ID)));
 					}
 				})
 				.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

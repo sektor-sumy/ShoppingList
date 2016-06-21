@@ -19,6 +19,7 @@
 	<string name="showcase_create_list_desc">Нажмите на \"плюсик\", чтобы создать новый список</string>
 	<string name="showcase_manage_list_desc">Нажмите на \"карандаш\" для изменения списка, а на \"корзину\" - для его удаления</string>
 	<string name="showcase_open_list_desc">Нажмите на карточку списка для его просмотра</string>
+	<string name="error_delete">Ошибка удаления</string>
 	<!--menu-->
 	<string name="add_list">"Добавить</string>
 	<string name="take_photo">"Сделать снимок</string>

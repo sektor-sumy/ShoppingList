@@ -109,31 +109,35 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	protected EditText mPrice;
 	protected Spinner mCategory;
 	protected EditText mComment;
-	protected ItemDS mItemDS;
-	protected ShoppingListDS mItemsInListDS;
-	protected ShoppingList mItemInList;
-	protected boolean mIsProposedItem = false;
-	protected SharedPreferences mPrefs;
-	protected boolean mIsUseNewItemInSpinner;
-	protected RetainedFragment dataFragment;
-	protected boolean mIsAdded = false;
 	private ToggleButton mIsBought;
 	private AppBarLayout mAppBarLayout;
 	private TextView mCurrency;
 	private ImageButton mCategorySettings;
 	private ImageButton mUnitSettings;
 	private LinearLayout mCategoryContainer;
-	private String mCurrencyList;
-	private File mFile;
 	private TextView mFinishPrice;
+
+	protected ItemDS mItemDS;
+	protected ShoppingListDS mItemsInListDS;
+	private OnItemChangeListener mItemChangeListener;
+
+	protected ShoppingList mItemInList;
 	protected long mIdSelectedUnit;
 	protected long mIdSelectedCategory;
+	protected boolean mIsProposedItem = false;
+	protected boolean mIsAdded = false;
+	private String mCurrencyList;
 	private boolean mIsOpenedKeyboard = false;
 	private boolean mIsExpandedAppbar = true;
-	protected boolean mIsUseCategory;
 	private boolean mIsCollapsedMode;
-	private OnItemChangeListener mItemChangeListener;
 	private int mScreenAppHeight;
+
+	protected SharedPreferences mPrefs;
+	protected boolean mIsUseNewItemInSpinner;
+	protected boolean mIsUseCategory;
+
+	protected RetainedFragment dataFragment;
+	private File mFile;
 
 	protected abstract TextWatcher getNameChangedListener();
 
@@ -469,7 +473,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	@Override
 	public void onBackPressed() {
 		if (mName.length() != 0) {
-			QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_save_item));
+			QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_save_item), -1);
 			dialogFrag.setTargetFragment(ItemFragment.this, IS_SAVE_CHANGES);
 			dialogFrag.show(getFragmentManager(), IS_SAVE_CHANGES_DATE);
 		} else {

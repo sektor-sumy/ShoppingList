@@ -391,7 +391,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			public boolean onMenuItemClick(MenuItem item) {
 				switch (item.getItemId()) {
 					case R.id.delete_list:
-						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + mList.getName() + "\"?");
+						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + mList.getName() + "\"?", -1);
 						dialogFrag.setTargetFragment(ShoppingListFragment.this, IS_DELETE_LIST);
 						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
 						mUpdateListListener.onOpenDialog(mList.getId());

@@ -29,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -49,6 +50,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
 	private static final String STATE_LISTS = "state_lists";
+	private static final String STATE_IS_UPDATE_DATA = "state_is_update_data";
 
 	private static final int ADD_LIST = 1;
 	private static final int EDIT_LIST = 2;
@@ -64,10 +66,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private OnListsLoadFinishedListener mOnListsLoadFinishedListener;
 
 	private ArrayList<List> mLists = new ArrayList<>();
-	private ArrayList<List> mSaveListRotate;
 	private ListsDS mListsDS;
-	private int mPositionForDelete;
-	private boolean mIsUpdateData = false;
 	private boolean mIsLandscapeTablet;
 	private long mAddIdList = -1;
 
@@ -76,6 +75,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ImageButton mAddButton;
 	private ProgressBar mProgressBar;
 	private ImageView mEmptyImage;
+
+	private ArrayList<List> mSaveListRotate;
+	private boolean mIsUpdateData = false;
 
 	private Handler mHandler = new Handler()  {
 		@Override
@@ -130,6 +132,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		if (savedInstanceState != null) {
 			mSaveListRotate = (ArrayList<List>) savedInstanceState.getSerializable(STATE_LISTS);
+			mIsUpdateData = savedInstanceState.getBoolean(STATE_IS_UPDATE_DATA);
 		}
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
@@ -199,6 +202,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		super.onSaveInstanceState(outState);
 
 		outState.putSerializable(STATE_LISTS, mLists);
+		outState.putBoolean(STATE_IS_UPDATE_DATA, mIsUpdateData);
 	}
 
 	@Override
@@ -211,7 +215,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		switch (requestCode) {
 			case ADD_LIST:
 				updateData();
-				mIsUpdateData = true;
 				mAddIdList = data.getLongExtra(ListDialogFragment.ID_LIST, -1);
 
 				if (mIsLandscapeTablet) {
@@ -223,20 +226,26 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				mListsChangeListener.onListUpdate(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
 				break;
 			case IS_DELETE_LIST:
-				List list = mLists.get(mPositionForDelete);
+				int position = getPosition(data.getLongExtra(QuestionDialogFragment.ID, -1));
+				if (position != -1) {
+					List list = mLists.get(position);
 
-				mListsDS.delete(list.getId());
-				mAdapterRV.removeItem(mPositionForDelete);
-				Image.deleteFile(list.getImagePath());
+					mListsDS.delete(list.getId());
+					mAdapterRV.removeItem(position);
+					Image.deleteFile(list.getImagePath());
 
-				if (mLists.size() > 0) {
-					hideEmptyStates();
-				} else {
-					showEmptyStates();
+					if (mLists.size() > 0) {
+						hideEmptyStates();
+					} else {
+						showEmptyStates();
+					}
+
+					mListsChangeListener.onListDelete(list.getId(), mLists.size() > 0 ? mLists.get(0).getId() : -1);
+					deleteSaveListFromSettings(list.getId());
+				} else{
+					Toast.makeText(getActivity(), getString(R.string.error_delete), Toast.LENGTH_SHORT).show();
 				}
 
-				mListsChangeListener.onListDelete(list.getId(), mLists.size() > 0 ? mLists.get(0).getId() : -1);
-				deleteSaveListFromSettings(list.getId());
 				break;
 			case SETTINGS:
 				long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
@@ -290,6 +299,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	public void scrollToList(long id) {
 		if (id != -1) {
 			mListsRV.scrollToPosition(getPosition(id));
+			mAddIdList = -1;
 		}
 	}
 
@@ -462,7 +472,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		@Override
 		public int getItemCount() {
-			return mLists != null ? mLists.size() : 0;
+			return mLists.size();
 		}
 
 		@Override
@@ -541,10 +551,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				mDelete.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						mPositionForDelete = getAdapterPosition();
-						List list = mLists.get(mPositionForDelete);
+						int itemPosition = getAdapterPosition();
+						List list = mLists.get(itemPosition);
 
-						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + list.getName() + "\"?");
+						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + list.getName() + "\"?", list.getId());
 						dialogFrag.setTargetFragment(ListsFragment.this, IS_DELETE_LIST);
 						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
 						mListsChangeListener.onOpenDialog(list.getId());
