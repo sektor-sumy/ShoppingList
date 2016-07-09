@@ -1,5 +1,5 @@
 <resources>
-	<string name="app_name">Dev За покупками</string>
+	<string name="app_name">За покупками</string>
 
 	<string name="error_file_not_create">Не удалось создать файл</string>
 	<string name="error_bitmap">Произошла ошибка обработки</string>
