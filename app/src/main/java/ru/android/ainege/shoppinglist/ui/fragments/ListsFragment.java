@@ -1,6 +1,5 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
@@ -36,6 +35,7 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
+import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
 import ru.android.ainege.shoppinglist.util.Image;
@@ -62,7 +62,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final int DATA_LOADER = 0;
 	private static final int HANDLER_LOAD_FINISHED = 1;
 
-	private OnListsChangeListener mListsChangeListener;
+	private OnListSelectListener mOnListSelectListener;
+	private OnListChangedListener mOnListChangedListener; // TODO: 11.07.2016 check for null
+	private OnDialogShownListener mOnDialogShownListener;
 	private OnListsLoadFinishedListener mOnListsLoadFinishedListener;
 
 	private ArrayList<List> mLists = new ArrayList<>();
@@ -88,37 +90,20 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 	};
 
+	public interface OnListSelectListener {
+		void onListClick(long id);
+	}
 
-	public interface OnListsChangeListener {
-		void onListSelect(long id);
-		void onListUpdate(long id);
-		void onListDelete(long idDeletedList, long idNewList);
+	public interface OnListChangedListener {
+		void onListUpdated(long id);
+		void onListDeleted(long idDeletedList, long idNewList);
 		void updateCurrentList();
 		long getLastSelectedListId();
 		void onShowCaseShown();
-		void onOpenDialog(long id);
-		void onCloseDialog();
 	}
 
 	public interface OnListsLoadFinishedListener {
 		void onLoadFinished(ArrayList<List> lists);
-	}
-
-	@TargetApi(23)
-	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
-		mListsChangeListener = (OnListsChangeListener) getActivity();
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-			mListsChangeListener = (OnListsChangeListener) getActivity();
-		}
 	}
 
 	@Override
@@ -163,7 +148,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				ListDialogFragment addListDialog = new ListDialogFragment();
 				addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
 				addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
-				mListsChangeListener.onOpenDialog(-1);
+				mOnDialogShownListener.onOpenDialog(-1);
 			}
 		});
 
@@ -194,7 +179,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		mListsChangeListener = null;
+		mOnListChangedListener = null;
 	}
 
 	@Override
@@ -208,7 +193,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == ADD_LIST || requestCode == EDIT_LIST || requestCode == IS_DELETE_LIST) {
-			mListsChangeListener.onCloseDialog();
+			mOnDialogShownListener.onCloseDialog();
 		}
 		if (resultCode != Activity.RESULT_OK) return;
 
@@ -218,12 +203,12 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				mAddIdList = data.getLongExtra(ListDialogFragment.ID_LIST, -1);
 
 				if (mIsLandscapeTablet) {
-					mListsChangeListener.onListSelect(mAddIdList);
+					mOnListSelectListener.onListClick(mAddIdList);
 				}
 				break;
 			case EDIT_LIST:
 				updateData();
-				mListsChangeListener.onListUpdate(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
+				mOnListChangedListener.onListUpdated(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
 				break;
 			case IS_DELETE_LIST:
 				int position = getPosition(data.getLongExtra(QuestionDialogFragment.ID, -1));
@@ -240,7 +225,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						showEmptyStates();
 					}
 
-					mListsChangeListener.onListDelete(list.getId(), mLists.size() > 0 ? mLists.get(0).getId() : -1);
+					mOnListChangedListener.onListDeleted(list.getId(), mLists.size() > 0 ? mLists.get(0).getId() : -1);
 					deleteSaveListFromSettings(list.getId());
 				} else{
 					Toast.makeText(getActivity(), getString(R.string.error_delete), Toast.LENGTH_SHORT).show();
@@ -250,7 +235,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			case SETTINGS:
 				long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
 				if (modifyCatalog != -1) {
-					mListsChangeListener.updateCurrentList();
+					mOnListChangedListener.updateCurrentList();
 				}
 				break;
 		}
@@ -294,6 +279,28 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 
+	}
+
+	public void setListeners(OnListSelectListener onListSelectListener, OnListChangedListener onListChangedListener, OnDialogShownListener onDialogShownListener) {
+		setOnListSelectListener(onListSelectListener);
+		setListeners(onListChangedListener, onDialogShownListener);
+	}
+
+	public void setListeners(OnListChangedListener onListChangedListener, OnDialogShownListener onDialogShownListener) {
+		setOnListChangedListener(onListChangedListener);
+		setOnDialogShownListener(onDialogShownListener);
+	}
+
+	public void setOnListSelectListener(OnListSelectListener onListSelectListener) {
+		mOnListSelectListener = onListSelectListener;
+	}
+
+	public void setOnListChangedListener(OnListChangedListener onListChangedListener) {
+		mOnListChangedListener = onListChangedListener;
+	}
+
+	public void setOnDialogShownListener(OnDialogShownListener onDialogShownListener) {
+		mOnDialogShownListener = onDialogShownListener;
 	}
 
 	public void scrollToList(long id) {
@@ -344,7 +351,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		hideEmptyStates();
 
 		if (mIsLandscapeTablet) {
-			scrollToList(mListsChangeListener.getLastSelectedListId());
+			scrollToList(mOnListChangedListener.getLastSelectedListId());
 		} else {
 			scrollToList(mAddIdList);
 		}
@@ -426,7 +433,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			@Override
 			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
 				if (i == 1) {
-					mListsChangeListener.onShowCaseShown();
+					mOnListChangedListener.onShowCaseShown();
 				}
 			}
 		});
@@ -544,7 +551,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						ListDialogFragment editListDialog = ListDialogFragment.newInstance(list);
 						editListDialog.setTargetFragment(ListsFragment.this, EDIT_LIST);
 						editListDialog.show(getFragmentManager(), EDIT_LIST_DATE);
-						mListsChangeListener.onOpenDialog(list.getId());
+						mOnDialogShownListener.onOpenDialog(list.getId());
 					}
 				});
 
@@ -557,7 +564,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + list.getName() + "\"?", list.getId());
 						dialogFrag.setTargetFragment(ListsFragment.this, IS_DELETE_LIST);
 						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
-						mListsChangeListener.onOpenDialog(list.getId());
+						mOnDialogShownListener.onOpenDialog(list.getId());
 					}
 				});
 
@@ -569,7 +576,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 						if (itemPosition != RecyclerView.NO_POSITION) {
 							List list = mLists.get(itemPosition);
-							mListsChangeListener.onListSelect(list.getId());
+							mOnListSelectListener.onListClick(list.getId());
 						}
 					}
 				});

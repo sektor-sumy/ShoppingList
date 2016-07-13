@@ -13,7 +13,7 @@ public class ItemActivity extends SingleFragmentActivity {
 	public final static String EXTRA_ITEM = "item";
 	private final static String FRAGMENT_TAG = "item_activity_tag";
 
-	private OnBackPressedInterface mOnBackPressedListener;
+	private OnBackPressedInterface mOnBackPressedListener; //// TODO: 11.07.2016 later
 
 	@Override
 	protected Fragment getFragment() {

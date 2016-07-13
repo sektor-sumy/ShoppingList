@@ -8,15 +8,17 @@ import android.os.Build;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 
-public class ShoppingListActivity extends SingleFragmentActivity implements ShoppingListFragment.OnListChangeListener, ShoppingListFragment.OnUpdateListListener {
+public class ShoppingListActivity extends SingleFragmentActivity implements ShoppingListFragment.OnClickListener {
 	public final static String EXTRA_ID_LIST = "idList";
 	private static final String SHOPPING_LIST_TAG = "shopping_list_tag_activity";
 
 	@Override
 	protected Fragment getFragment() {
 		long idList = getIntent().getLongExtra(EXTRA_ID_LIST, -1);
+		ShoppingListFragment fragment = ShoppingListFragment.newInstance(idList);
+		fragment.setOnClickListener(this);
 
-		return ShoppingListFragment.newInstance(idList);
+		return fragment;
 	}
 
 	@Override
@@ -59,45 +61,5 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 		} else {
 			startActivityForResult(i, ShoppingListFragment.EDIT_ITEM);
 		}
-	}
-
-	@Override
-	public void onItemSetBought(ShoppingList item) {
-
-	}
-
-	@Override
-	public void onItemDelete() {
-
-	}
-
-	@Override
-	public void updateItem(String setting) {
-
-	}
-
-	@Override
-	public long getLastSelectedItemId() {
-		return 0;
-	}
-
-	@Override
-	public void onListDelete(long id) {
-		onBackPressed();
-	}
-
-	@Override
-	public void onOpenDialog(long id) {
-
-	}
-
-	@Override
-	public void onCloseDialog() {
-
-	}
-
-	@Override
-	public void onListUpdate() {
-
 	}
 }

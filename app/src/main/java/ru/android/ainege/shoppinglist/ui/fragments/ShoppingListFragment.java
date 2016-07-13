@@ -1,6 +1,5 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
@@ -51,6 +50,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingList
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
@@ -88,8 +88,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private ListsDS mListsDS;
 	private List mList;
 
-	private OnUpdateListListener mUpdateListListener;
-	private OnListChangeListener mListChangeListener;
+	private OnClickListener mOnClickListener;
+	private OnListChangedListener mOnListChangedListener;
+	private OnItemChangedListener mOnItemChangedListener;
+	private OnDialogShownListener mOnDialogShownListener;
 
 	private java.util.List<Object> mSaveListRotate;
 	private boolean mIsStartActionMode;
@@ -133,7 +135,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				return false;
 			}
 
-			mUpdateListListener.onOpenDialog(mList.getId());
+			mOnDialogShownListener.onOpenDialog(mList.getId());
 			mFAB.setVisibility(View.GONE);
 			if (!mIsStartActionMode) {
 				mAdapterRV.extendAllCategory(false);
@@ -167,7 +169,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			mAdapterRV.recoveryCollapseAllCategory();
 			mAdapterRV.clearSelections();
-			mUpdateListListener.onCloseDialog();
+			mOnDialogShownListener.onCloseDialog();
 		}
 	};
 
@@ -181,40 +183,21 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		return fragment;
 	}
 
-	public interface OnUpdateListListener {
-		void onListUpdate();
-		void onListDelete(long idDeletedList);
-		void onOpenDialog(long idList);
-		void onCloseDialog();
-	}
-
-	public interface OnListChangeListener {
+	public interface OnClickListener {
 		void onItemAdd(long id);
 		void onItemSelect(ShoppingList item);
+	}
+
+	public interface OnListChangedListener {
+		void onListUpdated();
+		void onListDeleted(long idDeletedList);
+	}
+
+	public interface OnItemChangedListener {
 		void onItemSetBought(ShoppingList item);
 		void onItemDelete();
 		void updateItem(String setting);
 		long getLastSelectedItemId();
-	}
-
-	@TargetApi(23)
-	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
-
-		mUpdateListListener = (OnUpdateListListener) getActivity();
-		mListChangeListener = (OnListChangeListener) getActivity();
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-			mUpdateListListener = (OnUpdateListListener) getActivity();
-			mListChangeListener = (OnListChangeListener) getActivity();
-		}
 	}
 
 	@Override
@@ -276,7 +259,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mListChangeListener.onItemAdd(mList.getId());
+				mOnClickListener.onItemAdd(mList.getId());
 			}
 		});
 
@@ -369,8 +352,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		mUpdateListListener = null;
-		mListChangeListener = null;
+		mOnListChangedListener = null;
+		mOnItemChangedListener = null;
 	}
 
 	@Override
@@ -394,13 +377,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + mList.getName() + "\"?", -1);
 						dialogFrag.setTargetFragment(ShoppingListFragment.this, IS_DELETE_LIST);
 						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
-						mUpdateListListener.onOpenDialog(mList.getId());
+						mOnDialogShownListener.onOpenDialog(mList.getId());
 						return true;
 					case R.id.update_list:
 						ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
 						editListDialog.setTargetFragment(ShoppingListFragment.this, EDIT_LIST);
 						editListDialog.show(getFragmentManager(), EDIT_ITEM_DATE);
-						mUpdateListListener.onOpenDialog(mList.getId());
+						mOnDialogShownListener.onOpenDialog(mList.getId());
 						return true;
 					case R.id.settings:
 						Intent i = new Intent(getActivity(), SettingsActivity.class);
@@ -453,7 +436,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == EDIT_LIST || requestCode == IS_DELETE_LIST) {
-			mUpdateListListener.onCloseDialog();
+			mOnDialogShownListener.onCloseDialog();
 		}
 		if (resultCode != Activity.RESULT_OK) return;
 
@@ -468,12 +451,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				Image.deleteFile(mList.getImagePath());
 
 				saveId(-1);
-				mUpdateListListener.onListDelete(mList.getId());
+				mOnListChangedListener.onListDeleted(mList.getId());
 				break;
 			case EDIT_LIST:
 				updateList();
-				mUpdateListListener.onListUpdate();
-				mListChangeListener.updateItem(getString(R.string.settings_key_currency));
+				mOnListChangedListener.onListUpdated();
+				mOnItemChangedListener.updateItem(getString(R.string.settings_key_currency));
 				break;
 			case SETTINGS:
 				long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
@@ -481,10 +464,34 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					setList(getArguments().getLong(ID_LIST));
 					mAdapterRV.setCurrency(mList.getCurrency().getSymbol(), false);
 					updateData();
-					mListChangeListener.updateItem(null);
+					mOnItemChangedListener.updateItem(null);
 				}
 				break;
 		}
+	}
+
+	public void setListeners(OnClickListener onClickListener, OnListChangedListener onListChangedListener,
+	                         OnItemChangedListener onItemChangedListener, OnDialogShownListener onDialogShownListener) {
+		setOnClickListener(onClickListener);
+		setOnListChangedListener(onListChangedListener);
+		setOnItemChangedListener(onItemChangedListener);
+		setOnDialogShownListener(onDialogShownListener);
+	}
+
+	public void setOnClickListener(OnClickListener onClickListener) {
+		mOnClickListener = onClickListener;
+	}
+
+	public void setOnListChangedListener(OnListChangedListener onListChangedListener) {
+		mOnListChangedListener = onListChangedListener;
+	}
+
+	public void setOnItemChangedListener(OnItemChangedListener onItemChangedListener) {
+		mOnItemChangedListener = onItemChangedListener;
+	}
+
+	public void setOnDialogShownListener(OnDialogShownListener onDialogShownListener) {
+		mOnDialogShownListener = onDialogShownListener;
 	}
 
 	public void updateList() {
@@ -571,7 +578,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	public void updateData() {
 		mSaveListRotate = null;
-		mUpdateListListener.onListUpdate();
+		mOnListChangedListener.onListUpdated();
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
@@ -626,15 +633,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mIsUpdateData = true;
 				readCategorySetting();
 				updateMenu();
-				mListChangeListener.updateItem(getString(R.string.settings_key_use_category));
+				mOnItemChangedListener.updateItem(getString(R.string.settings_key_use_category));
 			} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
 				mIsUpdateData = true;
 				readCollapseCategorySetting();
 				updateMenu();
 			} else if (key.equals(getString(R.string.settings_key_transition))) {
-				mListChangeListener.updateItem(getString(R.string.settings_key_transition));
+				mOnItemChangedListener.updateItem(getString(R.string.settings_key_transition));
 			} else if (key.equals(getString(R.string.settings_key_fast_edit))) {
-				mListChangeListener.updateItem(getString(R.string.settings_key_fast_edit));
+				mOnItemChangedListener.updateItem(getString(R.string.settings_key_fast_edit));
 			}
 		}
 	}
@@ -744,7 +751,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			return;
 		}
 
-		mListChangeListener.onItemSelect(itemInList);
+		mOnClickListener.onItemSelect(itemInList);
 	}
 
 	private void onItemClick(Category category, int position) {
@@ -831,12 +838,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		updateSpentSum(mSaveSpentMoney);
 		mAdapterRV.notifyItemChanged(categoryPosition);
 
-		mUpdateListListener.onListUpdate();
-		mListChangeListener.onItemSetBought(itemInList);
+		mOnListChangedListener.onListUpdated();
+		mOnItemChangedListener.onItemSetBought(itemInList);
 	}
 
 	private void deleteSelectedItems() {
-		boolean isDeleteOpenItem = mAdapterRV.isContainsInSelected(mListChangeListener.getLastSelectedItemId());
+		boolean isDeleteOpenItem = mAdapterRV.isContainsInSelected(mOnItemChangedListener.getLastSelectedItemId());
 		mAdapterRV.removeSelected();
 
 		if (mAdapterRV.getItemCount() > 0) {
@@ -845,16 +852,16 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			if (isDeleteOpenItem) {
 				ShoppingList item = (ShoppingList) (mIsUseCategory ? mAdapterRV.getListItem(1) : mAdapterRV.getListItem(0));
-				mListChangeListener.onItemSelect(item);
+				mOnClickListener.onItemSelect(item);
 			}
 		} else {
 			showEmptyStates();
 			mActionMode.finish();
 
-			mListChangeListener.onItemDelete();
+			mOnItemChangedListener.onItemDelete();
 		}
 
-		mUpdateListListener.onListUpdate();
+		mOnListChangedListener.onListUpdated();
 	}
 
 	//<editor-fold desc="Counting the amount of list">
