@@ -10,14 +10,14 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import ru.android.ainege.shoppinglist.db.ITable;
-import ru.android.ainege.shoppinglist.db.ITable.IItemData;
-import ru.android.ainege.shoppinglist.db.ITable.IShoppingLists;
+import ru.android.ainege.shoppinglist.db.TableInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.ItemDataInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.ShoppingListsInterface;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 
-public class CategoriesDS extends DictionaryDS<Category> implements ITable.ICategories{
+public class CategoriesDS extends DictionaryDS<Category> implements TableInterface.CategoriesInterface {
 
 	public CategoriesDS(Context context) {
 		super(context);
@@ -70,11 +70,11 @@ public class CategoriesDS extends DictionaryDS<Category> implements ITable.ICate
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + TABLE_NAME + ".*" +
 				" FROM " + TABLE_NAME +
-				" INNER JOIN " + IItemData.TABLE_NAME +
-				" ON " + TABLE_NAME + "." + COLUMN_ID + " = " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID_CATEGORY +
-				" INNER JOIN " + IShoppingLists.TABLE_NAME +
-				" ON " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID + " = " + IShoppingLists.TABLE_NAME + "." + IShoppingLists.COLUMN_ID_DATA +
-				" WHERE " + IShoppingLists.TABLE_NAME + "." + IShoppingLists.COLUMN_ID_LIST + " = ?" +
+				" INNER JOIN " + ItemDataInterface.TABLE_NAME +
+				" ON " + TABLE_NAME + "." + COLUMN_ID + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY +
+				" INNER JOIN " + ShoppingListsInterface.TABLE_NAME +
+				" ON " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID + " = " + ShoppingListsInterface.TABLE_NAME + "." + ShoppingListsInterface.COLUMN_ID_DATA +
+				" WHERE " + ShoppingListsInterface.TABLE_NAME + "." + ShoppingListsInterface.COLUMN_ID_LIST + " = ?" +
 				" GROUP BY " + TABLE_NAME + "." + COLUMN_NAME +
 				" ORDER BY " + COLUMN_NAME;
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(idList)});
@@ -84,7 +84,7 @@ public class CategoriesDS extends DictionaryDS<Category> implements ITable.ICate
 	@Override
 	public boolean isUsed(long idCategory) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(IItemData.TABLE_NAME, null, IItemData.COLUMN_ID_CATEGORY + " = " + idCategory,
+		Cursor cursor = db.query(ItemDataInterface.TABLE_NAME, null, ItemDataInterface.COLUMN_ID_CATEGORY + " = " + idCategory,
 				null, null, null, null);
 		boolean result = cursor.getCount() > 0;
 		cursor.close();

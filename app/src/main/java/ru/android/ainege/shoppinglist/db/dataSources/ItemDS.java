@@ -5,13 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import ru.android.ainege.shoppinglist.db.ITable;
-import ru.android.ainege.shoppinglist.db.ITable.ICategories;
-import ru.android.ainege.shoppinglist.db.ITable.IItemData;
+import ru.android.ainege.shoppinglist.db.TableInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.CategoriesInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.ItemDataInterface;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
 
-public class ItemDS extends GenericDS<Item> implements ITable.IItems {
+public class ItemDS extends GenericDS<Item> implements TableInterface.ItemsInterface {
 
 	public ItemDS(Context context) {
 		super(context);
@@ -35,27 +35,27 @@ public class ItemDS extends GenericDS<Item> implements ITable.IItems {
 	private Cursor getFullData(String where, String[] params) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		return db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
-				IItemData.COLUMN_AMOUNT + ", " +
-				IItemData.COLUMN_ID_UNIT + ", " +
-				IItemData.COLUMN_PRICE + ", " +
-				IItemData.COLUMN_ID_CATEGORY + ", " +
-				IItemData.COLUMN_COMMENT +
-				" FROM " + TABLE_NAME + " INNER JOIN " + IItemData.TABLE_NAME + " ON " +
-				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID +
+				ItemDataInterface.COLUMN_AMOUNT + ", " +
+				ItemDataInterface.COLUMN_ID_UNIT + ", " +
+				ItemDataInterface.COLUMN_PRICE + ", " +
+				ItemDataInterface.COLUMN_ID_CATEGORY + ", " +
+				ItemDataInterface.COLUMN_COMMENT +
+				" FROM " + TABLE_NAME + " INNER JOIN " + ItemDataInterface.TABLE_NAME + " ON " +
+				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
 				where, params);
 	}
 
 	public Cursor getNames(String substring) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
-				ICategories.TABLE_NAME + "." + ICategories.COLUMN_COLOR +
+				CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_COLOR +
 				" FROM " + TABLE_NAME +
-				" INNER JOIN " + IItemData.TABLE_NAME +
+				" INNER JOIN " + ItemDataInterface.TABLE_NAME +
 				" ON " + TABLE_NAME + "." + COLUMN_ID_DATA + " = " +
-				IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID +
-				" INNER JOIN " + ICategories.TABLE_NAME +
-				" ON " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID_CATEGORY + " = " +
-				ICategories.TABLE_NAME + "." + ICategories.COLUMN_ID +
+				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
+				" INNER JOIN " + CategoriesInterface.TABLE_NAME +
+				" ON " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " +
+				CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID +
 				" WHERE " + COLUMN_NAME + " LIKE '%" + substring + "%'", null);
 		return cursor;
 	}
@@ -109,12 +109,12 @@ public class ItemDS extends GenericDS<Item> implements ITable.IItems {
 
 			Item item = new Item(id, name, defaultImagePath, imagePath, idData);
 
-			if (getColumnIndex(IItemData.COLUMN_AMOUNT) != -1) {
-				item.setAmount(getDouble(getColumnIndex(IItemData.COLUMN_AMOUNT)));
-				item.setIdUnit(getLong(getColumnIndex(IItemData.COLUMN_ID_UNIT)));
-				item.setPrice(getDouble(getColumnIndex(IItemData.COLUMN_PRICE)));
-				item.setIdCategory(getLong(getColumnIndex(IItemData.COLUMN_ID_CATEGORY)));
-				item.setComment(getString(getColumnIndex(IItemData.COLUMN_COMMENT)));
+			if (getColumnIndex(ItemDataInterface.COLUMN_AMOUNT) != -1) {
+				item.setAmount(getDouble(getColumnIndex(ItemDataInterface.COLUMN_AMOUNT)));
+				item.setIdUnit(getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_UNIT)));
+				item.setPrice(getDouble(getColumnIndex(ItemDataInterface.COLUMN_PRICE)));
+				item.setIdCategory(getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_CATEGORY)));
+				item.setComment(getString(getColumnIndex(ItemDataInterface.COLUMN_COMMENT)));
 			}
 
 			return item;

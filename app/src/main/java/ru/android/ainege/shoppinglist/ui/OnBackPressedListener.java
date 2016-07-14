@@ -1,5 +1,5 @@
 package ru.android.ainege.shoppinglist.ui;
 
-public interface OnBackPressed {
+public interface OnBackPressedListener {
 	boolean onBackPressed();
 }

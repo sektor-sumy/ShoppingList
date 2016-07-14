@@ -7,7 +7,7 @@ import android.widget.Toast;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 
-import ru.android.ainege.shoppinglist.ui.OnBackPressed;
+import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.activities.lists.TabletState;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
@@ -19,7 +19,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 		ShoppingListFragment.OnItemChangedListener, ItemFragment.OnItemChangedListener {
 	public static final int SCREEN_ID = 3;
 
-	private OnBackPressed mOnBackPressedListener;
+	private OnBackPressedListener mOnBackPressedListener;
 
 	private long mIdForAdd = -1;
 	private ShoppingList mItemForEdit = null;
@@ -191,7 +191,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 		}
 	}
 
-	public void setOnBackPressedListener(OnBackPressed onBackPressedListener) {
+	public void setOnBackPressedListener(OnBackPressedListener onBackPressedListener) {
 		mOnBackPressedListener = onBackPressedListener;
 	}
 

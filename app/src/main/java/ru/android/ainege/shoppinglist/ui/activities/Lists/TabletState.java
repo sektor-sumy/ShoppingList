@@ -24,7 +24,7 @@ import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
-public class TabletState implements IState, OnDialogShownListener,
+public class TabletState implements StateInterface, OnDialogShownListener,
 		ShoppingListFragment.OnListChangedListener, ShoppingListFragment.OnClickListener {
 	public static final String SHOPPING_LIST_TAG = "shopping_list_tag";
 	public static final String ITEM_TAG = "item_tag";
@@ -84,6 +84,7 @@ public class TabletState implements IState, OnDialogShownListener,
 			mShouldBackPressed = savedInstanceState.getInt(STATE_SHOULD_BACK_PRESSED);
 			int idScreen = savedInstanceState.getInt(STATE_SCREEN);
 
+			//for retained tablet with open dialog
 			if (!mIsLandscape && mShouldBackPressed != DIALOG_BEHAVIOUR_DEFAULT) {
 				idScreen--;
 			} else if (mIsLandscape && mShouldBackPressed == DIALOG_BEHAVIOUR_ITEM) {

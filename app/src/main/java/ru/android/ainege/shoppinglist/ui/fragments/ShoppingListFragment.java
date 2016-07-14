@@ -135,8 +135,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				return false;
 			}
 
-			mOnDialogShownListener.onOpenDialog(mList.getId());
+			if (mOnDialogShownListener != null) {
+				mOnDialogShownListener.onOpenDialog(mList.getId());
+			}
+
 			mFAB.setVisibility(View.GONE);
+
 			if (!mIsStartActionMode) {
 				mAdapterRV.extendAllCategory(false);
 			}
@@ -169,7 +173,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			mAdapterRV.recoveryCollapseAllCategory();
 			mAdapterRV.clearSelections();
-			mOnDialogShownListener.onCloseDialog();
+
+			if (mOnDialogShownListener != null) {
+				mOnDialogShownListener.onCloseDialog();
+			}
 		}
 	};
 
@@ -379,13 +386,19 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + mList.getName() + "\"?", -1);
 						dialogFrag.setTargetFragment(ShoppingListFragment.this, IS_DELETE_LIST);
 						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
-						mOnDialogShownListener.onOpenDialog(mList.getId());
+
+						if (mOnDialogShownListener != null) {
+							mOnDialogShownListener.onOpenDialog(mList.getId());
+						}
 						return true;
 					case R.id.update_list:
 						ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
 						editListDialog.setTargetFragment(ShoppingListFragment.this, EDIT_LIST);
 						editListDialog.show(getFragmentManager(), EDIT_ITEM_DATE);
-						mOnDialogShownListener.onOpenDialog(mList.getId());
+
+						if (mOnDialogShownListener != null) {
+							mOnDialogShownListener.onOpenDialog(mList.getId());
+						}
 						return true;
 					case R.id.settings:
 						Intent i = new Intent(getActivity(), SettingsActivity.class);
@@ -437,7 +450,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == EDIT_LIST || requestCode == IS_DELETE_LIST) {
+		if (mOnDialogShownListener != null && (requestCode == EDIT_LIST || requestCode == IS_DELETE_LIST)) {
 			mOnDialogShownListener.onCloseDialog();
 		}
 		if (resultCode != Activity.RESULT_OK) return;
@@ -473,7 +486,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					setList(getArguments().getLong(ID_LIST));
 					mAdapterRV.setCurrency(mList.getCurrency().getSymbol(), false);
 					updateData();
-					mOnItemChangedListener.updateItem(null);
+
+					if (mOnItemChangedListener != null) {
+						mOnItemChangedListener.updateItem(null);
+					}
 				}
 				break;
 		}
@@ -644,14 +660,17 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mIsUpdateData = true;
 				readCategorySetting();
 				updateMenu();
-				mOnItemChangedListener.updateItem(getString(R.string.settings_key_use_category));
+
+				if (mOnItemChangedListener != null) {
+					mOnItemChangedListener.updateItem(getString(R.string.settings_key_use_category));
+				}
 			} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
 				mIsUpdateData = true;
 				readCollapseCategorySetting();
 				updateMenu();
-			} else if (key.equals(getString(R.string.settings_key_transition))) {
+			} else if (key.equals(getString(R.string.settings_key_transition)) && mOnItemChangedListener != null) {
 				mOnItemChangedListener.updateItem(getString(R.string.settings_key_transition));
-			} else if (key.equals(getString(R.string.settings_key_fast_edit))) {
+			} else if (key.equals(getString(R.string.settings_key_fast_edit)) && mOnItemChangedListener != null) {
 				mOnItemChangedListener.updateItem(getString(R.string.settings_key_fast_edit));
 			}
 		}
@@ -851,12 +870,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		updateSpentSum(mSaveSpentMoney);
 		mAdapterRV.notifyItemChanged(categoryPosition);
 
-		mOnListChangedListener.onListUpdated();
-		mOnItemChangedListener.onItemSetBought(itemInList);
+		if (mOnListChangedListener != null) {
+			mOnListChangedListener.onListUpdated();
+		}
+
+		if (mOnItemChangedListener != null) {
+			mOnItemChangedListener.onItemSetBought(itemInList);
+		}
 	}
 
 	private void deleteSelectedItems() {
-		boolean isDeleteOpenItem = mAdapterRV.isContainsInSelected(mOnItemChangedListener.getLastSelectedItemId());
+		boolean isDeleteOpenItem = false;
+
+		if (mOnItemChangedListener != null) {
+			isDeleteOpenItem = mAdapterRV.isContainsInSelected(mOnItemChangedListener.getLastSelectedItemId());
+		}
+
 		mAdapterRV.removeSelected();
 
 		if (mAdapterRV.getItemCount() > 0) {
@@ -871,10 +900,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			showEmptyStates();
 			mActionMode.finish();
 
-			mOnItemChangedListener.onItemDelete();
+			if (mOnItemChangedListener != null) {
+				mOnItemChangedListener.onItemDelete();
+			}
 		}
 
-		mOnListChangedListener.onListUpdated();
+		if (mOnListChangedListener != null) {
+			mOnListChangedListener.onListUpdated();
+		}
 	}
 
 	//<editor-fold desc="Counting the amount of list">

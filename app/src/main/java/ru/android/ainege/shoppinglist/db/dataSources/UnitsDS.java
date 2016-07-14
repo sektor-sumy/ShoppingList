@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.db.entities.Unit;
-import ru.android.ainege.shoppinglist.db.ITable;
-import ru.android.ainege.shoppinglist.db.ITable.IItemData;
+import ru.android.ainege.shoppinglist.db.TableInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.ItemDataInterface;
 
-public class UnitsDS extends DictionaryDS<Unit> implements ITable.IUnits {
+public class UnitsDS extends DictionaryDS<Unit> implements TableInterface.UnitsInterface {
 
 	public UnitsDS(Context context) {
 		super(context);
@@ -65,7 +65,7 @@ public class UnitsDS extends DictionaryDS<Unit> implements ITable.IUnits {
 	@Override
 	public boolean isUsed(long idUnit) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(IItemData.TABLE_NAME, null, IItemData.COLUMN_ID_UNIT + " = " + idUnit,
+		Cursor cursor = db.query(ItemDataInterface.TABLE_NAME, null, ItemDataInterface.COLUMN_ID_UNIT + " = " + idUnit,
 				null, null, null, null);
 		boolean result = cursor.getCount() > 0;
 		cursor.close();

@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
-import ru.android.ainege.shoppinglist.ui.OnBackPressed;
+import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 
-public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnBackPressed {
+public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnBackPressedListener {
 	public static final String LAST_EDIT = "lastEdit";
 	protected static final int ADD = 1;
 	protected static final int EDIT = 2;

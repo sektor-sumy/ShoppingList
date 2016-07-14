@@ -5,13 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import ru.android.ainege.shoppinglist.db.ITable;
-import ru.android.ainege.shoppinglist.db.ITable.ICurrencies;
-import ru.android.ainege.shoppinglist.db.ITable.IShoppingLists;
+import ru.android.ainege.shoppinglist.db.TableInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.CurrenciesInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.ShoppingListsInterface;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.entities.List;
 
-public class ListsDS extends GenericDS<List> implements ITable.ILists {
+public class ListsDS extends GenericDS<List> implements TableInterface.ListsInterface {
 
 	public ListsDS(Context context) {
 		super(context);
@@ -22,13 +22,13 @@ public class ListsDS extends GenericDS<List> implements ITable.ILists {
 	public ListCursor getAll() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + TABLE_NAME + ".*, " +
-				"SUM(" + IShoppingLists.TABLE_NAME + "." + IShoppingLists.COLUMN_IS_BOUGHT +
+				"SUM(" + ShoppingListsInterface.TABLE_NAME + "." + ShoppingListsInterface.COLUMN_IS_BOUGHT +
 				") AS " + ListCursor.AMOUNT_BOUGHT_ITEMS + ", " +
-				"COUNT(" + IShoppingLists.TABLE_NAME + "." + IShoppingLists.COLUMN_ID_ITEM +
+				"COUNT(" + ShoppingListsInterface.TABLE_NAME + "." + ShoppingListsInterface.COLUMN_ID_ITEM +
 				") AS " + ListCursor.AMOUNT_ITEMS + " " +
-				"FROM " + TABLE_NAME + " left join " + IShoppingLists.TABLE_NAME + " " +
+				"FROM " + TABLE_NAME + " left join " + ShoppingListsInterface.TABLE_NAME + " " +
 				"ON " + TABLE_NAME + "." + COLUMN_ID + " = " +
-				IShoppingLists.TABLE_NAME + "." + IShoppingLists.COLUMN_ID_LIST + " " +
+				ShoppingListsInterface.TABLE_NAME + "." + ShoppingListsInterface.COLUMN_ID_LIST + " " +
 				"GROUP BY " + TABLE_NAME + "." + COLUMN_ID +
 				" ORDER BY " + COLUMN_ID + " DESC";
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -38,11 +38,11 @@ public class ListsDS extends GenericDS<List> implements ITable.ILists {
 	public ListCursor get(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + TABLE_NAME + ".*, " +
-				ICurrencies.TABLE_NAME + "." + ICurrencies.COLUMN_NAME + ", " +
-				ICurrencies.TABLE_NAME + "." + ICurrencies.COLUMN_SYMBOL + " " +
-				"FROM " + TABLE_NAME + " INNER JOIN " + ICurrencies.TABLE_NAME + " " +
+				CurrenciesInterface.TABLE_NAME + "." + CurrenciesInterface.COLUMN_NAME + ", " +
+				CurrenciesInterface.TABLE_NAME + "." + CurrenciesInterface.COLUMN_SYMBOL + " " +
+				"FROM " + TABLE_NAME + " INNER JOIN " + CurrenciesInterface.TABLE_NAME + " " +
 				"ON " + TABLE_NAME + "." + COLUMN_ID_CURRENCY + " = " +
-				ICurrencies.TABLE_NAME + "." + ICurrencies.COLUMN_ID + " " +
+				CurrenciesInterface.TABLE_NAME + "." + CurrenciesInterface.COLUMN_ID + " " +
 				"WHERE " + TABLE_NAME + "." + COLUMN_ID + " = ?";
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
 		return new ListCursor(cursor);
@@ -101,9 +101,9 @@ public class ListsDS extends GenericDS<List> implements ITable.ILists {
 
 			List list = new List(id, name, idCurrency, imagePath);
 
-			if (getColumnIndex(ICurrencies.COLUMN_NAME) != -1) {
-				String currencyName = getString(getColumnIndex(ICurrencies.COLUMN_NAME));
-				String currencySymbol = getString(getColumnIndex(ICurrencies.COLUMN_SYMBOL));
+			if (getColumnIndex(CurrenciesInterface.COLUMN_NAME) != -1) {
+				String currencyName = getString(getColumnIndex(CurrenciesInterface.COLUMN_NAME));
+				String currencySymbol = getString(getColumnIndex(CurrenciesInterface.COLUMN_SYMBOL));
 				list.setCurrency(new Currency(idCurrency, currencyName, currencySymbol));
 			}
 

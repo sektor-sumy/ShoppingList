@@ -18,7 +18,7 @@ public class ListsActivity extends SingleFragmentActivity {
 	static final String LISTS_TAG = "lists_tag";
 
 	private ListsFragment mListsFragment;
-	private IState mState = new PhoneState(this);
+	private StateInterface mState = new PhoneState(this);
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

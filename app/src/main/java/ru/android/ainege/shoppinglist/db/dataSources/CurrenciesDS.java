@@ -5,11 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import ru.android.ainege.shoppinglist.db.ITable;
-import ru.android.ainege.shoppinglist.db.ITable.ILists;
+import ru.android.ainege.shoppinglist.db.TableInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.ListsInterface;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
-public class CurrenciesDS extends DictionaryDS<Currency> implements ITable.ICurrencies{
+public class CurrenciesDS extends DictionaryDS<Currency> implements TableInterface.CurrenciesInterface {
 	public CurrenciesDS(Context context) {
 		super(context);
 	}
@@ -40,16 +40,16 @@ public class CurrenciesDS extends DictionaryDS<Currency> implements ITable.ICurr
 	public CurrencyCursor getByList(long idList) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("Select " + TABLE_NAME + ".* from " + TABLE_NAME +
-				" INNER JOIN " + ILists.TABLE_NAME + " ON " +
-				TABLE_NAME + "." + COLUMN_ID + " = " + ILists.TABLE_NAME + "." + ILists.COLUMN_ID_CURRENCY +
-				" where " + ILists.TABLE_NAME + " . " + ILists.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
+				" INNER JOIN " + ListsInterface.TABLE_NAME + " ON " +
+				TABLE_NAME + "." + COLUMN_ID + " = " + ListsInterface.TABLE_NAME + "." + ListsInterface.COLUMN_ID_CURRENCY +
+				" where " + ListsInterface.TABLE_NAME + " . " + ListsInterface.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
 		return new CurrencyCursor(cursor);
 	}
 
 	@Override
 	public boolean isUsed(long idCurrency) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(ILists.TABLE_NAME, null, ILists.COLUMN_ID_CURRENCY + " = " + idCurrency,
+		Cursor cursor = db.query(ListsInterface.TABLE_NAME, null, ListsInterface.COLUMN_ID_CURRENCY + " = " + idCurrency,
 				null, null, null, null);
 		boolean result = cursor.getCount() > 0;
 		cursor.close();

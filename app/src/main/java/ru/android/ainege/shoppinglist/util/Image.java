@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
+import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 
 import static android.graphics.Bitmap.CompressFormat;
 import static android.graphics.Bitmap.createBitmap;
@@ -159,19 +159,13 @@ public class Image {
 
 	private boolean isExternalStorageWritable() {
 		String state = Environment.getExternalStorageState();
-		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			return true;
-		}
-		return false;
+		return Environment.MEDIA_MOUNTED.equals(state);
 	}
 
 	private boolean isExternalStorageReadable() {
 		String state = Environment.getExternalStorageState();
-		if (Environment.MEDIA_MOUNTED.equals(state) ||
-				Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-			return true;
-		}
-		return false;
+		return Environment.MEDIA_MOUNTED.equals(state) ||
+				Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
 	}
 
 	private File getAlbumStorageDir() {
@@ -266,14 +260,14 @@ public class Image {
 		private File mFile;
 		private Bitmap mBitmap;
 		private int mWidthImageView;
-		private ImageFragmentInterface mFragment;
+		private OnFinishedImageListener mFragment;
 
-		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, ImageFragmentInterface fragment) {
+		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, OnFinishedImageListener fragment) {
 			this(file, widthImageView, fragment);
 			mBitmap = bitmap;
 		}
 
-		public BitmapWorkerTask(File file, int widthImageView, ImageFragmentInterface fragment) {
+		public BitmapWorkerTask(File file, int widthImageView, OnFinishedImageListener fragment) {
 			mFile = file;
 			mWidthImageView = widthImageView;
 			mFragment = fragment;
@@ -294,7 +288,7 @@ public class Image {
 
 		@Override
 		protected void onPostExecute(Boolean isSuccess) {
-			mFragment.onImageLoaded(isSuccess, Image.PATH_PROTOCOL + mFile.getAbsolutePath());
+			mFragment.onFinished(isSuccess, Image.PATH_PROTOCOL + mFile.getAbsolutePath());
 		}
 	}
 }

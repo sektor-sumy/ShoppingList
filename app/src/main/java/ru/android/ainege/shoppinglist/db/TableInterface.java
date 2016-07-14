@@ -2,15 +2,15 @@ package ru.android.ainege.shoppinglist.db;
 
 import ru.android.ainege.shoppinglist.db.migration.Migration3;
 
-public interface ITable {
-	interface IUnits {
+public interface TableInterface {
+	interface UnitsInterface {
 		String TABLE_NAME = Migration3.UnitT.TABLE_NAME;
 
 		String COLUMN_ID = Migration3.UnitT.COLUMN_ID;
 		String COLUMN_NAME = Migration3.UnitT.COLUMN_NAME;
 	}
 
-	interface ICurrencies {
+	interface CurrenciesInterface {
 		String TABLE_NAME = Migration3.CurrencyT.TABLE_NAME;
 
 		String COLUMN_ID = Migration3.CurrencyT.COLUMN_ID;
@@ -18,7 +18,7 @@ public interface ITable {
 		String COLUMN_SYMBOL = Migration3.CurrencyT.COLUMN_SYMBOL;
 	}
 
-	interface ICategories {
+	interface CategoriesInterface {
 		String TABLE_NAME = Migration3.CategoryT.TABLE_NAME;
 
 		String COLUMN_ID = Migration3.CategoryT.COLUMN_ID;
@@ -26,7 +26,7 @@ public interface ITable {
 		String COLUMN_COLOR = Migration3.CategoryT.COLUMN_COLOR;
 	}
 
-	interface ILists {
+	interface ListsInterface {
 		String TABLE_NAME = Migration3.ListT.TABLE_NAME;
 
 		String COLUMN_ID = Migration3.ListT.COLUMN_ID;
@@ -35,7 +35,7 @@ public interface ITable {
 		String COLUMN_IMAGE_PATH = Migration3.ListT.COLUMN_IMAGE_PATH;
 	}
 
-	interface IItemData {
+	interface ItemDataInterface {
 		String TABLE_NAME = Migration3.ItemDataT.TABLE_NAME;
 
 		String COLUMN_ID = Migration3.ItemDataT.COLUMN_ID;
@@ -46,7 +46,7 @@ public interface ITable {
 		String COLUMN_COMMENT = Migration3.ItemDataT.COLUMN_COMMENT;
 	}
 
-	interface IItems {
+	interface ItemsInterface {
 		String TABLE_NAME = Migration3.ItemT.TABLE_NAME;
 
 		String COLUMN_ID = Migration3.ItemT.COLUMN_ID;
@@ -56,7 +56,7 @@ public interface ITable {
 		String COLUMN_ID_DATA = Migration3.ItemT.COLUMN_ID_DATA;
 	}
 
-	interface IShoppingLists {
+	interface ShoppingListsInterface {
 		String TABLE_NAME = Migration3.ShoppingListT.TABLE_NAME;
 
 		String COLUMN_ID_ITEM = Migration3.ShoppingListT.COLUMN_ID_ITEM;

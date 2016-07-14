@@ -7,14 +7,14 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.Date;
 
-import ru.android.ainege.shoppinglist.db.ITable.*;
+import ru.android.ainege.shoppinglist.db.TableInterface.*;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
-public class ShoppingListDS extends GenericDS<ShoppingList> implements IShoppingLists{
+public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingListsInterface {
 	private static final String DEFAULT_ITEM_DATA = "id_default_data";
 
 	public ShoppingListDS(Context context) {
@@ -29,21 +29,21 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements IShopping
 	public ShoppingListCursor getItemsInList(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String selectQuery = "SELECT " + TABLE_NAME + ".*, " +
-				IItems.COLUMN_NAME + ", " + IItems.COLUMN_DEFAULT_IMAGE_PATH + ", " +
-				IItems.COLUMN_IMAGE_PATH + ", " +
-				IItems.TABLE_NAME + "." + IItems.COLUMN_ID_DATA + " AS " + DEFAULT_ITEM_DATA + ", " +
-				IItemData.TABLE_NAME + ".*, " +
-				IUnits.COLUMN_NAME + ", " + ICategories.COLUMN_NAME + ", " +
-				ICategories.COLUMN_COLOR +
+				ItemsInterface.COLUMN_NAME + ", " + ItemsInterface.COLUMN_DEFAULT_IMAGE_PATH + ", " +
+				ItemsInterface.COLUMN_IMAGE_PATH + ", " +
+				ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID_DATA + " AS " + DEFAULT_ITEM_DATA + ", " +
+				ItemDataInterface.TABLE_NAME + ".*, " +
+				UnitsInterface.COLUMN_NAME + ", " + CategoriesInterface.COLUMN_NAME + ", " +
+				CategoriesInterface.COLUMN_COLOR +
 				" FROM " + TABLE_NAME +
-				" INNER JOIN " + IItems.TABLE_NAME + " ON " +
-				TABLE_NAME + "." + COLUMN_ID_ITEM + " = " + IItems.TABLE_NAME + "." + IItems.COLUMN_ID +
-				" INNER JOIN " + IItemData.TABLE_NAME + " ON " +
-				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID +
-				" INNER JOIN " + IUnits.TABLE_NAME + " ON " +
-				IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID_UNIT + " = " + IUnits.TABLE_NAME + "." + IUnits.COLUMN_ID +
-				" INNER JOIN " + ICategories.TABLE_NAME + " ON " +
-				IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID_CATEGORY + " = " + ICategories.TABLE_NAME + "." + ICategories.COLUMN_ID +
+				" INNER JOIN " + ItemsInterface.TABLE_NAME + " ON " +
+				TABLE_NAME + "." + COLUMN_ID_ITEM + " = " + ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID +
+				" INNER JOIN " + ItemDataInterface.TABLE_NAME + " ON " +
+				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
+				" INNER JOIN " + UnitsInterface.TABLE_NAME + " ON " +
+				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_UNIT + " = " + UnitsInterface.TABLE_NAME + "." + UnitsInterface.COLUMN_ID +
+				" INNER JOIN " + CategoriesInterface.TABLE_NAME + " ON " +
+				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " + CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID +
 				" WHERE " + TABLE_NAME + "." + COLUMN_ID_LIST + " = ? ";
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
 		return new ShoppingListCursor(cursor);
@@ -52,16 +52,16 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements IShopping
 	public ShoppingListCursor getByName(String name, long idList) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
-				IItems.COLUMN_NAME + ", " +
-				IItems.COLUMN_DEFAULT_IMAGE_PATH + ", " +
-				IItems.COLUMN_IMAGE_PATH + ", " +
-				IItemData.COLUMN_ID_CATEGORY + " AS " + IItemData.COLUMN_ID_CATEGORY + "Item , " +
-				IItems.TABLE_NAME + "." + IItems.COLUMN_ID_DATA + " AS " + DEFAULT_ITEM_DATA +
-				" FROM " + TABLE_NAME + " INNER JOIN " + IItems.TABLE_NAME +
-				" ON " + TABLE_NAME + "." + COLUMN_ID_ITEM + " = " + IItems.TABLE_NAME + "." + IItems.COLUMN_ID +
-				" INNER JOIN " + IItemData.TABLE_NAME +
-				" ON " + IItems.TABLE_NAME + "." + IItems.COLUMN_ID + " = " + IItemData.TABLE_NAME + "." + IItemData.COLUMN_ID +
-				" WHERE " + IItems.COLUMN_NAME + " LIKE '" + name +
+				ItemsInterface.COLUMN_NAME + ", " +
+				ItemsInterface.COLUMN_DEFAULT_IMAGE_PATH + ", " +
+				ItemsInterface.COLUMN_IMAGE_PATH + ", " +
+				ItemDataInterface.COLUMN_ID_CATEGORY + " AS " + ItemDataInterface.COLUMN_ID_CATEGORY + "Item , " +
+				ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID_DATA + " AS " + DEFAULT_ITEM_DATA +
+				" FROM " + TABLE_NAME + " INNER JOIN " + ItemsInterface.TABLE_NAME +
+				" ON " + TABLE_NAME + "." + COLUMN_ID_ITEM + " = " + ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID +
+				" INNER JOIN " + ItemDataInterface.TABLE_NAME +
+				" ON " + ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
+				" WHERE " + ItemsInterface.COLUMN_NAME + " LIKE '" + name +
 				"' AND " + COLUMN_ID_LIST + " = " + idList, null);
 		return new ShoppingListCursor(cursor);
 	}
@@ -135,36 +135,36 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements IShopping
 
 			ShoppingList shoppingList = new ShoppingList(idItem, idList, isBought, idData, new Date(date));
 
-			if (getColumnIndex(IItems.COLUMN_NAME) != -1) {
-				String nameItem = getString(getColumnIndex(IItems.COLUMN_NAME));
-				String defaultImage = getString(getColumnIndex(IItems.COLUMN_DEFAULT_IMAGE_PATH));
-				String image = getString(getColumnIndex(IItems.COLUMN_IMAGE_PATH));
+			if (getColumnIndex(ItemsInterface.COLUMN_NAME) != -1) {
+				String nameItem = getString(getColumnIndex(ItemsInterface.COLUMN_NAME));
+				String defaultImage = getString(getColumnIndex(ItemsInterface.COLUMN_DEFAULT_IMAGE_PATH));
+				String image = getString(getColumnIndex(ItemsInterface.COLUMN_IMAGE_PATH));
 				long idItemData = getLong(getColumnIndex(DEFAULT_ITEM_DATA));
 
 				Item item = new Item(idItem, nameItem, defaultImage, image, idItemData);
-				if (getColumnIndex(IItemData.COLUMN_ID_CATEGORY + "Item") != -1) {
-					item.setIdCategory(getLong(getColumnIndex(IItemData.COLUMN_ID_CATEGORY + "Item")));
+				if (getColumnIndex(ItemDataInterface.COLUMN_ID_CATEGORY + "Item") != -1) {
+					item.setIdCategory(getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_CATEGORY + "Item")));
 				}
 				shoppingList.setItem(item);
 			}
 
-			if (getColumnIndex(IItemData.COLUMN_AMOUNT) != -1) {
-				shoppingList.setAmount(getDouble(getColumnIndex(IItemData.COLUMN_AMOUNT)));
-				shoppingList.setPrice(getDouble(getColumnIndex(IItemData.COLUMN_PRICE)));
-				shoppingList.setComment(getString(getColumnIndex(IItemData.COLUMN_COMMENT)));
+			if (getColumnIndex(ItemDataInterface.COLUMN_AMOUNT) != -1) {
+				shoppingList.setAmount(getDouble(getColumnIndex(ItemDataInterface.COLUMN_AMOUNT)));
+				shoppingList.setPrice(getDouble(getColumnIndex(ItemDataInterface.COLUMN_PRICE)));
+				shoppingList.setComment(getString(getColumnIndex(ItemDataInterface.COLUMN_COMMENT)));
 
-				long idUnit = getLong(getColumnIndex(IItemData.COLUMN_ID_UNIT));
-				if (getColumnIndex(IUnits.COLUMN_NAME) != -1) {
-					String unitName = getString(getColumnIndex(IUnits.COLUMN_NAME));
+				long idUnit = getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_UNIT));
+				if (getColumnIndex(UnitsInterface.COLUMN_NAME) != -1) {
+					String unitName = getString(getColumnIndex(UnitsInterface.COLUMN_NAME));
 					shoppingList.setUnit(new Unit(idUnit, unitName));
 				} else {
 					shoppingList.setIdUnit(idUnit);
 				}
 
-				long idCategory = getLong(getColumnIndex(IItemData.COLUMN_ID_CATEGORY));
-				if (getColumnIndex(ICategories.COLUMN_NAME) != -1) {
-					String categoryName = getString(getColumnIndex(ICategories.COLUMN_NAME));
-					int color = getInt(getColumnIndex(ICategories.COLUMN_COLOR));
+				long idCategory = getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_CATEGORY));
+				if (getColumnIndex(CategoriesInterface.COLUMN_NAME) != -1) {
+					String categoryName = getString(getColumnIndex(CategoriesInterface.COLUMN_NAME));
+					int color = getInt(getColumnIndex(CategoriesInterface.COLUMN_COLOR));
 					shoppingList.setCategory(new Category(idCategory, categoryName, color));
 				} else {
 					shoppingList.setIdCategory(idCategory);

@@ -15,14 +15,14 @@ public class AndroidBug5497Workaround {
 		return new AndroidBug5497Workaround(activity);
 	}
 
-	OnOpenKeyboard mOnOpenKeyboard;
+	OnOpenKeyboardListener mOnOpenKeyboard;
 
-	public interface OnOpenKeyboard {
+	public interface OnOpenKeyboardListener {
 		void isOpen(int screenAppHeight);
 		void isClose();
 	}
 
-	public void setOnOpenKeyboard(OnOpenKeyboard onOpenKeyboard) {
+	public void setOnOpenKeyboard(OnOpenKeyboardListener onOpenKeyboard) {
 		mOnOpenKeyboard = onOpenKeyboard;
 	}
 

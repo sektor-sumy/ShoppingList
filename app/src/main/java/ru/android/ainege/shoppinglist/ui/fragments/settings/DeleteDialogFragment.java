@@ -12,9 +12,9 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.ITable.IUnits;
-import ru.android.ainege.shoppinglist.db.ITable.ICurrencies;
-import ru.android.ainege.shoppinglist.db.ITable.ICategories;
+import ru.android.ainege.shoppinglist.db.TableInterface.UnitsInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.CurrenciesInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.CategoriesInterface;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
@@ -88,7 +88,7 @@ public class DeleteDialogFragment extends DialogFragment {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				android.R.layout.simple_spinner_item,
 				new UnitsDS(getActivity()).getAll(id),
-				new String[]{IUnits.COLUMN_NAME},
+				new String[]{UnitsInterface.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		return spinnerAdapter;
@@ -98,7 +98,7 @@ public class DeleteDialogFragment extends DialogFragment {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				android.R.layout.simple_spinner_item,
 				new CategoriesDS(getActivity()).getAll(id),
-				new String[]{ICategories.COLUMN_NAME},
+				new String[]{CategoriesInterface.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		return spinnerAdapter;
@@ -108,7 +108,7 @@ public class DeleteDialogFragment extends DialogFragment {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				android.R.layout.simple_spinner_item,
 				new CurrenciesDS(getActivity()).getAll(id),
-				new String[]{ICurrencies.COLUMN_NAME},
+				new String[]{CurrenciesInterface.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		return spinnerAdapter;

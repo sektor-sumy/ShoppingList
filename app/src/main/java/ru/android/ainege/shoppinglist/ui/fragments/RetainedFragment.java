@@ -10,19 +10,15 @@ import android.widget.Toast;
 import java.io.File;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.ImageFragmentInterface;
+import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.util.Image;
 
-public class RetainedFragment extends Fragment implements ImageFragmentInterface{
+public class RetainedFragment extends Fragment implements OnFinishedImageListener {
 	private Activity mActivity;
-	private ImageLoad mLoadingListener;
+	private OnFinishedImageListener mLoadingListener;
 	private String mImagePath;
 	private boolean mIsLoading;
 	private ImageView mImageView;
-
-	public interface ImageLoad {
-		void finish(String path);
-	}
 
 	public RetainedFragment() {
 
@@ -65,14 +61,14 @@ public class RetainedFragment extends Fragment implements ImageFragmentInterface
 	}
 
 	@Override
-	public void onImageLoaded(boolean isSuccess, String path) {
+	public void onFinished(boolean isSuccess, String path) {
 		mIsLoading = false;
 
 		if (isSuccess) {
 			mImagePath = path;
 
 			if (mLoadingListener != null) {
-				mLoadingListener.finish(mImagePath);
+				mLoadingListener.onFinished(isSuccess, mImagePath);
 			}
 		} else {
 			Image.create().insertImageToView(mActivity, mImagePath, mImageView);
@@ -80,7 +76,7 @@ public class RetainedFragment extends Fragment implements ImageFragmentInterface
 		}
 	}
 
-	public void setOnLoadedFinish(ImageLoad load){
+	public void setOnLoadedFinish(OnFinishedImageListener load){
 		mLoadingListener = load;
 	}
 }

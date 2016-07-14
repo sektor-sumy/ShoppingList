@@ -7,7 +7,7 @@ import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 
-public class PhoneState implements IState {
+public class PhoneState implements StateInterface {
 	private ListsActivity mListsActivity;
 
 	public PhoneState(ListsActivity listsActivity) {

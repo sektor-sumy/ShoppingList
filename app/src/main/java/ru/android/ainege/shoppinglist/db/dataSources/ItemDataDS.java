@@ -4,10 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import ru.android.ainege.shoppinglist.db.ITable;
+import ru.android.ainege.shoppinglist.db.TableInterface;
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
 
-public class ItemDataDS extends GenericDS<ItemData> implements ITable.IItemData{
+public class ItemDataDS extends GenericDS<ItemData> implements TableInterface.ItemDataInterface {
 
 	public ItemDataDS(Context context) {
 		super(context);

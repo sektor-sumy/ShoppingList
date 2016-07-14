@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.OnBackPressed;
+import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.CategoryFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.CurrencyFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.UnitFragment;
@@ -14,14 +14,14 @@ public class SettingsDictionaryActivity extends SingleFragmentActivity {
 	public final static String EXTRA_TYPE = "type";
 	private final static String FRAGMENT_TAG = "settings_dictionary_tag";
 
-	private OnBackPressed mOnBackPressedListener;
+	private OnBackPressedListener mOnBackPressedListener;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		if (savedInstanceState != null) {
-			mOnBackPressedListener = (OnBackPressed) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+			mOnBackPressedListener = (OnBackPressedListener) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
 		}
 	}
 
@@ -39,7 +39,7 @@ public class SettingsDictionaryActivity extends SingleFragmentActivity {
 			fragment = new CategoryFragment();
 		}
 
-		mOnBackPressedListener = (OnBackPressed) fragment;
+		mOnBackPressedListener = (OnBackPressedListener) fragment;
 
 		return fragment;
 	}
@@ -51,7 +51,7 @@ public class SettingsDictionaryActivity extends SingleFragmentActivity {
 
 	@Override
 	public void onBackPressed() {
-		if (mOnBackPressedListener != null && mOnBackPressedListener.onBackPressed()) {
+		if (mOnBackPressedListener == null || (mOnBackPressedListener != null && mOnBackPressedListener.onBackPressed())) {
 			super.onBackPressed();
 		}
 	}

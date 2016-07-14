@@ -50,9 +50,9 @@ import java.io.IOException;
 import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.ITable.ICategories;
-import ru.android.ainege.shoppinglist.db.ITable.IItems;
-import ru.android.ainege.shoppinglist.db.ITable.IUnits;
+import ru.android.ainege.shoppinglist.db.TableInterface.CategoriesInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.ItemsInterface;
+import ru.android.ainege.shoppinglist.db.TableInterface.UnitsInterface;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
@@ -61,8 +61,9 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-import ru.android.ainege.shoppinglist.ui.OnBackPressed;
+import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
+import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
@@ -80,7 +81,7 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCursor;
 
-public abstract class ItemFragment extends Fragment implements OnBackPressed {
+public abstract class ItemFragment extends Fragment implements OnBackPressedListener {
 	public static final String ID_ITEM = "idItem";
 	protected static final String UNIT_ADD_DATE = "addItemDialog";
 	protected static final String CATEGORY_ADD_DATE = "addItemDialog";
@@ -185,7 +186,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressed {
 			mIsCollapsedMode = false;
 		} else {
 			mIsCollapsedMode = true;
-			AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboard() {
+			AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboardListener() {
 				@Override
 				public void isOpen(int screenAppHeight) {
 					mIsOpenedKeyboard = true;
@@ -257,9 +258,9 @@ public abstract class ItemFragment extends Fragment implements OnBackPressed {
 			fm.beginTransaction().add(dataFragment, RETAINED_FRAGMENT).commit();
 		}
 
-		dataFragment.setOnLoadedFinish(new RetainedFragment.ImageLoad() {
+		dataFragment.setOnLoadedFinish(new OnFinishedImageListener() {
 			@Override
-			public void finish(String path) {
+			public void onFinished(boolean isSuccess, String path) {
 				loadImage(path);
 			}
 		});
@@ -588,7 +589,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressed {
 							GeneralDialogFragment addItemDialog = new UnitDialogFragment();
 							addItemDialog.setTargetFragment(ItemFragment.this, UNIT_ADD);
 							addItemDialog.show(getFragmentManager(), UNIT_ADD_DATE);
-							if (mOnItemChangedListener != null) {
+							if (mOnDialogShownListener != null) {
 								mOnDialogShownListener.onOpenDialog(-1);
 							}
 						} else {
@@ -713,7 +714,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressed {
 		completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
 			@Override
 			public CharSequence convertToString(Cursor cursor) {
-				return cursor.getString(cursor.getColumnIndex(IItems.COLUMN_NAME));
+				return cursor.getString(cursor.getColumnIndex(ItemsInterface.COLUMN_NAME));
 			}
 		});
 		return completeTextAdapter;
@@ -854,7 +855,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressed {
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.spinner_unit,
 				cursor,
-				new String[]{IUnits.COLUMN_NAME},
+				new String[]{UnitsInterface.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		return spinnerAdapter;
@@ -979,16 +980,16 @@ public abstract class ItemFragment extends Fragment implements OnBackPressed {
 			ViewHolder holder = (ViewHolder) view.getTag();
 			String name = "";
 
-			if (cursor.getColumnIndex(IItems.COLUMN_NAME) != -1) {
-				name = cursor.getString(cursor.getColumnIndex(IItems.COLUMN_NAME));
-			} else if (cursor.getColumnIndex(ICategories.COLUMN_NAME) != -1) {
-				name = cursor.getString(cursor.getColumnIndex(ICategories.COLUMN_NAME));
+			if (cursor.getColumnIndex(ItemsInterface.COLUMN_NAME) != -1) {
+				name = cursor.getString(cursor.getColumnIndex(ItemsInterface.COLUMN_NAME));
+			} else if (cursor.getColumnIndex(CategoriesInterface.COLUMN_NAME) != -1) {
+				name = cursor.getString(cursor.getColumnIndex(CategoriesInterface.COLUMN_NAME));
 			}
 
 			holder.mName.setText(name);
 
 			if (mIsUseCategory) {
-				holder.mColor.setBackgroundColor(cursor.getInt(cursor.getColumnIndex(ICategories.COLUMN_COLOR)));
+				holder.mColor.setBackgroundColor(cursor.getInt(cursor.getColumnIndex(CategoriesInterface.COLUMN_COLOR)));
 			}
 		}
 

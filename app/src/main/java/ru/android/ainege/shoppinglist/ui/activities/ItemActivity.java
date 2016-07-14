@@ -4,7 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
-import ru.android.ainege.shoppinglist.ui.OnBackPressed;
+import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.fragments.item.AddItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.EditItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
@@ -14,7 +14,7 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 	public final static String EXTRA_ITEM = "item";
 	private final static String FRAGMENT_TAG = "item_activity_tag";
 
-	private OnBackPressed mOnBackPressedListener;
+	private OnBackPressedListener mOnBackPressedListener;
 
 	@Override
 	protected Fragment getFragment() {
