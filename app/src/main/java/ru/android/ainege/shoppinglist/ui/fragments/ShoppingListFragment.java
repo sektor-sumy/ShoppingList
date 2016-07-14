@@ -259,7 +259,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mOnClickListener.onItemAdd(mList.getId());
+				if (mOnClickListener != null) {
+					mOnClickListener.onItemAdd(mList.getId());
+				}
 			}
 		});
 
@@ -449,14 +451,21 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			case IS_DELETE_LIST:
 				mListsDS.delete(mList.getId());
 				Image.deleteFile(mList.getImagePath());
-
 				saveId(-1);
-				mOnListChangedListener.onListDeleted(mList.getId());
+
+				if (mOnListChangedListener != null) {
+					mOnListChangedListener.onListDeleted(mList.getId());
+				}
 				break;
 			case EDIT_LIST:
 				updateList();
-				mOnListChangedListener.onListUpdated();
-				mOnItemChangedListener.updateItem(getString(R.string.settings_key_currency));
+				if (mOnListChangedListener != null) {
+					mOnListChangedListener.onListUpdated();
+				}
+
+				if (mOnItemChangedListener != null) {
+					mOnItemChangedListener.updateItem(getString(R.string.settings_key_currency));
+				}
 				break;
 			case SETTINGS:
 				long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
@@ -578,7 +587,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	public void updateData() {
 		mSaveListRotate = null;
-		mOnListChangedListener.onListUpdated();
+		if (mOnListChangedListener != null) {
+			mOnListChangedListener.onListUpdated();
+		}
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
@@ -751,7 +762,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			return;
 		}
 
-		mOnClickListener.onItemSelect(itemInList);
+		if (mOnClickListener != null) {
+			mOnClickListener.onItemSelect(itemInList);
+		}
 	}
 
 	private void onItemClick(Category category, int position) {
@@ -850,7 +863,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			updateSums();
 			hideEmptyStates();
 
-			if (isDeleteOpenItem) {
+			if (isDeleteOpenItem && mOnClickListener != null) {
 				ShoppingList item = (ShoppingList) (mIsUseCategory ? mAdapterRV.getListItem(1) : mAdapterRV.getListItem(0));
 				mOnClickListener.onItemSelect(item);
 			}

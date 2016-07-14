@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
-import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
+import ru.android.ainege.shoppinglist.ui.OnBackPressed;
 
-public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SettingsDictionaryActivity.OnBackPressedInterface {
+public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnBackPressed {
 	public static final String LAST_EDIT = "lastEdit";
 	protected static final int ADD = 1;
 	protected static final int EDIT = 2;
@@ -137,9 +137,9 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	}
 
 	@Override
-	public void onBackPressed() {
+	public boolean onBackPressed() {
 		getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, mLastEditId));
-		getActivity().finish();
+		return true;
 	}
 
 	@Override

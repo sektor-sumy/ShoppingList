@@ -82,8 +82,15 @@ public class TabletState implements IState, OnDialogShownListener,
 			mLastSelectedListId = savedInstanceState.getLong(STATE_LAST_LIST_ID);
 			mLastSelectedItemId = savedInstanceState.getLong(STATE_LAST_ITEM_ID);
 			mShouldBackPressed = savedInstanceState.getInt(STATE_SHOULD_BACK_PRESSED);
+			int idScreen = savedInstanceState.getInt(STATE_SCREEN);
 
-			switch (savedInstanceState.getInt(STATE_SCREEN)) {
+			if (!mIsLandscape && mShouldBackPressed != DIALOG_BEHAVIOUR_DEFAULT) {
+				idScreen--;
+			} else if (mIsLandscape && mShouldBackPressed == DIALOG_BEHAVIOUR_ITEM) {
+				idScreen++;
+			}
+
+			switch (idScreen) {
 				case ListsScreen.SCREEN_ID:
 					mCurrentScreen = mListsScreen;
 					break;
@@ -92,17 +99,6 @@ public class TabletState implements IState, OnDialogShownListener,
 					break;
 				case ItemScreen.SCREEN_ID:
 					mCurrentScreen = mItemScreen;
-			}
-
-			// TODO: 11.07.2016 later
-			if (!mIsLandscape && mShouldBackPressed != DIALOG_BEHAVIOUR_DEFAULT) {
-				if (mCurrentScreen instanceof ItemScreen) {
-					mCurrentScreen = mShoppingListScreen;
-				} else if (mCurrentScreen instanceof ShoppingListScreen) {
-					mCurrentScreen = mListsScreen;
-				}
-			} else if (mIsLandscape && mShouldBackPressed == DIALOG_BEHAVIOUR_ITEM) {
-				mCurrentScreen = mItemScreen;
 			}
 
 			mCurrentScreen.restore();

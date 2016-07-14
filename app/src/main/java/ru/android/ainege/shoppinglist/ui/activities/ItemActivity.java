@@ -4,16 +4,17 @@ import android.app.Fragment;
 import android.content.Intent;
 
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.ui.OnBackPressed;
 import ru.android.ainege.shoppinglist.ui.fragments.item.AddItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.EditItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 
-public class ItemActivity extends SingleFragmentActivity {
+public class ItemActivity extends SingleFragmentActivity implements ItemFragment.OnClickListener {
 	public final static String EXTRA_ID_LIST = "idList";
 	public final static String EXTRA_ITEM = "item";
 	private final static String FRAGMENT_TAG = "item_activity_tag";
 
-	private OnBackPressedInterface mOnBackPressedListener; //// TODO: 11.07.2016 later
+	private OnBackPressed mOnBackPressedListener;
 
 	@Override
 	protected Fragment getFragment() {
@@ -27,11 +28,24 @@ public class ItemActivity extends SingleFragmentActivity {
 
 	@Override
 	public void onBackPressed() {
-		if (mOnBackPressedListener != null) {
-			mOnBackPressedListener.onBackPressed();
-		} else {
+		if (mOnBackPressedListener == null || (mOnBackPressedListener != null && mOnBackPressedListener.onBackPressed())) {
 			super.onBackPressed();
 		}
+	}
+
+	@Override
+	public void onItemSave(long id, boolean isAdded, boolean isClose) {
+		super.onBackPressed();
+	}
+
+	@Override
+	public void onImageClick() {
+
+	}
+
+	@Override
+	public void onNotSave() {
+		super.onBackPressed();
 	}
 
 	private Fragment createFragment() {
@@ -48,11 +62,8 @@ public class ItemActivity extends SingleFragmentActivity {
 		}
 
 		mOnBackPressedListener = fragment;
+		fragment.setOnClickListener(this);
 
 		return fragment;
-	}
-
-	public interface OnBackPressedInterface {
-		void onBackPressed();
 	}
 }

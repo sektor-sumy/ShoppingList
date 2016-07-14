@@ -43,6 +43,15 @@ public class ShoppingList extends ItemData {
 		mDate = date;
 	}
 
+	public ShoppingList(ShoppingList list) {
+		super(list);
+		mIdItem = list.getIdItem();
+		mIdList = list.getIdList();
+		mIsBought = list.isBought();
+		mItem = list.getItem();
+		mDate = list.getDate();
+	}
+
 	public static void setSortSettings(boolean isBoughtEndInList) {
 		mIsBoughtEndInList = isBoughtEndInList;
 	}
@@ -55,7 +64,7 @@ public class ShoppingList extends ItemData {
 		Collections.sort(itemsInList, new Comparator<ShoppingList>() {
 			@Override
 			public int compare(ShoppingList lhs, ShoppingList rhs) {
-				int result = 0;
+				int result;
 
 				if (mIsBoughtEndInList) {
 					if (lhs.isBought() && !rhs.isBought()) {
@@ -144,7 +153,7 @@ public class ShoppingList extends ItemData {
 	}
 
 	public double getSum() {
-		mSum = mPrice * (mAmount == 0 ? 1 : mAmount);
+		mSum = getSum(this);
 		return new BigDecimal(mSum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
 
@@ -153,14 +162,14 @@ public class ShoppingList extends ItemData {
 	}
 
 	public boolean equals(ShoppingList item) {
-		return !(!mItem.getName().equals(item.getItem().getName()) ||
-				!mItem.getImagePath().equals(item.getItem().getImagePath()) ||
-				mIsBought != item.isBought() ||
-				mAmount != item.getAmount() ||
-				mIdUnit != item.getIdUnit() ||
-				mPrice != item.getPrice() ||
-				mIdCategory != item.getIdCategory() ||
-				!mComment.equals(item.getComment()));
+		return mItem.getName().equals(item.getItem().getName()) &&
+				mItem.getImagePath().equals(item.getItem().getImagePath()) &&
+				mIsBought == item.isBought() &&
+				mAmount == item.getAmount() &&
+				mIdUnit == item.getIdUnit() &&
+				mPrice == item.getPrice() &&
+				mIdCategory == item.getIdCategory() &&
+				mComment.equals(item.getComment());
 	}
 
 	public long updateItem(Context context) {

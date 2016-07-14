@@ -6,6 +6,8 @@ import android.widget.Toast;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+
+import ru.android.ainege.shoppinglist.ui.OnBackPressed;
 import ru.android.ainege.shoppinglist.ui.activities.lists.TabletState;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
@@ -16,6 +18,11 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 		ShoppingListFragment.OnClickListener, ShoppingListFragment.OnListChangedListener,
 		ShoppingListFragment.OnItemChangedListener, ItemFragment.OnItemChangedListener {
 	public static final int SCREEN_ID = 3;
+
+	private OnBackPressed mOnBackPressedListener;
+
+	private long mIdForAdd = -1;
+	private ShoppingList mItemForEdit = null;
 
 	public ItemScreen(TabletState state) {
 		super(state);
@@ -28,10 +35,10 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 
 	@Override
 	public boolean onBackPressed() {
-		mState.updateList();
-		mState.toScreen(mState.getShoppingListScreen());
-		mState.closeShowcase();
-		mState.setFragmentTagForRemove(TabletState.ITEM_TAG);
+		if (!isItemChanged()) {
+			toPreviousScreen();
+		}
+
 		return false;
 	}
 
@@ -76,7 +83,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	}
 
 	@Override
-	public void onItemSave(boolean isAdded, long id) {
+	public void onItemSave(long id, boolean isAdded, boolean isClose) {
 		ShoppingListFragment listFragment = (ShoppingListFragment) mState.getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
 		listFragment.setItemDetailsId(id);
 		listFragment.updateData();
@@ -84,7 +91,15 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 		if (mState.isLandscape()) {
 			Toast.makeText(mState.getListsActivity(), mState.getListsActivity().getString(R.string.data_save), Toast.LENGTH_SHORT).show();
 
-			if (isAdded) {
+			if (mIdForAdd != -1) {
+				super.onItemAdd(mIdForAdd);
+				mIdForAdd = -1;
+			} else if (mItemForEdit != null) {
+				super.onItemSelect(mItemForEdit);
+				mItemForEdit = null;
+			} else if (isClose) {
+				toPreviousScreen();
+			} else if (isAdded) {
 				SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mState.getListsActivity());
 				boolean isItemShowcaseFired = new MaterialShowcaseSequence(mState.getListsActivity(), Showcase.SHOT_ITEM_IN_LIST).hasFired();
 				boolean isCategoryShowcaseFired = new MaterialShowcaseSequence(mState.getListsActivity(), Showcase.SHOT_CATEGORY).hasFired();
@@ -93,13 +108,13 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 				if (!isItemShowcaseFired ||
 						(!isCategoryShowcaseFired && sharedPref.getBoolean(mState.getListsActivity().getString(R.string.settings_key_use_category), true)) ||
 						(!isCollapseCategoryShowcaseFired && sharedPref.getBoolean(mState.getListsActivity().getString(R.string.settings_key_collapse_category), true))) {
-					onBackPressed();
+					toPreviousScreen();
 				} else {
 					onItemAdd(mState.getLastSelectedListId());
 				}
 			}
 		} else {
-			onBackPressed();
+			toPreviousScreen();
 		}
 	}
 
@@ -107,6 +122,37 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	public void onImageClick() {
 		ShoppingListFragment listFragment = (ShoppingListFragment) mState.getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
 		if (listFragment != null) listFragment.closeActionMode();
+	}
+
+	@Override
+	public void onNotSave() {
+		if (mIdForAdd != -1) {
+			super.onItemAdd(mIdForAdd);
+			mIdForAdd = -1;
+		} else if (mItemForEdit != null) {
+			super.onItemSelect(mItemForEdit);
+			mItemForEdit = null;
+		} else {
+			toPreviousScreen();
+		}
+	}
+
+	@Override
+	public void onItemAdd(long idList) {
+		if (isItemChanged()) {
+			mIdForAdd = idList;
+		} else {
+			super.onItemAdd(idList);
+		}
+	}
+
+	@Override
+	public void onItemSelect(ShoppingList item) {
+		if (isItemChanged()) {
+			mItemForEdit = item;
+		} else {
+			super.onItemSelect(item);
+		}
 	}
 
 	@Override
@@ -120,7 +166,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 
 	@Override
 	public void onItemDelete() {
-		onBackPressed();
+		toPreviousScreen();
 	}
 
 	@Override
@@ -143,5 +189,20 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 				fr.setCurrency();
 			}
 		}
+	}
+
+	public void setOnBackPressedListener(OnBackPressed onBackPressedListener) {
+		mOnBackPressedListener = onBackPressedListener;
+	}
+
+	private boolean isItemChanged() {
+		return !(mOnBackPressedListener == null || (mOnBackPressedListener != null && mOnBackPressedListener.onBackPressed()));
+	}
+
+	private void toPreviousScreen() {
+		mState.updateList();
+		mState.toScreen(mState.getShoppingListScreen());
+		mState.closeShowcase();
+		mState.setFragmentTagForRemove(TabletState.ITEM_TAG);
 	}
 }

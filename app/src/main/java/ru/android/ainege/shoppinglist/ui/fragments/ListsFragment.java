@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
@@ -23,8 +24,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -63,7 +64,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final int HANDLER_LOAD_FINISHED = 1;
 
 	private OnListSelectListener mOnListSelectListener;
-	private OnListChangedListener mOnListChangedListener; // TODO: 11.07.2016 check for null
+	private OnListChangedListener mOnListChangedListener;
 	private OnDialogShownListener mOnDialogShownListener;
 	private OnListsLoadFinishedListener mOnListsLoadFinishedListener;
 
@@ -81,6 +82,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ArrayList<List> mSaveListRotate;
 	private boolean mIsUpdateData = false;
 
+	@SuppressLint("HandlerLeak")
 	private Handler mHandler = new Handler()  {
 		@Override
 		public void handleMessage(Message msg) {
@@ -148,7 +150,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				ListDialogFragment addListDialog = new ListDialogFragment();
 				addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
 				addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
-				mOnDialogShownListener.onOpenDialog(-1);
+
+				if (mOnDialogShownListener != null) {
+					mOnDialogShownListener.onOpenDialog(-1);
+				}
 			}
 		});
 
@@ -192,7 +197,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == ADD_LIST || requestCode == EDIT_LIST || requestCode == IS_DELETE_LIST) {
+		if (mOnDialogShownListener != null &&
+				(requestCode == ADD_LIST || requestCode == EDIT_LIST || requestCode == IS_DELETE_LIST)) {
 			mOnDialogShownListener.onCloseDialog();
 		}
 		if (resultCode != Activity.RESULT_OK) return;
@@ -202,19 +208,22 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				updateData();
 				mAddIdList = data.getLongExtra(ListDialogFragment.ID_LIST, -1);
 
-				if (mIsLandscapeTablet) {
+				if (mIsLandscapeTablet && mOnListSelectListener != null) {
 					mOnListSelectListener.onListClick(mAddIdList);
 				}
 				break;
 			case EDIT_LIST:
 				updateData();
-				mOnListChangedListener.onListUpdated(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
+
+				if (mOnListChangedListener != null) {
+					mOnListChangedListener.onListUpdated(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
+				}
 				break;
 			case IS_DELETE_LIST:
 				int position = getPosition(data.getLongExtra(QuestionDialogFragment.ID, -1));
+
 				if (position != -1) {
 					List list = mLists.get(position);
-
 					mListsDS.delete(list.getId());
 					mAdapterRV.removeItem(position);
 					Image.deleteFile(list.getImagePath());
@@ -225,7 +234,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						showEmptyStates();
 					}
 
-					mOnListChangedListener.onListDeleted(list.getId(), mLists.size() > 0 ? mLists.get(0).getId() : -1);
+					if (mOnListChangedListener != null) {
+						mOnListChangedListener.onListDeleted(list.getId(), mLists.size() > 0 ? mLists.get(0).getId() : -1);
+					}
+
 					deleteSaveListFromSettings(list.getId());
 				} else{
 					Toast.makeText(getActivity(), getString(R.string.error_delete), Toast.LENGTH_SHORT).show();
@@ -234,7 +246,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				break;
 			case SETTINGS:
 				long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
-				if (modifyCatalog != -1) {
+
+				if (modifyCatalog != -1 && mOnListChangedListener != null) {
 					mOnListChangedListener.updateCurrentList();
 				}
 				break;
@@ -350,7 +363,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mAdapterRV.setDate();
 		hideEmptyStates();
 
-		if (mIsLandscapeTablet) {
+		if (mIsLandscapeTablet && mOnListChangedListener != null) {
 			scrollToList(mOnListChangedListener.getLastSelectedListId());
 		} else {
 			scrollToList(mAddIdList);
@@ -432,7 +445,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		sequence.setOnItemDismissedListener(new MaterialShowcaseSequence.OnSequenceItemDismissedListener() {
 			@Override
 			public void onDismiss(MaterialShowcaseView materialShowcaseView, int i) {
-				if (i == 1) {
+				if (i == 1 && mOnListChangedListener != null) {
 					mOnListChangedListener.onShowCaseShown();
 				}
 			}
@@ -504,22 +517,17 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		private String getStatisticsShopping(List list) {
 			int amountItems = list.getAmountItems();
+			int amountBoughtItems = list.getAmountBoughtItems();
 			String statisticsShopping;
 
 			if (amountItems == 0) {
 				statisticsShopping = getString(R.string.list_empty);
+			} else if (amountBoughtItems == 0) {
+				statisticsShopping = getString(R.string.nothing_bought) + amountItems;
+			} else if (amountItems == amountBoughtItems) {
+				statisticsShopping = getString(R.string.all_bought);
 			} else {
-				int amountBoughtItems = list.getAmountBoughtItems();
-
-				if (amountBoughtItems == 0) {
-					statisticsShopping = getString(R.string.nothing_bought) + amountItems;
-				} else {
-					if (amountItems == amountBoughtItems) {
-						statisticsShopping = getString(R.string.all_bought);
-					} else {
-						statisticsShopping = getString(R.string.bought) + amountBoughtItems + getString(R.string.of) + amountItems;
-					}
-				}
+				statisticsShopping = getString(R.string.bought) + amountBoughtItems + getString(R.string.of) + amountItems;
 			}
 
 			return statisticsShopping;
@@ -551,7 +559,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						ListDialogFragment editListDialog = ListDialogFragment.newInstance(list);
 						editListDialog.setTargetFragment(ListsFragment.this, EDIT_LIST);
 						editListDialog.show(getFragmentManager(), EDIT_LIST_DATE);
-						mOnDialogShownListener.onOpenDialog(list.getId());
+
+						if (mOnDialogShownListener != null) {
+							mOnDialogShownListener.onOpenDialog(list.getId());
+						}
 					}
 				});
 
@@ -564,7 +575,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_delete_list) + " \"" + list.getName() + "\"?", list.getId());
 						dialogFrag.setTargetFragment(ListsFragment.this, IS_DELETE_LIST);
 						dialogFrag.show(getFragmentManager(), IS_DELETE_LIST_DATE);
-						mOnDialogShownListener.onOpenDialog(list.getId());
+
+						if (mOnDialogShownListener != null) {
+							mOnDialogShownListener.onOpenDialog(list.getId());
+						}
 					}
 				});
 
@@ -576,7 +590,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 						if (itemPosition != RecyclerView.NO_POSITION) {
 							List list = mLists.get(itemPosition);
-							mOnListSelectListener.onListClick(list.getId());
+
+							if (mOnListSelectListener != null) {
+								mOnListSelectListener.onListClick(list.getId());
+							}
 						}
 					}
 				});

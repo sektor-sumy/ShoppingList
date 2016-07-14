@@ -61,8 +61,8 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.ui.OnBackPressed;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
-import ru.android.ainege.shoppinglist.ui.activities.ItemActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
@@ -80,7 +80,7 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCursor;
 
-public abstract class ItemFragment extends Fragment implements ItemActivity.OnBackPressedInterface {
+public abstract class ItemFragment extends Fragment implements OnBackPressed {
 	public static final String ID_ITEM = "idItem";
 	protected static final String UNIT_ADD_DATE = "addItemDialog";
 	protected static final String CATEGORY_ADD_DATE = "addItemDialog";
@@ -153,8 +153,9 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	protected abstract void resetImage();
 
 	public interface OnClickListener {
-		void onItemSave(boolean isAdded, long id);
+		void onItemSave(long id, boolean isAdded, boolean isClose);
 		void onImageClick();
+		void onNotSave();
 	}
 
 	public interface OnItemChangedListener {
@@ -235,7 +236,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		save.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				saveItem();
+				saveItem(false);
 			}
 		});
 
@@ -381,7 +382,9 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		if (resultCode != Activity.RESULT_OK) {
 			switch (requestCode) {
 				case IS_SAVE_CHANGES:
-					getActivity().finish();
+					if (mOnClickListener != null) {
+						mOnClickListener.onNotSave();
+					}
 					break;
 				case UNIT_ADD:
 					setSelectionUnit(-1);
@@ -425,7 +428,7 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 
 				break;
 			case IS_SAVE_CHANGES:
-				saveItem();
+				saveItem(true);
 				break;
 			case UNIT_SETTINGS:
 				if (mOnItemChangedListener != null) {
@@ -472,14 +475,18 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 	}
 
 	@Override
-	public void onBackPressed() {
+	public boolean onBackPressed() {
+		boolean result = true;
+
 		if (mName.length() != 0) {
 			QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_save_item), -1);
-			dialogFrag.setTargetFragment(ItemFragment.this, IS_SAVE_CHANGES);
+			dialogFrag.setTargetFragment(this, IS_SAVE_CHANGES);
 			dialogFrag.show(getFragmentManager(), IS_SAVE_CHANGES_DATE);
-		} else {
-			getActivity().finish();
+
+			result = false;
 		}
+
+		return result;
 	}
 
 	public void setIsBought(boolean isBought) {
@@ -884,13 +891,11 @@ public abstract class ItemFragment extends Fragment implements ItemActivity.OnBa
 		return nf.format(value);
 	}
 
-	private void saveItem() {
+	private void saveItem(boolean isClose) {
 		if (saveData()) {
 			if (mOnClickListener != null) {
 				closeKeyboard();
-				mOnClickListener.onItemSave(mIsAdded, mItemInList.getIdItem());
-			} else {
-				getActivity().finish();
+				mOnClickListener.onItemSave(mItemInList.getIdItem(), mIsAdded, isClose);
 			}
 		} else {
 			Toast.makeText(getActivity().getApplicationContext(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();

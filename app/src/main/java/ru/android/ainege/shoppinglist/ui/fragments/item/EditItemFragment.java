@@ -39,7 +39,7 @@ public class EditItemFragment extends ItemFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mItemInList = (ShoppingList) getArguments().getSerializable(ITEM_IN_LIST);
+		mItemInList = new ShoppingList((ShoppingList) getArguments().getSerializable(ITEM_IN_LIST));
 		mOriginalIdItem = mItemInList.getIdItem();
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -201,11 +201,10 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
-	public void onBackPressed() {
-		if (!mItemInList.equals(mItemInList)) {
-			super.onBackPressed();
-		} else {
-			getActivity().finish();
-		}
+	public boolean onBackPressed() {
+		updateItemInList();
+		ShoppingList gg = (ShoppingList) getArguments().getSerializable(ITEM_IN_LIST);
+
+		return mItemInList.equals(gg) || super.onBackPressed();
 	}
 }

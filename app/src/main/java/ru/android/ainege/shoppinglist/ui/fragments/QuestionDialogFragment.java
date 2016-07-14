@@ -13,7 +13,6 @@ import ru.android.ainege.shoppinglist.R;
 public class QuestionDialogFragment extends DialogFragment {
 	public static final String ID = "id";
 	private static final String MESSAGE = "message";
-	private static final String OK_CLICK = "okClick";
 
 	public static QuestionDialogFragment newInstance(String message, long id) {
 		Bundle args = new Bundle();
