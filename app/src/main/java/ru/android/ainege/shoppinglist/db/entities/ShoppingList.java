@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
+import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
 public class ShoppingList extends ItemData {
 	public final static String ALPHABET = "alphabet";
@@ -184,6 +185,13 @@ public class ShoppingList extends ItemData {
 		if (mItem.isNew()) {
 			idItem = new ItemDS(context).add(mItem);
 			setIdItem(idItem);
+
+			FirebaseAnalytic.getInstance(context, FirebaseAnalytic.SELECT_CONTENT)
+					.putString(FirebaseAnalytic.TYPE, "add new item (item)")
+					.putString(FirebaseAnalytic.NEW_ITEM, mItem.getName())
+					.putString(FirebaseAnalytic.UNIT, mUnit.getName())
+					.putString(FirebaseAnalytic.CATEGORY, mCategory.getName())
+					.addEvent();
 		} else {
 			new ItemDS(context).update(mItem);
 		}

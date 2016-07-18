@@ -8,6 +8,7 @@ import android.widget.EditText;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
+import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
 public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 	private TextInputLayout mSymbolInputLayout;
@@ -74,13 +75,13 @@ public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 			long id;
 			if (getArguments() == null) {
 				id = currencyDS.add(new Currency(name, symbol));
+				addAnalytics(FirebaseAnalytic.CURRENCY, name);
 			} else {
 				id = mEditItem.getId();
 				currencyDS.update(new Currency(id, name, symbol));
 			}
 
 			sendResult(id);
-
 			isSave = true;
 		}
 

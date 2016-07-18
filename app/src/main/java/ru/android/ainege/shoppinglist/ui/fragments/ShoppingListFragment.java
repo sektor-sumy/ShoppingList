@@ -55,6 +55,7 @@ import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
+import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -390,6 +391,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						if (mOnDialogShownListener != null) {
 							mOnDialogShownListener.onOpenDialog(mList.getId());
 						}
+
+						addAnalytics("delete list (list)");
 						return true;
 					case R.id.update_list:
 						ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
@@ -399,6 +402,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						if (mOnDialogShownListener != null) {
 							mOnDialogShownListener.onOpenDialog(mList.getId());
 						}
+
+						addAnalytics("update list (list)");
+
 						return true;
 					case R.id.settings:
 						Intent i = new Intent(getActivity(), SettingsActivity.class);
@@ -427,9 +433,15 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				switch (item.getItemId()) {
 					case R.id.collapse_all:
 						mAdapterRV.collapseAllCategory(true);
+
+						addAnalytics("collapse category (list)");
+
 						return true;
 					case R.id.expanded_all:
 						mAdapterRV.extendAllCategory(true);
+
+						addAnalytics("extend category (list)");
+
 						return true;
 					default:
 						return false;
@@ -1112,6 +1124,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		b.singleUse(Showcase.SHOT_CATEGORY_COLLAPSE).show();
 	}
 	//</editor-fold>
+
+	private void addAnalytics(String value) {
+		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.SELECT_CONTENT)
+				.putString(FirebaseAnalytic.TYPE, value)
+				.addEvent();
+	}
 
 	private static class ItemsInListCursorLoader extends CursorLoader {
 		private final Context mContext;

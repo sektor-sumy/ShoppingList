@@ -12,6 +12,7 @@ import com.larswerkman.lobsterpicker.sliders.LobsterShadeSlider;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
+import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
 public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 	private static final String STATE_COLOR = "state_color";
@@ -95,6 +96,7 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 
 			if (getArguments() == null) {
 				id = categoryDS.add(new Category(name, color));
+				addAnalytics(FirebaseAnalytic.CATEGORY, name);
 			} else {
 				id = mEditItem.getId();
 				categoryDS.update(new Category(id, name, color));

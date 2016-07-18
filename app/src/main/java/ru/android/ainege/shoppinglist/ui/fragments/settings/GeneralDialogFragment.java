@@ -15,6 +15,7 @@ import android.widget.EditText;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.Dictionary;
+import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
 public abstract class GeneralDialogFragment<T extends Dictionary> extends DialogFragment {
 	protected static final String ITEM = "item";
@@ -72,6 +73,7 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 			@Override
 			public void onClick(View v) {
 				Boolean wantToCloseDialog = saveData();
+
 				if (wantToCloseDialog) {
 					dialog.dismiss();
 				}
@@ -114,5 +116,12 @@ public abstract class GeneralDialogFragment<T extends Dictionary> extends Dialog
 		}
 
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
+	}
+
+	protected void addAnalytics(String catalog, String name) {
+		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.SELECT_CONTENT)
+				.putString(FirebaseAnalytic.TYPE, "add " + catalog)
+				.putString(FirebaseAnalytic.NEW + " " + catalog, name)
+				.addEvent();
 	}
 }

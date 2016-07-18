@@ -8,6 +8,7 @@ import android.view.View;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
+import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
 public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 
@@ -52,13 +53,13 @@ public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 			long id;
 			if (getArguments() == null) {
 				id = unitDS.add(new Unit(name));
+				addAnalytics(FirebaseAnalytic.UNIT, name);
 			} else {
 				id = mEditItem.getId();
 				unitDS.update(new Unit(id, name));
 			}
 
 			sendResult(id);
-
 			isSave = true;
 		}
 

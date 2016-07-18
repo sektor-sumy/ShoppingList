@@ -11,6 +11,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.ui.activities.SingleFragmentActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
+import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
 public class ListsActivity extends SingleFragmentActivity {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
@@ -101,6 +102,7 @@ public class ListsActivity extends SingleFragmentActivity {
 
 	private void init() {
 		SharedPreferences sp = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		addAnalytics();
 
 		if (sp.getBoolean("isFirst", false)) {
 			return;
@@ -129,5 +131,17 @@ public class ListsActivity extends SingleFragmentActivity {
 			currenciesDS.update("ман.", "\u20BC");
 			currenciesDS.update("тг", "\u20B8");
 		}
+	}
+
+	private void addAnalytics() {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+
+		FirebaseAnalytic.getInstance(this, null)
+				.setUserProperty(FirebaseAnalytic.IS_OPEN_LAST_LIST, String.valueOf(settings.getBoolean(getString(R.string.settings_key_open_last_list), false)))
+				.setUserProperty(FirebaseAnalytic.IS_BOUGHT_END, String.valueOf(settings.getBoolean(getString(R.string.settings_key_sort_is_bought), true)))
+				.setUserProperty(FirebaseAnalytic.USE_CATEGORY, String.valueOf(settings.getBoolean(getString(R.string.settings_key_use_category), true)))
+				.setUserProperty(FirebaseAnalytic.AUTO_COMPLETE_DATA, String.valueOf(settings.getBoolean(getString(R.string.settings_key_auto_complete_data), true)))
+				.setUserProperty(FirebaseAnalytic.TRANSITION_TO_SETTINGS, String.valueOf(settings.getBoolean(getString(R.string.settings_key_transition), false)))
+				.setUserProperty(FirebaseAnalytic.FAST_EDIT_CATALOGS, String.valueOf(settings.getBoolean(getString(R.string.settings_key_fast_edit), true)));
 	}
 }

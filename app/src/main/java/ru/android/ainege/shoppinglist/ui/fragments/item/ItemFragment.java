@@ -67,11 +67,11 @@ import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.CategoryDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.GeneralDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.UnitDialogFragment;
 import ru.android.ainege.shoppinglist.util.AndroidBug5497Workaround;
+import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import ru.android.ainege.shoppinglist.util.Validation;
@@ -83,8 +83,8 @@ import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCurs
 
 public abstract class ItemFragment extends Fragment implements OnBackPressedListener {
 	public static final String ID_ITEM = "idItem";
-	protected static final String UNIT_ADD_DATE = "addItemDialog";
-	protected static final String CATEGORY_ADD_DATE = "addItemDialog";
+	protected static final String UNIT_ADD_DATE = "addUnitDialog";
+	protected static final String CATEGORY_ADD_DATE = "addCategoryDialog";
 	private static final int TAKE_PHOTO = 0;
 	private static final int LOAD_IMAGE = 1;
 	private static final int IS_SAVE_CHANGES = 2;
@@ -495,7 +495,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	}
 
 	public void updateSpinners() {
-		mIsUseNewItemInSpinner = mPrefs.getBoolean(getString(R.string.settings_key_fast_edit), false);
+		mIsUseNewItemInSpinner = mPrefs.getBoolean(getString(R.string.settings_key_fast_edit), true);
 
 		setUnit(-1);
 		setCategory(-1);
@@ -586,12 +586,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 					@Override
 					public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 						if (position == 0 && id == -1) {
-							GeneralDialogFragment addItemDialog = new UnitDialogFragment();
-							addItemDialog.setTargetFragment(ItemFragment.this, UNIT_ADD);
-							addItemDialog.show(getFragmentManager(), UNIT_ADD_DATE);
-							if (mOnDialogShownListener != null) {
-								mOnDialogShownListener.onOpenDialog(-1);
-							}
+							openAddItemDialog(UNIT_ADD, UNIT_ADD_DATE);
 						} else {
 							mIdSelectedUnit = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
 						}
@@ -638,12 +633,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 					@Override
 					public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 						if (position == 0 && id == -1) {
-							GeneralDialogFragment addItemDialog = new CategoryDialogFragment();
-							addItemDialog.setTargetFragment(ItemFragment.this, CATEGORY_ADD);
-							addItemDialog.show(getFragmentManager(), CATEGORY_ADD_DATE);
-							if (mOnDialogShownListener != null) {
-								mOnDialogShownListener.onOpenDialog(-1);
-							}
+							openAddItemDialog(CATEGORY_ADD, CATEGORY_ADD_DATE);
 						} else {
 							mIdSelectedCategory = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
 						}
@@ -912,6 +902,10 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		} else {
 			startActivityForResult(i, code);
 		}
+
+		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.SELECT_CONTENT)
+				.putString(FirebaseAnalytic.TYPE, value + " (item)")
+				.addEvent();
 	}
 
 	private boolean hasPermission(String permission){
@@ -960,6 +954,20 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 			InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
+	}
+
+	private void openAddItemDialog (int requestCode, String tag) {
+		GeneralDialogFragment addItemDialog = new UnitDialogFragment();
+		addItemDialog.setTargetFragment(ItemFragment.this, requestCode);
+		addItemDialog.show(getFragmentManager(), tag);
+
+		if (mOnDialogShownListener != null) {
+			mOnDialogShownListener.onOpenDialog(-1);
+		}
+
+		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.SELECT_CONTENT)
+				.putString(FirebaseAnalytic.TYPE, tag + " (item)")
+				.addEvent();
 	}
 
 	private class ColorAdapter extends SimpleCursorAdapter {

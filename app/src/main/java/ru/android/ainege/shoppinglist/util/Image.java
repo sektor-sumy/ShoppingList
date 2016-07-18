@@ -13,6 +13,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -129,6 +130,7 @@ public class Image {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			FirebaseCrash.report(e);
 			return false;
 		}
 
