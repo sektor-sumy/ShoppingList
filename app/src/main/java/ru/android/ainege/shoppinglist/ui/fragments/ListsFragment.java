@@ -150,7 +150,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mAddButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				ListDialogFragment addListDialog = new ListDialogFragment();
+				ListDialogFragment addListDialog = new AddListDialogFragment();
 				addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
 				addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
 
@@ -559,7 +559,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						int itemPosition = getAdapterPosition();
 						List list = mLists.get(itemPosition);
 
-						ListDialogFragment editListDialog = ListDialogFragment.newInstance(list);
+						ListDialogFragment editListDialog = EditListDialogFragment.newInstance(list);
 						editListDialog.setTargetFragment(ListsFragment.this, EDIT_LIST);
 						editListDialog.show(getFragmentManager(), EDIT_LIST_DATE);
 
