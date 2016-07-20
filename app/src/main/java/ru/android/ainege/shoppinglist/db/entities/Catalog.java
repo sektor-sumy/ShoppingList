@@ -2,15 +2,15 @@ package ru.android.ainege.shoppinglist.db.entities;
 
 import java.io.Serializable;
 
-public class Dictionary implements Serializable {
+public class Catalog implements Serializable {
 	private long mId;
 	private String mName;
 
-	public Dictionary(String name) {
+	public Catalog(String name) {
 		mName = name;
 	}
 
-	public Dictionary(long id, String name) {
+	public Catalog(long id, String name) {
 		this(name);
 		mId = id;
 	}

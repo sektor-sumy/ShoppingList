@@ -29,11 +29,11 @@ public class Migration2 {
 	}
 
 	private void upgradeUnit() {
-		HashMap<String, Unit> dictionary = UnitsDS.getUnit(mDb);
+		HashMap<String, Unit> catalog = UnitsDS.getUnit(mDb);
 		String[] units = mCtx.getResources().getStringArray(R.array.units);
 
 		for (String unit : units) {
-			if (!dictionary.containsKey(unit.toLowerCase())) {
+			if (!catalog.containsKey(unit.toLowerCase())) {
 				ContentValues contentValue = new ContentValues();
 				contentValue.put(UnitT.COLUMN_NAME, unit);
 				mDb.insert(UnitT.TABLE_NAME, null, contentValue);

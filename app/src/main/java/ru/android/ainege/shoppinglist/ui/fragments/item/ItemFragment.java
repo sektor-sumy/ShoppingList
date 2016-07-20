@@ -59,15 +59,15 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
-import ru.android.ainege.shoppinglist.db.entities.Dictionary;
+import ru.android.ainege.shoppinglist.db.entities.Catalog;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
-import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
+import ru.android.ainege.shoppinglist.ui.activities.SettingsCatalogActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.CatalogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.GeneralDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.UnitDialogFragment;
 import ru.android.ainege.shoppinglist.util.AndroidBug5497Workaround;
@@ -435,13 +435,13 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 				if (mOnItemChangedListener != null) {
 					mOnItemChangedListener.updateCurrentList();
 				}
-				setUnit(data.getLongExtra(DictionaryFragment.LAST_EDIT, -1));
+				setUnit(data.getLongExtra(CatalogFragment.LAST_EDIT, -1));
 				break;
 			case CATEGORY_SETTINGS:
 				if (mOnItemChangedListener != null) {
 					mOnItemChangedListener.updateCurrentList();
 				}
-				setCategory(data.getLongExtra(DictionaryFragment.LAST_EDIT, -1));
+				setCategory(data.getLongExtra(CatalogFragment.LAST_EDIT, -1));
 				break;
 			case UNIT_ADD:
 				mUnit.setAdapter(getUnitsAdapter());
@@ -753,7 +753,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	protected int getPosition(Spinner spinner, long id) {
 		int index = -1;
 		for (int i = 0; i < spinner.getCount(); i++) {
-			if (((EntityCursor<Dictionary>) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
+			if (((EntityCursor<Catalog>) spinner.getItemAtPosition(i)).getEntity().getId() == id) {
 				index = i;
 				break;
 			}
@@ -896,8 +896,8 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	}
 
 	private void settingOnClickListener(String value, int code) {
-		Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
-		i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, value);
+		Intent i = new Intent(getActivity(), SettingsCatalogActivity.class);
+		i.putExtra(SettingsCatalogActivity.EXTRA_TYPE, value);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			startActivityForResult(i, code, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());

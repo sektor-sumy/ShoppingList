@@ -14,7 +14,7 @@ import ru.android.ainege.shoppinglist.db.entities.Unit;
 import ru.android.ainege.shoppinglist.db.TableInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.ItemDataInterface;
 
-public class UnitsDS extends DictionaryDS<Unit> implements TableInterface.UnitsInterface {
+public class UnitsDS extends CatalogDS<Unit> implements TableInterface.UnitsInterface {
 
 	public UnitsDS(Context context) {
 		super(context);
@@ -113,7 +113,7 @@ public class UnitsDS extends DictionaryDS<Unit> implements TableInterface.UnitsI
 		return values;
 	}
 
-	public static class UnitCursor extends DictionaryCursor<Unit> {
+	public static class UnitCursor extends CatalogCursor<Unit> {
 		public UnitCursor(Cursor cursor) {
 			super(cursor);
 		}

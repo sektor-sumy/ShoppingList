@@ -38,7 +38,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.CatalogFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -245,7 +245,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 				break;
 			case SETTINGS:
-				long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
+				long modifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
 
 				if (modifyCatalog != -1 && mOnListChangedListener != null) {
 					mOnListChangedListener.updateCurrentList();

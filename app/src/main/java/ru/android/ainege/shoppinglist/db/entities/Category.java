@@ -2,7 +2,7 @@ package ru.android.ainege.shoppinglist.db.entities;
 
 import java.util.ArrayList;
 
-public class Category extends Dictionary {
+public class Category extends Catalog {
 	private int mColor;
 	private ArrayList<ShoppingList> mItemsByCategoriesInList;
 

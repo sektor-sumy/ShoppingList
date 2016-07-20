@@ -1,6 +1,6 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-public class Currency extends Dictionary {
+public class Currency extends Catalog {
 	private String mSymbol;
 
 	public Currency(String name, String symbol) {

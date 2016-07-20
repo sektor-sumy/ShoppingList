@@ -7,11 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
+import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
-public class UnitFragment extends DictionaryFragment<Unit> {
+public class UnitFragment extends CatalogFragment<Unit> {
 
 	@Override
 	protected String getTitle() {
@@ -31,7 +31,7 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 	}
 
 	@Override
-	protected DictionaryDS getDS() {
+	protected CatalogDS getDS() {
 		return new UnitsDS(getActivity());
 	}
 
@@ -50,14 +50,14 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 		switch (loader.getId()) {
 			case DATA_LOADER:
 				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
-					mDictionary = mSaveListRotate;
+					mCatalog = mSaveListRotate;
 					mAdapterRV.notifyDataSetChanged();
 				} else if (mSaveListRotate == null && data.moveToFirst()) {
-					mDictionary = ((UnitsDS.UnitCursor) data).getEntities();
+					mCatalog = ((UnitsDS.UnitCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
 
 					if (mLastEditId != -1) {
-						mDictionaryRV.scrollToPosition(getPosition(mLastEditId));
+						mCatalogRV.scrollToPosition(getPosition(mLastEditId));
 					}
 				}
 
@@ -69,7 +69,7 @@ public class UnitFragment extends DictionaryFragment<Unit> {
 
 	@Override
 	protected void showEditDialog(int position) {
-		GeneralDialogFragment editItemDialog = UnitDialogFragment.newInstance(mDictionary.get(position));
+		GeneralDialogFragment editItemDialog = UnitDialogFragment.newInstance(mCatalog.get(position));
 		editItemDialog.setTargetFragment(UnitFragment.this, EDIT);
 		editItemDialog.show(getFragmentManager(), EDIT_DATE);
 	}

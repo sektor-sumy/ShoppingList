@@ -9,7 +9,7 @@ import ru.android.ainege.shoppinglist.db.TableInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.ListsInterface;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
-public class CurrenciesDS extends DictionaryDS<Currency> implements TableInterface.CurrenciesInterface {
+public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.CurrenciesInterface {
 	public CurrenciesDS(Context context) {
 		super(context);
 	}
@@ -106,7 +106,7 @@ public class CurrenciesDS extends DictionaryDS<Currency> implements TableInterfa
 		return values;
 	}
 
-	public static class CurrencyCursor extends DictionaryCursor<Currency> {
+	public static class CurrencyCursor extends CatalogCursor<Currency> {
 		public CurrencyCursor(Cursor cursor) {
 			super(cursor);
 		}

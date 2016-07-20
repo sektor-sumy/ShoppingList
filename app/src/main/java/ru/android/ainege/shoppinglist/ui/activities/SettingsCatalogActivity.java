@@ -10,9 +10,9 @@ import ru.android.ainege.shoppinglist.ui.fragments.settings.CategoryFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.CurrencyFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.UnitFragment;
 
-public class SettingsDictionaryActivity extends SingleFragmentActivity {
+public class SettingsCatalogActivity extends SingleFragmentActivity {
 	public final static String EXTRA_TYPE = "type";
-	private final static String FRAGMENT_TAG = "settings_dictionary_tag";
+	private final static String FRAGMENT_TAG = "settings_catalog_tag";
 
 	private OnBackPressedListener mOnBackPressedListener;
 
