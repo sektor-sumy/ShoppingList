@@ -45,8 +45,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.io.File;
-import java.io.IOException;
 import java.text.NumberFormat;
 
 import ru.android.ainege.shoppinglist.R;
@@ -413,9 +414,9 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 				dataFragment.execute(mAppBarImage, mItemInList.getItem().getImagePath(), mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
-				try {
-					File file = Image.create().createImageFile();
+				File file = Image.create().createImageFile();
 
+				try {
 					if (file != null) {
 						Uri selectedImage = data.getData();
 						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
@@ -423,8 +424,10 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 					} else {
 						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
-				} catch (IOException e) {
+				} catch (OutOfMemoryError | Exception e) {
 					e.printStackTrace();
+					FirebaseCrash.report(e);
+					Image.deleteFile(file.getAbsolutePath());
 				}
 
 				break;

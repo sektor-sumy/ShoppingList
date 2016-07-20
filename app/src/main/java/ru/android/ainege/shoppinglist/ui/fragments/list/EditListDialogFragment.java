@@ -27,21 +27,20 @@ public class EditListDialogFragment extends ListDialogFragment {
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		AlertDialog.Builder builder = createDialog(savedInstanceState);
-
 		mOriginalList = new List((List) getArguments().getSerializable(LIST));
 		mEditList = new List((List) getArguments().getSerializable(LIST));
 
-		if (mDataFragment == null || savedInstanceState == null) {
-			mDataFragment = new RetainedFragment(getActivity());
-			getFragmentManager().beginTransaction().add(mDataFragment, RETAINED_FRAGMENT).commit();
+		return super.onCreateDialog(savedInstanceState);
+	}
 
-			setDataToView();
-		} else {
-			loadImage(mDataFragment.getImagePath());
-		}
+	@Override
+	protected void setDataToView() {
+		loadImage(mEditList.getImagePath());
 
-		return builder.create();
+		mName.setText(mEditList.getName());
+		mName.setSelection(mName.getText().length());
+
+		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
 	}
 
 	@Override
@@ -62,14 +61,5 @@ public class EditListDialogFragment extends ListDialogFragment {
 				!mImagePath.contains(Image.ASSETS_IMAGE_PATH) &&
 				!newPath.equals(mImagePath) &&
 				!mOriginalList.getImagePath().equals(mImagePath);
-	}
-
-	private void setDataToView() {
-		loadImage(mEditList.getImagePath());
-
-		mName.setText(mEditList.getName());
-		mName.setSelection(mName.getText().length());
-
-		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
 	}
 }

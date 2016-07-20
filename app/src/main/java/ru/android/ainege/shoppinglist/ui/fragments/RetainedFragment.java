@@ -56,7 +56,7 @@ public class RetainedFragment extends Fragment implements OnFinishedImageListene
 		mImageView = view;
 
 		mIsLoading = true;
-		Image.create().insertImageToView(mActivity, "android.resource://ru.android.ainege.shoppinglist/" + Image.mLoadingImage, mImageView);
+		Image.create().insertImageToView(mActivity, Image.getPathFromResource(Image.mLoadingImage), mImageView);
 		new Image.BitmapWorkerTask(file, bitmap, widthImageView, this).execute();
 	}
 

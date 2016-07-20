@@ -63,6 +63,7 @@ public class AddItemFragment extends ItemFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mItemInList = new ShoppingList(getIdList());
+		mItemInList.getItem().setImagePath(Image.getPathFromResource(R.drawable.no_image));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setEnterTransition(new Fade());
@@ -322,7 +323,7 @@ public class AddItemFragment extends ItemFragment {
 				Image.deleteFile(mItemInList.getItem().getImagePath());
 			}
 
-			mItemInList.getItem().setImagePath(null);
+			mItemInList.getItem().setImagePath(Image.getPathFromResource(R.drawable.no_image));
 			mAppBarImage.setImageResource(R.drawable.no_image);
 			mCollapsingToolbarLayout.setTitle(getString(R.string.add));
 		}

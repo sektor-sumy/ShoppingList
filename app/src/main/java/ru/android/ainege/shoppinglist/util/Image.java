@@ -35,6 +35,7 @@ public class Image {
 	public static final String CHARACTER_IMAGE_PATH = ASSETS_IMAGE_PATH + "character/";
 	public static final String LIST_IMAGE_PATH = ASSETS_IMAGE_PATH + "list/";
 	public static final String ITEM_IMAGE_PATH = ASSETS_IMAGE_PATH + "item/";
+	public static final String RESOURCE_PATH = "android.resource://ru.android.ainege.shoppinglist/";
 	private static final double MIN_RATIO = 1.25;
 	private static final double MAX_RATIO = 2;
 
@@ -58,8 +59,14 @@ public class Image {
 		return result;
 	}
 
+	public static String getPathFromResource(int resource) {
+		return RESOURCE_PATH + resource;
+	}
+
 	public Image insertImageToView(Context context, String path, ImageView image) {
-		insertImageToView(context, Uri.parse(path), image);
+		if (path != null) {
+			insertImageToView(context, Uri.parse(path), image);
+		}
 		return this;
 	}
 
@@ -120,18 +127,11 @@ public class Image {
 		if (!isExternalStorageReadable()) {
 			return false;
 		}
-		Bitmap bitmap;
 
-		try {
-			bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+		Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
 
-			if (bitmap == null) {
-				throw new NullPointerException("Bitmap is null");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			FirebaseCrash.report(e);
-			return false;
+		if (bitmap == null) {
+			throw new NullPointerException("Bitmap is null");
 		}
 
 		return postProcessingToFile(file, bitmap, widthImageView);
@@ -279,10 +279,17 @@ public class Image {
 		protected Boolean doInBackground(Integer... params) {
 			boolean result;
 
-			if (mBitmap == null) {
-				result = Image.create().postProcessingToFile(mFile, mWidthImageView);
-			} else {
-				result = Image.create().postProcessingToFile(mFile, mBitmap, mWidthImageView);
+			try {
+				if (mBitmap == null) {
+					result = Image.create().postProcessingToFile(mFile, mWidthImageView);
+				} else {
+					result = Image.create().postProcessingToFile(mFile, mBitmap, mWidthImageView);
+				}
+			} catch (OutOfMemoryError | Exception e) {
+				e.printStackTrace();
+				FirebaseCrash.report(e);
+				deleteFile(mFile.getAbsolutePath());
+				result = false;
 			}
 
 			return result;

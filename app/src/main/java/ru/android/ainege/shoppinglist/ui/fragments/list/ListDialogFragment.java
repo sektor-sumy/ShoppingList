@@ -29,8 +29,9 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 
 import ru.android.ainege.shoppinglist.R;
@@ -61,6 +62,7 @@ public abstract class ListDialogFragment extends DialogFragment {
 	protected RetainedFragment mDataFragment;
 
 	protected abstract long save(ListsDS listDS, String name, long idCurrency);
+	protected abstract void setDataToView();
 
 	@Override
 	public void onStart() {
@@ -171,9 +173,9 @@ public abstract class ListDialogFragment extends DialogFragment {
 				mDataFragment.execute(mImageList, mImagePath, mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
-				try {
-					File file = Image.create().createImageFile();
+				File file = Image.create().createImageFile();
 
+				try {
 					if (file != null) {
 						Uri selectedImage = data.getData();
 						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
@@ -181,8 +183,10 @@ public abstract class ListDialogFragment extends DialogFragment {
 					} else {
 						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
-				} catch (IOException e) {
+				} catch (OutOfMemoryError | Exception e) {
 					e.printStackTrace();
+					FirebaseCrash.report(e);
+					Image.deleteFile(file.getAbsolutePath());
 				}
 
 				break;
@@ -241,7 +245,7 @@ public abstract class ListDialogFragment extends DialogFragment {
 		loadImage(path);
 	}
 
-	protected AlertDialog.Builder createDialog(Bundle savedInstanceState) {
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_list, null);
 
@@ -261,6 +265,16 @@ public abstract class ListDialogFragment extends DialogFragment {
 		mCurrency.setSelection(getPosition(mCurrency, getDefaultIdCurrency()));
 
 		mDataFragment = (RetainedFragment) getFragmentManager().findFragmentByTag(RETAINED_FRAGMENT);
+
+		if (mDataFragment == null || savedInstanceState == null) {
+			mDataFragment = new RetainedFragment(getActivity());
+			getFragmentManager().beginTransaction().add(mDataFragment, RETAINED_FRAGMENT).commit();
+
+			setDataToView();
+		} else {
+			loadImage(mDataFragment.getImagePath());
+		}
+
 		mDataFragment.setOnLoadedFinish(new OnFinishedImageListener() {
 			@Override
 			public void onFinished(boolean isSuccess, String path) {
@@ -287,7 +301,7 @@ public abstract class ListDialogFragment extends DialogFragment {
 					}
 				});
 
-		return builder;
+		return builder.create();
 	}
 
 	protected boolean isDeleteImage(String newPath) {
