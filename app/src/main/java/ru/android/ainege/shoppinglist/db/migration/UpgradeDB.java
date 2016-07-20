@@ -1,13 +1,19 @@
 package ru.android.ainege.shoppinglist.db.migration;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-public class UpgradeDB {
+public abstract class UpgradeDB {
 	protected static final String TMP_TABLE_SUFFIX = "_tmp";
-	private SQLiteDatabase mDb;
 
-	protected UpgradeDB(SQLiteDatabase db) {
+	protected SQLiteDatabase mDb;
+	protected Context mCtx;
+
+	public abstract void run();
+
+	public UpgradeDB(SQLiteDatabase db, Context ctx) {
 		mDb = db;
+		mCtx = ctx;
 	}
 
 	protected void createTemporaryTable(String query) {

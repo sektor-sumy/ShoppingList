@@ -89,9 +89,10 @@ public class Image {
 		return this;
 	}
 
-	public File createImageFile() {
+	public File createImageFile(Context context) {
 		if (isExternalStorageWritable()) {
-			File mediaStorageDir = getAlbumStorageDir();
+			File mediaStorageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
 			if (mediaStorageDir == null) {
 				return null;
 			}
@@ -168,18 +169,6 @@ public class Image {
 		String state = Environment.getExternalStorageState();
 		return Environment.MEDIA_MOUNTED.equals(state) ||
 				Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
-	}
-
-	private File getAlbumStorageDir() {
-		File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-				Environment.DIRECTORY_PICTURES), "ShopList");
-
-		if (!mediaStorageDir.exists()) {
-			if (!mediaStorageDir.mkdirs()) {
-				return null;
-			}
-		}
-		return mediaStorageDir;
 	}
 
 	private Bitmap postProcessing(Bitmap bitmap, int widthImageView) {

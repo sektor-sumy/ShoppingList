@@ -7,10 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import ru.android.ainege.shoppinglist.db.migration.Create;
 import ru.android.ainege.shoppinglist.db.migration.Migration2;
 import ru.android.ainege.shoppinglist.db.migration.Migration3;
+import ru.android.ainege.shoppinglist.db.migration.Migration4;
 
 public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "shoppingList.db";
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	private static ShoppingListSQLiteHelper instance;
 	private final Context mCtx;
 
@@ -63,6 +64,8 @@ public class ShoppingListSQLiteHelper extends SQLiteOpenHelper {
 				new Migration2(db, mCtx).run();
 			case 2:
 				new Migration3(db, mCtx).run();
+			case 3:
+				new Migration4(db, mCtx).run();
 		}
 	}
 }

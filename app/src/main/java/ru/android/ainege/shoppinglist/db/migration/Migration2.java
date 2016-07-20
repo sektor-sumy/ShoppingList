@@ -14,15 +14,13 @@ import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 import ru.android.ainege.shoppinglist.util.Image;
 
-public class Migration2 {
-	private SQLiteDatabase mDb;
-	private Context mCtx;
+public class Migration2 extends UpgradeDB{
 
 	public Migration2(SQLiteDatabase db, Context ctx) {
-		mDb = db;
-		mCtx = ctx;
+		super(db, ctx);
 	}
 
+	@Override
 	public void run() {
 		upgradeUnit();
 		upgradeItem();

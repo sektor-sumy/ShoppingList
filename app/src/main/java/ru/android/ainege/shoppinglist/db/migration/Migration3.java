@@ -15,15 +15,12 @@ import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.PrefsManager;
 
 public class Migration3 extends UpgradeDB {
-	private SQLiteDatabase mDb;
-	private Context mCtx;
 
 	public Migration3(SQLiteDatabase db, Context ctx) {
-		super(db);
-		mDb = db;
-		mCtx = ctx;
+		super(db, ctx);
 	}
 
+	@Override
 	public void run() {
 		upgradeDB();
 		updateShowcase();

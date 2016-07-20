@@ -173,7 +173,7 @@ public abstract class ListDialogFragment extends DialogFragment {
 				mDataFragment.execute(mImageList, mImagePath, mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
-				File file = Image.create().createImageFile();
+				File file = Image.create().createImageFile(getActivity());
 
 				try {
 					if (file != null) {
@@ -364,7 +364,7 @@ public abstract class ListDialogFragment extends DialogFragment {
 
 	private void takePhoto(){
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		mFile = Image.create().createImageFile();
+		mFile = Image.create().createImageFile(getActivity());
 
 		if (mFile != null) {
 			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));

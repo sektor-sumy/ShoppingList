@@ -414,7 +414,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 				dataFragment.execute(mAppBarImage, mItemInList.getItem().getImagePath(), mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
-				File file = Image.create().createImageFile();
+				File file = Image.create().createImageFile(getActivity());
 
 				try {
 					if (file != null) {
@@ -919,7 +919,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 
 	private void takePhoto(){
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		mFile = Image.create().createImageFile();
+		mFile = Image.create().createImageFile(getActivity());
 
 		if (mFile != null) {
 			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
