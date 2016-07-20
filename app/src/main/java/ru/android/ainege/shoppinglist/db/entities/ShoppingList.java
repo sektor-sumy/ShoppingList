@@ -49,8 +49,8 @@ public class ShoppingList extends ItemData {
 		mIdItem = list.getIdItem();
 		mIdList = list.getIdList();
 		mIsBought = list.isBought();
-		mItem = list.getItem();
 		mDate = list.getDate();
+		setItem(new Item(list.getItem()));
 	}
 
 	public static void setSortSettings(boolean isBoughtEndInList) {

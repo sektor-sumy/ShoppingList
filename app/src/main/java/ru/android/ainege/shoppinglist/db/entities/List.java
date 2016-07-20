@@ -15,15 +15,19 @@ public class List implements Serializable {
 	private int mAmountBoughtItems;
 	private int mAmountItems;
 
-	public List(String name, long currency, String imagePath) {
+	public List(String name, long idCurrency, String imagePath) {
 		mName = name;
-		mIdCurrency = currency;
+		mIdCurrency = idCurrency;
 		mImagePath = imagePath;
 	}
 
 	public List(long id, String name, long idCurrency, String imagePath) {
 		this(name, idCurrency, imagePath);
 		mId = id;
+	}
+
+	public List(List list) {
+		this(list.getId(), list.getName(), list.getIdCurrency(), list.getImagePath());
 	}
 
 	public long getId() {

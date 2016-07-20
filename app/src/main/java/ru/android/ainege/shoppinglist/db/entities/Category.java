@@ -9,6 +9,10 @@ public class Category extends Dictionary {
 	private double mSpentSum;
 	private int mBoughtItemsCount;
 
+	public Category(Category category) {
+		this(category.getId(), category.getName(), category.getColor());
+	}
+
 	public Category(String name, int color) {
 		super(name);
 		mColor = color;

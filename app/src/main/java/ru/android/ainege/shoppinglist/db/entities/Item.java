@@ -6,7 +6,15 @@ public class Item extends ItemData {
 	private String mDefaultImagePath;
 	private String mImagePath;
 
-	public Item(){}
+	public Item() {}
+
+	public Item(Item item) {
+		super(item);
+		mId = item.getId();
+		mName = item.getName();
+		mDefaultImagePath = item.getDefaultImagePath();
+		mImagePath = item.getImagePath();
+	}
 
 	public Item(String name, String defaultImagePath) {
 		mName = name;

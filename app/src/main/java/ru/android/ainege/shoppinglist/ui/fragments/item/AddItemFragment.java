@@ -185,10 +185,10 @@ public class AddItemFragment extends ItemFragment {
 			private void setDefaultData(Item item) {
 				mItemInList.setIdItem(item.getId());
 
+				loadImage(item.getImagePath());
 				mItemInList.getItem().setDefaultImagePath(item.getDefaultImagePath());
 				mItemInList.getItem().setIdItemData(item.getIdItemData());
 				setSelectionCategory(item.getIdCategory());
-				loadImage(item.getImagePath());
 			}
 		};
 	}
@@ -275,7 +275,7 @@ public class AddItemFragment extends ItemFragment {
 
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
 				!mPriceInputLayout.isErrorEnabled()) {
-			updateItemInList();
+			updatedItem();
 			mItemInList.updateItem(getActivity());
 
 			if (mInfo.getVisibility() == View.VISIBLE) { //If item in list, update it
@@ -296,7 +296,7 @@ public class AddItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected void updatedItem() {
+	protected ShoppingList updatedItem() {
 		if (mItemInList.getItem().isNew()) {
 			String image = mItemInList.getItem().getImagePath();
 			String defaultImage = mItemInList.getItem().getDefaultImagePath();
@@ -310,6 +310,7 @@ public class AddItemFragment extends ItemFragment {
 			mItemInList.getItem().setName(getName());
 		}
 
+		return super.updatedItem();
 	}
 
 	@Override
@@ -317,10 +318,39 @@ public class AddItemFragment extends ItemFragment {
 		if (!mItemInList.getItem().isNew() && mItemInList.getItem().getDefaultImagePath() != null) {
 			loadImage(mItemInList.getItem().getDefaultImagePath());
 		} else {
+			if (!mItemInList.getItem().getImagePath().contains(Image.ASSETS_IMAGE_PATH)) {
+				Image.deleteFile(mItemInList.getItem().getImagePath());
+			}
+
 			mItemInList.getItem().setImagePath(null);
 			mAppBarImage.setImageResource(R.drawable.no_image);
 			mCollapsingToolbarLayout.setTitle(getString(R.string.add));
 		}
+	}
+
+	@Override
+	protected boolean isDeleteImage(String newPath) {
+		boolean result = true;
+
+		if(mItemInList.getItem() == null) {
+			return false;
+		}
+		String imagePath = mItemInList.getItem().getImagePath();
+		String dPath  = mItemInList.getItem().getDefaultImagePath();
+
+		if (dPath == null && imagePath == null) {
+			result = false;
+		} else{
+			if (imagePath != null) {
+				result = !imagePath.contains(Image.ASSETS_IMAGE_PATH);
+			}
+
+			if (dPath != null) {
+				result = result && !newPath.equals(imagePath) && !dPath.equals(imagePath);
+			}
+		}
+
+		return result;
 	}
 
 	private int getPosition(Spinner spinner, String name) {

@@ -21,8 +21,14 @@ public class ItemData implements Serializable {
 		mAmount = itemData.getAmount();
 		mPrice = itemData.getPrice();
 		mComment = itemData.getComment();
-		setUnit(itemData.getUnit());
-		setCategory(itemData.getCategory());
+
+		if (itemData.getUnit() != null) {
+			setUnit(new Unit(itemData.getUnit()));
+		}
+
+		if (itemData.getCategory() != null) {
+			setCategory(new Category(itemData.getCategory()));
+		}
 	}
 
 	public long getIdItemData() {

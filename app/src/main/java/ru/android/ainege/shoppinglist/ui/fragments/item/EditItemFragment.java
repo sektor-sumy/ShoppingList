@@ -18,13 +18,14 @@ import ru.android.ainege.shoppinglist.db.dataSources.ItemDS.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.util.Image;
 
 import static java.lang.String.format;
 
 public class EditItemFragment extends ItemFragment {
 	private static final String ITEM_IN_LIST = "itemInList";
 
-	private long mOriginalIdItem;
+	private ShoppingList mOriginalItem;
 
 	public static EditItemFragment newInstance(ShoppingList itemInList) {
 		Bundle args = new Bundle();
@@ -39,8 +40,8 @@ public class EditItemFragment extends ItemFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mOriginalItem = new ShoppingList((ShoppingList) getArguments().getSerializable(ITEM_IN_LIST));
 		mItemInList = new ShoppingList((ShoppingList) getArguments().getSerializable(ITEM_IN_LIST));
-		mOriginalIdItem = mItemInList.getIdItem();
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setEnterTransition(new Fade());
@@ -165,14 +166,20 @@ public class EditItemFragment extends ItemFragment {
 
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
 				!mPriceInputLayout.isErrorEnabled()) {
-			updateItemInList();
+			updatedItem();
 			boolean isItemChanged = mItemInList.getItem().isNew();
 			mItemInList.updateItem(getActivity());
+			String originImagePath = mOriginalItem.getItem().getImagePath();
 
 			if (!isItemChanged) {
 				mItemsInListDS.update(mItemInList);
 			} else {
-				mItemsInListDS.update(mItemInList, mOriginalIdItem);
+				mItemsInListDS.update(mItemInList, mOriginalItem.getIdItem());
+			}
+
+			if (!originImagePath.contains(Image.ASSETS_IMAGE_PATH) && !mItemInList.getItem().getImagePath().equals(originImagePath) &&
+					!mItemInList.getItem().getDefaultImagePath().equals(originImagePath)) {
+				Image.deleteFile(originImagePath);
 			}
 
 			sendResult(mItemInList.getIdItem());
@@ -187,10 +194,12 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected void updatedItem() {
+	protected ShoppingList updatedItem() {
 		if (!getName().equals(mItemInList.getItem().getName())) {
 			mItemInList.setItem(new Item(getName(), mItemInList.getItem().getImagePath(), mItemInList.getItem().getImagePath()));
 		}
+
+		return super.updatedItem();
 	}
 
 	@Override
@@ -201,10 +210,17 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
-	public boolean onBackPressed() {
-		updateItemInList();
-		ShoppingList gg = (ShoppingList) getArguments().getSerializable(ITEM_IN_LIST);
+	protected boolean isDeleteImage(String newPath) {
+		String imagePath = mItemInList.getItem().getImagePath();
+		String dPath  = mItemInList.getItem().getDefaultImagePath();
 
-		return mItemInList.equals(gg) || super.onBackPressed();
+		return !imagePath.contains(Image.ASSETS_IMAGE_PATH) && !newPath.equals(imagePath) && !dPath.equals(imagePath);
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		updatedItem();
+
+		return mItemInList.equals(mOriginalItem) || super.onBackPressed();
 	}
 }

@@ -57,6 +57,7 @@ public class ListDialogFragment extends DialogFragment {
 	private EditText mName;
 	private Spinner mCurrency;
 
+	private List mOriginalList;
 	private List mEditList;
 	private File mFile;
 	private String mImagePath;
@@ -116,14 +117,16 @@ public class ListDialogFragment extends DialogFragment {
 			fm.beginTransaction().add(dataFragment, RETAINED_FRAGMENT).commit();
 
 			if (getArguments() != null) {
-				mEditList = (List) getArguments().getSerializable(LIST);
+				mOriginalList = new List((List) getArguments().getSerializable(LIST));
+				mEditList = new List((List) getArguments().getSerializable(LIST));
 				setDataToView();
 			} else {
 				setRandomImage();
 			}
 		} else {
 			if (getArguments() != null) {
-				mEditList = (List) getArguments().getSerializable(LIST);
+				mOriginalList = new List((List) getArguments().getSerializable(LIST));
+				mEditList = new List((List) getArguments().getSerializable(LIST));
 			}
 
 			loadImage(dataFragment.getImagePath());
@@ -328,6 +331,10 @@ public class ListDialogFragment extends DialogFragment {
 	}
 
 	private void loadImage(String imagePath) {
+		if (isDeleteImage(imagePath)) {
+			Image.deleteFile(mImagePath);
+		}
+
 		mImagePath = imagePath;
 		Image.create().insertImageToView(getActivity(), mImagePath, mImageList);
 	}
@@ -360,19 +367,21 @@ public class ListDialogFragment extends DialogFragment {
 
 		if (!mNameInputLayout.isErrorEnabled()) {
 			long idCurrency = ((CurrencyCursor) mCurrency.getSelectedItem()).getEntity().getId();
-
 			ListsDS listDS = new ListsDS(getActivity());
-
 			long id;
+
 			if (getArguments() == null) {
 				id = listDS.add(new List(name, idCurrency, mImagePath));
 			} else {
 				id = mEditList.getId();
 				listDS.update(new List(id, name, idCurrency, mImagePath));
+
+				if (!mOriginalList.getImagePath().contains(Image.ASSETS_IMAGE_PATH) && !mImagePath.equals(mOriginalList.getImagePath())) {
+					Image.deleteFile(mOriginalList.getImagePath());
+				}
 			}
 
 			sendResult(Activity.RESULT_OK, new Intent().putExtra(ID_LIST, id));
-
 			isSave = true;
 		}
 
@@ -405,5 +414,17 @@ public class ListDialogFragment extends DialogFragment {
 	private void selectFromGallery() {
 		Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		startActivityForResult(galleryIntent, LOAD_IMAGE);
+	}
+
+	private boolean isDeleteImage(String newPath) {
+		if (mImagePath == null) {
+			return false;
+		}
+
+		if (getArguments() == null) {
+			return !mImagePath.contains(Image.ASSETS_IMAGE_PATH) && !newPath.equals(mImagePath);
+		} else {
+			return !mImagePath.contains(Image.ASSETS_IMAGE_PATH) && !newPath.equals(mImagePath) && !mOriginalList.getImagePath().equals(mImagePath);
+		}
 	}
 }

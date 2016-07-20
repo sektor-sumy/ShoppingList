@@ -149,9 +149,9 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 
 	protected abstract long getIdList();
 
-	protected abstract void updatedItem();
-
 	protected abstract void resetImage();
+
+	protected abstract boolean isDeleteImage(String newPath);
 
 	public interface OnClickListener {
 		void onItemSave(long id, boolean isAdded, boolean isClose);
@@ -675,6 +675,10 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	}
 
 	protected void loadImage(String path) {
+		if (isDeleteImage(path)) {
+			Image.deleteFile(mItemInList.getItem().getImagePath());
+		}
+
 		mItemInList.getItem().setImagePath(path);
 
 		Image.create().insertImageToView(getActivity(), path, mAppBarImage);
@@ -717,9 +721,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		}
 	}
 
-	protected ShoppingList updateItemInList() {
-		updatedItem();
-
+	protected ShoppingList updatedItem() {
 		double amount = 0;
 		if (mAmount.getText().length() > 0) {
 			amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));

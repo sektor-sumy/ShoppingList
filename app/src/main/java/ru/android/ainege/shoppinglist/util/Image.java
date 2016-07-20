@@ -51,7 +51,7 @@ public class Image {
 
 	public static boolean deleteFile(String path) {
 		boolean result = false;
-		if (!path.contains(Image.ASSETS_IMAGE_PATH)) {
+		if (path != null && !path.contains(Image.ASSETS_IMAGE_PATH)) {
 			File f = new File(Uri.parse(path).getPath());
 			result = f.delete();
 		}
