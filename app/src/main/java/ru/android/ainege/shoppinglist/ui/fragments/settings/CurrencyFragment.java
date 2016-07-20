@@ -13,18 +13,18 @@ import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
-import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
+import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 
-public class CurrencyFragment extends DictionaryFragment<Currency> {
+public class CurrencyFragment extends CatalogFragment<Currency> {
 	private void showCaseView() {
 		CurrencyAdapter.CurrencyHolder holder;
 		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CURRENCY);
 
 		if (!sequence.hasFired()) {
-			holder = (CurrencyAdapter.CurrencyHolder) mDictionaryRV.findViewHolderForLayoutPosition(0);
+			holder = (CurrencyAdapter.CurrencyHolder) mCatalogRV.findViewHolderForLayoutPosition(0);
 
 			Showcase.createShowcase(getActivity(), holder.itemView,
 					getString(R.string.showcase_default_currency))
@@ -53,7 +53,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 	}
 
 	@Override
-	protected DictionaryDS getDS() {
+	protected CatalogDS getDS() {
 		return new CurrenciesDS(getActivity());
 	}
 
@@ -72,14 +72,14 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		switch (loader.getId()) {
 			case DATA_LOADER:
 				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
-					mDictionary = mSaveListRotate;
+					mCatalog = mSaveListRotate;
 					mAdapterRV.notifyDataSetChanged();
 				} else if (mSaveListRotate == null && data.moveToFirst()) {
-					mDictionary = ((CurrenciesDS.CurrencyCursor) data).getEntities();
+					mCatalog = ((CurrenciesDS.CurrencyCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
 
 					if (mLastEditId != -1) {
-						mDictionaryRV.scrollToPosition(getPosition(mLastEditId));
+						mCatalogRV.scrollToPosition(getPosition(mLastEditId));
 					}
 				}
 
@@ -91,7 +91,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 	@Override
 	protected void showEditDialog(int position) {
-		GeneralDialogFragment editItemDialog = CurrencyDialogFragment.newInstance(mDictionary.get(position));
+		GeneralDialogFragment editItemDialog = CurrencyDialogFragment.newInstance(mCatalog.get(position));
 		editItemDialog.setTargetFragment(CurrencyFragment.this, EDIT);
 		editItemDialog.show(getFragmentManager(), EDIT_DATE);
 	}
@@ -123,9 +123,9 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 		public void onBindViewHolder(CurrencyHolder holder, int position) {
 			super.onBindViewHolder(holder, position);
 
-			if (mIdSelected == mDictionary.get(position).getId()) {
+			if (mIdSelected == mCatalog.get(position).getId()) {
 				holder.setImageSelected();
-				mIdOld = mDictionary.get(position).getId();
+				mIdOld = mCatalog.get(position).getId();
 			} else {
 				holder.setImageNotSelected();
 			}
@@ -133,7 +133,7 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 
 		@Override
 		public void removeItem(int position) {
-			Currency c = mDictionary.get(position);
+			Currency c = mCatalog.get(position);
 
 			if (c.getId() == mIdSelected) {
 				saveCurrencySetting(-1);
@@ -170,14 +170,14 @@ public class CurrencyFragment extends DictionaryFragment<Currency> {
 					@Override
 					public void onClick(View v) {
 						int itemPosition = getAdapterPosition();
-						Currency currency = mDictionary.get(itemPosition);
+						Currency currency = mCatalog.get(itemPosition);
 
 						saveCurrencySetting(currency.getId());
 
 						setImageSelected();
 						mIdSelected = currency.getId();
 
-						notifyItemChanged(getPosition(mDictionary, mIdOld));
+						notifyItemChanged(getPosition(mCatalog, mIdOld));
 						mIdOld = mIdSelected;
 					}
 				});

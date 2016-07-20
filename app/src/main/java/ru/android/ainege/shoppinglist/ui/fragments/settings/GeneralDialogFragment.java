@@ -14,10 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.entities.Dictionary;
+import ru.android.ainege.shoppinglist.db.entities.Catalog;
 import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
-public abstract class GeneralDialogFragment<T extends Dictionary> extends DialogFragment {
+public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFragment {
 	protected static final String ITEM = "item";
 	public static final String ID_ITEM = "idItem";
 

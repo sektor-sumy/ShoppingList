@@ -41,7 +41,7 @@ import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.list.AddListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.EditListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.ListDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.CatalogFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -150,7 +150,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mAddButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				ListDialogFragment addListDialog = new AddListDialogFragment();
+				ListDialogFragment addListDialog = new ListDialogFragment();
 				addListDialog.setTargetFragment(ListsFragment.this, ADD_LIST);
 				addListDialog.show(getFragmentManager(), ADD_LIST_DATE);
 
@@ -248,7 +248,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 				break;
 			case SETTINGS:
-				long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
+				long modifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
 
 				if (modifyCatalog != -1 && mOnListChangedListener != null) {
 					mOnListChangedListener.updateCurrentList();
@@ -559,7 +559,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 						int itemPosition = getAdapterPosition();
 						List list = mLists.get(itemPosition);
 
-						ListDialogFragment editListDialog = EditListDialogFragment.newInstance(list);
+						ListDialogFragment editListDialog = ListDialogFragment.newInstance(list);
 						editListDialog.setTargetFragment(ListsFragment.this, EDIT_LIST);
 						editListDialog.show(getFragmentManager(), EDIT_LIST_DATE);
 

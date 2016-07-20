@@ -43,7 +43,7 @@
 			android:theme="@style/AppTheme.NoActionBar">
 		</activity>
 		<activity
-			android:name=".ui.activities.SettingsDictionaryActivity"
+			android:name=".ui.activities.SettingsCatalogActivity"
 			android:label=""
 			android:theme="@style/AppTheme.NoActionBar">
 			<intent-filter>

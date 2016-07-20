@@ -23,7 +23,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.GenericDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
-import ru.android.ainege.shoppinglist.db.entities.Dictionary;
+import ru.android.ainege.shoppinglist.db.entities.Catalog;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.util.Image;
@@ -357,7 +357,7 @@ public class AddItemFragment extends ItemFragment {
 		int index = -1;
 
 		for (int i = 0; i < spinner.getCount(); i++) {
-			if (((GenericDS.EntityCursor<Dictionary>) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
+			if (((GenericDS.EntityCursor<Catalog>) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
 				index = i;
 				break;
 			}

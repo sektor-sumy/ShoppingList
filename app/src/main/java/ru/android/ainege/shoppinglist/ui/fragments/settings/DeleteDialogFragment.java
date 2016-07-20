@@ -17,23 +17,23 @@ import ru.android.ainege.shoppinglist.db.TableInterface.CurrenciesInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.CategoriesInterface;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
-import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
+import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
-import ru.android.ainege.shoppinglist.db.entities.Dictionary;
+import ru.android.ainege.shoppinglist.db.entities.Catalog;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
 public class DeleteDialogFragment extends DialogFragment {
 	public static final String POSITION = "position";
 	public static final String REPLACEMENT = "replacement";
-	private static final String DICTIONARY = "dictionary";
+	private static final String CATALOG = "catalog";
 
 	private Spinner mSpinner;
 
-	public static DeleteDialogFragment newInstance(Dictionary dictionary, int position) {
+	public static DeleteDialogFragment newInstance(Catalog catalog, int position) {
 		Bundle args = new Bundle();
-		args.putSerializable(DICTIONARY, dictionary);
+		args.putSerializable(CATALOG, catalog);
 		args.putInt(POSITION, position);
 
 		DeleteDialogFragment fragment = new DeleteDialogFragment();
@@ -53,7 +53,7 @@ public class DeleteDialogFragment extends DialogFragment {
 				.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						sendResult(((DictionaryDS.DictionaryCursor<Dictionary>) mSpinner.getSelectedItem()).getEntity());
+						sendResult(((CatalogDS.CatalogCursor<Catalog>) mSpinner.getSelectedItem()).getEntity());
 					}
 				})
 				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -67,18 +67,18 @@ public class DeleteDialogFragment extends DialogFragment {
 
 	protected View setupView() {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_delete_dictionary, null);
+		View v = inflater.inflate(R.layout.dialog_delete_catalog, null);
 
 		mSpinner = (Spinner) v.findViewById(R.id.spinner);
 
-		Dictionary dictionary = (Dictionary) getArguments().getSerializable(DICTIONARY);
+		Catalog catalog = (Catalog) getArguments().getSerializable(CATALOG);
 
-		if (dictionary instanceof Unit) {
-			mSpinner.setAdapter(getUnitsAdapter(dictionary.getId()));
-		} else if (dictionary instanceof Category) {
-			mSpinner.setAdapter(getCategoriesAdapter(dictionary.getId()));
-		} else if (dictionary instanceof Currency) {
-			mSpinner.setAdapter(getCurrenciesAdapter(dictionary.getId()));
+		if (catalog instanceof Unit) {
+			mSpinner.setAdapter(getUnitsAdapter(catalog.getId()));
+		} else if (catalog instanceof Category) {
+			mSpinner.setAdapter(getCategoriesAdapter(catalog.getId()));
+		} else if (catalog instanceof Currency) {
+			mSpinner.setAdapter(getCurrenciesAdapter(catalog.getId()));
 		}
 
 		return v;
@@ -114,7 +114,7 @@ public class DeleteDialogFragment extends DialogFragment {
 		return spinnerAdapter;
 	}
 
-	protected void sendResult(Dictionary replacement) {
+	protected void sendResult(Catalog replacement) {
 		if (getTargetFragment() == null)
 			return;
 

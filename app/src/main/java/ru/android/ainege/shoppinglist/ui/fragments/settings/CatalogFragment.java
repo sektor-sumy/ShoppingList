@@ -28,11 +28,11 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
-import ru.android.ainege.shoppinglist.db.entities.Dictionary;
+import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
+import ru.android.ainege.shoppinglist.db.entities.Catalog;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 
-public abstract class DictionaryFragment<T extends Dictionary> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnBackPressedListener {
+public abstract class CatalogFragment<T extends Catalog> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnBackPressedListener {
 	public static final String LAST_EDIT = "lastEdit";
 	protected static final int ADD = 1;
 	protected static final int EDIT = 2;
@@ -44,10 +44,10 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	private static final String STATE_LIST = "state_list";
 	private static final String STATE_LAST_EDIT_ID = "state_last_edit_id";
 
-	protected ArrayList<T> mDictionary;
+	protected ArrayList<T> mCatalog;
 	protected ArrayList<T> mSaveListRotate;
 	protected RecyclerViewAdapter mAdapterRV;
-	protected RecyclerView mDictionaryRV;
+	protected RecyclerView mCatalogRV;
 
 	protected long mLastEditId = -1;
 
@@ -55,7 +55,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 	protected abstract View.OnClickListener getAddHandler();
 
-	protected abstract DictionaryDS getDS();
+	protected abstract CatalogDS getDS();
 
 	protected abstract RecyclerViewAdapter getAdapter();
 
@@ -87,7 +87,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.fragment_dictionary, container, false);
+		View v = inflater.inflate(R.layout.fragment_catalog, container, false);
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.main_toolbar);
 		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -115,9 +115,9 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 		FloatingActionButton mFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
 		mFAB.setOnClickListener(getAddHandler());
 
-		mDictionaryRV = (RecyclerView) v.findViewById(R.id.list);
-		mDictionaryRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-		mDictionaryRV.setAdapter(mAdapterRV);
+		mCatalogRV = (RecyclerView) v.findViewById(R.id.list);
+		mCatalogRV.setLayoutManager(new LinearLayoutManager(getActivity()));
+		mCatalogRV.setAdapter(mAdapterRV);
 
 		return v;
 	}
@@ -132,7 +132,7 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-		outState.putSerializable(STATE_LIST, mDictionary);
+		outState.putSerializable(STATE_LIST, mCatalog);
 		outState.putLong(STATE_LAST_EDIT_ID, mLastEditId);
 	}
 
@@ -179,15 +179,15 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 				updateData();
 				break;
 			case DELETE:
-				Dictionary dictionary = (Dictionary) data.getSerializableExtra(DeleteDialogFragment.REPLACEMENT);
-				deleteItem(data.getIntExtra(DeleteDialogFragment.POSITION, -1), dictionary.getId());
+				Catalog catalog = (Catalog) data.getSerializableExtra(DeleteDialogFragment.REPLACEMENT);
+				deleteItem(data.getIntExtra(DeleteDialogFragment.POSITION, -1), catalog.getId());
 				break;
 		}
 	}
 
 	private void deleteItem(int position, long newId) {
 		if (position != -1) {
-			T d = mDictionary.get(position);
+			T d = mCatalog.get(position);
 
 			if (newId != -1) {
 				getDS().delete(d.getId(), newId);
@@ -202,9 +202,9 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	protected int getPosition(long id) {
 		int position = 0;
 
-		for (T t : mDictionary) {
+		for (T t : mCatalog) {
 			if (t.getId() == id) {
-				position = mDictionary.indexOf(t);
+				position = mCatalog.indexOf(t);
 			}
 		}
 
@@ -212,9 +212,9 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 	}
 
 	private static class DataCursorLoader extends CursorLoader {
-		private final DictionaryDS mDS;
+		private final CatalogDS mDS;
 
-		public DataCursorLoader(Context context, DictionaryDS ds) {
+		public DataCursorLoader(Context context, CatalogDS ds) {
 			super(context);
 			mDS = ds;
 		}
@@ -229,16 +229,16 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 
 		@Override
 		public void onBindViewHolder(S holder, int position) {
-			holder.mName.setText(mDictionary.get(position).toString());
+			holder.mName.setText(mCatalog.get(position).toString());
 		}
 
 		@Override
 		public int getItemCount() {
-			return mDictionary != null ? mDictionary.size() : 0;
+			return mCatalog != null ? mCatalog.size() : 0;
 		}
 
 		public void removeItem(int position) {
-			mDictionary.remove(position);
+			mCatalog.remove(position);
 			notifyItemRemoved(position);
 		}
 
@@ -264,15 +264,15 @@ public abstract class DictionaryFragment<T extends Dictionary> extends Fragment 
 				mDelete.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						if (mDictionary.size() == 1) {
+						if (mCatalog.size() == 1) {
 							Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_one_item), Toast.LENGTH_SHORT).show();
 						} else {
 							int itemPosition = getAdapterPosition();
-							T d = mDictionary.get(itemPosition);
+							T d = mCatalog.get(itemPosition);
 
 							if (isEntityUsed(d.getId())) {
 								DeleteDialogFragment dialogFrag = DeleteDialogFragment.newInstance(d, itemPosition);
-								dialogFrag.setTargetFragment(DictionaryFragment.this, DELETE);
+								dialogFrag.setTargetFragment(CatalogFragment.this, DELETE);
 								dialogFrag.show(getFragmentManager(), DELETE_DATE);
 							} else {
 								deleteItem(itemPosition, -1);

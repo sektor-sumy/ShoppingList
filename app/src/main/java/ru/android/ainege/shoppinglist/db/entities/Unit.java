@@ -1,6 +1,6 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-public class Unit extends Dictionary {
+public class Unit extends Catalog {
 
 	public Unit(Unit unit) {
 		this(unit.getId(), unit.getName());

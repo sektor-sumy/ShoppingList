@@ -17,7 +17,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingList
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 
-public class CategoriesDS extends DictionaryDS<Category> implements TableInterface.CategoriesInterface {
+public class CategoriesDS extends CatalogDS<Category> implements TableInterface.CategoriesInterface {
 
 	public CategoriesDS(Context context) {
 		super(context);
@@ -133,7 +133,7 @@ public class CategoriesDS extends DictionaryDS<Category> implements TableInterfa
 		return values;
 	}
 
-	public static class CategoryCursor extends DictionaryCursor<Category> {
+	public static class CategoryCursor extends CatalogCursor<Category> {
 		private ShoppingListCursor mItemsInListCursor;
 
 		public CategoryCursor(Cursor cursor) {

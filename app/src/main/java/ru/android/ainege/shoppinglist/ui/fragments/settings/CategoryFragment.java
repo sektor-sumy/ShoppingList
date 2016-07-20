@@ -9,12 +9,12 @@ import android.widget.TextView;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
-import ru.android.ainege.shoppinglist.db.dataSources.DictionaryDS;
+import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
 
-public class CategoryFragment extends DictionaryFragment<Category> {
+public class CategoryFragment extends CatalogFragment<Category> {
 
 	@Override
 	protected String getTitle() {
@@ -34,7 +34,7 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 	}
 
 	@Override
-	protected DictionaryDS getDS() {
+	protected CatalogDS getDS() {
 		return new CategoriesDS(getActivity());
 	}
 
@@ -53,18 +53,18 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 		switch (loader.getId()) {
 			case DATA_LOADER:
 				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
-					mDictionary = mSaveListRotate;
+					mCatalog = mSaveListRotate;
 					mAdapterRV.notifyDataSetChanged();
 
 					if (mLastEditId != -1) {
-						mDictionaryRV.scrollToPosition(getPosition(mLastEditId));
+						mCatalogRV.scrollToPosition(getPosition(mLastEditId));
 					}
 				} else if (mSaveListRotate == null && data.moveToFirst()) {
-					mDictionary = ((CategoryCursor) data).getEntities();
+					mCatalog = ((CategoryCursor) data).getEntities();
 					mAdapterRV.notifyDataSetChanged();
 
 					if (mLastEditId != -1) {
-						mDictionaryRV.scrollToPosition(getPosition(mLastEditId));
+						mCatalogRV.scrollToPosition(getPosition(mLastEditId));
 					}
 				}
 
@@ -76,7 +76,7 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 
 	@Override
 	protected void showEditDialog(int position) {
-		GeneralDialogFragment editItemDialog = CategoryDialogFragment.newInstance(mDictionary.get(position));
+		GeneralDialogFragment editItemDialog = CategoryDialogFragment.newInstance(mCatalog.get(position));
 		editItemDialog.setTargetFragment(CategoryFragment.this, EDIT);
 		editItemDialog.show(getFragmentManager(), EDIT_DATE);
 	}
@@ -93,7 +93,7 @@ public class CategoryFragment extends DictionaryFragment<Category> {
 		public void onBindViewHolder(CategoryHolder holder, int position) {
 			super.onBindViewHolder(holder, position);
 
-			holder.mColor.setBackgroundColor(mDictionary.get(position).getColor());
+			holder.mColor.setBackgroundColor(mCatalog.get(position).getColor());
 		}
 
 		public class CategoryHolder extends RecyclerViewAdapter<CategoryHolder>.ViewHolder {

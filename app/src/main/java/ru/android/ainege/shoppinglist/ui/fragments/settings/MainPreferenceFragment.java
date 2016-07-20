@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.activities.SettingsDictionaryActivity;
+import ru.android.ainege.shoppinglist.ui.activities.SettingsCatalogActivity;
 
 public class MainPreferenceFragment extends android.preference.PreferenceFragment {
 	private static final String STATE_SCREEN = "state_screen";
@@ -100,8 +100,8 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 		super.onActivityResult(requestCode, resultCode, data);
 
 		if (requestCode == SETTINGS) {
-			long modifyCatalog = data.getLongExtra(DictionaryFragment.LAST_EDIT, -1);
-			getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(DictionaryFragment.LAST_EDIT, modifyCatalog));
+			long modifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
+			getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(CatalogFragment.LAST_EDIT, modifyCatalog));
 		}
 	}
 
@@ -110,8 +110,8 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 		categorySettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				Intent i = new Intent(getActivity(), SettingsDictionaryActivity.class);
-				i.putExtra(SettingsDictionaryActivity.EXTRA_TYPE, key);
+				Intent i = new Intent(getActivity(), SettingsCatalogActivity.class);
+				i.putExtra(SettingsCatalogActivity.EXTRA_TYPE, key);
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
