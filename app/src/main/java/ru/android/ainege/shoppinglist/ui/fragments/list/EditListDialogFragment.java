@@ -1,0 +1,75 @@
+package ru.android.ainege.shoppinglist.ui.fragments.list;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.os.Bundle;
+
+import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
+import ru.android.ainege.shoppinglist.db.entities.List;
+import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
+import ru.android.ainege.shoppinglist.util.Image;
+
+public class EditListDialogFragment extends ListDialogFragment {
+	private static final String LIST = "list";
+
+	private List mOriginalList;
+	private List mEditList;
+
+	public static ListDialogFragment newInstance(List list) {
+		Bundle args = new Bundle();
+		args.putSerializable(LIST, list);
+
+		ListDialogFragment fragment = new EditListDialogFragment();
+		fragment.setArguments(args);
+
+		return fragment;
+	}
+
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		AlertDialog.Builder builder = createDialog(savedInstanceState);
+
+		mOriginalList = new List((List) getArguments().getSerializable(LIST));
+		mEditList = new List((List) getArguments().getSerializable(LIST));
+
+		if (mDataFragment == null || savedInstanceState == null) {
+			mDataFragment = new RetainedFragment(getActivity());
+			getFragmentManager().beginTransaction().add(mDataFragment, RETAINED_FRAGMENT).commit();
+
+			setDataToView();
+		} else {
+			loadImage(mDataFragment.getImagePath());
+		}
+
+		return builder.create();
+	}
+
+	@Override
+	protected long save(ListsDS listDS, String name, long idCurrency) {
+		long id = mEditList.getId();
+		listDS.update(new List(id, name, idCurrency, mImagePath));
+
+		if (!mOriginalList.getImagePath().contains(Image.ASSETS_IMAGE_PATH) && !mImagePath.equals(mOriginalList.getImagePath())) {
+			Image.deleteFile(mOriginalList.getImagePath());
+		}
+
+		return id;
+	}
+
+	@Override
+	protected boolean isDeleteImage(String newPath) {
+		return super.isDeleteImage(newPath) &&
+				!mImagePath.contains(Image.ASSETS_IMAGE_PATH) &&
+				!newPath.equals(mImagePath) &&
+				!mOriginalList.getImagePath().equals(mImagePath);
+	}
+
+	private void setDataToView() {
+		loadImage(mEditList.getImagePath());
+
+		mName.setText(mEditList.getName());
+		mName.setSelection(mName.getText().length());
+
+		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
+	}
+}

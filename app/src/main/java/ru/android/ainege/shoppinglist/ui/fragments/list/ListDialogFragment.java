@@ -1,11 +1,10 @@
-package ru.android.ainege.shoppinglist.ui.fragments;
+package ru.android.ainege.shoppinglist.ui.fragments.list;
 
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,113 +37,30 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.TableInterface.CurrenciesInterface;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
-import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
+import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
 
-public class ListDialogFragment extends DialogFragment {
+public abstract class ListDialogFragment extends DialogFragment {
 	public static final String ID_LIST = "idList";
-	private static final String LIST = "list";
-	private static final String RETAINED_FRAGMENT = "retained_fragment_list";
+	protected static final String RETAINED_FRAGMENT = "retained_fragment_list";
 	private static final int TAKE_PHOTO = 0;
 	private static final int LOAD_IMAGE = 1;
 	private static final String STATE_FILE = "state_file";
 
 	private ImageView mImageList;
 	private TextInputLayout mNameInputLayout;
-	private EditText mName;
-	private Spinner mCurrency;
+	protected EditText mName;
+	protected Spinner mCurrency;
 
-	private List mOriginalList;
-	private List mEditList;
 	private File mFile;
-	private String mImagePath;
+	protected String mImagePath;
 
-	private RetainedFragment dataFragment;
+	protected RetainedFragment mDataFragment;
 
-	public static ListDialogFragment newInstance(List list) {
-		Bundle args = new Bundle();
-		args.putSerializable(LIST, list);
-
-		ListDialogFragment fragment = new ListDialogFragment();
-		fragment.setArguments(args);
-
-		return fragment;
-	}
-
-	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_list, null);
-
-		mImageList = (ImageView) v.findViewById(R.id.image);
-		registerForContextMenu(mImageList);
-		mImageList.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				v.showContextMenu();
-			}
-		});
-
-		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
-		mName = (EditText) v.findViewById(R.id.name);
-		mCurrency = (Spinner) v.findViewById(R.id.currency);
-		mCurrency.setAdapter(getSpinnerAdapter());
-		mCurrency.setSelection(getPosition(mCurrency, getDefaultIdCurrency()));
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setView(v)
-				.setCancelable(true)
-				.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
-					}
-				})
-				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
-
-		FragmentManager fm = getFragmentManager();
-		dataFragment = (RetainedFragment) fm.findFragmentByTag(RETAINED_FRAGMENT);
-
-		if (dataFragment == null || savedInstanceState == null) {
-			dataFragment = new RetainedFragment(getActivity());
-			fm.beginTransaction().add(dataFragment, RETAINED_FRAGMENT).commit();
-
-			if (getArguments() != null) {
-				mOriginalList = new List((List) getArguments().getSerializable(LIST));
-				mEditList = new List((List) getArguments().getSerializable(LIST));
-				setDataToView();
-			} else {
-				setRandomImage();
-			}
-		} else {
-			if (getArguments() != null) {
-				mOriginalList = new List((List) getArguments().getSerializable(LIST));
-				mEditList = new List((List) getArguments().getSerializable(LIST));
-			}
-
-			loadImage(dataFragment.getImagePath());
-		}
-
-		dataFragment.setOnLoadedFinish(new OnFinishedImageListener() {
-			@Override
-			public void onFinished(boolean isSuccess, String path) {
-				loadImage(path);
-			}
-		});
-
-		if (savedInstanceState != null) {
-			mFile = (File) savedInstanceState.getSerializable(STATE_FILE);
-		}
-
-		return builder.create();
-	}
+	protected abstract long save(ListsDS listDS, String name, long idCurrency);
 
 	@Override
 	public void onStart() {
@@ -184,7 +100,7 @@ public class ListDialogFragment extends DialogFragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		dataFragment.setImagePath(mImagePath);
+		mDataFragment.setImagePath(mImagePath);
 	}
 
 	@Override
@@ -252,7 +168,7 @@ public class ListDialogFragment extends DialogFragment {
 		switch (requestCode) {
 			case TAKE_PHOTO:
 				Image.create().deletePhotoFromGallery(getActivity(), mFile);
-				dataFragment.execute(mImageList, mImagePath, mFile, metrics.widthPixels - 30);
+				mDataFragment.execute(mImageList, mImagePath, mFile, metrics.widthPixels - 30);
 				break;
 			case LOAD_IMAGE:
 				try {
@@ -261,7 +177,7 @@ public class ListDialogFragment extends DialogFragment {
 					if (file != null) {
 						Uri selectedImage = data.getData();
 						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
-						dataFragment.execute(mImageList, mImagePath, file, bitmap, metrics.widthPixels - 30);
+						mDataFragment.execute(mImageList, mImagePath, file, bitmap, metrics.widthPixels - 30);
 					} else {
 						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 					}
@@ -294,13 +210,88 @@ public class ListDialogFragment extends DialogFragment {
 		}
 	}
 
-	private void setDataToView() {
-		loadImage(mEditList.getImagePath());
+	public int getPosition(Spinner spinner, long idCurrency) {
+		int index = 0;
+		for (int i = 0; i < spinner.getCount(); i++) {
+			long id = ((CurrencyCursor) spinner.getItemAtPosition(i)).getEntity().getId();
+			if (id == idCurrency) {
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
 
-		mName.setText(mEditList.getName());
-		mName.setSelection(mName.getText().length());
+	public void loadImage(String imagePath) {
+		if (isDeleteImage(imagePath)) {
+			Image.deleteFile(mImagePath);
+		}
 
-		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
+		mImagePath = imagePath;
+		Image.create().insertImageToView(getActivity(), mImagePath, mImageList);
+	}
+
+	public void setRandomImage() {
+		String path;
+
+		do {
+			path = Image.LIST_IMAGE_PATH + "random_list_" + new Random().nextInt(9) + ".png";
+		} while (path.equals(mImagePath));
+
+		loadImage(path);
+	}
+
+	protected AlertDialog.Builder createDialog(Bundle savedInstanceState) {
+		LayoutInflater inflater = getActivity().getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_list, null);
+
+		mImageList = (ImageView) v.findViewById(R.id.image);
+		registerForContextMenu(mImageList);
+		mImageList.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				v.showContextMenu();
+			}
+		});
+
+		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
+		mName = (EditText) v.findViewById(R.id.name);
+		mCurrency = (Spinner) v.findViewById(R.id.currency);
+		mCurrency.setAdapter(getSpinnerAdapter());
+		mCurrency.setSelection(getPosition(mCurrency, getDefaultIdCurrency()));
+
+		mDataFragment = (RetainedFragment) getFragmentManager().findFragmentByTag(RETAINED_FRAGMENT);
+		mDataFragment.setOnLoadedFinish(new OnFinishedImageListener() {
+			@Override
+			public void onFinished(boolean isSuccess, String path) {
+				loadImage(path);
+			}
+		});
+
+		if (savedInstanceState != null) {
+			mFile = (File) savedInstanceState.getSerializable(STATE_FILE);
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setView(v)
+				.setCancelable(true)
+				.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+					}
+				})
+				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+
+		return builder;
+	}
+
+	protected boolean isDeleteImage(String newPath) {
+		return mImagePath != null;
 	}
 
 	private SimpleCursorAdapter getSpinnerAdapter() {
@@ -318,37 +309,6 @@ public class ListDialogFragment extends DialogFragment {
 		return prefs.getLong(getResources().getString(R.string.settings_key_currency), -1);
 	}
 
-	private int getPosition(Spinner spinner, long idCurrency) {
-		int index = 0;
-		for (int i = 0; i < spinner.getCount(); i++) {
-			long id = ((CurrencyCursor) spinner.getItemAtPosition(i)).getEntity().getId();
-			if (id == idCurrency) {
-				index = i;
-				break;
-			}
-		}
-		return index;
-	}
-
-	private void loadImage(String imagePath) {
-		if (isDeleteImage(imagePath)) {
-			Image.deleteFile(mImagePath);
-		}
-
-		mImagePath = imagePath;
-		Image.create().insertImageToView(getActivity(), mImagePath, mImageList);
-	}
-
-	private void setRandomImage() {
-		String path;
-
-		do {
-			path = Image.LIST_IMAGE_PATH + "random_list_" + new Random().nextInt(9) + ".png";
-		} while (path.equals(mImagePath));
-
-		loadImage(path);
-	}
-
 	private boolean saveData() {
 		boolean isSave = false;
 		String name = mName.getText().toString().trim();
@@ -360,7 +320,7 @@ public class ListDialogFragment extends DialogFragment {
 			mNameInputLayout.setErrorEnabled(false);
 		}
 
-		if (dataFragment.isLoading()) {
+		if (mDataFragment.isLoading()) {
 			Toast.makeText(getActivity().getApplicationContext(), "Подождите загрузке картинки", Toast.LENGTH_SHORT).show();
 			return false;
 		}
@@ -368,18 +328,7 @@ public class ListDialogFragment extends DialogFragment {
 		if (!mNameInputLayout.isErrorEnabled()) {
 			long idCurrency = ((CurrencyCursor) mCurrency.getSelectedItem()).getEntity().getId();
 			ListsDS listDS = new ListsDS(getActivity());
-			long id;
-
-			if (getArguments() == null) {
-				id = listDS.add(new List(name, idCurrency, mImagePath));
-			} else {
-				id = mEditList.getId();
-				listDS.update(new List(id, name, idCurrency, mImagePath));
-
-				if (!mOriginalList.getImagePath().contains(Image.ASSETS_IMAGE_PATH) && !mImagePath.equals(mOriginalList.getImagePath())) {
-					Image.deleteFile(mOriginalList.getImagePath());
-				}
-			}
+			long id = save(listDS, name, idCurrency);
 
 			sendResult(Activity.RESULT_OK, new Intent().putExtra(ID_LIST, id));
 			isSave = true;
@@ -414,17 +363,5 @@ public class ListDialogFragment extends DialogFragment {
 	private void selectFromGallery() {
 		Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		startActivityForResult(galleryIntent, LOAD_IMAGE);
-	}
-
-	private boolean isDeleteImage(String newPath) {
-		if (mImagePath == null) {
-			return false;
-		}
-
-		if (getArguments() == null) {
-			return !mImagePath.contains(Image.ASSETS_IMAGE_PATH) && !newPath.equals(mImagePath);
-		} else {
-			return !mImagePath.contains(Image.ASSETS_IMAGE_PATH) && !newPath.equals(mImagePath) && !mOriginalList.getImagePath().equals(mImagePath);
-		}
 	}
 }

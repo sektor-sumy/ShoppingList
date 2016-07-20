@@ -54,6 +54,8 @@ import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.list.EditListDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.list.ListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.DictionaryFragment;
 import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 import ru.android.ainege.shoppinglist.util.Image;
@@ -395,7 +397,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						addAnalytics("delete list (list)");
 						return true;
 					case R.id.update_list:
-						ListDialogFragment editListDialog = ListDialogFragment.newInstance(mList);
+						ListDialogFragment editListDialog = EditListDialogFragment.newInstance(mList);
 						editListDialog.setTargetFragment(ShoppingListFragment.this, EDIT_LIST);
 						editListDialog.show(getFragmentManager(), EDIT_ITEM_DATE);
 
