@@ -302,7 +302,7 @@ public class AddItemFragment extends ItemFragment {
 			String image = mItemInList.getItem().getImagePath();
 			String defaultImage = mItemInList.getItem().getDefaultImagePath();
 
-			if (image == null) {
+			if (image == null || image.equals(Image.getPathFromResource(R.drawable.no_image))) {
 				defaultImage = image = Image.CHARACTER_IMAGE_PATH + (int) getName().toUpperCase().charAt(0) + ".png";
 			}
 
