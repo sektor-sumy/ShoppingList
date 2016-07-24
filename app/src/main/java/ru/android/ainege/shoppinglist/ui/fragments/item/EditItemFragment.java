@@ -177,8 +177,9 @@ public class EditItemFragment extends ItemFragment {
 				mItemsInListDS.update(mItemInList, mOriginalItem.getIdItem());
 			}
 
-			if (!originImagePath.contains(Image.ASSETS_IMAGE_PATH) && !mItemInList.getItem().getImagePath().equals(originImagePath) &&
-					!mItemInList.getItem().getDefaultImagePath().equals(originImagePath)) {
+			if (!originImagePath.contains(Image.ASSETS_IMAGE_PATH) &&
+					!originImagePath.equals(mItemInList.getItem().getImagePath()) &&
+					!originImagePath.equals(mItemInList.getItem().getDefaultImagePath())) {
 				Image.deleteFile(originImagePath);
 			}
 
@@ -214,7 +215,10 @@ public class EditItemFragment extends ItemFragment {
 		String imagePath = mItemInList.getItem().getImagePath();
 		String dPath  = mItemInList.getItem().getDefaultImagePath();
 
-		return !imagePath.contains(Image.ASSETS_IMAGE_PATH) && !newPath.equals(imagePath) && !dPath.equals(imagePath);
+		return !imagePath.contains(Image.ASSETS_IMAGE_PATH) &&
+				!imagePath.equals(newPath) &&
+				!imagePath.equals(mOriginalItem.getItem().getImagePath()) &&
+				!imagePath.equals(dPath);
 	}
 
 	@Override
