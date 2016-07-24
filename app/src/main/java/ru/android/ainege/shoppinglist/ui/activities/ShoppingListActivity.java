@@ -4,19 +4,30 @@ import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 
-public class ShoppingListActivity extends SingleFragmentActivity implements ShoppingListFragment.OnClickListener {
+public class ShoppingListActivity extends SingleFragmentActivity implements ShoppingListFragment.OnClickListener, ShoppingListFragment.OnListChangedListener {
 	public final static String EXTRA_ID_LIST = "idList";
 	private static final String SHOPPING_LIST_TAG = "shopping_list_tag_activity";
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		if (savedInstanceState != null) {
+			ShoppingListFragment shoppingListFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(getTag());
+			setListeners(shoppingListFragment);
+		}
+	}
 
 	@Override
 	protected Fragment getFragment() {
 		long idList = getIntent().getLongExtra(EXTRA_ID_LIST, -1);
 		ShoppingListFragment fragment = ShoppingListFragment.newInstance(idList);
-		fragment.setOnClickListener(this);
+		setListeners(fragment);
 
 		return fragment;
 	}
@@ -61,5 +72,19 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 		} else {
 			startActivityForResult(i, ShoppingListFragment.EDIT_ITEM);
 		}
+	}
+
+	@Override
+	public void onListUpdated() {
+
+	}
+
+	@Override
+	public void onListDeleted(long idDeletedList) {
+		super.onBackPressed();
+	}
+
+	private void setListeners(ShoppingListFragment fragment) {
+		fragment.setListeners(this, this);
 	}
 }

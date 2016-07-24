@@ -290,6 +290,10 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	public void onDestroy() {
 		super.onDestroy();
 		dataFragment.setImagePath(mItemInList.getItem().getImagePath());
+
+		mOnClickListener = null;
+		mOnItemChangedListener = null;
+		mOnDialogShownListener = null;
 	}
 
 	@Override
@@ -524,7 +528,10 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	public void setCurrency() {
 		getCurrencyFromDb();
 		mCurrency.setText(mCurrencyList);
-		setFinishPrice();
+
+		if (mFinishPrice.getVisibility() == View.VISIBLE) {
+			setFinishPrice();
+		}
 	}
 
 	public void setUnit(long idUnit) {

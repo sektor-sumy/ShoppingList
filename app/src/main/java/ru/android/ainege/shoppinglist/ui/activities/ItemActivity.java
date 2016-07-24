@@ -2,6 +2,7 @@ package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
@@ -15,6 +16,16 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 	private final static String FRAGMENT_TAG = "item_activity_tag";
 
 	private OnBackPressedListener mOnBackPressedListener;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		if (savedInstanceState != null) {
+			ItemFragment itemFragment = (ItemFragment) getFragmentManager().findFragmentByTag(getTag());
+			setListeners(itemFragment);
+		}
+	}
 
 	@Override
 	protected Fragment getFragment() {
@@ -62,8 +73,12 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 		}
 
 		mOnBackPressedListener = fragment;
-		fragment.setOnClickListener(this);
+		setListeners(fragment);
 
 		return fragment;
+	}
+
+	private void setListeners(ItemFragment fragment) {
+		fragment.setOnClickListener(this);
 	}
 }

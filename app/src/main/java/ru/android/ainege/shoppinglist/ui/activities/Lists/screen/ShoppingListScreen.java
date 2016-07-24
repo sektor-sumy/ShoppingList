@@ -7,12 +7,18 @@ import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 
-public class ShoppingListScreen extends TabletScreen implements ShoppingListFragment.OnClickListener,
-		ListsFragment.OnListChangedListener, ShoppingListFragment.OnListChangedListener {
+public class ShoppingListScreen extends TabletScreen implements	ListsFragment.OnListChangedListener {
 	public static final int SCREEN_ID = 2;
+	private ShoppingListFragment mShoppingListFragment;
 
 	public ShoppingListScreen(TabletState state) {
 		super(state);
+	}
+
+	public void setListeners(ShoppingListFragment fragment) {
+		mState.getListsActivity().getListsFragment().setOnListChangedListener(this);
+		mShoppingListFragment = fragment;
+		mShoppingListFragment.setListeners(mState, mState, mState);
 	}
 
 	@Override
@@ -34,6 +40,8 @@ public class ShoppingListScreen extends TabletScreen implements ShoppingListFrag
 		} else {
 			mState.toScreen(mState.getListsScreen());
 			mState.closeShowcase();
+
+			mState.getListsActivity().getListsFragment().setOnListChangedListener(null);
 		}
 
 		return result;
@@ -64,9 +72,7 @@ public class ShoppingListScreen extends TabletScreen implements ShoppingListFrag
 
 	@Override
 	public void onListClick(long id) {
-		ShoppingListFragment listFragment = (ShoppingListFragment) mState.getListsActivity().
-				getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
-		listFragment.closeActionMode();
+		mShoppingListFragment.closeActionMode();
 
 		mState.openList(id, false);
 		mState.toScreen(this);
@@ -75,9 +81,7 @@ public class ShoppingListScreen extends TabletScreen implements ShoppingListFrag
 	@Override
 	public void onListUpdated(long id) {
 		if (mState.getLastSelectedListId() == id) {
-			ShoppingListFragment listFragment = (ShoppingListFragment) mState.getListsActivity().
-					getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
-			listFragment.updateList();
+			mShoppingListFragment.updateList();
 		}
 	}
 
@@ -110,9 +114,7 @@ public class ShoppingListScreen extends TabletScreen implements ShoppingListFrag
 
 	@Override
 	public void onShowCaseShown() {
-		ShoppingListFragment listFragment = (ShoppingListFragment) mState.getListsActivity().
-				getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
-		listFragment.showCaseView();
+		mShoppingListFragment.showCaseView();
 	}
 
 	public void openScreen() {

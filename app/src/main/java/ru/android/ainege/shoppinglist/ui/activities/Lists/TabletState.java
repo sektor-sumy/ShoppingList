@@ -22,6 +22,7 @@ import ru.android.ainege.shoppinglist.ui.activities.lists.screen.ShoppingListScr
 import ru.android.ainege.shoppinglist.ui.activities.lists.screen.TabletScreen;
 import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class TabletState implements StateInterface, OnDialogShownListener,
@@ -77,7 +78,6 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 			}
 		} else {
 			ListsFragment fragment = (ListsFragment) mListsActivity.getFragmentManager().findFragmentByTag(ListsActivity.LISTS_TAG);
-			fragment.setListeners(this, mShoppingListScreen, this);
 			mListsActivity.setListsFragment(fragment);
 			mLastSelectedListId = savedInstanceState.getLong(STATE_LAST_LIST_ID);
 			mLastSelectedItemId = savedInstanceState.getLong(STATE_LAST_ITEM_ID);
@@ -91,15 +91,28 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 				idScreen++;
 			}
 
+			mListsScreen.setListeners();
+			ShoppingListFragment shippingListFragment;
+
 			switch (idScreen) {
 				case ListsScreen.SCREEN_ID:
 					mCurrentScreen = mListsScreen;
 					break;
 				case ShoppingListScreen.SCREEN_ID:
 					mCurrentScreen = mShoppingListScreen;
+
+					shippingListFragment = (ShoppingListFragment) getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
+					mShoppingListScreen.setListeners(shippingListFragment);
 					break;
 				case ItemScreen.SCREEN_ID:
 					mCurrentScreen = mItemScreen;
+
+					shippingListFragment = (ShoppingListFragment) getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
+					mShoppingListScreen.setListeners(shippingListFragment);
+
+					ItemFragment itemFragment = (ItemFragment) getListsActivity().getFragmentManager().findFragmentByTag(TabletState.ITEM_TAG);
+					mItemScreen.setListeners(itemFragment);
+					break;
 			}
 
 			mCurrentScreen.restore();
@@ -244,7 +257,7 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 	public void openList(long id, boolean isScrollToList) {
 		mLastSelectedListId = id;
 		ShoppingListFragment fragment = ShoppingListFragment.newInstance(id);
-		fragment.setListeners(this, this, mItemScreen, this);
+		mShoppingListScreen.setListeners(fragment);
 		mListsActivity.injectFragmentToUI(R.id.list_fragment_container, fragment, SHOPPING_LIST_TAG);
 
 		if (isScrollToList) {

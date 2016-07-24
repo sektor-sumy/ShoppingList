@@ -19,7 +19,7 @@ public class ListsActivity extends SingleFragmentActivity {
 	static final String LISTS_TAG = "lists_tag";
 
 	private ListsFragment mListsFragment;
-	private StateInterface mState = new PhoneState(this);
+	private StateInterface mState;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -27,10 +27,8 @@ public class ListsActivity extends SingleFragmentActivity {
 
 		if (getResources().getBoolean(R.bool.isTablet)) {
 			mState = new TabletState(this);
-		}
-
-		if (mListsFragment != null) {
-			mListsFragment.setOnListSelectListener(mState);
+		} else {
+			mState = new PhoneState(this);
 		}
 
 		mState.onCreate(savedInstanceState);

@@ -187,7 +187,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	@Override
 	public void onDetach() {
 		super.onDetach();
+
+		mOnListSelectListener = null;
 		mOnListChangedListener = null;
+		mOnDialogShownListener = null;
 	}
 
 	@Override
@@ -297,13 +300,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	}
 
-	public void setListeners(OnListSelectListener onListSelectListener, OnListChangedListener onListChangedListener, OnDialogShownListener onDialogShownListener) {
+	public void setListeners(OnListSelectListener onListSelectListener, OnDialogShownListener onDialogShownListener) {
 		setOnListSelectListener(onListSelectListener);
-		setListeners(onListChangedListener, onDialogShownListener);
-	}
-
-	public void setListeners(OnListChangedListener onListChangedListener, OnDialogShownListener onDialogShownListener) {
-		setOnListChangedListener(onListChangedListener);
 		setOnDialogShownListener(onDialogShownListener);
 	}
 

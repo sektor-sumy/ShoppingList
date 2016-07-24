@@ -9,8 +9,12 @@ public class ListsScreen extends TabletScreen {
 	public ListsScreen(TabletState state) {
 		super(state);
 		if (mState.getListsActivity().getListsFragment() != null) {
-			mState.getListsActivity().getListsFragment().setListeners(mState.getShoppingListScreen(), mState);
+			setListeners();
 		}
+	}
+
+	public void setListeners() {
+		mState.getListsActivity().getListsFragment().setListeners(mState, mState);
 	}
 
 	@Override

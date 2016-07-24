@@ -41,16 +41,14 @@ public abstract class TabletScreen implements OnDialogShownListener, ListsFragme
 	@Override
 	public void onItemAdd(long idList) {
 		ItemFragment fragment = AddItemFragment.newInstance(idList);
-		fragment.setListeners(mState.getItemScreen(), mState.getItemScreen(), mState);
-		mState.getItemScreen().setOnBackPressedListener(fragment);
+		mState.getItemScreen().setListeners(fragment);
 		mState.openItem(0, fragment);
 	}
 
 	@Override
 	public void onItemSelect(ShoppingList item) {
 		ItemFragment fragment = EditItemFragment.newInstance(item);
-		fragment.setListeners(mState.getItemScreen(), mState.getItemScreen(), mState);
-		mState.getItemScreen().setOnBackPressedListener(fragment);
+		mState.getItemScreen().setListeners(fragment);
 		mState.openItem(item.getIdItem(), fragment);
 	}
 

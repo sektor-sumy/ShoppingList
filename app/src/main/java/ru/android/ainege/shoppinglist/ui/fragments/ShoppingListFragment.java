@@ -67,7 +67,6 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
 import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 
-
 public class ShoppingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener, ShoppingListAdapter.ShowcaseListener {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
@@ -364,8 +363,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	@Override
 	public void onDetach() {
 		super.onDetach();
+		mOnClickListener = null;
 		mOnListChangedListener = null;
 		mOnItemChangedListener = null;
+		mOnDialogShownListener = null;
 	}
 
 	@Override
@@ -510,11 +511,14 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	public void setListeners(OnClickListener onClickListener, OnListChangedListener onListChangedListener,
-	                         OnItemChangedListener onItemChangedListener, OnDialogShownListener onDialogShownListener) {
+	                         OnDialogShownListener onDialogShownListener) {
 		setOnClickListener(onClickListener);
 		setOnListChangedListener(onListChangedListener);
-		setOnItemChangedListener(onItemChangedListener);
 		setOnDialogShownListener(onDialogShownListener);
+	}
+
+	public void setListeners(OnClickListener onClickListener, OnListChangedListener onListChangedListener) {
+		setListeners(onClickListener, onListChangedListener, null);
 	}
 
 	public void setOnClickListener(OnClickListener onClickListener) {

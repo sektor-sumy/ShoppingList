@@ -15,7 +15,6 @@ import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 
 public class ItemScreen extends TabletScreen implements ItemFragment.OnClickListener,
-		ShoppingListFragment.OnClickListener, ShoppingListFragment.OnListChangedListener,
 		ShoppingListFragment.OnItemChangedListener, ItemFragment.OnItemChangedListener {
 	public static final int SCREEN_ID = 3;
 
@@ -24,8 +23,20 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	private long mIdForAdd = -1;
 	private ShoppingList mItemForEdit = null;
 
+	private ShoppingListFragment mShoppingListFragment;
+	private ItemFragment mItemFragment;
+
 	public ItemScreen(TabletState state) {
 		super(state);
+	}
+
+	public void setListeners(ItemFragment fragment) {
+		mShoppingListFragment = (ShoppingListFragment) mState.getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
+		mShoppingListFragment.setOnItemChangedListener(this);
+
+		mItemFragment = fragment;
+		mItemFragment.setListeners(this, this, mState);
+		mOnBackPressedListener = mItemFragment;
 	}
 
 	@Override
@@ -84,9 +95,8 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 
 	@Override
 	public void onItemSave(long id, boolean isAdded, boolean isClose) {
-		ShoppingListFragment listFragment = (ShoppingListFragment) mState.getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
-		listFragment.setItemDetailsId(id);
-		listFragment.updateData();
+		mShoppingListFragment.setItemDetailsId(id);
+		mShoppingListFragment.updateData();
 
 		if (mState.isLandscape()) {
 			Toast.makeText(mState.getListsActivity(), mState.getListsActivity().getString(R.string.data_save), Toast.LENGTH_SHORT).show();
@@ -120,8 +130,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 
 	@Override
 	public void onImageClick() {
-		ShoppingListFragment listFragment = (ShoppingListFragment) mState.getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
-		if (listFragment != null) listFragment.closeActionMode();
+		mShoppingListFragment.closeActionMode();
 	}
 
 	@Override
@@ -158,9 +167,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	@Override
 	public void onItemSetBought(ShoppingList item) {
 		if (mState.getLastSelectedItemId() == item.getIdItem()) {
-			ItemFragment itemFragment = (ItemFragment) mState.getListsActivity().
-					getFragmentManager().findFragmentByTag(TabletState.ITEM_TAG);
-			itemFragment.setIsBought(item.isBought());
+			mItemFragment.setIsBought(item.isBought());
 		}
 	}
 
@@ -172,27 +179,20 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	@Override
 	public void updateItem(String setting) {
 		if (mState.isLandscape()) {
-			ItemFragment fr = (ItemFragment) mState.getListsActivity().
-					getFragmentManager().findFragmentByTag(TabletState.ITEM_TAG);
-
 			if (setting == null) {
-				fr.setCurrency();
-				fr.setUnit(-1);
-				fr.setCategory(-1);
+				mItemFragment.setCurrency();
+				mItemFragment.setUnit(-1);
+				mItemFragment.setCategory(-1);
 			} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_transition))) {
-				fr.setTransitionButtons();
+				mItemFragment.setTransitionButtons();
 			} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_fast_edit))) {
-				fr.updateSpinners();
+				mItemFragment.updateSpinners();
 			} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_use_category))) {
-				fr.setCategory();
+				mItemFragment.setCategory();
 			} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_currency))) {
-				fr.setCurrency();
+				mItemFragment.setCurrency();
 			}
 		}
-	}
-
-	public void setOnBackPressedListener(OnBackPressedListener onBackPressedListener) {
-		mOnBackPressedListener = onBackPressedListener;
 	}
 
 	private boolean isItemChanged() {
@@ -204,5 +204,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 		mState.toScreen(mState.getShoppingListScreen());
 		mState.closeShowcase();
 		mState.setFragmentTagForRemove(TabletState.ITEM_TAG);
+
+		mShoppingListFragment.setOnItemChangedListener(null);
 	}
 }

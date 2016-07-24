@@ -6,18 +6,28 @@ import android.os.Build;
 import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
+import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 
 public class PhoneState implements StateInterface {
 	private ListsActivity mListsActivity;
 
 	public PhoneState(ListsActivity listsActivity) {
 		mListsActivity = listsActivity;
+
+		if (mListsActivity.getListsFragment() != null) {
+			setListeners(mListsActivity.getListsFragment());
+		}
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if (savedInstanceState == null && mListsActivity.shouldOpenLastList()) {
 			openLastList();
+		}
+
+		if (savedInstanceState != null) {
+			ListsFragment listFragment = (ListsFragment) mListsActivity.getFragmentManager().findFragmentByTag(ListsActivity.LISTS_TAG);
+			setListeners(listFragment);
 		}
 	}
 
@@ -55,5 +65,9 @@ public class PhoneState implements StateInterface {
 		}
 
 		return result;
+	}
+
+	private void setListeners(ListsFragment fragment) {
+		fragment.setOnListSelectListener(this);
 	}
 }
