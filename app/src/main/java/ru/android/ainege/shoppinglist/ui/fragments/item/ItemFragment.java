@@ -122,7 +122,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	protected ShoppingListDS mItemsInListDS;
 	private OnClickListener mOnClickListener;
 	private OnItemChangedListener mOnItemChangedListener;
-	private OnDialogShownListener mOnDialogShownListener;
 
 	protected ShoppingList mItemInList;
 	protected long mIdSelectedUnit;
@@ -293,7 +292,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 
 		mOnClickListener = null;
 		mOnItemChangedListener = null;
-		mOnDialogShownListener = null;
 	}
 
 	@Override
@@ -304,11 +302,9 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		outState.putLong(STATE_CATEGORY_ID, ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId());
 	}
 
-	public void setListeners(OnClickListener onClickListener, OnItemChangedListener onItemChangedListener,
-	                         OnDialogShownListener onDialogShownListener) {
+	public void setListeners(OnClickListener onClickListener, OnItemChangedListener onItemChangedListener) {
 		setOnClickListener(onClickListener);
 		setOnItemChangedListener(onItemChangedListener);
-		setOnDialogShownListener(onDialogShownListener);
 	}
 
 	public void setOnClickListener(OnClickListener onClickListener) {
@@ -317,10 +313,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 
 	public void setOnItemChangedListener(OnItemChangedListener onItemChangedListener) {
 		mOnItemChangedListener = onItemChangedListener;
-	}
-
-	public void setOnDialogShownListener(OnDialogShownListener onDialogShownListener) {
-		mOnDialogShownListener = onDialogShownListener;
 	}
 
 	private void showCaseViews() {
@@ -394,15 +386,9 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 					break;
 				case UNIT_ADD:
 					setSelectionUnit(-1);
-					if (mOnDialogShownListener != null) {
-						mOnDialogShownListener.onCloseDialog();
-					}
 					break;
 				case CATEGORY_ADD:
 					setSelectionCategory(-1);
-					if (mOnDialogShownListener != null) {
-						mOnDialogShownListener.onCloseDialog();
-					}
 					break;
 			}
 
@@ -972,10 +958,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		GeneralDialogFragment addItemDialog = new UnitDialogFragment();
 		addItemDialog.setTargetFragment(ItemFragment.this, requestCode);
 		addItemDialog.show(getFragmentManager(), tag);
-
-		if (mOnDialogShownListener != null) {
-			mOnDialogShownListener.onOpenDialog(-1);
-		}
 
 		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.SELECT_CONTENT)
 				.putString(FirebaseAnalytic.TYPE, tag + " (item)")
