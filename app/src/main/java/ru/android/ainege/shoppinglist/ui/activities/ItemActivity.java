@@ -72,13 +72,13 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 			fragment = EditItemFragment.newInstance(itemInList);
 		}
 
-		mOnBackPressedListener = fragment;
 		setListeners(fragment);
 
 		return fragment;
 	}
 
 	private void setListeners(ItemFragment fragment) {
+		mOnBackPressedListener = fragment;
 		fragment.setOnClickListener(this);
 	}
 }
