@@ -25,12 +25,9 @@ public abstract class TabletScreen implements OnDialogShownListener, ListsFragme
 		mState = state;
 	}
 
-	@Override
-	public void onOpenDialog(long idList) {
+	public void onOpenDialog(ShoppingListFragment fragment, long idList) {
 		//if screen of shopping list opened with delete mode and open dialog - close delete mode
-		ShoppingListFragment listFragment = (ShoppingListFragment) mState.getListsActivity().
-				getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
-		if (listFragment != null) listFragment.closeActionMode();
+		if (fragment != null) fragment.closeActionMode();
 	}
 
 	@Override
@@ -50,12 +47,6 @@ public abstract class TabletScreen implements OnDialogShownListener, ListsFragme
 		ItemFragment fragment = EditItemFragment.newInstance(item);
 		mState.getItemScreen().setListeners(fragment);
 		mState.openItem(item.getIdItem(), fragment);
-	}
-
-	public void updateCurrentList() {
-		ShoppingListFragment listFragment = (ShoppingListFragment) mState.getListsActivity().
-				getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
-		listFragment.updateData();
 	}
 
 	public long getLastSelectedListId() {

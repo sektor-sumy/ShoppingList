@@ -221,7 +221,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		mIsLandscapeTablet = getResources().getBoolean(R.bool.isTablet) && getResources().getBoolean(R.bool.isLandscape);
 		mListsDS = new ListsDS(getActivity());
-		setList(getArguments().getLong(ID_LIST));
+		setList();
 		saveId(mList.getId());
 
 		readSettings();
@@ -498,8 +498,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			case SETTINGS:
 				long modifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
 				if (modifyCatalog != -1) {
-					setList(getArguments().getLong(ID_LIST));
-					mAdapterRV.setCurrency(mList.getCurrency().getSymbol(), false);
+					setList();
 					updateData();
 
 					if (mOnItemChangedListener != null) {
@@ -538,7 +537,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	public void updateList() {
-		setList(getArguments().getLong(ID_LIST));
+		setList();
 		setListData();
 		updateSums(mSaveSpentMoney, mSaveTotalMoney);
 		mAdapterRV.setCurrency(mList.getCurrency().getSymbol(), true);
@@ -621,10 +620,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	public void updateData() {
 		mSaveListRotate = null;
+		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
+
 		if (mOnListChangedListener != null) {
 			mOnListChangedListener.onListUpdated();
 		}
-		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
 	private ArrayList<Category> getItemsList(CategoryCursor data) {
@@ -742,8 +742,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	//</editor-fold>
 
 	//<editor-fold desc="Customize the list">
-	private void setList(long idList) {
-		ListCursor cursor = mListsDS.get(idList);
+	public void setList() {
+		ListCursor cursor = mListsDS.get(getArguments().getLong(ID_LIST));
 
 		if (cursor.moveToFirst()) {
 			mList = cursor.getEntity();

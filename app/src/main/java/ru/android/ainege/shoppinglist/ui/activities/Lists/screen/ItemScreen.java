@@ -67,7 +67,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 
 	@Override
 	public void onOpenDialog(long idList) {
-		super.onOpenDialog(idList);
+		onOpenDialog(mShoppingListFragment, idList);
 		mState.setShouldBackPressed(TabletState.DIALOG_BEHAVIOUR_ITEM);
 	}
 
@@ -193,6 +193,10 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 				mItemFragment.setCurrency();
 			}
 		}
+	}
+
+	public void updateCurrentList() {
+		mShoppingListFragment.updateData();
 	}
 
 	private boolean isItemChanged() {

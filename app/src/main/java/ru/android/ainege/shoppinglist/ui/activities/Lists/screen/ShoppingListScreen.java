@@ -63,7 +63,7 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 
 	@Override
 	public void onOpenDialog(long idList) {
-		super.onOpenDialog(idList);
+		onOpenDialog(mShoppingListFragment, idList);
 
 		if (mState.getLastSelectedListId() != idList) {
 			mState.setShouldBackPressed(TabletState.DIALOG_BEHAVIOUR_LIST);
@@ -110,6 +110,12 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 		}
 
 		mState.updateList();
+	}
+
+	@Override
+	public void updateCurrentList() {
+		mShoppingListFragment.setList();
+		mShoppingListFragment.updateData();
 	}
 
 	@Override
