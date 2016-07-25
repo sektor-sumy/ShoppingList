@@ -18,13 +18,16 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import ru.android.ainege.shoppinglist.R;
+import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsCatalogActivity;
 
-public class MainPreferenceFragment extends android.preference.PreferenceFragment {
+public class MainPreferenceFragment extends android.preference.PreferenceFragment implements OnBackPressedListener {
 	private static final String STATE_SCREEN = "state_screen";
+	private static final String STATE_MODIFY_CATALOG = "state_modify_catalog";
 	private static final int SETTINGS = 1;
 
 	private PreferenceScreen mNestedScreen;
+	private long mModifyCatalog = -1;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -47,8 +50,12 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 		startSettingByKey(getString(R.string.settings_key_unit));
 		startSettingByKey(getString(R.string.settings_key_category));
 
-		if (savedInstanceState != null && savedInstanceState.get(STATE_SCREEN) != null) {
-			mNestedScreen = (PreferenceScreen) findPreference(savedInstanceState.get(STATE_SCREEN).toString());
+		if (savedInstanceState != null) {
+			mModifyCatalog = savedInstanceState.getLong(STATE_MODIFY_CATALOG);
+
+			if (savedInstanceState.get(STATE_SCREEN) != null) {
+				mNestedScreen = (PreferenceScreen) findPreference(savedInstanceState.get(STATE_SCREEN).toString());
+			}
 		}
 	}
 
@@ -82,6 +89,8 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 		if (mNestedScreen != null) {
 			outState.putString(STATE_SCREEN, mNestedScreen.getKey());
 		}
+
+		outState.putLong(STATE_MODIFY_CATALOG, mModifyCatalog);
 	}
 
 	@Override
@@ -100,9 +109,14 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 		super.onActivityResult(requestCode, resultCode, data);
 
 		if (requestCode == SETTINGS) {
-			long modifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
-			getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(CatalogFragment.LAST_EDIT, modifyCatalog));
+			mModifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
 		}
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(CatalogFragment.LAST_EDIT, mModifyCatalog));
+		return true;
 	}
 
 	private void startSettingByKey(final String key) {

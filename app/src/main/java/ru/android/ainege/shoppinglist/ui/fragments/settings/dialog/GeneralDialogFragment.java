@@ -46,7 +46,6 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 				})
 				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						sendCancelResult();
 						dialog.cancel();
 					}
 				});
@@ -79,6 +78,18 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 				}
 			}
 		});
+	}
+
+	@Override
+	public void onCancel(DialogInterface dialog) {
+		super.onCancel(dialog);
+
+		sendCancelResult();
+	}
+
+	@Override
+	public void onDismiss(DialogInterface dialog) {
+		super.onDismiss(dialog);
 	}
 
 	protected View setupView() {

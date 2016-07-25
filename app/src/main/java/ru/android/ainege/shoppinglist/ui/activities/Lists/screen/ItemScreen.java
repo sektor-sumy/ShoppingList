@@ -178,20 +178,18 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 
 	@Override
 	public void updateItem(String setting) {
-		if (mState.isLandscape()) {
-			if (setting == null) {
-				mItemFragment.setCurrency();
-				mItemFragment.setUnit(-1);
-				mItemFragment.setCategory(-1);
-			} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_transition))) {
-				mItemFragment.setTransitionButtons();
-			} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_fast_edit))) {
-				mItemFragment.updateSpinners();
-			} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_use_category))) {
-				mItemFragment.setCategory();
-			} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_currency))) {
-				mItemFragment.setCurrency();
-			}
+		if (setting == null) {
+			mItemFragment.setCurrency();
+			mItemFragment.setUnit(-1);
+			mItemFragment.setCategory(-1);
+		} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_transition))) {
+			mItemFragment.setTransitionButtons();
+		} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_fast_edit))) {
+			mItemFragment.updateSpinners();
+		} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_use_category))) {
+			mItemFragment.setCategory();
+		} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_currency))) {
+			mItemFragment.setCurrency();
 		}
 	}
 
