@@ -183,6 +183,8 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 			case DELETE:
 				Catalog catalog = (Catalog) data.getSerializableExtra(DeleteDialogFragment.REPLACEMENT);
 				deleteItem(data.getIntExtra(DeleteDialogFragment.POSITION, -1), catalog.getId());
+
+				mLastEditId = catalog.getId();
 				break;
 		}
 	}
