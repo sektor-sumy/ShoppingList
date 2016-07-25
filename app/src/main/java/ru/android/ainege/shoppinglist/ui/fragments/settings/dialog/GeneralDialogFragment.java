@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments.settings;
+package ru.android.ainege.shoppinglist.ui.fragments.settings.dialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;

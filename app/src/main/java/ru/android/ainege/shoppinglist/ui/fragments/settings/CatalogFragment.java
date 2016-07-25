@@ -31,6 +31,8 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.entities.Catalog;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.DeleteDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.GeneralDialogFragment;
 
 public abstract class CatalogFragment<T extends Catalog> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnBackPressedListener {
 	public static final String LAST_EDIT = "lastEdit";

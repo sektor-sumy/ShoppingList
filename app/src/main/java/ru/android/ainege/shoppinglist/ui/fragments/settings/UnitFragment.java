@@ -10,6 +10,8 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.GeneralDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.UnitDialogFragment;
 
 public class UnitFragment extends CatalogFragment<Unit> {
 

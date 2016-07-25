@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments.settings;
+package ru.android.ainege.shoppinglist.ui.fragments.settings.dialog;
 
 import android.os.Build;
 import android.os.Bundle;

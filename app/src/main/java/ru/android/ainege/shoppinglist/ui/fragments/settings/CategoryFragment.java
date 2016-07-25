@@ -11,6 +11,8 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.CategoryDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.GeneralDialogFragment;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
 
