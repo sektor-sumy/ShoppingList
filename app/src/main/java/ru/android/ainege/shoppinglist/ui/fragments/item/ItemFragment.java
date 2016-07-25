@@ -785,6 +785,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 				if (s != null && s.length() > 0) {
 					if (!Validation.isAmountValid(s.toString().trim())) {
 						mAmountInputLayout.setError(getString(R.string.error_value));
+						mFinishPrice.setVisibility(View.GONE);
 					} else {
 						disableError(mAmountInputLayout);
 						if (mPrice.getText().length() > 0) {
@@ -816,6 +817,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 				if (s != null && s.length() > 0) {
 					if (!Validation.isPriceValid(s.toString().trim())) {
 						mPriceInputLayout.setError(getString(R.string.error_value));
+						mFinishPrice.setVisibility(View.GONE);
 					} else {
 						disableError(mPriceInputLayout);
 						if (mAmount.getText().length() > 0) {
@@ -865,11 +867,15 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	}
 
 	private void setFinishPrice() {
-		double amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
-		double price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
-		String finalPriceText = getString(R.string.finish_price) + localValue(amount * price) + " " + mCurrencyList;
-		mFinishPrice.setText(finalPriceText);
-		mFinishPrice.setVisibility(View.VISIBLE);
+		try {
+			double amount = Double.parseDouble(mAmount.getText().toString().replace(',', '.'));
+			double price = Double.parseDouble(mPrice.getText().toString().replace(',', '.'));
+			String finalPriceText = getString(R.string.finish_price) + localValue(amount * price) + " " + mCurrencyList;
+			mFinishPrice.setText(finalPriceText);
+			mFinishPrice.setVisibility(View.VISIBLE);
+		} catch (Exception e) {
+			mFinishPrice.setVisibility(View.GONE);
+		}
 	}
 
 	private String localValue(double value) {
