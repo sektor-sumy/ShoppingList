@@ -119,9 +119,8 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 	}
 
 	protected void addAnalytics(String catalog, String name) {
-		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.SELECT_CONTENT)
-				.putString(FirebaseAnalytic.TYPE, "add " + catalog)
-				.putString(FirebaseAnalytic.NEW + " " + catalog, name)
+		FirebaseAnalytic.getInstance(getActivity(), catalog)
+				.putString(FirebaseAnalytic.NAME, name)
 				.addEvent();
 	}
 }

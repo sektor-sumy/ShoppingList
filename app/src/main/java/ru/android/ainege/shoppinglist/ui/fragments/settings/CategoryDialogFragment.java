@@ -96,7 +96,7 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 
 			if (getArguments() == null) {
 				id = categoryDS.add(new Category(name, color));
-				addAnalytics(FirebaseAnalytic.CATEGORY, name);
+				addAnalytics(FirebaseAnalytic.ADD_CATEGORY, name);
 			} else {
 				id = mEditItem.getId();
 				categoryDS.update(new Category(id, name, color));

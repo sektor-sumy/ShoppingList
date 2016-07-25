@@ -75,7 +75,7 @@ public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 			long id;
 			if (getArguments() == null) {
 				id = currencyDS.add(new Currency(name, symbol));
-				addAnalytics(FirebaseAnalytic.CURRENCY, name);
+				addAnalytics(FirebaseAnalytic.ADD_CURRENCY, name);
 			} else {
 				id = mEditItem.getId();
 				currencyDS.update(new Currency(id, name, symbol));

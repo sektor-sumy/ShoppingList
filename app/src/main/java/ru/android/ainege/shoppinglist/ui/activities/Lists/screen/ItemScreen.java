@@ -35,7 +35,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 		mShoppingListFragment.setOnItemChangedListener(this);
 
 		mItemFragment = fragment;
-		mItemFragment.setListeners(this, this, mState);
+		mItemFragment.setListeners(this, this);
 		mOnBackPressedListener = mItemFragment;
 	}
 

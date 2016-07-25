@@ -186,9 +186,8 @@ public class ShoppingList extends ItemData {
 			idItem = new ItemDS(context).add(mItem);
 			setIdItem(idItem);
 
-			FirebaseAnalytic.getInstance(context, FirebaseAnalytic.SELECT_CONTENT)
-					.putString(FirebaseAnalytic.TYPE, "add new item (item)")
-					.putString(FirebaseAnalytic.NEW_ITEM, mItem.getName())
+			FirebaseAnalytic.getInstance(context, FirebaseAnalytic.NEW_ITEM)
+					.putString(FirebaseAnalytic.NAME, mItem.getName())
 					.putString(FirebaseAnalytic.UNIT, mUnit.getName())
 					.putString(FirebaseAnalytic.CATEGORY, mCategory.getName())
 					.addEvent();

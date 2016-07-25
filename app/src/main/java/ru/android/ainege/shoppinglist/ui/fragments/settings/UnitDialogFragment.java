@@ -53,7 +53,7 @@ public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 			long id;
 			if (getArguments() == null) {
 				id = unitDS.add(new Unit(name));
-				addAnalytics(FirebaseAnalytic.UNIT, name);
+				addAnalytics(FirebaseAnalytic.ADD_UNIT, name);
 			} else {
 				id = mEditItem.getId();
 				unitDS.update(new Unit(id, name));

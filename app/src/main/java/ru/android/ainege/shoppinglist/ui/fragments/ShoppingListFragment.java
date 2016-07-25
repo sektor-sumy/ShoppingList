@@ -395,7 +395,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 							mOnDialogShownListener.onOpenDialog(mList.getId());
 						}
 
-						addAnalytics("delete list (list)");
+						addAnalytics(FirebaseAnalytic.DELETE_LIST_IN_SL, null);
 						return true;
 					case R.id.update_list:
 						ListDialogFragment editListDialog = EditListDialogFragment.newInstance(mList);
@@ -406,7 +406,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 							mOnDialogShownListener.onOpenDialog(mList.getId());
 						}
 
-						addAnalytics("update list (list)");
+						addAnalytics(FirebaseAnalytic.UPDATE_LIST_IN_SL, null);
 
 						return true;
 					case R.id.settings:
@@ -437,13 +437,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					case R.id.collapse_all:
 						mAdapterRV.collapseAllCategory(true);
 
-						addAnalytics("collapse category (list)");
+						addAnalytics(FirebaseAnalytic.COLLAPSE_CATEGORY, FirebaseAnalytic.COLLAPSE);
 
 						return true;
 					case R.id.expanded_all:
 						mAdapterRV.extendAllCategory(true);
 
-						addAnalytics("extend category (list)");
+						addAnalytics(FirebaseAnalytic.COLLAPSE_CATEGORY, FirebaseAnalytic.EXTEND);
 
 						return true;
 					default:
@@ -1131,9 +1131,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 	//</editor-fold>
 
-	private void addAnalytics(String value) {
-		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.SELECT_CONTENT)
-				.putString(FirebaseAnalytic.TYPE, value)
+	private void addAnalytics(String name, String value) {
+		FirebaseAnalytic.getInstance(getActivity(), name)
+				.putString(FirebaseAnalytic.CONTENT_TYPE, value)
 				.addEvent();
 	}
 

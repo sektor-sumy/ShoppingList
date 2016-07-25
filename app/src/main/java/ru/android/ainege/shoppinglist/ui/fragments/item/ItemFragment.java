@@ -63,7 +63,6 @@ import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Catalog;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
-import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.ui.activities.SettingsCatalogActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
@@ -901,8 +900,8 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 			startActivityForResult(i, code);
 		}
 
-		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.SELECT_CONTENT)
-				.putString(FirebaseAnalytic.TYPE, value + " (item)")
+		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.TRANSITION_TO_SETTINGS_IN_ITEM)
+				.putString(FirebaseAnalytic.CONTENT_TYPE, value)
 				.addEvent();
 	}
 
@@ -959,8 +958,8 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		addItemDialog.setTargetFragment(ItemFragment.this, requestCode);
 		addItemDialog.show(getFragmentManager(), tag);
 
-		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.SELECT_CONTENT)
-				.putString(FirebaseAnalytic.TYPE, tag + " (item)")
+		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.ADD_CATALOG_IN_ITEM)
+				.putString(FirebaseAnalytic.CONTENT_TYPE, tag)
 				.addEvent();
 	}
 
