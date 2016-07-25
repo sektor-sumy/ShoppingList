@@ -183,6 +183,7 @@ public class EditItemFragment extends ItemFragment {
 				Image.deleteFile(originImagePath);
 			}
 
+			mOriginalItem = new ShoppingList(mItemInList);
 			sendResult(mItemInList.getIdItem());
 			isSave = true;
 		}
@@ -213,12 +214,12 @@ public class EditItemFragment extends ItemFragment {
 	@Override
 	protected boolean isDeleteImage(String newPath) {
 		String imagePath = mItemInList.getItem().getImagePath();
-		String dPath  = mItemInList.getItem().getDefaultImagePath();
+		String defaultImagePath  = mItemInList.getItem().getDefaultImagePath();
 
 		return !imagePath.contains(Image.ASSETS_IMAGE_PATH) &&
 				!imagePath.equals(newPath) &&
 				!imagePath.equals(mOriginalItem.getItem().getImagePath()) &&
-				!imagePath.equals(dPath);
+				!imagePath.equals(defaultImagePath);
 	}
 
 	@Override
