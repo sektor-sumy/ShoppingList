@@ -120,7 +120,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 						(!isCollapseCategoryShowcaseFired && sharedPref.getBoolean(mState.getListsActivity().getString(R.string.settings_key_collapse_category), true))) {
 					toPreviousScreen();
 				} else {
-					onItemAdd(mState.getLastSelectedListId());
+					super.onItemAdd(mState.getLastSelectedListId());
 				}
 			}
 		} else {
