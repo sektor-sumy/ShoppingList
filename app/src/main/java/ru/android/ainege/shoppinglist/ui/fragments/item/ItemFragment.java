@@ -262,6 +262,11 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 			public void onFinished(boolean isSuccess, String path) {
 				loadImage(path);
 			}
+
+			@Override
+			public Activity getActivity() {
+				return getActivity();
+			}
 		});
 
 		setupView(v, savedInstanceState);
@@ -415,7 +420,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 					}
 				} catch (OutOfMemoryError | Exception e) {
 					e.printStackTrace();
-					FirebaseCrash.report(e);
+					FirebaseCrash.report(new Exception(getResources().getString(R.string.catched_exception), e));
 					Image.deleteFile(file.getAbsolutePath());
 				}
 

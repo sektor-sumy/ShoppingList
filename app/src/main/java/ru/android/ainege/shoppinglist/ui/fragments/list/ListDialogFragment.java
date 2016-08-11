@@ -185,7 +185,7 @@ public abstract class ListDialogFragment extends DialogFragment {
 					}
 				} catch (OutOfMemoryError | Exception e) {
 					e.printStackTrace();
-					FirebaseCrash.report(e);
+					FirebaseCrash.report(new Exception(getResources().getString(R.string.catched_exception), e));
 					Image.deleteFile(file.getAbsolutePath());
 				}
 
@@ -279,6 +279,11 @@ public abstract class ListDialogFragment extends DialogFragment {
 			@Override
 			public void onFinished(boolean isSuccess, String path) {
 				loadImage(path);
+			}
+
+			@Override
+			public Activity getActivity() {
+				return getActivity();
 			}
 		});
 

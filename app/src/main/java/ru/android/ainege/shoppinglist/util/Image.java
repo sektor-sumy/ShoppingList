@@ -124,7 +124,7 @@ public class Image {
 		}
 	}
 
-	public boolean postProcessingToFile(File file, int widthImageView) {
+	private boolean postProcessingToFile(File file, int widthImageView) {
 		if (!isExternalStorageReadable()) {
 			return false;
 		}
@@ -138,11 +138,11 @@ public class Image {
 		return postProcessingToFile(file, bitmap, widthImageView);
 	}
 
-	public boolean postProcessingToFile(File file, Bitmap bitmap, int widthImageView) {
+	private boolean postProcessingToFile(File file, Bitmap bitmap, int widthImageView) {
 		return saveImageToFile(file, postProcessing(bitmap, widthImageView));
 	}
 
-	public boolean saveImageToFile(File file, Bitmap bitmap) {
+	private boolean saveImageToFile(File file, Bitmap bitmap) {
 		boolean result = false;
 
 		try {
@@ -276,7 +276,7 @@ public class Image {
 				}
 			} catch (OutOfMemoryError | Exception e) {
 				e.printStackTrace();
-				FirebaseCrash.report(e);
+				FirebaseCrash.report(new Exception(mFragment.getActivity().getResources().getString(R.string.catched_exception), e));
 				deleteFile(mFile.getAbsolutePath());
 				result = false;
 			}
