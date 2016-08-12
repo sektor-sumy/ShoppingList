@@ -68,6 +68,7 @@ import ru.android.ainege.shoppinglist.ui.activities.SettingsCatalogActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.CatalogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.CategoryDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.GeneralDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.UnitDialogFragment;
 import ru.android.ainege.shoppinglist.util.AndroidBug5497Workaround;
@@ -965,7 +966,19 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	}
 
 	private void openAddItemDialog (int requestCode, String tag) {
-		GeneralDialogFragment addItemDialog = new UnitDialogFragment();
+		GeneralDialogFragment addItemDialog;
+
+		switch (requestCode) {
+			case UNIT_ADD:
+				addItemDialog = new UnitDialogFragment();
+				break;
+			case CATEGORY_ADD:
+				addItemDialog = new CategoryDialogFragment();
+				break;
+			default:
+				return;
+		}
+
 		addItemDialog.setTargetFragment(ItemFragment.this, requestCode);
 		addItemDialog.show(getFragmentManager(), tag);
 
