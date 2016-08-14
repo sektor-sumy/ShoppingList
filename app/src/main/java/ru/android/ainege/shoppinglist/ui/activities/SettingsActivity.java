@@ -37,6 +37,11 @@ public class SettingsActivity extends SingleFragmentActivity {
 	}
 
 	@Override
+	protected void adsInitialize() {
+
+	}
+
+	@Override
 	public void onBackPressed() {
 		if (mOnBackPressedListener == null || (mOnBackPressedListener != null && mOnBackPressedListener.onBackPressed())) {
 			super.onBackPressed();

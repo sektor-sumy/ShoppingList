@@ -179,4 +179,7 @@
 	<string name="sort_order_down_price">убыванию цены за единицу измерения</string>
 	<string name="sort_order_up_purchase_price">возрастанию цены за покупку</string>
 	<string name="sort_order_down_purchase_price">убыванию цены за покупку</string>
+
+
+	<string name="banner_ad_unit_id">ca-app-pub-3804902313328755/8598932222</string>
 </resources>
