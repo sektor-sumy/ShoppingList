@@ -2,6 +2,7 @@ package ru.android.ainege.shoppinglist.ui.activities.lists.screen;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import ru.android.ainege.shoppinglist.R;
@@ -37,6 +38,8 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 		mItemFragment = fragment;
 		mItemFragment.setListeners(this, this);
 		mOnBackPressedListener = mItemFragment;
+
+		mState.getListsActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 	}
 
 	@Override
@@ -202,6 +205,8 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	}
 
 	private void toPreviousScreen() {
+		mItemFragment.getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
 		mState.updateList();
 		mState.toScreen(mState.getShoppingListScreen());
 		mState.closeShowcase();

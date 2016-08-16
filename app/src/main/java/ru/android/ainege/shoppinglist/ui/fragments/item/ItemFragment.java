@@ -36,15 +36,18 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
@@ -183,15 +186,20 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		final View v = inflater.inflate(R.layout.fragment_item, container, false);
 
 		if (getResources().getBoolean(R.bool.isLandscape) && getResources().getBoolean(R.bool.isPhone)) {
+			//TODO: 15.08.2016  AdMob on it
 			mIsCollapsedMode = false;
 		} else {
 			mIsCollapsedMode = true;
+			View view = ((FrameLayout)  getActivity().findViewById(android.R.id.content)).getChildAt(0);
+			final AdView adView = (AdView) ((RelativeLayout) view).getChildAt(1);
+
 			AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboardListener() {
 				@Override
 				public void isOpen(int screenAppHeight) {
 					mIsOpenedKeyboard = true;
 					mScreenAppHeight = screenAppHeight;
 
+					adView.setVisibility(View.GONE);
 					View focusedView = v.findFocus();
 
 					if (focusedView != null && !(focusedView instanceof LinearLayout) && !isViewVisible(focusedView)) {
@@ -201,6 +209,10 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 
 				@Override
 				public void isClose() {
+					if (mIsOpenedKeyboard) {
+						adView.setVisibility(View.VISIBLE);
+					}
+
 					mIsOpenedKeyboard = false;
 					View focusedView = v.findFocus();
 

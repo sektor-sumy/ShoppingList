@@ -18,7 +18,7 @@
 		android:theme="@style/AppTheme">
 		<activity
 			android:name=".ui.activities.lists.ListsActivity"
-			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
 			android:theme="@style/AppTheme.NoActionBar">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
@@ -29,6 +29,7 @@
 		<activity
 			android:name=".ui.activities.ShoppingListActivity"
 			android:label=""
+			android:windowSoftInputMode="adjustPan"
 			android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
 		</activity>
 		<activity
@@ -45,6 +46,7 @@
 		<activity
 			android:name=".ui.activities.SettingsCatalogActivity"
 			android:label=""
+			android:windowSoftInputMode="adjustPan"
 			android:theme="@style/AppTheme.NoActionBar">
 			<intent-filter>
 				<action android:name="ru.android.ainege.shoppinglist.SettingsDataActivity"/>
