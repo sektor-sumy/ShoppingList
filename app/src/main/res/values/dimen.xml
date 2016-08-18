@@ -59,4 +59,8 @@
 	<dimen name="card_view_margin">-3dp</dimen>
 	<dimen name="card_view_margin_top">53dp</dimen>
 	<dimen name="card_view_toolbar_spacer">42dp</dimen>
+
+	<!--navigation drawer-->
+	<dimen name="header_height">160dp</dimen>
+
 </resources>

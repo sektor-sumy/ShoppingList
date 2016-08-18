@@ -22,4 +22,7 @@
 
 	<!--settings-->
 	<dimen name="card_view_toolbar_spacer">90dp</dimen>
+
+	<!--navigation drawer-->
+	<dimen name="header_height">200dp</dimen>
 </resources>

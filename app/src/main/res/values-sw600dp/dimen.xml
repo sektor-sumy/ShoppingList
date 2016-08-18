@@ -29,4 +29,8 @@
 	<dimen name="toolbar_size">64dp</dimen>
 	<dimen name="toolbar_size_x2">128dp</dimen>
 	<dimen name="card_view_toolbar_spacer">75dp</dimen>
+
+	<!--navigation drawer-->
+	<dimen name="header_height">180dp</dimen>
+
 </resources>

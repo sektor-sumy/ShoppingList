@@ -150,8 +150,17 @@
 	<string name="settings_title_fast_edit">Быстрое добавление</string>
 	<string name="settings_summary_fast_edit">Вначале выпадающего списка появится пункт \"Добавить\"</string>
 
+	<string name="sort_order_alphabet">алфавиту</string>
+	<string name="sort_order_adding">порядку добавления</string>
+	<string name="sort_order_up_price">возрастанию цены за единицу измерения</string>
+	<string name="sort_order_down_price">убыванию цены за единицу измерения</string>
+	<string name="sort_order_up_purchase_price">возрастанию цены за покупку</string>
+	<string name="sort_order_down_purchase_price">убыванию цены за покупку</string>
+
+
 	<string name="settings_category_other">Каталоги</string>
 	<string name="settings_key_currency">settings_key_summary</string>
+	<string name="catalogs_items">Товары</string>
 	<string name="settings_title_currency">Валюты</string>
 
 	<string name="name">Название</string>
@@ -173,13 +182,7 @@
 	<string name="settings_title_category">Категории товаров</string>
 	<string name="category_info">Категория товаров</string>
 
-	<string name="sort_order_alphabet">алфавиту</string>
-	<string name="sort_order_adding">порядку добавления</string>
-	<string name="sort_order_up_price">возрастанию цены за единицу измерения</string>
-	<string name="sort_order_down_price">убыванию цены за единицу измерения</string>
-	<string name="sort_order_up_purchase_price">возрастанию цены за покупку</string>
-	<string name="sort_order_down_purchase_price">убыванию цены за покупку</string>
-
+	<string name="feedback">Обратная связь</string>
 
 	<string name="banner_ad_unit_id">ca-app-pub-3804902313328755/8598932222</string>
 </resources>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<group android:checkableBehavior="single">
+		<item
+			android:id="@+id/nav_main"
+			android:icon="@drawable/ic_list_white_24dp"
+			android:title="@string/you_lists"/>
+	</group>
+
+	<item android:title="@string/settings_category_other">
+		<menu>
+			<group android:checkableBehavior="single">
+				<item
+					android:id="@+id/nav_catalog_items"
+					android:icon="@drawable/ic_style_white_24dp"
+					android:title="@string/catalogs_items"/>
+				<item
+					android:id="@+id/nav_catalog_catalogs"
+					android:icon="@drawable/ic_file_tree_white_24dp"
+					android:title="@string/settings_title_category"/>
+				<item
+					android:id="@+id/nav_catalog_units"
+					android:icon="@drawable/ic_scale_white_24dp"
+					android:title="@string/settings_title_unit"/>
+				<item
+					android:id="@+id/nav_catalog_currencies"
+					android:icon="@drawable/ic_attach_money_white_24dp"
+					android:title="@string/settings_title_currency"/>
+			</group>
+		</menu>
+	</item>
+
+	<group android:id="@+id/new_group_setting">
+		<item
+			android:id="@+id/nav_settings"
+			android:icon="@drawable/ic_settings_white_24dp"
+			android:title="@string/settings"/>
+		<item
+			android:id="@+id/nav_feedback"
+			android:icon="@drawable/ic_mail_white_24dp"
+			android:title="@string/feedback"/>
+	</group>
+
+</menu>

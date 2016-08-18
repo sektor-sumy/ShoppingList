@@ -1,43 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+	android:id="@+id/drawer_layout"
 	xmlns:ads="http://schemas.android.com/apk/res-auto"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent">
+	android:layout_height="match_parent"
+	android:fitsSystemWindows="true"
+	tools:openDrawer="start">
 
-	<LinearLayout
+	<RelativeLayout
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:orientation="horizontal"
-		android:layout_above="@+id/adView">
+		android:layout_height="match_parent">
 
-		<FrameLayout
-			android:id="@+id/fragment_container"
-			android:layout_width="0dp"
+		<LinearLayout
+			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:layout_weight="1"/>
+			android:layout_above="@+id/adView"
+			android:orientation="horizontal">
 
-		<FrameLayout
-			android:id="@+id/list_fragment_container"
-			android:layout_width="0dp"
-			android:layout_height="match_parent"/>
+			<FrameLayout
+				android:id="@+id/fragment_container"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"/>
 
-		<FrameLayout
-			android:id="@+id/item_fragment_container"
-			android:layout_width="0dp"
-			android:layout_height="match_parent"/>
+			<FrameLayout
+				android:id="@+id/list_fragment_container"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"/>
 
-	</LinearLayout>
+			<FrameLayout
+				android:id="@+id/item_fragment_container"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"/>
 
-	<com.google.android.gms.ads.AdView
-		android:id="@+id/adView"
+		</LinearLayout>
+
+		<com.google.android.gms.ads.AdView
+			android:id="@+id/adView"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_centerHorizontal="true"
+			android:visibility="gone"
+			ads:adSize="SMART_BANNER"
+			ads:adUnitId="@string/banner_ad_unit_id">
+		</com.google.android.gms.ads.AdView>
+
+	</RelativeLayout>
+
+	<android.support.design.widget.NavigationView
+		android:id="@+id/nav_view"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_centerHorizontal="true"
-		android:layout_alignParentBottom="true"
-		ads:adSize="SMART_BANNER"
-		ads:adUnitId="@string/banner_ad_unit_id"
-		android:visibility="gone">
-	</com.google.android.gms.ads.AdView>
+		android:layout_height="match_parent"
+		android:layout_gravity="start"
+		android:fitsSystemWindows="true"
+		app:headerLayout="@layout/nav_header_main"
+		app:menu="@menu/activity_main_drawer"/>
 
-</RelativeLayout>
+</android.support.v4.widget.DrawerLayout>

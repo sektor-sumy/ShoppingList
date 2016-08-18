@@ -21,6 +21,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -191,7 +192,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		} else {
 			mIsCollapsedMode = true;
 			View view = ((FrameLayout)  getActivity().findViewById(android.R.id.content)).getChildAt(0);
-			final AdView adView = (AdView) ((RelativeLayout) view).getChildAt(1);
+			final AdView adView = (AdView) ((RelativeLayout) ((DrawerLayout) view).getChildAt(0)).getChildAt(1);
 
 			AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboardListener() {
 				@Override
