@@ -8,7 +8,7 @@
 			android:title="@string/you_lists"/>
 	</group>
 
-	<item android:title="@string/settings_category_other">
+	<item android:title="@string/catalogs">
 		<menu>
 			<group android:checkableBehavior="single">
 				<item
@@ -18,15 +18,15 @@
 				<item
 					android:id="@+id/nav_catalog_catalogs"
 					android:icon="@drawable/ic_file_tree_white_24dp"
-					android:title="@string/settings_title_category"/>
+					android:title="@string/catalogs_category"/>
 				<item
 					android:id="@+id/nav_catalog_units"
 					android:icon="@drawable/ic_scale_white_24dp"
-					android:title="@string/settings_title_unit"/>
+					android:title="@string/catalogs_unit"/>
 				<item
 					android:id="@+id/nav_catalog_currencies"
 					android:icon="@drawable/ic_attach_money_white_24dp"
-					android:title="@string/settings_title_currency"/>
+					android:title="@string/catalogs_currency"/>
 			</group>
 		</menu>
 	</item>

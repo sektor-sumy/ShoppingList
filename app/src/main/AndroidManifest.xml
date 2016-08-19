@@ -44,7 +44,7 @@
 			android:theme="@style/AppTheme.NoActionBar">
 		</activity>
 		<activity
-			android:name=".ui.activities.SettingsCatalogActivity"
+			android:name=".ui.activities.CatalogsActivity"
 			android:label=""
 			android:windowSoftInputMode="adjustPan"
 			android:theme="@style/AppTheme.NoActionBar">

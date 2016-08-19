@@ -119,7 +119,7 @@ public class ListsActivity extends SingleFragmentActivity {
 
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 			SharedPreferences.Editor editor = settings.edit();
-			editor.putLong(getString(R.string.settings_key_currency), id);
+			editor.putLong(getString(R.string.catalogs_key_currency), id);
 			editor.apply();
 		}
 

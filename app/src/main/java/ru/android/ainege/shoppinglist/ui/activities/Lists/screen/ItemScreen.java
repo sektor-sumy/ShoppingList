@@ -191,7 +191,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 			mItemFragment.updateSpinners();
 		} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_use_category))) {
 			mItemFragment.setCategory();
-		} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_currency))) {
+		} else if (setting.equals(mState.getListsActivity().getString(R.string.catalogs_key_currency))) {
 			mItemFragment.setCurrency();
 		}
 	}

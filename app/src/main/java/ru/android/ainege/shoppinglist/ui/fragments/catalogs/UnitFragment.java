@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments.settings;
+package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
 import android.content.Loader;
 import android.database.Cursor;
@@ -10,14 +10,14 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.GeneralDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.UnitDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.UnitDialogFragment;
 
 public class UnitFragment extends CatalogFragment<Unit> {
 
 	@Override
 	protected String getTitle() {
-		return getString(R.string.settings_title_unit);
+		return getString(R.string.catalogs_unit);
 	}
 
 	@Override

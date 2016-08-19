@@ -24,9 +24,9 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.activities.lists.ListsActivity;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-	private static final int LISTS = 1;
-	private static final int CATALOGS = 2;
-	private static final int SETTINGS = 3;
+	private static final int LISTS = 101;
+	private static final int CATALOGS = 102;
+	private static final int SETTINGS = 103;
 
 	private DrawerLayout mDrawerLayout;
 
@@ -61,18 +61,18 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 				Toast.makeText(getApplicationContext(), getString(R.string.catalogs_items), Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.nav_catalog_catalogs:
-				openCatalog(SettingsCatalogActivity.class,
-						new String[][] {{SettingsCatalogActivity.EXTRA_TYPE, getString(R.string.settings_key_category)}},
+				openCatalog(CatalogsActivity.class,
+						new String[][] {{CatalogsActivity.EXTRA_TYPE, getString(R.string.catalogs_key_category)}},
 						CATALOGS);
 				break;
 			case R.id.nav_catalog_units:
-				openCatalog(SettingsCatalogActivity.class,
-						new String[][] {{SettingsCatalogActivity.EXTRA_TYPE, getString(R.string.settings_key_unit)}},
+				openCatalog(CatalogsActivity.class,
+						new String[][] {{CatalogsActivity.EXTRA_TYPE, getString(R.string.catalogs_key_unit)}},
 						CATALOGS);
 				break;
 			case R.id.nav_catalog_currencies:
-				openCatalog(SettingsCatalogActivity.class,
-						new String[][] {{SettingsCatalogActivity.EXTRA_TYPE, getString(R.string.settings_key_currency)}},
+				openCatalog(CatalogsActivity.class,
+						new String[][] {{CatalogsActivity.EXTRA_TYPE, getString(R.string.catalogs_key_currency)}},
 						CATALOGS);
 				break;
 			case R.id.nav_settings:

@@ -1,23 +1,11 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.Fragment;
-import android.os.Bundle;
 
-import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.MainPreferenceFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.MainPreferenceFragment;
 
 public class SettingsActivity extends SingleFragmentActivity {
 	private final static String FRAGMENT_TAG = "settings_activity_tag";
-	private OnBackPressedListener mOnBackPressedListener;
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		if (savedInstanceState != null) {
-			mOnBackPressedListener = (MainPreferenceFragment) getFragmentManager().findFragmentByTag(getTag());
-		}
-	}
 
 	@Override
 	protected int getDefaultContainer() {
@@ -26,9 +14,7 @@ public class SettingsActivity extends SingleFragmentActivity {
 
 	@Override
 	protected Fragment getFragment() {
-		MainPreferenceFragment fragment = new MainPreferenceFragment();
-		mOnBackPressedListener = fragment;
-		return fragment;
+		return new MainPreferenceFragment();
 	}
 
 	@Override
@@ -39,12 +25,5 @@ public class SettingsActivity extends SingleFragmentActivity {
 	@Override
 	protected void adsInitialize() {
 
-	}
-
-	@Override
-	public void onBackPressed() {
-		if (mOnBackPressedListener == null || (mOnBackPressedListener != null && mOnBackPressedListener.onBackPressed())) {
-			super.onBackPressed();
-		}
 	}
 }

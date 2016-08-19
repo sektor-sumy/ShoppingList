@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments.settings.dialog;
+package ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -94,7 +94,7 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 
 	protected View setupView() {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_settings, null);
+		View v = inflater.inflate(R.layout.dialog_catalogs, null);
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
 		mName = (EditText) v.findViewById(R.id.name);

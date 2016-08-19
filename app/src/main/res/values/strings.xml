@@ -96,8 +96,6 @@
 	<string name="error_failed_get_file">Не удалось получить файл</string>
 
 	<!--settings-->
-	<string name="settings_new">NEW!</string>
-	<string name="settings_shared_preferences">new_setting</string>
 	<string name="settings">Настройки</string>
 	<string name="settings_list">Списки</string>
 	<string name="settings_key_open_last_list">open_last_list</string>
@@ -157,30 +155,31 @@
 	<string name="sort_order_up_purchase_price">возрастанию цены за покупку</string>
 	<string name="sort_order_down_purchase_price">убыванию цены за покупку</string>
 
-
-	<string name="settings_category_other">Каталоги</string>
-	<string name="settings_key_currency">settings_key_summary</string>
+	<!--catalogs-->
+	<string name="catalogs">Каталоги</string>
+	<string name="catalogs_key_item">catalogs_key_item</string>
 	<string name="catalogs_items">Товары</string>
-	<string name="settings_title_currency">Валюты</string>
 
-	<string name="name">Название</string>
+	<string name="catalogs_key_currency">catalogs_key_currency</string>
+	<string name="catalogs_currency">Валюты</string>
+	<string name="currency_info">Информация о валюте</string>
 	<string name="currency_symbol">Символ или сокращение</string>
 	<string name="showcase_default_currency">Валюта по умолчанию отмечена цветом, для ее изменения нажмите на \"звездочку\" нужной валюты</string>
+	<string name="select_default_currency">Выбрана валютой по умолчанию</string>
 
+	<string name="catalogs_key_unit">catalogs_key_unit</string>
+	<string name="catalogs_unit">Единицы измерения</string>
+	<string name="unit_info">Единица измерения</string>
+
+	<string name="catalogs_key_category">catalogs_key_category</string>
+	<string name="catalogs_category">Категории товаров</string>
+	<string name="category_info">Категория товаров</string>
+
+	<string name="name">Название</string>
 	<string name="error_empty">Не может быть пустым</string>
 	<string name="error_one_item">Что-то должно остаться</string>
-	<string name="settings_currency">Настройка валют</string>
-	<string name="select_default_currency">Выбрана валютой по умолчанию</string>
-	<string name="currency_info">Информация о валюте</string>
-
-	<string name="settings_title_unit">Единицы измерения</string>
-	<string name="settings_key_unit">setting_key_unit</string>
-	<string name="unit_info">Единица измерения</string>
 	<string name="ask_delete_item">Значение уже используется. При удалении, оно будет заменено на: </string>
 
-	<string name="settings_key_category">setting_key_category</string>
-	<string name="settings_title_category">Категории товаров</string>
-	<string name="category_info">Категория товаров</string>
 
 	<string name="feedback">Обратная связь</string>
 

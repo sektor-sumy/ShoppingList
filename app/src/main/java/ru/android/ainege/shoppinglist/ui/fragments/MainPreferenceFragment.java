@@ -1,10 +1,7 @@
-package ru.android.ainege.shoppinglist.ui.fragments.settings;
+package ru.android.ainege.shoppinglist.ui.fragments;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -12,22 +9,16 @@ import android.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
-import ru.android.ainege.shoppinglist.ui.activities.SettingsCatalogActivity;
 
-public class MainPreferenceFragment extends android.preference.PreferenceFragment implements OnBackPressedListener {
+public class MainPreferenceFragment extends android.preference.PreferenceFragment {
 	private static final String STATE_SCREEN = "state_screen";
-	private static final String STATE_MODIFY_CATALOG = "state_modify_catalog";
-	private static final int SETTINGS = 1;
 
 	private PreferenceScreen mNestedScreen;
-	private long mModifyCatalog = -1;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -46,13 +37,7 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 		nestedScreen(getString(R.string.settings_key_text_selection_screen));
 		nestedScreen(getString(R.string.settings_key_transition_screen));
 
-		startSettingByKey(getString(R.string.settings_key_currency));
-		startSettingByKey(getString(R.string.settings_key_unit));
-		startSettingByKey(getString(R.string.settings_key_category));
-
 		if (savedInstanceState != null) {
-			mModifyCatalog = savedInstanceState.getLong(STATE_MODIFY_CATALOG);
-
 			if (savedInstanceState.get(STATE_SCREEN) != null) {
 				mNestedScreen = (PreferenceScreen) findPreference(savedInstanceState.get(STATE_SCREEN).toString());
 			}
@@ -89,53 +74,6 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 		if (mNestedScreen != null) {
 			outState.putString(STATE_SCREEN, mNestedScreen.getKey());
 		}
-
-		outState.putLong(STATE_MODIFY_CATALOG, mModifyCatalog);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				getActivity().finish();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		if (requestCode == SETTINGS) {
-			mModifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
-		}
-	}
-
-	@Override
-	public boolean onBackPressed() {
-		getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(CatalogFragment.LAST_EDIT, mModifyCatalog));
-		return true;
-	}
-
-	private void startSettingByKey(final String key) {
-		Preference categorySettings = findPreference(key);
-		categorySettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-			@Override
-			public boolean onPreferenceClick(Preference preference) {
-				Intent i = new Intent(getActivity(), SettingsCatalogActivity.class);
-				i.putExtra(SettingsCatalogActivity.EXTRA_TYPE, key);
-
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-				} else {
-					startActivityForResult(i, SETTINGS);
-				}
-
-				return true;
-			}
-		});
 	}
 
 	private void nestedScreen(String key) {

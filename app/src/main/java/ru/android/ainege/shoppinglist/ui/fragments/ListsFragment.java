@@ -2,7 +2,6 @@ package ru.android.ainege.shoppinglist.ui.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
@@ -12,7 +11,6 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -21,7 +19,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -37,11 +34,10 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
-import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.list.AddListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.EditListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.ListDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.CatalogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CatalogFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -134,7 +130,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		toolbar.inflateMenu(R.menu.list_of_lists_menu);
-		toolbar.setOnMenuItemClickListener(onMenuItemClickListener());
 		toolbar.setTitle(R.string.you_lists);
 
 		mAddButton = (FloatingActionButton) v.findViewById(R.id.add_fab);
@@ -250,7 +245,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 				}
 
 				break;
-			case SETTINGS:
+			case SETTINGS: // TODO: 19.08.2016
 				long modifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
 
 				if (modifyCatalog != -1 && mOnListChangedListener != null) {
@@ -335,28 +330,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	public void setOnListsLoadListener(OnListsLoadFinishedListener listener) {
 		mOnListsLoadFinishedListener = listener;
-	}
-
-	private Toolbar.OnMenuItemClickListener onMenuItemClickListener() {
-		return new Toolbar.OnMenuItemClickListener() {
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				switch (item.getItemId()) {
-					case R.id.settings:
-						Intent i = new Intent(getActivity(), SettingsActivity.class);
-
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-						} else {
-							startActivityForResult(i, SETTINGS);
-						}
-
-						return true;
-					default:
-						return false;
-				}
-			}
-		};
 	}
 
 	private void setLists(ArrayList<List> lists) {

@@ -68,13 +68,13 @@ import ru.android.ainege.shoppinglist.db.entities.Catalog;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
-import ru.android.ainege.shoppinglist.ui.activities.SettingsCatalogActivity;
+import ru.android.ainege.shoppinglist.ui.activities.CatalogsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.CatalogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.CategoryDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.GeneralDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.UnitDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CatalogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.CategoryDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.UnitDialogFragment;
 import ru.android.ainege.shoppinglist.util.AndroidBug5497Workaround;
 import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 import ru.android.ainege.shoppinglist.util.Image;
@@ -617,7 +617,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		mUnitSettings.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				settingOnClickListener(getString(R.string.settings_key_unit), UNIT_SETTINGS);
+				settingOnClickListener(getString(R.string.catalogs_key_unit), UNIT_SETTINGS);
 			}
 		});
 
@@ -664,7 +664,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		mCategorySettings.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				settingOnClickListener(getString(R.string.settings_key_category), CATEGORY_SETTINGS);
+				settingOnClickListener(getString(R.string.catalogs_key_category), CATEGORY_SETTINGS);
 			}
 		});
 		mCategoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
@@ -916,8 +916,8 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	}
 
 	private void settingOnClickListener(String value, int code) {
-		Intent i = new Intent(getActivity(), SettingsCatalogActivity.class);
-		i.putExtra(SettingsCatalogActivity.EXTRA_TYPE, value);
+		Intent i = new Intent(getActivity(), CatalogsActivity.class);
+		i.putExtra(CatalogsActivity.EXTRA_TYPE, value);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			startActivityForResult(i, code, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());

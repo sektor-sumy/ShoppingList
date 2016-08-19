@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments.settings;
+package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
 import android.content.Loader;
 import android.database.Cursor;
@@ -11,8 +11,8 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.CategoryDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.GeneralDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.CategoryDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
 
@@ -20,7 +20,7 @@ public class CategoryFragment extends CatalogFragment<Category> {
 
 	@Override
 	protected String getTitle() {
-		return getString(R.string.settings_title_category);
+		return getString(R.string.catalogs_category);
 	}
 
 	@Override

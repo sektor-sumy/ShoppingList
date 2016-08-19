@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.fragments.settings;
+package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -15,8 +15,8 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.CurrencyDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.dialog.GeneralDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.CurrencyDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 
@@ -39,7 +39,7 @@ public class CurrencyFragment extends CatalogFragment<Currency> {
 
 	@Override
 	protected String getTitle() {
-		return getString(R.string.settings_currency);
+		return getString(R.string.catalogs_currency);
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class CurrencyFragment extends CatalogFragment<Currency> {
 	private void saveCurrencySetting(long id) {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putLong(getString(R.string.settings_key_currency), id);
+		editor.putLong(getString(R.string.catalogs_key_currency), id);
 		editor.apply();
 	}
 
@@ -112,7 +112,7 @@ public class CurrencyFragment extends CatalogFragment<Currency> {
 
 		public CurrencyAdapter() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-			mIdSelected = prefs.getLong(getString(R.string.settings_key_currency), -1);
+			mIdSelected = prefs.getLong(getString(R.string.catalogs_key_currency), -1);
 		}
 
 		@Override

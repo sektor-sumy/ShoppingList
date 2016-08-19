@@ -6,11 +6,11 @@ import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.CategoryFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.CurrencyFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.UnitFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CategoryFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CurrencyFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.UnitFragment;
 
-public class SettingsCatalogActivity extends SingleFragmentActivity {
+public class CatalogsActivity extends SingleFragmentActivity {
 	public final static String EXTRA_TYPE = "type";
 	private final static String FRAGMENT_TAG = "settings_catalog_tag";
 
@@ -31,13 +31,13 @@ public class SettingsCatalogActivity extends SingleFragmentActivity {
 		String type = intent.getStringExtra(EXTRA_TYPE);
 		Fragment fragment = null;
 
-		if (type.equals(getString(R.string.settings_key_currency))) {
-			fragment = new CurrencyFragment();
-		} else if (type.equals(getString(R.string.settings_key_unit))) {
-			fragment = new UnitFragment();
-		} else if (type.equals(getString(R.string.settings_key_category))) {
-			fragment = new CategoryFragment();
-		}
+			if (type.equals(getString(R.string.catalogs_key_currency))) {
+				fragment = new CurrencyFragment();
+			} else if (type.equals(getString(R.string.catalogs_key_unit))) {
+				fragment = new UnitFragment();
+			} else if (type.equals(getString(R.string.catalogs_key_category))) {
+				fragment = new CategoryFragment();
+			}
 
 		mOnBackPressedListener = (OnBackPressedListener) fragment;
 

@@ -8,9 +8,4 @@
 		android:visible="@bool/menu_add_list_visibility"
 		app:actionViewClass="android.widget.ImageButton"
 		app:showAsAction="always"/>
-	<item
-		android:id="@+id/settings"
-		android:icon="@drawable/ic_settings_white_24dp"
-		android:title="@string/settings"
-		app:showAsAction="ifRoom"/>
 </menu>

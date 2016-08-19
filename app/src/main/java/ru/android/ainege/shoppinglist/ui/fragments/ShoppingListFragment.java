@@ -1,7 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
@@ -52,11 +51,10 @@ import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
-import ru.android.ainege.shoppinglist.ui.activities.SettingsActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.EditListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.ListDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.settings.CatalogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CatalogFragment;
 import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
@@ -337,6 +335,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		if (new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_LIST).hasFired()) {
 			showCaseView();
 		}
+
 		setListData();
 
 		return v;
@@ -363,6 +362,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	@Override
 	public void onDetach() {
 		super.onDetach();
+
 		mOnClickListener = null;
 		mOnListChangedListener = null;
 		mOnItemChangedListener = null;
@@ -407,16 +407,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 						}
 
 						addAnalytics(FirebaseAnalytic.UPDATE_LIST_IN_SL, null);
-
-						return true;
-					case R.id.settings:
-						Intent i = new Intent(getActivity(), SettingsActivity.class);
-
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							startActivityForResult(i, SETTINGS, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-						} else {
-							startActivityForResult(i, SETTINGS);
-						}
 
 						return true;
 					default:
@@ -492,10 +482,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				}
 
 				if (mOnItemChangedListener != null) {
-					mOnItemChangedListener.updateItem(getString(R.string.settings_key_currency));
+					mOnItemChangedListener.updateItem(getString(R.string.catalogs_key_currency));
 				}
 				break;
-			case SETTINGS:
+			case SETTINGS: // TODO: 16.08.2016
 				long modifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
 				if (modifyCatalog != -1) {
 					setList();
