@@ -180,7 +180,8 @@
 	<string name="error_one_item">Что-то должно остаться</string>
 	<string name="ask_delete_item">Значение уже используется. При удалении, оно будет заменено на: </string>
 
-
+	<!--Navigation drawer-->
+	<string name="last_list">Последний список</string>
 	<string name="feedback">Обратная связь</string>
 
 	<string name="banner_ad_unit_id">ca-app-pub-3804902313328755/8598932222</string>

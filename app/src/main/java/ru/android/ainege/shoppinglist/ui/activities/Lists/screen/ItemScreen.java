@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.activities.lists.screen;
+package ru.android.ainege.shoppinglist.ui.activities.Lists.screen;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -9,7 +9,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
-import ru.android.ainege.shoppinglist.ui.activities.lists.TabletState;
+import ru.android.ainege.shoppinglist.ui.activities.Lists.TabletState;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.util.Showcase;
@@ -45,6 +45,28 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	@Override
 	public void restore() {
 		mState.setLayoutWeight(R.string.lists_weight_is, R.string.shopping_list_weight_is, R.string.item_weight_is);
+	}
+
+	@Override
+	public ItemFragment getFragment() {
+		return mItemFragment;
+	}
+
+	@Override
+	public void onMainSelected() {
+		if (mState.isLandscape()) {
+			onBackPressed();
+		} else {
+			mState.toScreen(mState.getListsScreen());
+		}
+		
+	}
+
+	@Override
+	public void onLastListSelected() {
+		if (!mState.isLandscape()) {
+			onBackPressed();
+		}
 	}
 
 	@Override
@@ -93,7 +115,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 		mState.setFragmentTagForRemove(TabletState.ITEM_TAG);
 		mState.setLastSelectedItemId(-1);
 
-		mState.updateList();
+		mState.getListsScreen().updateList();
 	}
 
 	@Override
@@ -180,23 +202,14 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	}
 
 	@Override
-	public void updateItem(String setting) {
-		if (setting == null) {
-			mItemFragment.setCurrency();
-			mItemFragment.setUnit(-1);
-			mItemFragment.setCategory(-1);
-		} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_transition))) {
-			mItemFragment.setTransitionButtons();
-		} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_fast_edit))) {
-			mItemFragment.updateSpinners();
-		} else if (setting.equals(mState.getListsActivity().getString(R.string.settings_key_use_category))) {
-			mItemFragment.setCategory();
-		} else if (setting.equals(mState.getListsActivity().getString(R.string.catalogs_key_currency))) {
+	public void updateCatalogs(String catalogKey) {
+		if (catalogKey.equals(mState.getListsActivity().getString(R.string.catalogs_key_currency))) {
 			mItemFragment.setCurrency();
 		}
 	}
 
 	public void updateCurrentList() {
+		mShoppingListFragment.setList();
 		mShoppingListFragment.updateData();
 	}
 
@@ -207,7 +220,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	private void toPreviousScreen() {
 		mItemFragment.getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
-		mState.updateList();
+		mState.getListsScreen().updateList();
 		mState.toScreen(mState.getShoppingListScreen());
 		mState.closeShowcase();
 		mState.setFragmentTagForRemove(TabletState.ITEM_TAG);

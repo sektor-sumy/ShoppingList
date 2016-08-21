@@ -26,16 +26,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.entities.Catalog;
-import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.DeleteDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
 
-public abstract class CatalogFragment<T extends Catalog> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnBackPressedListener {
-	public static final String LAST_EDIT = "lastEdit";
+public abstract class CatalogFragment<T extends Catalog> extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	protected static final int ADD = 1;
 	protected static final int EDIT = 2;
 	protected static final String ADD_DATE = "addItemDialog";
@@ -51,7 +50,12 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	protected RecyclerViewAdapter mAdapterRV;
 	protected RecyclerView mCatalogRV;
 
+	HashMap<Integer, Long> mLastEditIds;
 	protected long mLastEditId = -1;
+
+	public abstract void onLoadFinished(Loader<Cursor> loader, Cursor data);
+
+	public abstract int getKey();
 
 	protected abstract String getTitle();
 
@@ -62,8 +66,6 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	protected abstract RecyclerViewAdapter getAdapter();
 
 	protected abstract boolean isEntityUsed(long id);
-
-	public abstract void onLoadFinished(Loader<Cursor> loader, Cursor data);
 
 	protected abstract void showEditDialog(int position);
 
@@ -139,12 +141,6 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	}
 
 	@Override
-	public boolean onBackPressed() {
-		getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, mLastEditId));
-		return true;
-	}
-
-	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		Loader<Cursor> loader = null;
 		switch (id) {
@@ -160,11 +156,6 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 
-	}
-
-	private void updateData() {
-		mSaveListRotate = null;
-		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
 	@Override
@@ -189,17 +180,21 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		}
 	}
 
-	private void deleteItem(int position, long newId) {
-		if (position != -1) {
-			T d = mCatalog.get(position);
-
-			if (newId != -1) {
-				getDS().delete(d.getId(), newId);
-			} else {
-				getDS().delete(d.getId());
+	public HashMap<Integer, Long> getLastEditIds() {
+		if (mLastEditId != -1) {
+			if (mLastEditIds == null) {
+				mLastEditIds = new HashMap<>();
 			}
 
-			mAdapterRV.removeItem(position);
+			updateLastEditIds();
+		}
+
+		return mLastEditIds;
+	}
+
+	public void setLastEditIds(HashMap<Integer, Long> lastEditIds) {
+		if (lastEditIds != null) {
+			mLastEditIds = lastEditIds;
 		}
 	}
 
@@ -213,6 +208,29 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		}
 
 		return position;
+	}
+
+	private void updateLastEditIds() {
+		mLastEditIds.put(getKey(), mLastEditId);
+	}
+
+	private void updateData() {
+		mSaveListRotate = null;
+		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
+	}
+
+	private void deleteItem(int position, long newId) {
+		if (position != -1) {
+			T d = mCatalog.get(position);
+
+			if (newId != -1) {
+				getDS().delete(d.getId(), newId);
+			} else {
+				getDS().delete(d.getId());
+			}
+
+			mAdapterRV.removeItem(position);
+		}
 	}
 
 	private static class DataCursorLoader extends CursorLoader {

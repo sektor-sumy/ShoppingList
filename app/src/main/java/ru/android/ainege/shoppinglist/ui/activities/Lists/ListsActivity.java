@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.activities.lists;
+package ru.android.ainege.shoppinglist.ui.activities.Lists;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -14,23 +14,21 @@ import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
 public class ListsActivity extends SingleFragmentActivity {
-	private static final String APP_PREFERENCES = "shopping_list_settings";
-	private static final String APP_PREFERENCES_ID = "idList";
+	public static final String LISTS_SELECT = "lists_select";
+	public static final String LAST_LIST_SELECT = "last_list_select";
 	static final String LISTS_TAG = "lists_tag";
 
-	private ListsFragment mListsFragment;
 	private StateInterface mState;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
 		if (getResources().getBoolean(R.bool.isTablet)) {
 			mState = new TabletState(this);
 		} else {
 			mState = new PhoneState(this);
 		}
 
+		super.onCreate(savedInstanceState);
 		mState.onCreate(savedInstanceState);
 	}
 
@@ -40,16 +38,33 @@ public class ListsActivity extends SingleFragmentActivity {
 	}
 
 	@Override
-	protected Fragment getFragment() {
+	protected ListsFragment createFragment() {
 		init();
-		mListsFragment = new ListsFragment();
 
-		return mListsFragment;
+		ListsFragment fragment = new ListsFragment();
+		mState.setFragment(fragment);
+
+		return fragment;
+	}
+
+	@Override
+	protected Fragment getFragment() {
+		return mState.getFragment();
 	}
 
 	@Override
 	protected String getTag() {
 		return LISTS_TAG;
+	}
+
+	@Override
+	protected void onMainSelected() {
+		mState.onMainSelected();
+	}
+
+	@Override
+	protected void onLastListSelected() {
+		mState.onLastListSelected();
 	}
 
 	@Override
@@ -65,14 +80,6 @@ public class ListsActivity extends SingleFragmentActivity {
 		}
 	}
 
-	public ListsFragment getListsFragment() {
-		return mListsFragment;
-	}
-
-	public void setListsFragment(ListsFragment listsFragment) {
-		mListsFragment = listsFragment;
-	}
-
 	void injectFragmentToUI(Integer container, Fragment fragment, String tag) {
 		injectFragment(container, fragment, tag);
 	}
@@ -86,16 +93,10 @@ public class ListsActivity extends SingleFragmentActivity {
 		boolean isShould = false;
 
 		if (prefs.getBoolean(getString(R.string.settings_key_open_last_list), false)) {
-			SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-			isShould = mSettings.contains(APP_PREFERENCES_ID);
+			isShould = getSaveListId() != -1;
 		}
 
 		return isShould;
-	}
-
-	long getSaveListId() {
-		SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-		return mSettings.getLong(APP_PREFERENCES_ID, -1);
 	}
 
 	private void init() {

@@ -1,6 +1,5 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -15,6 +14,7 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 	public final static String EXTRA_ITEM = "item";
 	private final static String FRAGMENT_TAG = "item_activity_tag";
 
+	private ItemFragment mItemFragment;
 	private OnBackPressedListener mOnBackPressedListener;
 
 	@Override
@@ -28,13 +28,37 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 	}
 
 	@Override
-	protected Fragment getFragment() {
-		return createFragment();
+	protected ItemFragment createFragment() {
+		Intent intent = getIntent();
+
+		long idList = intent.getLongExtra(EXTRA_ID_LIST, -1);
+		ShoppingList itemInList = (ShoppingList) intent.getSerializableExtra(EXTRA_ITEM);
+
+		if (idList != -1) { //add item to list
+			mItemFragment = AddItemFragment.newInstance(idList);
+		} else { //edit item in list
+			mItemFragment = EditItemFragment.newInstance(itemInList);
+		}
+
+		setListeners(mItemFragment);
+
+		return mItemFragment;
+	}
+
+	@Override
+	protected ItemFragment getFragment() {
+		return mItemFragment;
 	}
 
 	@Override
 	protected String getTag() {
 		return FRAGMENT_TAG;
+	}
+
+	@Override
+	protected void onLastListSelected() {
+		//todo нужно сделать проверку на сохранение и закрыть
+		superOnBackPressed();
 	}
 
 	@Override
@@ -57,24 +81,6 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 	@Override
 	public void onNotSave() {
 		super.onBackPressed();
-	}
-
-	private Fragment createFragment() {
-		Intent intent = getIntent();
-
-		long idList = intent.getLongExtra(EXTRA_ID_LIST, -1);
-		ShoppingList itemInList = (ShoppingList) intent.getSerializableExtra(EXTRA_ITEM);
-
-		ItemFragment fragment;
-		if (idList != -1) { //add item to list
-			fragment = AddItemFragment.newInstance(idList);
-		} else { //edit item in list
-			fragment = EditItemFragment.newInstance(itemInList);
-		}
-
-		setListeners(fragment);
-
-		return fragment;
 	}
 
 	private void setListeners(ItemFragment fragment) {

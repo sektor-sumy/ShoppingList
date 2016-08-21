@@ -51,10 +51,11 @@ import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.RecyclerItemClickListener;
+import ru.android.ainege.shoppinglist.ui.activities.CatalogsActivity;
+import ru.android.ainege.shoppinglist.ui.activities.SingleFragmentActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.EditListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.ListDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CatalogFragment;
 import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
@@ -80,7 +81,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public static final int EDIT_ITEM = 1;
 	public static final int EDIT_LIST = 3;
 	private static final int IS_DELETE_LIST = 4;
-	private static final int SETTINGS = 5;
 	private static final String EDIT_ITEM_DATE = "editListDialog";
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
 	private static final int DATA_LOADER = 0;
@@ -203,7 +203,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public interface OnItemChangedListener {
 		void onItemSetBought(ShoppingList item);
 		void onItemDelete();
-		void updateItem(String setting);
+		void updateCatalogs(String catalogKey);
 		long getLastSelectedItemId();
 	}
 
@@ -474,6 +474,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				if (mOnListChangedListener != null) {
 					mOnListChangedListener.onListDeleted(mList.getId());
 				}
+
 				break;
 			case EDIT_LIST:
 				updateList();
@@ -482,19 +483,19 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				}
 
 				if (mOnItemChangedListener != null) {
-					mOnItemChangedListener.updateItem(getString(R.string.catalogs_key_currency));
+					mOnItemChangedListener.updateCatalogs(getString(R.string.catalogs_key_currency));
 				}
+
 				break;
-			case SETTINGS: // TODO: 16.08.2016
-				long modifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
-				if (modifyCatalog != -1) {
+			case SingleFragmentActivity.CATALOGS:
+			case SingleFragmentActivity.SETTINGS:
+				HashMap<Integer, Long> modifyCatalog = (HashMap<Integer, Long>) data.getSerializableExtra(CatalogsActivity.LAST_EDIT);
+
+				if (modifyCatalog != null) {
 					setList();
 					updateData();
-
-					if (mOnItemChangedListener != null) {
-						mOnItemChangedListener.updateItem(null);
-					}
 				}
+
 				break;
 		}
 	}
@@ -668,18 +669,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 				mIsUpdateData = true;
 				readCategorySetting();
 				updateMenu();
-
-				if (mOnItemChangedListener != null) {
-					mOnItemChangedListener.updateItem(getString(R.string.settings_key_use_category));
-				}
 			} else if (key.equals(getString(R.string.settings_key_collapse_category))) {
 				mIsUpdateData = true;
 				readCollapseCategorySetting();
 				updateMenu();
-			} else if (key.equals(getString(R.string.settings_key_transition)) && mOnItemChangedListener != null) {
-				mOnItemChangedListener.updateItem(getString(R.string.settings_key_transition));
-			} else if (key.equals(getString(R.string.settings_key_fast_edit)) && mOnItemChangedListener != null) {
-				mOnItemChangedListener.updateItem(getString(R.string.settings_key_fast_edit));
 			}
 		}
 	}

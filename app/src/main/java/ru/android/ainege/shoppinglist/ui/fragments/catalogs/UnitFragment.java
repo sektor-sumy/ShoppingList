@@ -14,7 +14,6 @@ import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialog
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.UnitDialogFragment;
 
 public class UnitFragment extends CatalogFragment<Unit> {
-
 	@Override
 	protected String getTitle() {
 		return getString(R.string.catalogs_unit);
@@ -74,6 +73,11 @@ public class UnitFragment extends CatalogFragment<Unit> {
 		GeneralDialogFragment editItemDialog = UnitDialogFragment.newInstance(mCatalog.get(position));
 		editItemDialog.setTargetFragment(UnitFragment.this, EDIT);
 		editItemDialog.show(getFragmentManager(), EDIT_DATE);
+	}
+
+	@Override
+	public int getKey() {
+		return R.string.catalogs_key_unit;
 	}
 
 	private class UnitAdapter extends RecyclerViewAdapter<RecyclerViewAdapter.ViewHolder> {

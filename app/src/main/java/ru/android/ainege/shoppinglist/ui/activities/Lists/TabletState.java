@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.activities.lists;
+package ru.android.ainege.shoppinglist.ui.activities.Lists;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -16,10 +16,10 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
-import ru.android.ainege.shoppinglist.ui.activities.lists.screen.ItemScreen;
-import ru.android.ainege.shoppinglist.ui.activities.lists.screen.ListsScreen;
-import ru.android.ainege.shoppinglist.ui.activities.lists.screen.ShoppingListScreen;
-import ru.android.ainege.shoppinglist.ui.activities.lists.screen.TabletScreen;
+import ru.android.ainege.shoppinglist.ui.activities.Lists.screen.ItemScreen;
+import ru.android.ainege.shoppinglist.ui.activities.Lists.screen.ListsScreen;
+import ru.android.ainege.shoppinglist.ui.activities.Lists.screen.ShoppingListScreen;
+import ru.android.ainege.shoppinglist.ui.activities.Lists.screen.TabletScreen;
 import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
@@ -40,6 +40,7 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 	private static final String STATE_SHOULD_BACK_PRESSED = "state_should_back_pressed";
 
 	private ListsActivity mListsActivity;
+
 	private FrameLayout mListsLayout;
 	private FrameLayout mShoppingListLayout;
 	private FrameLayout mItemLayout;
@@ -58,7 +59,7 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 		mListsActivity = listsActivity;
 		mItemScreen = new ItemScreen(this);
 		mShoppingListScreen = new ShoppingListScreen(this);
-		mListsScreen = new ListsScreen(this);
+		mCurrentScreen = mListsScreen = new ListsScreen(this);
 	}
 
 	@Override
@@ -66,19 +67,21 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 		mListsLayout = (FrameLayout) mListsActivity.findViewById(R.id.fragment_container);
 		mShoppingListLayout = (FrameLayout) mListsActivity.findViewById(R.id.list_fragment_container);
 		mItemLayout = (FrameLayout) mListsActivity.findViewById(R.id.item_fragment_container);
-		
-		mCurrentScreen = mListsScreen;
+
 		mIsLandscape = mListsActivity.getResources().getBoolean(R.bool.isLandscape);
 
 		if (savedInstanceState == null) {
+			boolean lists_select = mListsActivity.getIntent().getBooleanExtra(ListsActivity.LISTS_SELECT, false);
+			boolean last_list_select = mListsActivity.getIntent().getBooleanExtra(ListsActivity.LAST_LIST_SELECT, false);
+
 			if (mIsLandscape) {
 				openList();
-			} else if (mListsActivity.shouldOpenLastList()) {
+			} else if (last_list_select || !lists_select && mListsActivity.shouldOpenLastList()) {
 				openLastList();
 			}
 		} else {
 			ListsFragment fragment = (ListsFragment) mListsActivity.getFragmentManager().findFragmentByTag(ListsActivity.LISTS_TAG);
-			mListsActivity.setListsFragment(fragment);
+			mListsScreen.setFragment(fragment);
 			mLastSelectedListId = savedInstanceState.getLong(STATE_LAST_LIST_ID);
 			mLastSelectedItemId = savedInstanceState.getLong(STATE_LAST_ITEM_ID);
 			mShouldBackPressed = savedInstanceState.getInt(STATE_SHOULD_BACK_PRESSED);
@@ -91,7 +94,6 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 				idScreen++;
 			}
 
-			mListsScreen.setListeners();
 			ShoppingListFragment shippingListFragment;
 
 			switch (idScreen) {
@@ -117,6 +119,26 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 
 			mCurrentScreen.restore();
 		}
+	}
+
+	@Override
+	public Fragment getFragment() {
+		return mCurrentScreen.getFragment();
+	}
+
+	@Override
+	public void setFragment(ListsFragment listsFragment) {
+		mListsScreen.setFragment(listsFragment);
+	}
+
+	@Override
+	public void onMainSelected() {
+		mCurrentScreen.onMainSelected();
+	}
+
+	@Override
+	public void onLastListSelected() {
+		mCurrentScreen.onLastListSelected();
 	}
 
 	@Override
@@ -179,7 +201,7 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 		mCurrentScreen = currentScreen;
 	}
 
-	public TabletScreen getListsScreen() {
+	public ListsScreen getListsScreen() {
 		return mListsScreen;
 	}
 
@@ -224,10 +246,6 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 		}
 	}
 
-	public void updateList() {
-		mListsActivity.getListsFragment().updateData();
-	}
-
 	public void openItem(long idItem, Fragment fragment) {
 		mLastSelectedItemId = idItem;
 		mListsActivity.injectFragmentToUI(R.id.item_fragment_container, fragment, ITEM_TAG);
@@ -236,15 +254,16 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 
 	public void openList() {
 		if (!openLastList()) {  //if not open last opened list, open first in list
-			ArrayList<List> lists = mListsActivity.getListsFragment().getLists();
+			final ListsFragment listsFragment = mListsScreen.getFragment();
+			ArrayList<List> lists = listsFragment.getLists();
 
 			if (lists == null || lists.isEmpty()) {
-				mListsActivity.getListsFragment().setOnListsLoadListener(new ListsFragment.OnListsLoadFinishedListener() {
+				listsFragment.setOnListsLoadListener(new ListsFragment.OnListsLoadFinishedListener() {
 					@Override
 					public void onLoadFinished(ArrayList<List> lists) {
 						mShoppingListScreen.openScreen();
 						openList(lists.get(0).getId(), true);
-						mListsActivity.getListsFragment().setOnListsLoadListener(null);
+						listsFragment.setOnListsLoadListener(null);
 					}
 				});
 			} else {
@@ -261,11 +280,11 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 		mListsActivity.injectFragmentToUI(R.id.list_fragment_container, fragment, SHOPPING_LIST_TAG);
 
 		if (isScrollToList) {
-			mListsActivity.getListsFragment().scrollToList(id);
+			mListsScreen.getFragment().scrollToList(id);
 		}
 	}
 
-	private boolean openLastList() {
+	public boolean openLastList() {
 		long id = mListsActivity.getSaveListId();
 		boolean result = false;
 

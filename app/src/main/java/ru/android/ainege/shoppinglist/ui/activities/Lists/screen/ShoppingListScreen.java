@@ -1,7 +1,7 @@
-package ru.android.ainege.shoppinglist.ui.activities.lists.screen;
+package ru.android.ainege.shoppinglist.ui.activities.Lists.screen;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.activities.lists.TabletState;
+import ru.android.ainege.shoppinglist.ui.activities.Lists.TabletState;
 import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.util.Showcase;
@@ -16,7 +16,7 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 	}
 
 	public void setListeners(ShoppingListFragment fragment) {
-		mState.getListsActivity().getListsFragment().setOnListChangedListener(this);
+		mState.getListsScreen().getFragment().setOnListChangedListener(this);
 		mShoppingListFragment = fragment;
 		mShoppingListFragment.setListeners(mState, mState, mState);
 	}
@@ -32,6 +32,23 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 	}
 
 	@Override
+	public ShoppingListFragment getFragment() {
+		return mShoppingListFragment;
+	}
+
+	@Override
+	public void onMainSelected() {
+		if (!mState.isLandscape()) {
+			onBackPressed();
+		}
+	}
+
+	@Override
+	public void onLastListSelected() {
+
+	}
+
+	@Override
 	public boolean onBackPressed() {
 		boolean result = false;
 
@@ -41,7 +58,7 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 			mState.toScreen(mState.getListsScreen());
 			mState.closeShowcase();
 
-			mState.getListsActivity().getListsFragment().setOnListChangedListener(null);
+			mState.getListsScreen().getFragment().setOnListChangedListener(null);
 		}
 
 		return result;
@@ -87,7 +104,7 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 
 	@Override
 	public void onListUpdated() {
-		mState.updateList();
+		mState.getListsScreen().updateList();
 	}
 
 	@Override
@@ -109,13 +126,7 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 			onBackPressed();
 		}
 
-		mState.updateList();
-	}
-
-	@Override
-	public void updateCurrentList() {
-		mShoppingListFragment.setList();
-		mShoppingListFragment.updateData();
+		mState.getListsScreen().updateList();
 	}
 
 	@Override

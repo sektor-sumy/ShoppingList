@@ -1,20 +1,20 @@
-package ru.android.ainege.shoppinglist.ui.activities.lists.screen;
+package ru.android.ainege.shoppinglist.ui.activities.Lists.screen;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.activities.lists.TabletState;
+import ru.android.ainege.shoppinglist.ui.activities.Lists.TabletState;
+import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 
 public class ListsScreen extends TabletScreen {
 	public static final int SCREEN_ID = 1;
 
+	private ListsFragment mListsFragment;
+
 	public ListsScreen(TabletState state) {
 		super(state);
-		if (mState.getListsActivity().getListsFragment() != null) {
-			setListeners();
-		}
 	}
 
 	public void setListeners() {
-		mState.getListsActivity().getListsFragment().setListeners(mState, mState);
+		mListsFragment.setListeners(mState, mState);
 	}
 
 	@Override
@@ -22,6 +22,26 @@ public class ListsScreen extends TabletScreen {
 		if (mState.isLandscape()) {
 			mState.openList();
 		}
+	}
+
+	@Override
+	public ListsFragment getFragment() {
+		return mListsFragment;
+	}
+
+	public void setFragment(ListsFragment listsFragment) {
+		mListsFragment = listsFragment;
+		setListeners();
+	}
+
+	@Override
+	public void onMainSelected() {
+
+	}
+
+	@Override
+	public void onLastListSelected() {
+		mState.openLastList();
 	}
 
 	@Override
@@ -64,5 +84,9 @@ public class ListsScreen extends TabletScreen {
 	@Override
 	public void onListDeleted(long idDeletedList) {
 
+	}
+
+	public void updateList() {
+		mListsFragment.updateData();
 	}
 }

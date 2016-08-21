@@ -4,8 +4,13 @@
 	<group android:checkableBehavior="single">
 		<item
 			android:id="@+id/nav_main"
-			android:icon="@drawable/ic_list_white_24dp"
+			android:icon="@drawable/ic_library_books_white_24dp"
 			android:title="@string/you_lists"/>
+
+		<item
+			android:id="@+id/nav_last_list"
+			android:icon="@drawable/ic_list_white_24dp"
+			android:title="@string/last_list"/>
 	</group>
 
 	<item android:title="@string/catalogs">

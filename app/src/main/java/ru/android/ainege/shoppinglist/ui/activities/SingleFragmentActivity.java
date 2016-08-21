@@ -4,9 +4,11 @@ import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,15 +23,19 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.activities.lists.ListsActivity;
+import ru.android.ainege.shoppinglist.ui.activities.Lists.ListsActivity;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+	protected static final String APP_PREFERENCES = "shopping_list_settings";
+	private static final String APP_PREFERENCES_ID = "idList";
+
 	private static final int LISTS = 101;
-	private static final int CATALOGS = 102;
-	private static final int SETTINGS = 103;
+	public static final int CATALOGS = 102;
+	public static final int SETTINGS = 103;
 
 	private DrawerLayout mDrawerLayout;
 
+	protected abstract Fragment createFragment();
 	protected abstract Fragment getFragment();
 	protected abstract String getTag();
 
@@ -42,7 +48,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
 		if (savedInstanceState == null) {
-			injectFragment(getDefaultContainer(), getFragment(), getTag());
+			injectFragment(getDefaultContainer(), createFragment(), getTag());
 		}
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -52,31 +58,29 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 	}
 
 	@Override
-	public boolean onNavigationItemSelected(MenuItem item) {
+	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.nav_main:
-				openCatalog(ListsActivity.class, null, LISTS);
+				onMainSelected();
+				break;
+			case R.id.nav_last_list:
+				onLastListSelected();
 				break;
 			case R.id.nav_catalog_items:
+				//onCatalogSelected(R.string.catalogs_key_item);
 				Toast.makeText(getApplicationContext(), getString(R.string.catalogs_items), Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.nav_catalog_catalogs:
-				openCatalog(CatalogsActivity.class,
-						new String[][] {{CatalogsActivity.EXTRA_TYPE, getString(R.string.catalogs_key_category)}},
-						CATALOGS);
+				onCatalogSelected(R.string.catalogs_key_category);
 				break;
 			case R.id.nav_catalog_units:
-				openCatalog(CatalogsActivity.class,
-						new String[][] {{CatalogsActivity.EXTRA_TYPE, getString(R.string.catalogs_key_unit)}},
-						CATALOGS);
+				onCatalogSelected(R.string.catalogs_key_unit);
 				break;
 			case R.id.nav_catalog_currencies:
-				openCatalog(CatalogsActivity.class,
-						new String[][] {{CatalogsActivity.EXTRA_TYPE, getString(R.string.catalogs_key_currency)}},
-						CATALOGS);
+				onCatalogSelected(R.string.catalogs_key_currency);
 				break;
 			case R.id.nav_settings:
-				openCatalog(SettingsActivity.class, null, SETTINGS);
+				onSettingsSelect();
 				break;
 			case R.id.nav_feedback:
 				Toast.makeText(getApplicationContext(), getString(R.string.feedback), Toast.LENGTH_SHORT).show();
@@ -92,6 +96,18 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 	}
 
 	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		switch (requestCode) {
+			case CATALOGS:
+			case SETTINGS:
+				getFragment().onActivityResult(requestCode, resultCode, data);
+				break;
+		}
+	}
+
+	@Override
 	public void onBackPressed() {
 		if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
 			mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -100,12 +116,44 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 		}
 	}
 
+	protected void superOnBackPressed() {
+		super.onBackPressed();
+	}
+
 	protected int getLayout() {
 		return R.layout.activity_fragment;
 	}
 
 	protected int getDefaultContainer() {
 		return R.id.fragment_container;
+	}
+
+	protected void onMainSelected() {
+		Intent i = new Intent(this, ListsActivity.class);
+		i.putExtra(ListsActivity.LISTS_SELECT, true);
+
+		openCatalog(i, new int[] {Intent.FLAG_ACTIVITY_CLEAR_TOP}, LISTS);
+	}
+
+	protected void onLastListSelected() {
+		if (getResources().getBoolean(R.bool.isTablet)) {
+			Intent i = new Intent(this, ListsActivity.class);
+			i.putExtra(ListsActivity.LAST_LIST_SELECT, true);
+			openCatalog(i, new int[] {Intent.FLAG_ACTIVITY_CLEAR_TOP}, LISTS);
+		} else {
+			openLastList();
+		}
+	}
+
+	protected void onCatalogSelected(int key) {
+		Intent i = new Intent(this, CatalogsActivity.class);
+		i.putExtra(CatalogsActivity.EXTRA_TYPE, getString(key));
+
+		openCatalog(i, null, CATALOGS);
+	}
+
+	protected void onSettingsSelect() {
+		openCatalog(new Intent(this, SettingsActivity.class), null, SETTINGS);
 	}
 
 	protected void injectFragment(Integer container, Fragment fragment, String tag) {
@@ -138,12 +186,30 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 		});
 	}
 
-	private void openCatalog( Class<?> cls, String[][] extras, int requestCode) {
-		Intent i = new Intent(this, cls);
+	public long getSaveListId() {
+		SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+		return mSettings.getLong(APP_PREFERENCES_ID, -1);
+	}
 
-		if (extras != null) {
-			for (String[] extra : extras) {
-				i.putExtra(extra[0], extra[1]);
+	public boolean openLastList() {
+		long id = getSaveListId();
+		boolean result = false;
+
+		if (id != -1) {
+			Intent i = new Intent(this, ShoppingListActivity.class);
+			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
+			startActivity(i);
+			result = true;
+		}
+
+		return result;
+	}
+
+	private void openCatalog(Intent i, int[] flags, int requestCode) {
+		if (flags != null) {
+			for (int flag : flags) {
+				i.addFlags(flag);
 			}
 		}
 

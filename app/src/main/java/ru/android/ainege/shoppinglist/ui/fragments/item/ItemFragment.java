@@ -53,6 +53,7 @@ import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.TableInterface.CategoriesInterface;
@@ -69,9 +70,9 @@ import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.ui.activities.CatalogsActivity;
+import ru.android.ainege.shoppinglist.ui.activities.SingleFragmentActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CatalogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.CategoryDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.UnitDialogFragment;
@@ -86,7 +87,7 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.GenericDS.EntityCursor;
 
-public abstract class ItemFragment extends Fragment implements OnBackPressedListener {
+public abstract class ItemFragment extends Fragment implements OnBackPressedListener, SharedPreferences.OnSharedPreferenceChangeListener {
 	public static final String ID_ITEM = "idItem";
 	protected static final String UNIT_ADD_DATE = "addUnitDialog";
 	protected static final String CATEGORY_ADD_DATE = "addCategoryDialog";
@@ -175,6 +176,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		mItemsInListDS = new ShoppingListDS(getActivity());
 
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		mPrefs.registerOnSharedPreferenceChangeListener(this);
 		mIsUseNewItemInSpinner = mPrefs.getBoolean(getString(R.string.settings_key_fast_edit), false);
 
 		if (savedInstanceState != null) {
@@ -446,13 +448,13 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 				if (mOnItemChangedListener != null) {
 					mOnItemChangedListener.updateCurrentList();
 				}
-				setUnit(data.getLongExtra(CatalogFragment.LAST_EDIT, -1));
+				setUnit(data.getLongExtra(CatalogsActivity.LAST_EDIT, -1));
 				break;
 			case CATEGORY_SETTINGS:
 				if (mOnItemChangedListener != null) {
 					mOnItemChangedListener.updateCurrentList();
 				}
-				setCategory(data.getLongExtra(CatalogFragment.LAST_EDIT, -1));
+				setCategory(data.getLongExtra(CatalogsActivity.LAST_EDIT, -1));
 				break;
 			case UNIT_ADD:
 				mUnit.setAdapter(getUnitsAdapter());
@@ -461,6 +463,33 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 			case CATEGORY_ADD:
 				mCategory.setAdapter(getCategoriesAdapter());
 				setSelectionCategory(data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1));
+				break;
+			case SingleFragmentActivity.CATALOGS:
+			case SingleFragmentActivity.SETTINGS:
+				HashMap<Integer, Long> modifyCatalog = (HashMap<Integer, Long>) data.getSerializableExtra(CatalogsActivity.LAST_EDIT);
+
+				if (modifyCatalog != null) {
+					if (modifyCatalog.containsKey(R.string.catalogs_key_item)) {
+
+					}
+
+					if (modifyCatalog.containsKey(R.string.catalogs_key_category)) {
+						setCategory(modifyCatalog.get(R.string.catalogs_key_category));
+					}
+
+					if (modifyCatalog.containsKey(R.string.catalogs_key_unit)) {
+						setUnit(modifyCatalog.get(R.string.catalogs_key_unit));
+					}
+
+					if (modifyCatalog.containsKey(R.string.catalogs_key_currency)) {
+						setCurrency();
+					}
+
+					if (mOnItemChangedListener != null) {
+						mOnItemChangedListener.updateCurrentList();
+					}
+				}
+
 				break;
 		}
 	}
@@ -499,6 +528,19 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		}
 
 		return result;
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		if (isAdded()) {
+			if (key.equals(getString(R.string.settings_key_use_category))) {
+				setCategory();
+			} else if (key.equals(getString(R.string.settings_key_transition))) {
+				setTransitionButtons();
+			} else if (key.equals(getString(R.string.settings_key_fast_edit))) {
+				updateSpinners();
+			}
+		}
 	}
 
 	public void setIsBought(boolean isBought) {

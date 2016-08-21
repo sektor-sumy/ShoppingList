@@ -17,7 +17,6 @@ import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialog
 import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
 
 public class CategoryFragment extends CatalogFragment<Category> {
-
 	@Override
 	protected String getTitle() {
 		return getString(R.string.catalogs_category);
@@ -81,6 +80,11 @@ public class CategoryFragment extends CatalogFragment<Category> {
 		GeneralDialogFragment editItemDialog = CategoryDialogFragment.newInstance(mCatalog.get(position));
 		editItemDialog.setTargetFragment(CategoryFragment.this, EDIT);
 		editItemDialog.show(getFragmentManager(), EDIT_DATE);
+	}
+
+	@Override
+	public int getKey() {
+		return R.string.catalogs_key_category;
 	}
 
 	private class CategoryAdapter extends RecyclerViewAdapter<CategoryAdapter.CategoryHolder> {

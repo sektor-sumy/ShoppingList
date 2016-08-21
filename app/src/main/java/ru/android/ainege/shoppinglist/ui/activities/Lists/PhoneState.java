@@ -1,4 +1,4 @@
-package ru.android.ainege.shoppinglist.ui.activities.lists;
+package ru.android.ainege.shoppinglist.ui.activities.Lists;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
@@ -10,25 +10,45 @@ import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 
 public class PhoneState implements StateInterface {
 	private ListsActivity mListsActivity;
+	private ListsFragment mListsFragment;
 
 	public PhoneState(ListsActivity listsActivity) {
 		mListsActivity = listsActivity;
-
-		if (mListsActivity.getListsFragment() != null) {
-			setListeners(mListsActivity.getListsFragment());
-		}
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		if (savedInstanceState == null && mListsActivity.shouldOpenLastList()) {
-			openLastList();
+		boolean lists_select = mListsActivity.getIntent().getBooleanExtra(ListsActivity.LISTS_SELECT, false);
+
+		if (savedInstanceState == null && !lists_select && mListsActivity.shouldOpenLastList()) {
+			mListsActivity.openLastList();
 		}
 
 		if (savedInstanceState != null) {
-			ListsFragment listFragment = (ListsFragment) mListsActivity.getFragmentManager().findFragmentByTag(ListsActivity.LISTS_TAG);
-			setListeners(listFragment);
+			mListsFragment = (ListsFragment) mListsActivity.getFragmentManager().findFragmentByTag(ListsActivity.LISTS_TAG);
+			setListeners(mListsFragment);
 		}
+	}
+
+	@Override
+	public ListsFragment getFragment() {
+		return mListsFragment;
+	}
+
+	@Override
+	public void setFragment(ListsFragment listsFragment) {
+		mListsFragment = listsFragment;
+		setListeners(mListsFragment);
+	}
+
+	@Override
+	public void onMainSelected() {
+
+	}
+
+	@Override
+	public void onLastListSelected() {
+		mListsActivity.openLastList();
 	}
 
 	@Override
@@ -51,20 +71,6 @@ public class PhoneState implements StateInterface {
 		} else {
 			mListsActivity.startActivity(i);
 		}
-	}
-
-	private boolean openLastList() {
-		long id = mListsActivity.getSaveListId();
-		boolean result = false;
-
-		if (id != -1) {
-			Intent i = new Intent(mListsActivity, ShoppingListActivity.class);
-			i.putExtra(ShoppingListActivity.EXTRA_ID_LIST, id);
-			mListsActivity.startActivity(i);
-			result = true;
-		}
-
-		return result;
 	}
 
 	private void setListeners(ListsFragment fragment) {

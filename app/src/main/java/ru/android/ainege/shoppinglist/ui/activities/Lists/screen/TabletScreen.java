@@ -1,11 +1,13 @@
-package ru.android.ainege.shoppinglist.ui.activities.lists.screen;
+package ru.android.ainege.shoppinglist.ui.activities.Lists.screen;
+
+import android.app.Fragment;
 
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
-import ru.android.ainege.shoppinglist.ui.activities.lists.TabletState;
+import ru.android.ainege.shoppinglist.ui.activities.Lists.TabletState;
 import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.AddItemFragment;
@@ -20,6 +22,10 @@ public abstract class TabletScreen implements OnDialogShownListener, ListsFragme
 	public abstract boolean onBackPressed();
 	public abstract int getScreenId();
 	public abstract void toScreen();
+
+	public abstract Fragment getFragment();
+	public abstract void onMainSelected();
+	public abstract void onLastListSelected();
 
 	public TabletScreen (TabletState state) {
 		mState = state;
@@ -59,7 +65,7 @@ public abstract class TabletScreen implements OnDialogShownListener, ListsFragme
 
 	public boolean deleteList(long idDeletedList) {
 		boolean result = false;
-		ArrayList<List> lists = mState.getListsActivity().getListsFragment().getLists();
+		ArrayList<List> lists = mState.getListsScreen().getFragment().getLists();
 
 		if (lists.size() == 1) { // it was last list
 			mState.toScreen(mState.getListsScreen());

@@ -1,7 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.ActivityOptions;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,27 +8,36 @@ import android.os.Bundle;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 
-public class ShoppingListActivity extends SingleFragmentActivity implements ShoppingListFragment.OnClickListener, ShoppingListFragment.OnListChangedListener {
+import static ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment.*;
+
+public class ShoppingListActivity extends SingleFragmentActivity implements OnClickListener, OnListChangedListener {
 	public final static String EXTRA_ID_LIST = "idList";
 	private static final String SHOPPING_LIST_TAG = "shopping_list_tag_activity";
+
+	private ShoppingListFragment mShoppingListFragment;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		if (savedInstanceState != null) {
-			ShoppingListFragment shoppingListFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(getTag());
-			setListeners(shoppingListFragment);
+			mShoppingListFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(getTag());
+			setListeners(mShoppingListFragment);
 		}
 	}
 
 	@Override
-	protected Fragment getFragment() {
+	protected ShoppingListFragment createFragment() {
 		long idList = getIntent().getLongExtra(EXTRA_ID_LIST, -1);
-		ShoppingListFragment fragment = ShoppingListFragment.newInstance(idList);
-		setListeners(fragment);
+		mShoppingListFragment = newInstance(idList);
+		setListeners(mShoppingListFragment);
 
-		return fragment;
+		return mShoppingListFragment;
+	}
+
+	@Override
+	protected ShoppingListFragment getFragment() {
+		return mShoppingListFragment;
 	}
 
 	@Override
@@ -38,14 +46,25 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 	}
 
 	@Override
+	protected void onMainSelected() {
+		superOnBackPressed();
+	}
+
+	@Override
+	protected void onLastListSelected() {
+
+	}
+
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
 		if (resultCode != RESULT_OK) return;
 
 		switch (requestCode) {
-			case ShoppingListFragment.ADD_ITEM:
-			case ShoppingListFragment.EDIT_ITEM:
-				ShoppingListFragment fragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(SHOPPING_LIST_TAG);
-				fragment.onActivityResult(requestCode, resultCode, data);
+			case ADD_ITEM:
+			case EDIT_ITEM:
+				mShoppingListFragment.onActivityResult(requestCode, resultCode, data);
 				break;
 		}
 	}
@@ -56,9 +75,9 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 		i.putExtra(ItemActivity.EXTRA_ID_LIST, id);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			startActivityForResult(i, ShoppingListFragment.ADD_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+			startActivityForResult(i, ADD_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
 		} else {
-			startActivityForResult(i, ShoppingListFragment.ADD_ITEM);
+			startActivityForResult(i, ADD_ITEM);
 		}
 	}
 
@@ -68,9 +87,9 @@ public class ShoppingListActivity extends SingleFragmentActivity implements Shop
 		i.putExtra(ItemActivity.EXTRA_ITEM, item);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			startActivityForResult(i, ShoppingListFragment.EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+			startActivityForResult(i, EDIT_ITEM, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
 		} else {
-			startActivityForResult(i, ShoppingListFragment.EDIT_ITEM);
+			startActivityForResult(i, EDIT_ITEM);
 		}
 	}
 

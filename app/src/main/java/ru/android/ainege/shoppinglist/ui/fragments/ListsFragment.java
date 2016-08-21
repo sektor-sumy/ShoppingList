@@ -37,7 +37,6 @@ import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.fragments.list.AddListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.EditListDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.ListDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CatalogFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -55,7 +54,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final int ADD_LIST = 1;
 	private static final int EDIT_LIST = 2;
 	private static final int IS_DELETE_LIST = 3;
-	private static final int SETTINGS = 4;
 	private static final String ADD_LIST_DATE = "addListDialog";
 	private static final String EDIT_LIST_DATE = "editListDialog";
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
@@ -98,7 +96,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	public interface OnListChangedListener {
 		void onListUpdated(long id);
 		void onListDeleted(long idDeletedList, long idNewList);
-		void updateCurrentList();
 		long getLastSelectedListId();
 		void onShowCaseShown();
 	}
@@ -244,13 +241,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					Toast.makeText(getActivity(), getString(R.string.error_delete), Toast.LENGTH_SHORT).show();
 				}
 
-				break;
-			case SETTINGS: // TODO: 19.08.2016
-				long modifyCatalog = data.getLongExtra(CatalogFragment.LAST_EDIT, -1);
-
-				if (modifyCatalog != -1 && mOnListChangedListener != null) {
-					mOnListChangedListener.updateCurrentList();
-				}
 				break;
 		}
 	}

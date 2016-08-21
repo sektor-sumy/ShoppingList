@@ -1,52 +1,94 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
-import android.app.Fragment;
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
+
+import java.util.HashMap;
+
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CatalogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CategoryFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CurrencyFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.UnitFragment;
 
 public class CatalogsActivity extends SingleFragmentActivity {
 	public final static String EXTRA_TYPE = "type";
+	public final static String EXTRA_DATA = "data";
+	public static final String LAST_EDIT = "lastEdit";
 	private final static String FRAGMENT_TAG = "settings_catalog_tag";
 
-	private OnBackPressedListener mOnBackPressedListener;
+	private CatalogFragment mCatalogFragment;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		if (savedInstanceState != null) {
-			mOnBackPressedListener = (OnBackPressedListener) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+			mCatalogFragment = (CatalogFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
 		}
 	}
 
 	@Override
-	protected Fragment getFragment() {
+	protected CatalogFragment createFragment() {
 		Intent intent = getIntent();
 		String type = intent.getStringExtra(EXTRA_TYPE);
-		Fragment fragment = null;
 
-			if (type.equals(getString(R.string.catalogs_key_currency))) {
-				fragment = new CurrencyFragment();
-			} else if (type.equals(getString(R.string.catalogs_key_unit))) {
-				fragment = new UnitFragment();
-			} else if (type.equals(getString(R.string.catalogs_key_category))) {
-				fragment = new CategoryFragment();
-			}
+		if (type.equals(getString(R.string.catalogs_key_currency))) {
+			mCatalogFragment = new CurrencyFragment();
+		} else if (type.equals(getString(R.string.catalogs_key_unit))) {
+			mCatalogFragment = new UnitFragment();
+		} else if (type.equals(getString(R.string.catalogs_key_category))) {
+			mCatalogFragment = new CategoryFragment();
+		}
 
-		mOnBackPressedListener = (OnBackPressedListener) fragment;
+		mCatalogFragment.setLastEditIds((HashMap<Integer, Long>) intent.getSerializableExtra(EXTRA_DATA));
 
-		return fragment;
+		return mCatalogFragment;
+	}
+
+	@Override
+	protected CatalogFragment getFragment() {
+		return mCatalogFragment;
 	}
 
 	@Override
 	protected String getTag() {
 		return FRAGMENT_TAG;
+	}
+
+	@Override
+	protected void onCatalogSelected(int key) {
+		if (key == mCatalogFragment.getKey()) {
+			return;
+		}
+
+		Intent i = new Intent(this, CatalogsActivity.class);
+		i.putExtra(CatalogsActivity.EXTRA_TYPE, getString(key));
+		i.putExtra(CatalogsActivity.EXTRA_DATA, mCatalogFragment.getLastEditIds());
+		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			startActivity(i, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+		} else {
+			startActivity(i);
+		}
+	}
+
+	@Override
+	protected void onSettingsSelect() {
+		Intent i = new Intent(this, SettingsActivity.class);
+		i.putExtra(CatalogsActivity.EXTRA_DATA, mCatalogFragment.getLastEditIds());
+		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			startActivity(i, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+		} else {
+			startActivity(i);
+		}
 	}
 
 	@Override
@@ -56,8 +98,7 @@ public class CatalogsActivity extends SingleFragmentActivity {
 
 	@Override
 	public void onBackPressed() {
-		if (mOnBackPressedListener == null || (mOnBackPressedListener != null && mOnBackPressedListener.onBackPressed())) {
-			super.onBackPressed();
-		}
+		setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, mCatalogFragment.getLastEditIds()));
+		super.onBackPressed();
 	}
 }
