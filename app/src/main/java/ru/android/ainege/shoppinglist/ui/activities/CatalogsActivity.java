@@ -98,7 +98,9 @@ public class CatalogsActivity extends SingleFragmentActivity {
 
 	@Override
 	public void onBackPressed() {
-		setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, mCatalogFragment.getLastEditIds()));
-		super.onBackPressed();
+		if (!closeDrawer()) {
+			setResult(Activity.RESULT_OK, new Intent().putExtra(LAST_EDIT, mCatalogFragment.getLastEditIds()));
+			super.onBackPressed();
+		}
 	}
 }

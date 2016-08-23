@@ -63,7 +63,7 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 
 	@Override
 	public void onBackPressed() {
-		if (mOnBackPressedListener == null || (mOnBackPressedListener != null && mOnBackPressedListener.onBackPressed())) {
+		if (!closeDrawer() && mOnBackPressedListener == null || mOnBackPressedListener.onBackPressed()) {
 			super.onBackPressed();
 		}
 	}

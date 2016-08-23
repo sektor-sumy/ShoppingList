@@ -154,9 +154,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 
 	@Override
 	public void onBackPressed() {
-		if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-			mDrawerLayout.closeDrawer(GravityCompat.START);
-		} else {
+		if (!closeDrawer()) {
 			super.onBackPressed();
 		}
 	}
@@ -258,6 +256,15 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		}
 
 		return result;
+	}
+
+	public boolean closeDrawer() {
+		if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+			mDrawerLayout.closeDrawer(GravityCompat.START);
+			return true;
+		}
+
+		return false;
 	}
 
 	private void openCatalog(Intent i, int[] flags, int requestCode) {

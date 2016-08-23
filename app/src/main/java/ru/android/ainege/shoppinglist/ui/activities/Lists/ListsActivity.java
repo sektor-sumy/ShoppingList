@@ -83,7 +83,7 @@ public class ListsActivity extends SingleFragmentActivity {
 
 	@Override
 	public void onBackPressed() {
-		if (mState.onBackPressed()) {
+		if (!closeDrawer() && mState.onBackPressed()) {
 			super.onBackPressed();
 		}
 	}
