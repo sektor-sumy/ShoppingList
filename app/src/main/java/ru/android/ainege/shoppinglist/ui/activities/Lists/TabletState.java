@@ -124,9 +124,21 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 
 		mListsActivity.getDrawerLayout().addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
 			@Override
+			public void onDrawerSlide(View drawerView, float slideOffset) {
+				super.onDrawerSlide(drawerView, slideOffset);
+
+				if (!(mCurrentScreen instanceof ListsScreen)) {
+					mShoppingListScreen.getFragment().setDrawerOpened(slideOffset != 0);
+				}
+			}
+
+			@Override
 			public void onDrawerOpened(View drawerView) {
 				super.onDrawerOpened(drawerView);
-				mCurrentScreen.closeActionMode();
+
+				if (!(mCurrentScreen instanceof ListsScreen)) {
+					mShoppingListScreen.getFragment().closeActionMode();
+				}
 			}
 		});
 	}

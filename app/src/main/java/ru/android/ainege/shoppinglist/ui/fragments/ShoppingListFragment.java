@@ -121,6 +121,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private boolean mIsCollapsedCategory = false;
 	private boolean mIsLandscapeTablet;
 
+	private boolean mIsDrawerOpened = false;
 	private android.view.ActionMode mActionMode;
 	private final ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
@@ -555,6 +556,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		mItemDetailsId = id;
 	}
 
+	public void setDrawerOpened(boolean drawerOpened) {
+		mIsDrawerOpened = drawerOpened;
+	}
+
 	//<editor-fold desc="Work with loader">
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -814,7 +819,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void onItemLongClick(ShoppingList itemInList) {
-		if (mActionMode != null) {
+		if (mIsDrawerOpened) {
+			return;
+		} else if (mActionMode != null) {
 			mAdapterRV.selectItem(itemInList);
 			return;
 		}
@@ -825,7 +832,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void onItemLongClick(Category category) {
-		if (mActionMode != null) {
+		if (mIsDrawerOpened) {
+			return;
+		} else if (mActionMode != null) {
 			mAdapterRV.selectAllItemsInCategory(category);
 			return;
 		}
@@ -836,7 +845,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private void onItemSwipeRight(ShoppingList itemInList, int position) {
-		if (mActionMode != null) {
+		if (mIsDrawerOpened || mActionMode != null) {
 			return;
 		}
 

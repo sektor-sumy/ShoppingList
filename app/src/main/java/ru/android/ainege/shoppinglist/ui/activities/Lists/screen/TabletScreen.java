@@ -23,7 +23,6 @@ public abstract class TabletScreen implements OnDialogShownListener, ListsFragme
 	public abstract boolean onBackPressed();
 	public abstract int getScreenId();
 	public abstract void toScreen();
-	public abstract void closeActionMode();
 
 	public abstract boolean onCreateViewListener(Toolbar toolbar);
 	public abstract Fragment getFragment();

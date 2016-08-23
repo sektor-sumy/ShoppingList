@@ -105,11 +105,6 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 	}
 
 	@Override
-	public void closeActionMode() {
-		mShoppingListFragment.closeActionMode();
-	}
-
-	@Override
 	public void onOpenDialog(long idList) {
 		onOpenDialog(mShoppingListFragment, idList);
 

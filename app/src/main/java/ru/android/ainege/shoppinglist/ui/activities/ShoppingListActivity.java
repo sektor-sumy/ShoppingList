@@ -29,6 +29,13 @@ public class ShoppingListActivity extends SingleFragmentActivity implements OnCl
 
 		getDrawerLayout().addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
 			@Override
+			public void onDrawerSlide(View drawerView, float slideOffset) {
+				super.onDrawerSlide(drawerView, slideOffset);
+
+				mShoppingListFragment.setDrawerOpened(slideOffset != 0);
+			}
+
+			@Override
 			public void onDrawerOpened(View drawerView) {
 				super.onDrawerOpened(drawerView);
 

@@ -101,11 +101,6 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	}
 
 	@Override
-	public void closeActionMode() {
-		mShoppingListFragment.closeActionMode();
-	}
-
-	@Override
 	public void onOpenDialog(long idList) {
 		onOpenDialog(mShoppingListFragment, idList);
 		mState.setShouldBackPressed(TabletState.DIALOG_BEHAVIOUR_ITEM);
