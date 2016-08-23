@@ -1,5 +1,8 @@
 package ru.android.ainege.shoppinglist.ui.activities.Lists.screen;
 
+import android.support.design.widget.NavigationView;
+import android.support.v7.widget.Toolbar;
+
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.TabletState;
 import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
@@ -22,6 +25,11 @@ public class ListsScreen extends TabletScreen {
 		if (mState.isLandscape()) {
 			mState.openList();
 		}
+	}
+
+	@Override
+	public boolean onCreateViewListener(Toolbar toolbar) {
+		return true;
 	}
 
 	@Override
@@ -56,6 +64,9 @@ public class ListsScreen extends TabletScreen {
 
 	@Override
 	public void toScreen() {
+		NavigationView navigationView = (NavigationView) mState.getListsActivity().findViewById(R.id.nav_view);
+		navigationView.setCheckedItem(R.id.nav_main);
+
 		mState.setLastSelectedListId(-1);
 		mState.setFragmentTagForRemove(TabletState.SHOPPING_LIST_TAG);
 

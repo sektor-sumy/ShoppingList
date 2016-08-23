@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.activities.Lists.screen;
 
 import android.app.Fragment;
+import android.support.v7.widget.Toolbar;
 
 import java.util.ArrayList;
 
@@ -23,6 +24,7 @@ public abstract class TabletScreen implements OnDialogShownListener, ListsFragme
 	public abstract int getScreenId();
 	public abstract void toScreen();
 
+	public abstract boolean onCreateViewListener(Toolbar toolbar);
 	public abstract Fragment getFragment();
 	public abstract void onMainSelected();
 	public abstract void onLastListSelected();

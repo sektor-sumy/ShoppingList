@@ -185,4 +185,7 @@
 	<string name="feedback">Обратная связь</string>
 
 	<string name="banner_ad_unit_id">ca-app-pub-3804902313328755/8598932222</string>
+
+	<string name="navigation_drawer_open">Open navigation drawer</string>
+	<string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

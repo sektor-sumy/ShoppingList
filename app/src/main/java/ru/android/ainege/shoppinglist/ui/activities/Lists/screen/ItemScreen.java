@@ -2,6 +2,8 @@ package ru.android.ainege.shoppinglist.ui.activities.Lists.screen;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.design.widget.NavigationView;
+import android.support.v7.widget.Toolbar;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -48,6 +50,11 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	}
 
 	@Override
+	public boolean onCreateViewListener(Toolbar toolbar) {
+		return !mState.isLandscape();
+	}
+
+	@Override
 	public ItemFragment getFragment() {
 		return mItemFragment;
 	}
@@ -59,7 +66,6 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 		} else {
 			mState.toScreen(mState.getListsScreen());
 		}
-		
 	}
 
 	@Override
@@ -85,6 +91,10 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 
 	@Override
 	public void toScreen() {
+		NavigationView navigationView = (NavigationView) mState.getListsActivity().findViewById(R.id.nav_view);
+		navigationView.setCheckedItem(R.id.nav_last_list);
+
+		mState.getShoppingListScreen().showDrawerIcon();
 		mState.animation(Float.valueOf(mState.getListsActivity().getString(R.string.lists_weight_is)),
 				Float.valueOf(mState.getListsActivity().getString(R.string.shopping_list_weight_is)),
 				Float.valueOf(mState.getListsActivity().getString(R.string.item_weight_is)));
@@ -220,6 +230,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	private void toPreviousScreen() {
 		mItemFragment.getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
+		mState.getShoppingListScreen().hideDrawerIcon();
 		mState.getListsScreen().updateList();
 		mState.toScreen(mState.getShoppingListScreen());
 		mState.closeShowcase();

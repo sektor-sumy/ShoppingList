@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
@@ -11,6 +12,7 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -60,6 +62,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final int DATA_LOADER = 0;
 	private static final int HANDLER_LOAD_FINISHED = 1;
 
+	private OnCreateViewListener mOnCreateViewListener;
 	private OnListSelectListener mOnListSelectListener;
 	private OnListChangedListener mOnListChangedListener;
 	private OnDialogShownListener mOnDialogShownListener;
@@ -102,6 +105,23 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	public interface OnListsLoadFinishedListener {
 		void onLoadFinished(ArrayList<List> lists);
+	}
+
+	@TargetApi(23)
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		mOnCreateViewListener = (OnCreateViewListener) getActivity();
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			mOnCreateViewListener = (OnCreateViewListener) getActivity();
+		}
 	}
 
 	@Override
@@ -162,6 +182,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mListsRV.setLayoutManager(llm);
 
 		showcaseView();
+		mOnCreateViewListener.onCreateViewListener(this, toolbar);
 
 		return v;
 	}
@@ -180,6 +201,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	public void onDetach() {
 		super.onDetach();
 
+		mOnCreateViewListener = null;
 		mOnListSelectListener = null;
 		mOnListChangedListener = null;
 		mOnDialogShownListener = null;

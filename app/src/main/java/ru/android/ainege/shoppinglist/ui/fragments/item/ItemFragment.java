@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments.item;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
@@ -71,6 +72,7 @@ import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.ui.activities.CatalogsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SingleFragmentActivity;
+import ru.android.ainege.shoppinglist.ui.fragments.OnCreateViewListener;
 import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.CategoryDialogFragment;
@@ -125,6 +127,8 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 
 	protected ItemDS mItemDS;
 	protected ShoppingListDS mItemsInListDS;
+
+	private OnCreateViewListener mOnCreateViewListener;
 	private OnClickListener mOnClickListener;
 	private OnItemChangedListener mOnItemChangedListener;
 
@@ -166,6 +170,23 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 
 	public interface OnItemChangedListener {
 		void updateCurrentList();
+	}
+
+	@TargetApi(23)
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		mOnCreateViewListener = (OnCreateViewListener) getActivity();
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			mOnCreateViewListener = (OnCreateViewListener) getActivity();
+		}
 	}
 
 	@Override
@@ -235,18 +256,16 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		boolean isLandscapeTablet = getResources().getBoolean(R.bool.isTablet) && getResources().getBoolean(R.bool.isLandscape);
 
-		if (mOnItemChangedListener != null && isLandscapeTablet) {
+		if (isLandscapeTablet) {
 			toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
-		} else {
-			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-		}
 
-		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getActivity().onBackPressed();
-			}
-		});
+			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					getActivity().onBackPressed();
+				}
+			});
+		}
 
 		Button save = (Button) v.findViewById(R.id.save_item);
 		save.setOnClickListener(new View.OnClickListener() {
@@ -287,6 +306,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 
 		setupView(v, savedInstanceState);
 		showCaseViews();
+		mOnCreateViewListener.onCreateViewListener(this, toolbar);
 
 		return v;
 	}
@@ -310,6 +330,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		super.onDestroy();
 		dataFragment.setImagePath(mItemInList.getItem().getImagePath());
 
+		mOnCreateViewListener = null;
 		mOnClickListener = null;
 		mOnItemChangedListener = null;
 	}

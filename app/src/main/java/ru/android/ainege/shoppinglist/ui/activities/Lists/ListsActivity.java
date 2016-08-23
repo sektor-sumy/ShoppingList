@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.Toolbar;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
@@ -30,6 +31,13 @@ public class ListsActivity extends SingleFragmentActivity {
 
 		super.onCreate(savedInstanceState);
 		mState.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public void onCreateViewListener(Fragment fragment, Toolbar toolbar) {
+		if (mState.onCreateViewListener(fragment, toolbar)) {
+			super.onCreateViewListener(fragment, toolbar);
+		}
 	}
 
 	@Override

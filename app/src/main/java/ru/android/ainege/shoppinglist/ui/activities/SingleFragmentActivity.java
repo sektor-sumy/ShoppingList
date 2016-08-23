@@ -12,7 +12,9 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -24,8 +26,16 @@ import com.google.android.gms.ads.MobileAds;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.ListsActivity;
+import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.OnCreateViewListener;
+import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CategoryFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CurrencyFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.UnitFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 
-public abstract class SingleFragmentActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public abstract class SingleFragmentActivity extends AppCompatActivity
+		implements NavigationView.OnNavigationItemSelectedListener, OnCreateViewListener {
 	protected static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
 
@@ -55,6 +65,34 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+		if (getFragment() instanceof ListsFragment) {
+			navigationView.setCheckedItem(R.id.nav_main);
+		} else if (getFragment() instanceof ShoppingListFragment) {
+			navigationView.setCheckedItem(R.id.nav_last_list);
+		} else if (getFragment() instanceof ItemFragment) {
+			navigationView.setCheckedItem(R.id.nav_last_list);
+		} else if (getFragment() instanceof CategoryFragment) {
+			navigationView.setCheckedItem(R.id.nav_catalog_catalogs);
+		} else if (getFragment() instanceof UnitFragment) {
+			navigationView.setCheckedItem(R.id.nav_catalog_units);
+		} else if (getFragment() instanceof CurrencyFragment) {
+			navigationView.setCheckedItem(R.id.nav_catalog_currencies);
+		}
+	}
+
+	@Override
+	public void onCreateViewListener(Fragment fragment, Toolbar toolbar) {
+		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+				this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+		mDrawerLayout.addDrawerListener(toggle);
+		toggle.syncState();
 	}
 
 	@Override
@@ -89,8 +127,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 				break;
 		}
 
-		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-		drawer.closeDrawer(GravityCompat.START);
+		mDrawerLayout.closeDrawer(GravityCompat.START);
 
 		return true;
 	}
@@ -114,6 +151,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 		} else {
 			super.onBackPressed();
 		}
+	}
+
+	public DrawerLayout getDrawerLayout() {
+		return mDrawerLayout;
 	}
 
 	protected void superOnBackPressed() {

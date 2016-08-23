@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
@@ -88,6 +89,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private ListsDS mListsDS;
 	private List mList;
 
+	private OnCreateViewListener mOnCreateViewListener;
 	private OnClickListener mOnClickListener;
 	private OnListChangedListener mOnListChangedListener;
 	private OnItemChangedListener mOnItemChangedListener;
@@ -207,6 +209,23 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		long getLastSelectedItemId();
 	}
 
+	@TargetApi(23)
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		mOnCreateViewListener = (OnCreateViewListener) getActivity();
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			mOnCreateViewListener = (OnCreateViewListener) getActivity();
+		}
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -249,16 +268,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		toolbar.inflateMenu(R.menu.items_in_list_menu);
 		toolbar.setOnMenuItemClickListener(onMenuItemClickListener());
-
-		if (!mIsLandscapeTablet) {
-			toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					getActivity().onBackPressed();
-				}
-			});
-		}
 
 		mListImage = (ImageView) v.findViewById(R.id.appbar_image);
 
@@ -337,6 +346,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		setListData();
+		mOnCreateViewListener.onCreateViewListener(this, toolbar);
 
 		return v;
 	}
@@ -363,6 +373,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public void onDetach() {
 		super.onDetach();
 
+		mOnCreateViewListener = null;
 		mOnClickListener = null;
 		mOnListChangedListener = null;
 		mOnItemChangedListener = null;

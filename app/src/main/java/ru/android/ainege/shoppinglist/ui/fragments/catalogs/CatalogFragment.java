@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.entities.Catalog;
+import ru.android.ainege.shoppinglist.ui.fragments.OnCreateViewListener;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.DeleteDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
 
@@ -44,6 +46,8 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	private static final String DELETE_DATE = "answerListDialog";
 	private static final String STATE_LIST = "state_list";
 	private static final String STATE_LAST_EDIT_ID = "state_last_edit_id";
+
+	private OnCreateViewListener mOnCreateViewListener;
 
 	protected ArrayList<T> mCatalog;
 	protected ArrayList<T> mSaveListRotate;
@@ -68,6 +72,23 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	protected abstract boolean isEntityUsed(long id);
 
 	protected abstract void showEditDialog(int position);
+
+	@TargetApi(23)
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		mOnCreateViewListener = (OnCreateViewListener) getActivity();
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			mOnCreateViewListener = (OnCreateViewListener) getActivity();
+		}
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -95,13 +116,6 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.main_toolbar);
 		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-		toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getActivity().onBackPressed();
-			}
-		});
 
 		int orientation = getResources().getConfiguration().orientation;
 		boolean isTablet = getResources().getBoolean(R.bool.isTablet);
@@ -123,6 +137,8 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		mCatalogRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 		mCatalogRV.setAdapter(mAdapterRV);
 
+		mOnCreateViewListener.onCreateViewListener(this, toolbar);
+
 		return v;
 	}
 
@@ -130,6 +146,13 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	public void onPause() {
 		super.onPause();
 		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+
+		mOnCreateViewListener = null;
 	}
 
 	@Override

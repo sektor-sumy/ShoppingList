@@ -1,9 +1,11 @@
 package ru.android.ainege.shoppinglist.ui.activities.Lists;
 
 import android.app.ActivityOptions;
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 
 import ru.android.ainege.shoppinglist.ui.activities.ShoppingListActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
@@ -28,6 +30,11 @@ public class PhoneState implements StateInterface {
 			mListsFragment = (ListsFragment) mListsActivity.getFragmentManager().findFragmentByTag(ListsActivity.LISTS_TAG);
 			setListeners(mListsFragment);
 		}
+	}
+
+	@Override
+	public boolean onCreateViewListener(Fragment fragment, Toolbar toolbar) {
+		return true;
 	}
 
 	@Override

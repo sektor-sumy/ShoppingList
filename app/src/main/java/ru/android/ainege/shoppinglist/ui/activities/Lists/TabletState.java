@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -119,6 +120,21 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 
 			mCurrentScreen.restore();
 		}
+	}
+
+	@Override
+	public boolean onCreateViewListener(Fragment fragment, Toolbar toolbar) {
+		boolean isSetIcon = true;
+
+		if (fragment instanceof ListsFragment) {
+			isSetIcon = mListsScreen.onCreateViewListener(toolbar);
+		} else if (fragment instanceof ShoppingListFragment) {
+			isSetIcon = mShoppingListScreen.onCreateViewListener(toolbar);
+		} else if (fragment instanceof ItemFragment) {
+			isSetIcon = mItemScreen.onCreateViewListener(toolbar);
+		}
+
+		return isSetIcon;
 	}
 
 	@Override
