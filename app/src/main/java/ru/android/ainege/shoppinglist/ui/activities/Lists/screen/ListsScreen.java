@@ -76,6 +76,11 @@ public class ListsScreen extends TabletScreen {
 	}
 
 	@Override
+	public void closeActionMode() {
+
+	}
+
+	@Override
 	public void onOpenDialog(long idList) {
 		onOpenDialog(null, idList);
 		mState.setShouldBackPressed(TabletState.DIALOG_BEHAVIOUR_LIST);

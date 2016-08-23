@@ -4,6 +4,8 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.view.View;
 
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
@@ -24,6 +26,15 @@ public class ShoppingListActivity extends SingleFragmentActivity implements OnCl
 			mShoppingListFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(getTag());
 			setListeners(mShoppingListFragment);
 		}
+
+		getDrawerLayout().addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+			@Override
+			public void onDrawerOpened(View drawerView) {
+				super.onDrawerOpened(drawerView);
+
+				mShoppingListFragment.closeActionMode();
+			}
+		});
 	}
 
 	@Override

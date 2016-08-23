@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -120,6 +121,14 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 
 			mCurrentScreen.restore();
 		}
+
+		mListsActivity.getDrawerLayout().addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+			@Override
+			public void onDrawerOpened(View drawerView) {
+				super.onDrawerOpened(drawerView);
+				mCurrentScreen.closeActionMode();
+			}
+		});
 	}
 
 	@Override
