@@ -377,6 +377,10 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			SharedPreferences.Editor editor = mSettings.edit();
 			editor.remove(APP_PREFERENCES_ID);
 			editor.apply();
+
+			if (mOnCreateViewListener != null) {
+				mOnCreateViewListener.onDeleteSavedList();
+			}
 		}
 	}
 

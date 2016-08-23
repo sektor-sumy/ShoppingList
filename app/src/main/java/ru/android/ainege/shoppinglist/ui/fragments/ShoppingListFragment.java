@@ -770,6 +770,10 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			editor.putLong(APP_PREFERENCES_ID, id);
 		} else {
 			editor.remove(APP_PREFERENCES_ID);
+
+			if (mOnCreateViewListener != null) {
+				mOnCreateViewListener.onDeleteSavedList();
+			}
 		}
 
 		editor.apply();

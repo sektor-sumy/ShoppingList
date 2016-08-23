@@ -94,6 +94,7 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 	@Override
 	public void toScreen() {
 		NavigationView navigationView = (NavigationView) mState.getListsActivity().findViewById(R.id.nav_view);
+		navigationView.getMenu().findItem(R.id.nav_last_list).setEnabled(true);
 		navigationView.setCheckedItem(R.id.nav_last_list);
 
 		mState.setLastSelectedItemId(-1);
@@ -167,6 +168,10 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 	public void openScreen() {
 		mState.setCurrentScreen(this);
 		mState.setLayoutWeight(R.string.lists_weight_sls, R.string.shopping_list_weight_sls, R.string.item_weight_sls);
+
+		NavigationView navigationView = (NavigationView) mState.getListsActivity().findViewById(R.id.nav_view);
+		navigationView.getMenu().findItem(R.id.nav_last_list).setEnabled(true);
+		navigationView.setCheckedItem(R.id.nav_last_list);
 	}
 
 	void showDrawerIcon() {

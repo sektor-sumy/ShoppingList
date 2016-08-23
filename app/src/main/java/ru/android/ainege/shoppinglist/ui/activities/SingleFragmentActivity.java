@@ -85,6 +85,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		} else if (getFragment() instanceof CurrencyFragment) {
 			navigationView.setCheckedItem(R.id.nav_catalog_currencies);
 		}
+
+		if (getSaveListId() == -1) {
+			navigationView.getMenu().findItem(R.id.nav_last_list).setEnabled(false);
+		}
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean isUseCategory = sharedPreferences.getBoolean(getString(R.string.settings_key_use_category), true);
+		navigationView.getMenu().findItem(R.id.nav_catalog_catalogs).setEnabled(isUseCategory);
 	}
 
 	@Override
@@ -151,6 +159,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		} else {
 			super.onBackPressed();
 		}
+	}
+
+	@Override
+	public void onDeleteSavedList() {
+		((NavigationView) findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_last_list).setEnabled(false);
 	}
 
 	public DrawerLayout getDrawerLayout() {
