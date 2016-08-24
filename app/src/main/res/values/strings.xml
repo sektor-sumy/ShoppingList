@@ -184,8 +184,14 @@
 	<string name="last_list">Последний список</string>
 	<string name="feedback">Обратная связь</string>
 
-	<string name="banner_ad_unit_id">ca-app-pub-3804902313328755/8598932222</string>
-
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
+
+	<!--Ad-->
+	<string name="banner_ad_unit_id">ca-app-pub-3804902313328755/8598932222</string>
+
+	<!--Feedback-->
+	<string name="feedback_email">Ainege@gmail.com</string>
+	<string name="subject">Приложение \"За покупками\"</string>
+	<string name="feedback_error">Упс... Похоже у Вас нет почтового клиента</string>
 </resources>

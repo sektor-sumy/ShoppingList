@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -129,7 +130,16 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 				onSettingsSelect();
 				break;
 			case R.id.nav_feedback:
-				Toast.makeText(getApplicationContext(), getString(R.string.feedback), Toast.LENGTH_SHORT).show();
+				Intent intent = new Intent(Intent.ACTION_SENDTO);
+				intent.setData(Uri.parse("mailto:" + getString(R.string.feedback_email)));
+				intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.subject));
+
+				if (intent.resolveActivity(getPackageManager()) != null) {
+					startActivity(intent);
+				} else {
+					Toast.makeText(this, getString(R.string.feedback_error), Toast.LENGTH_LONG).show();
+				}
+
 				break;
 			default:
 				break;
