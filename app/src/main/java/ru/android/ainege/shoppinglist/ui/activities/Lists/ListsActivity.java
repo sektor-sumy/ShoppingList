@@ -148,7 +148,6 @@ public class ListsActivity extends SingleFragmentActivity {
 				.setUserProperty(FirebaseAnalytic.IS_BOUGHT_END, String.valueOf(settings.getBoolean(getString(R.string.settings_key_sort_is_bought), true)))
 				.setUserProperty(FirebaseAnalytic.USE_CATEGORY, String.valueOf(settings.getBoolean(getString(R.string.settings_key_use_category), true)))
 				.setUserProperty(FirebaseAnalytic.AUTO_COMPLETE_DATA, String.valueOf(settings.getBoolean(getString(R.string.settings_key_auto_complete_data), true)))
-				.setUserProperty(FirebaseAnalytic.TRANSITION_TO_SETTINGS, String.valueOf(settings.getBoolean(getString(R.string.settings_key_transition), false)))
 				.setUserProperty(FirebaseAnalytic.FAST_EDIT_CATALOGS, String.valueOf(settings.getBoolean(getString(R.string.settings_key_fast_edit), true)));
 	}
 }

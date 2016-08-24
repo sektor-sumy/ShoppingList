@@ -120,8 +120,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	private ToggleButton mIsBought;
 	private AppBarLayout mAppBarLayout;
 	private TextView mCurrency;
-	private ImageButton mCategorySettings;
-	private ImageButton mUnitSettings;
 	private LinearLayout mCategoryContainer;
 	private TextView mFinishPrice;
 
@@ -556,8 +554,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		if (isAdded()) {
 			if (key.equals(getString(R.string.settings_key_use_category))) {
 				setCategory();
-			} else if (key.equals(getString(R.string.settings_key_transition))) {
-				setTransitionButtons();
 			} else if (key.equals(getString(R.string.settings_key_fast_edit))) {
 				updateSpinners();
 			}
@@ -573,18 +569,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 
 		setUnit(-1);
 		setCategory(-1);
-	}
-
-	public void setTransitionButtons() {
-		if (mPrefs.getBoolean(getString(R.string.settings_key_transition), false)) {
-			mUnitSettings.setVisibility(View.VISIBLE);
-			mCategorySettings.setVisibility(View.VISIBLE);
-			mCurrency.getLayoutParams().width = getResources().getDimensionPixelOffset(R.dimen.width_currency);
-		} else {
-			mUnitSettings.setVisibility(View.GONE);
-			mCategorySettings.setVisibility(View.GONE);
-			mCurrency.getLayoutParams().width = getResources().getDimensionPixelOffset(R.dimen.width_spinner);
-		}
 	}
 
 	public void setCategory() {
@@ -676,13 +660,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 				});
 			}
 		});
-		mUnitSettings = (ImageButton) v.findViewById(R.id.unit_settings);
-		mUnitSettings.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				settingOnClickListener(getString(R.string.catalogs_key_unit), UNIT_SETTINGS);
-			}
-		});
 
 		mPriceInputLayout = (TextInputLayout) v.findViewById(R.id.price_input_layout);
 		mPrice = (EditText) v.findViewById(R.id.new_item_price);
@@ -723,13 +700,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 				});
 			}
 		});
-		mCategorySettings = (ImageButton) v.findViewById(R.id.category_settings);
-		mCategorySettings.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				settingOnClickListener(getString(R.string.catalogs_key_category), CATEGORY_SETTINGS);
-			}
-		});
 		mCategoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
 		setCategory();
 
@@ -747,8 +717,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		}
 
 		mIsBought = (ToggleButton) v.findViewById(R.id.is_bought);
-
-		setTransitionButtons();
 	}
 
 	protected void loadImage(String path) {
@@ -976,21 +944,6 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 		} else {
 			Toast.makeText(getActivity().getApplicationContext(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
 		}
-	}
-
-	private void settingOnClickListener(String value, int code) {
-		Intent i = new Intent(getActivity(), CatalogsActivity.class);
-		i.putExtra(CatalogsActivity.EXTRA_TYPE, value);
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			startActivityForResult(i, code, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-		} else {
-			startActivityForResult(i, code);
-		}
-
-		FirebaseAnalytic.getInstance(getActivity(), FirebaseAnalytic.TRANSITION_TO_SETTINGS_IN_ITEM)
-				.putString(FirebaseAnalytic.CONTENT_TYPE, value)
-				.addEvent();
 	}
 
 	private boolean hasPermission(String permission){

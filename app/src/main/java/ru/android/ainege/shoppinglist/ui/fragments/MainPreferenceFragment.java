@@ -35,7 +35,6 @@ public class MainPreferenceFragment extends android.preference.PreferenceFragmen
 
 		nestedScreen(getString(R.string.settings_key_auto_complete_screen));
 		nestedScreen(getString(R.string.settings_key_text_selection_screen));
-		nestedScreen(getString(R.string.settings_key_transition_screen));
 
 		if (savedInstanceState != null) {
 			if (savedInstanceState.get(STATE_SCREEN) != null) {

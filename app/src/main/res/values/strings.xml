@@ -139,13 +139,8 @@
 	<string name="settings_title_text_selection_price">Цена</string>
 	<string name="settings_key_text_selection_comment">text_selection_comment</string>
 	<string name="settings_title_text_selection_comment">Комментарий</string>
-	<string name="settings_key_transition_screen">transition_screen</string>
-	<string name="settings_title_transition_screen">Редактирование каталогов</string>
-	<string name="settings_key_transition">transition</string>
-	<string name="settings_title_transition">Переход в настройки</string>
-	<string name="settings_summary_transition">Добавить кнопку перехода в каталог</string>
 	<string name="settings_key_fast_edit">fast_edit</string>
-	<string name="settings_title_fast_edit">Быстрое добавление</string>
+	<string name="settings_title_fast_edit">Быстрое добавление значения в каталог</string>
 	<string name="settings_summary_fast_edit">Вначале выпадающего списка появится пункт \"Добавить\"</string>
 
 	<string name="sort_order_alphabet">алфавиту</string>
