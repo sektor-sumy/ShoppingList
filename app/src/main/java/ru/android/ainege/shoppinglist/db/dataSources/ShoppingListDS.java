@@ -17,6 +17,25 @@ import ru.android.ainege.shoppinglist.db.entities.Unit;
 public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingListsInterface {
 	private static final String DEFAULT_ITEM_DATA = "id_default_data";
 
+	private String selectItemsQuery = "SELECT " + TABLE_NAME + ".*, " +
+			ItemsInterface.COLUMN_NAME + ", " + ItemsInterface.COLUMN_DEFAULT_IMAGE_PATH + ", " +
+			ItemsInterface.COLUMN_IMAGE_PATH + ", " +
+			ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID_DATA + " AS " + DEFAULT_ITEM_DATA + ", " +
+			ItemDataInterface.TABLE_NAME + ".*, " +
+			UnitsInterface.COLUMN_NAME + ", " + CategoriesInterface.COLUMN_NAME + ", " +
+			CategoriesInterface.COLUMN_COLOR +
+			" FROM " + TABLE_NAME +
+			" INNER JOIN " + ItemsInterface.TABLE_NAME + " ON " +
+			TABLE_NAME + "." + COLUMN_ID_ITEM + " = " + ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID +
+			" INNER JOIN " + ItemDataInterface.TABLE_NAME + " ON " +
+			TABLE_NAME + "." + COLUMN_ID_DATA + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
+			" INNER JOIN " + UnitsInterface.TABLE_NAME + " ON " +
+			ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_UNIT + " = " + UnitsInterface.TABLE_NAME + "." + UnitsInterface.COLUMN_ID +
+			" INNER JOIN " + CategoriesInterface.TABLE_NAME + " ON " +
+			ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " + CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID +
+			" WHERE " + TABLE_NAME + "." + COLUMN_ID_LIST + " = ? ";
+
+
 	public ShoppingListDS(Context context) {
 		super(context);
 	}
@@ -26,26 +45,17 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingL
 		return null;
 	}
 
+	public ShoppingListCursor get(long idList, long idItem) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		String selectQuery = selectItemsQuery +
+				" AND " + TABLE_NAME + "." + COLUMN_ID_ITEM + " = ? " ;
+		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(idList), String.valueOf(idItem)});
+		return new ShoppingListCursor(cursor);
+	}
+
 	public ShoppingListCursor getItemsInList(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		String selectQuery = "SELECT " + TABLE_NAME + ".*, " +
-				ItemsInterface.COLUMN_NAME + ", " + ItemsInterface.COLUMN_DEFAULT_IMAGE_PATH + ", " +
-				ItemsInterface.COLUMN_IMAGE_PATH + ", " +
-				ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID_DATA + " AS " + DEFAULT_ITEM_DATA + ", " +
-				ItemDataInterface.TABLE_NAME + ".*, " +
-				UnitsInterface.COLUMN_NAME + ", " + CategoriesInterface.COLUMN_NAME + ", " +
-				CategoriesInterface.COLUMN_COLOR +
-				" FROM " + TABLE_NAME +
-				" INNER JOIN " + ItemsInterface.TABLE_NAME + " ON " +
-				TABLE_NAME + "." + COLUMN_ID_ITEM + " = " + ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID +
-				" INNER JOIN " + ItemDataInterface.TABLE_NAME + " ON " +
-				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
-				" INNER JOIN " + UnitsInterface.TABLE_NAME + " ON " +
-				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_UNIT + " = " + UnitsInterface.TABLE_NAME + "." + UnitsInterface.COLUMN_ID +
-				" INNER JOIN " + CategoriesInterface.TABLE_NAME + " ON " +
-				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " + CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID +
-				" WHERE " + TABLE_NAME + "." + COLUMN_ID_LIST + " = ? ";
-		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
+		Cursor cursor = db.rawQuery(selectItemsQuery, new String[]{String.valueOf(id)});
 		return new ShoppingListCursor(cursor);
 	}
 

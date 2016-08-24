@@ -1,5 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments.item;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,12 +13,15 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.ui.activities.CatalogsActivity;
+import ru.android.ainege.shoppinglist.ui.activities.SingleFragmentActivity;
 import ru.android.ainege.shoppinglist.util.Image;
 
 import static java.lang.String.format;
@@ -57,6 +61,34 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		switch (requestCode) {
+			case SingleFragmentActivity.CATALOGS:
+			case SingleFragmentActivity.SETTINGS:
+				HashMap<Integer, Long> modifyCatalog = (HashMap<Integer, Long>) data.getSerializableExtra(CatalogsActivity.LAST_EDIT);
+
+				if (modifyCatalog != null) {
+					ShoppingListCursor cursor = mItemsInListDS.get(mOriginalItem.getIdList(), mOriginalItem.getIdItem());
+
+					if (cursor.moveToFirst()) {
+						mOriginalItem = cursor.getEntity();
+					}
+
+					cursor.close();
+				}
+		}
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		updatedItem();
+
+		return mItemInList.equals(mOriginalItem) || super.onBackPressed();
+	}
+
+	@Override
 	protected void setupView(View v, Bundle savedInstanceState) {
 		super.setupView(v, savedInstanceState);
 
@@ -65,32 +97,6 @@ public class EditItemFragment extends ItemFragment {
 		} else {
 			loadImage(dataFragment.getImagePath());
 		}
-	}
-
-	private void setDataToView(Bundle savedInstanceState) {
-		loadImage(mItemInList.getItem().getImagePath());
-
-		mName.setText(mItemInList.getItem().getName());
-
-		if (mItemInList.getAmount() != 0) {
-			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getAmount()));
-		}
-
-		setSelectionUnit(mItemInList.getUnit().getId());
-
-		if (mItemInList.getPrice() != 0) {
-			mPrice.setText(format("%.2f", mItemInList.getPrice()));
-		}
-
-		if (savedInstanceState != null && !mIsUseCategory) {
-			setSelectionCategory(savedInstanceState.getLong(STATE_CATEGORY_ID));
-		} else {
-			setSelectionCategory(mItemInList.getCategory().getId());
-		}
-
-		mComment.setText(mItemInList.getComment());
-
-		setIsBought(mItemInList.isBought());
 	}
 
 	@Override
@@ -140,12 +146,14 @@ public class EditItemFragment extends ItemFragment {
 			@Override
 			public Cursor runQuery(CharSequence charSequence) {
 				Cursor managedCursor = null;
+
 				if (charSequence != null && !charSequence.toString().trim().equals(mItemInList.getItem().getName())) {
 					managedCursor = mItemDS.getNames(charSequence.toString().trim());
 					if (managedCursor.moveToFirst()) {
 						mIsProposedItem = true;
 					}
 				}
+
 				return managedCursor;
 			}
 		});
@@ -222,10 +230,29 @@ public class EditItemFragment extends ItemFragment {
 				!imagePath.equals(defaultImagePath);
 	}
 
-	@Override
-	public boolean onBackPressed() {
-		updatedItem();
+	private void setDataToView(Bundle savedInstanceState) {
+		loadImage(mItemInList.getItem().getImagePath());
 
-		return mItemInList.equals(mOriginalItem) || super.onBackPressed();
+		mName.setText(mItemInList.getItem().getName());
+
+		if (mItemInList.getAmount() != 0) {
+			mAmount.setText(new DecimalFormat("#.######").format(mItemInList.getAmount()));
+		}
+
+		setSelectionUnit(mItemInList.getUnit().getId());
+
+		if (mItemInList.getPrice() != 0) {
+			mPrice.setText(format("%.2f", mItemInList.getPrice()));
+		}
+
+		if (savedInstanceState != null && !mIsUseCategory) {
+			setSelectionCategory(savedInstanceState.getLong(STATE_CATEGORY_ID));
+		} else {
+			setSelectionCategory(mItemInList.getCategory().getId());
+		}
+
+		mComment.setText(mItemInList.getComment());
+
+		setIsBought(mItemInList.isBought());
 	}
 }
