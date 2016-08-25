@@ -225,9 +225,13 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 
 	protected void removeFragment(String tag) {
 		FragmentManager fm = getFragmentManager();
-		fm.beginTransaction()
-				.remove(fm.findFragmentByTag(tag))
-				.commit();
+		Fragment fragment = fm.findFragmentByTag(tag);
+
+		if (fragment != null) {
+			fm.beginTransaction()
+					.remove(fragment)
+					.commit();
+		}
 	}
 
 	protected void adsInitialize() {
