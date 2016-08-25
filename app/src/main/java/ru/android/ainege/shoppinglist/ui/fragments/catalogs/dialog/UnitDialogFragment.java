@@ -12,16 +12,6 @@ import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
 public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 
-	public static UnitDialogFragment newInstance(Unit unit) {
-		Bundle args = new Bundle();
-		args.putSerializable(ITEM, unit);
-
-		UnitDialogFragment fragment = new UnitDialogFragment();
-		fragment.setArguments(args);
-
-		return fragment;
-	}
-
 	@Override
 	protected View setupView() {
 		View v = super.setupView();

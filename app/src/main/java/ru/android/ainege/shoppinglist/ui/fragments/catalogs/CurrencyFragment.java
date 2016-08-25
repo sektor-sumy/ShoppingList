@@ -1,8 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
-import android.content.Loader;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +10,8 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
+import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.CurrencyDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
@@ -23,6 +21,39 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import static ru.android.ainege.shoppinglist.R.string.catalogs_key_currency;
 
 public class CurrencyFragment extends CatalogFragment<Currency> {
+
+	@Override
+	public int getKey() {
+		return catalogs_key_currency;
+	}
+
+	@Override
+	protected String getTitle() {
+		return getString(R.string.catalogs_currency);
+	}
+
+	@Override
+	protected RecyclerViewAdapter getAdapter() {
+		return new CurrencyAdapter();
+	}
+
+	@Override
+	protected CatalogDS getDS() {
+		return new CurrenciesDS(getActivity());
+	}
+
+	@Override
+	protected GeneralDialogFragment getDialog() {
+		return new CurrencyDialogFragment();
+	}
+
+	private void saveCurrencySetting(long id) {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putLong(getString(catalogs_key_currency), id);
+		editor.apply();
+	}
+
 	private void showCaseView() {
 		CurrencyAdapter.CurrencyHolder holder;
 		MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), Showcase.SHOT_CURRENCY);
@@ -37,79 +68,6 @@ public class CurrencyFragment extends CatalogFragment<Currency> {
 					.singleUse(Showcase.SHOT_CURRENCY)
 					.show();
 		}
-	}
-
-	@Override
-	protected String getTitle() {
-		return getString(R.string.catalogs_currency);
-	}
-
-	@Override
-	protected View.OnClickListener getAddHandler() {
-		return new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				GeneralDialogFragment addItemDialog = new CurrencyDialogFragment();
-				addItemDialog.setTargetFragment(CurrencyFragment.this, ADD);
-				addItemDialog.show(getFragmentManager(), ADD_DATE);
-			}
-		};
-	}
-
-	@Override
-	protected CatalogDS getDS() {
-		return new CurrenciesDS(getActivity());
-	}
-
-	@Override
-	protected RecyclerViewAdapter getAdapter() {
-		return new CurrencyAdapter();
-	}
-
-	@Override
-	protected boolean isEntityUsed(long idCurrency) {
-		return getDS().isUsed(idCurrency);
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		switch (loader.getId()) {
-			case DATA_LOADER:
-				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
-					mCatalog = mSaveListRotate;
-					mAdapterRV.notifyDataSetChanged();
-				} else if (mSaveListRotate == null && data.moveToFirst()) {
-					mCatalog = ((CurrenciesDS.CurrencyCursor) data).getEntities();
-					mAdapterRV.notifyDataSetChanged();
-
-					if (mLastEditId != -1) {
-						mCatalogRV.scrollToPosition(getPosition(mLastEditId));
-					}
-				}
-
-				break;
-			default:
-				break;
-		}
-	}
-
-	@Override
-	public int getKey() {
-		return catalogs_key_currency;
-	}
-
-	@Override
-	protected void showEditDialog(int position) {
-		GeneralDialogFragment editItemDialog = CurrencyDialogFragment.newInstance(mCatalog.get(position));
-		editItemDialog.setTargetFragment(CurrencyFragment.this, EDIT);
-		editItemDialog.show(getFragmentManager(), EDIT_DATE);
-	}
-
-	private void saveCurrencySetting(long id) {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putLong(getString(catalogs_key_currency), id);
-		editor.apply();
 	}
 
 	public class CurrencyAdapter extends RecyclerViewAdapter<CurrencyAdapter.CurrencyHolder> {

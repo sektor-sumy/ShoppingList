@@ -30,6 +30,14 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 
 	protected abstract boolean saveData();
 
+	public static GeneralDialogFragment newInstance(GeneralDialogFragment fragment, Catalog catalog) {
+		Bundle args = new Bundle();
+		args.putSerializable(ITEM, catalog);
+		fragment.setArguments(args);
+
+		return fragment;
+	}
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		View v = setupView();

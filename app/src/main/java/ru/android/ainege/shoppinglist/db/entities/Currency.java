@@ -1,16 +1,38 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-public class Currency extends Catalog {
+public class Currency implements Catalog {
+	private long mId;
+	private String mName;
 	private String mSymbol;
 
 	public Currency(String name, String symbol) {
-		super(name);
+		mName = name;
 		mSymbol = symbol;
 	}
 
 	public Currency(long id, String name, String symbol) {
-		super(id, name);
-		mSymbol = symbol;
+		this(name, symbol);
+		mId = id;
+	}
+
+	@Override
+	public long getId() {
+		return mId;
+	}
+
+	@Override
+	public void setId(long id) {
+		mId = id;
+	}
+
+	@Override
+	public String getName() {
+		return mName;
+	}
+
+	@Override
+	public void setName(String name) {
+		mName = name;
 	}
 
 	public String getSymbol() {
@@ -23,6 +45,6 @@ public class Currency extends Catalog {
 
 	@Override
 	public String toString() {
-		return mSymbol + " (" + super.toString() + ")";
+		return mSymbol + " (" + mName + ")";
 	}
 }

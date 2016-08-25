@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,21 +56,11 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	HashMap<Integer, Long> mLastEditIds;
 	protected long mLastEditId = -1;
 
-	public abstract void onLoadFinished(Loader<Cursor> loader, Cursor data);
-
 	public abstract int getKey();
-
 	protected abstract String getTitle();
-
-	protected abstract View.OnClickListener getAddHandler();
-
-	protected abstract CatalogDS getDS();
-
 	protected abstract RecyclerViewAdapter getAdapter();
-
-	protected abstract boolean isEntityUsed(long id);
-
-	protected abstract void showEditDialog(int position);
+	protected abstract CatalogDS getDS();
+	protected abstract GeneralDialogFragment getDialog();
 
 	@TargetApi(23)
 	@Override
@@ -117,21 +106,29 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.main_toolbar);
 		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-		int orientation = getResources().getConfiguration().orientation;
+		boolean isLandscape = getResources().getBoolean(R.bool.isLandscape);
 		boolean isTablet = getResources().getBoolean(R.bool.isTablet);
 
-		if (isTablet || (!isTablet && orientation == Configuration.ORIENTATION_LANDSCAPE)) {
+		if (isTablet || (!isTablet && isLandscape)) {
 			Toolbar cardToolbar = (Toolbar) v.findViewById(R.id.toolbar);
 			cardToolbar.setTitle(getTitle());
-		} else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+		} else if (!isLandscape) {
 			ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+
 			if (actionBar != null) {
 				actionBar.setTitle(getTitle());
 			}
 		}
 
 		FloatingActionButton mFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
-		mFAB.setOnClickListener(getAddHandler());
+		mFAB.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				GeneralDialogFragment addItemDialog = getDialog();
+				addItemDialog.setTargetFragment(CatalogFragment.this, ADD);
+				addItemDialog.show(getFragmentManager(), ADD_DATE);
+			}
+		});
 
 		mCatalogRV = (RecyclerView) v.findViewById(R.id.list);
 		mCatalogRV.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -174,6 +171,28 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 				break;
 		}
 		return loader;
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		switch (loader.getId()) {
+			case DATA_LOADER:
+				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
+					mCatalog = mSaveListRotate;
+				} else if (mSaveListRotate == null && data.moveToFirst()) {
+					mCatalog = ((CatalogDS.CatalogCursor<T>) data).getEntities();
+				}
+
+				mAdapterRV.notifyDataSetChanged();
+
+				if (mLastEditId != -1) {
+					mCatalogRV.scrollToPosition(getPosition(mLastEditId));
+				}
+
+				break;
+			default:
+				break;
+		}
 	}
 
 	@Override
@@ -231,6 +250,16 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		}
 
 		return position;
+	}
+
+	protected boolean isEntityUsed(long id) {
+		return getDS().isUsed(id);
+	}
+
+	protected void showEditDialog(int position) {
+		GeneralDialogFragment editItemDialog = GeneralDialogFragment.newInstance(getDialog(), mCatalog.get(position));
+		editItemDialog.setTargetFragment(CatalogFragment.this, EDIT);
+		editItemDialog.show(getFragmentManager(), EDIT_DATE);
 	}
 
 	private void updateLastEditIds() {

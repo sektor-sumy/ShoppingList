@@ -1,42 +1,27 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
-import android.content.Loader;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
+import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.CategoryDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
 
-import static ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS.CategoryCursor;
-
 public class CategoryFragment extends CatalogFragment<Category> {
+
+	@Override
+	public int getKey() {
+		return R.string.catalogs_key_category;
+	}
+
 	@Override
 	protected String getTitle() {
 		return getString(R.string.catalogs_category);
-	}
-
-	@Override
-	protected View.OnClickListener getAddHandler() {
-		return new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				GeneralDialogFragment addItemDialog = new CategoryDialogFragment();
-				addItemDialog.setTargetFragment(CategoryFragment.this, ADD);
-				addItemDialog.show(getFragmentManager(), ADD_DATE);
-			}
-		};
-	}
-
-	@Override
-	protected CatalogDS getDS() {
-		return new CategoriesDS(getActivity());
 	}
 
 	@Override
@@ -45,46 +30,13 @@ public class CategoryFragment extends CatalogFragment<Category> {
 	}
 
 	@Override
-	protected boolean isEntityUsed(long idCategory) {
-		return getDS().isUsed(idCategory);
+	protected CatalogDS getDS() {
+		return new CategoriesDS(getActivity());
 	}
 
 	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		switch (loader.getId()) {
-			case DATA_LOADER:
-				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
-					mCatalog = mSaveListRotate;
-					mAdapterRV.notifyDataSetChanged();
-
-					if (mLastEditId != -1) {
-						mCatalogRV.scrollToPosition(getPosition(mLastEditId));
-					}
-				} else if (mSaveListRotate == null && data.moveToFirst()) {
-					mCatalog = ((CategoryCursor) data).getEntities();
-					mAdapterRV.notifyDataSetChanged();
-
-					if (mLastEditId != -1) {
-						mCatalogRV.scrollToPosition(getPosition(mLastEditId));
-					}
-				}
-
-				break;
-			default:
-				break;
-		}
-	}
-
-	@Override
-	protected void showEditDialog(int position) {
-		GeneralDialogFragment editItemDialog = CategoryDialogFragment.newInstance(mCatalog.get(position));
-		editItemDialog.setTargetFragment(CategoryFragment.this, EDIT);
-		editItemDialog.show(getFragmentManager(), EDIT_DATE);
-	}
-
-	@Override
-	public int getKey() {
-		return R.string.catalogs_key_category;
+	protected GeneralDialogFragment getDialog() {
+		return new CategoryDialogFragment();
 	}
 
 	private class CategoryAdapter extends RecyclerViewAdapter<CategoryAdapter.CategoryHolder> {

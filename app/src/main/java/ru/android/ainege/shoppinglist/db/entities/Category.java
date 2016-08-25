@@ -2,30 +2,51 @@ package ru.android.ainege.shoppinglist.db.entities;
 
 import java.util.ArrayList;
 
-public class Category extends Catalog {
+public class Category implements Catalog {
+	private long mId;
+	private String mName;
 	private int mColor;
 	private ArrayList<ShoppingList> mItemsByCategoriesInList;
 
 	private double mSpentSum;
 	private int mBoughtItemsCount;
 
-	public Category(Category category) {
-		this(category.getId(), category.getName(), category.getColor());
-	}
-
 	public Category(String name, int color) {
-		super(name);
+		mName = name;
 		mColor = color;
 	}
 
 	public Category(long id, String name, int color) {
-		super(id, name);
-		mColor = color;
+		this(name, color);
+		mId = id;
+	}
+
+	public Category(Category category) {
+		this(category.getId(), category.getName(), category.getColor());
 	}
 
 	public Category(ArrayList<ShoppingList> itemsByCategories) {
-		super(null);
 		mItemsByCategoriesInList = itemsByCategories;
+	}
+
+	@Override
+	public long getId() {
+		return mId;
+	}
+
+	@Override
+	public void setId(long id) {
+		mId = id;
+	}
+
+	@Override
+	public String getName() {
+		return mName;
+	}
+
+	@Override
+	public void setName(String name) {
+		mName = name;
 	}
 
 	public int getColor() {
@@ -34,6 +55,11 @@ public class Category extends Catalog {
 
 	public void setColor(int color) {
 		mColor = color;
+	}
+
+	@Override
+	public String toString() {
+		return mName;
 	}
 
 	public ArrayList<ShoppingList> getItemsByCategoryInList() {

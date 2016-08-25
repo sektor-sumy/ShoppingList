@@ -19,16 +19,6 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 
 	private LobsterPicker mLobsterPicker;
 
-	public static CategoryDialogFragment newInstance(Category category) {
-		Bundle args = new Bundle();
-		args.putSerializable(ITEM, category);
-
-		CategoryDialogFragment fragment = new CategoryDialogFragment();
-		fragment.setArguments(args);
-
-		return fragment;
-	}
-
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);

@@ -14,16 +14,6 @@ public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 	private TextInputLayout mSymbolInputLayout;
 	private EditText mSymbol;
 
-	public static CurrencyDialogFragment newInstance(Currency currency) {
-		Bundle args = new Bundle();
-		args.putSerializable(ITEM, currency);
-
-		CurrencyDialogFragment fragment = new CurrencyDialogFragment();
-		fragment.setArguments(args);
-
-		return fragment;
-	}
-
 	@Override
 	protected View setupView() {
 		View v = super.setupView();
