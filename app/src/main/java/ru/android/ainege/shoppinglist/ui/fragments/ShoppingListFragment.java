@@ -253,7 +253,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			if (savedInstanceState.getBoolean(STATE_ACTION_MODE)) {
 				mIsStartActionMode = true;
-				mAdapterRV.setSelectedItems((ArrayList<ShoppingList>) savedInstanceState.getSerializable(STATE_ACTION_DATA));
+				mAdapterRV.setSelectedItems((ArrayList) savedInstanceState.getSerializable(STATE_ACTION_DATA));
 			}
 		}
 
@@ -598,8 +598,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					mAdapterRV.setData(categories, mList.getCurrency().getSymbol(), mIsUseCategory, mIsCollapsedCategory);     //update data in adapter
 
 					if (item != null) {
-						int itemPosition = mAdapterRV.mItemList.indexOf(item);
-						int position = itemPosition != -1 ? itemPosition : mAdapterRV.mItemList.indexOf(item.getCategory());
+						int itemPosition = mAdapterRV.getItemList().indexOf(item);
+						int position = itemPosition != -1 ? itemPosition : mAdapterRV.getItemList().indexOf(item.getCategory());
 						mItemsListRV.scrollToPosition(position);
 					}
 
@@ -646,7 +646,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			categories.add(new Category(itemsInList));
 
 			for (ShoppingList item : itemsInList) {
-				item.getCategory().setItemsByCategoryInList(itemsInList);
+				item.getCategory().setItemsByCategories(itemsInList);
 			}
 		}
 
@@ -656,10 +656,12 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private ShoppingList getDetailsItem(ArrayList<Category> categories) {
 		if (mItemDetailsId != -1) {
 			for (Category c : categories) {
-				for (ShoppingList item : c.getItemsByCategoryInList()) {
-					if (item.getIdItem() == mItemDetailsId) {
+				for (Object item : c.getItemsByCategories()) {
+					ShoppingList itemInList = (ShoppingList) item;
+
+					if (itemInList.getIdItem() == mItemDetailsId) {
 						mItemDetailsId = -1;
-						return item;
+						return itemInList;
 					}
 				}
 			}
@@ -828,7 +830,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		mActionMode = getActivity().startActionMode(mActionModeCallback);
 		mAdapterRV.selectItem(itemInList);
-		mItemsListRV.scrollToPosition(mAdapterRV.mItemList.indexOf(itemInList));
+		mItemsListRV.scrollToPosition(mAdapterRV.getItemList().indexOf(itemInList));
 	}
 
 	private void onItemLongClick(Category category) {
@@ -841,7 +843,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		mActionMode = getActivity().startActionMode(mActionModeCallback);
 		mAdapterRV.selectAllItemsInCategory(category);
-		mItemsListRV.scrollToPosition(mAdapterRV.mItemList.indexOf(category));
+		mItemsListRV.scrollToPosition(mAdapterRV.getItemList().indexOf(category));
 	}
 
 	private void onItemSwipeRight(ShoppingList itemInList, int position) {
@@ -850,7 +852,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 
 		ShoppingListAdapter.ItemViewHolder holder = (ShoppingListAdapter.ItemViewHolder) mItemsListRV.findViewHolderForAdapterPosition(position);
-		int categoryPosition = mAdapterRV.mItemList.indexOf(itemInList.getCategory());
+		int categoryPosition = mAdapterRV.getItemList().indexOf(itemInList.getCategory());
 		Category category = itemInList.getCategory();
 		boolean isBought = !itemInList.isBought();
 
@@ -863,13 +865,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		//if set bought items in the end of list - refresh position
 		if (mIsBoughtEndInList) {
-			int oldPositionInCategory = category.getItemsByCategoryInList().indexOf(itemInList);
-			ShoppingList.sort(category.getItemsByCategoryInList());
-			int newPositionInCategory = category.getItemsByCategoryInList().indexOf(itemInList);
+			int oldPositionInCategory = category.getItemsByCategories().indexOf(itemInList);
+			ShoppingList.sort(category.getItemsByCategories());
+			int newPositionInCategory = category.getItemsByCategories().indexOf(itemInList);
 			int toPosition = position + (newPositionInCategory - oldPositionInCategory);
 
-			mAdapterRV.mItemList.remove(itemInList);
-			mAdapterRV.mItemList.add(toPosition, itemInList);
+			mAdapterRV.getItemList().remove(itemInList);
+			mAdapterRV.getItemList().add(toPosition, itemInList);
 
 			if (toPosition != -1 && position != toPosition) {
 				mAdapterRV.notifyItemMoved(position, toPosition);

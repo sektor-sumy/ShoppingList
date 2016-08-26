@@ -6,7 +6,7 @@ public class Category implements Catalog {
 	private long mId;
 	private String mName;
 	private int mColor;
-	private ArrayList<ShoppingList> mItemsByCategoriesInList;
+	private ArrayList mItemsByCategories;
 
 	private double mSpentSum;
 	private int mBoughtItemsCount;
@@ -25,8 +25,8 @@ public class Category implements Catalog {
 		this(category.getId(), category.getName(), category.getColor());
 	}
 
-	public Category(ArrayList<ShoppingList> itemsByCategories) {
-		mItemsByCategoriesInList = itemsByCategories;
+	public Category(ArrayList itemsByCategories) {
+		mItemsByCategories = itemsByCategories;
 	}
 
 	@Override
@@ -62,12 +62,12 @@ public class Category implements Catalog {
 		return mName;
 	}
 
-	public ArrayList<ShoppingList> getItemsByCategoryInList() {
-		return mItemsByCategoriesInList;
+	public ArrayList getItemsByCategories() {
+		return mItemsByCategories;
 	}
 
-	public void setItemsByCategoryInList(ArrayList<ShoppingList> itemsByCategoryInList) {
-		mItemsByCategoriesInList = itemsByCategoryInList;
+	public void setItemsByCategories(ArrayList itemsByCategories) {
+		mItemsByCategories = itemsByCategories;
 	}
 
 	public double getSpentSum() {
@@ -98,8 +98,8 @@ public class Category implements Catalog {
 	public int countBoughtItems() {
 		mBoughtItemsCount = 0;
 
-		for (ShoppingList item : mItemsByCategoriesInList) {
-			if (item.isBought()) {
+		for (Object item : mItemsByCategories) {
+			if (((ShoppingList) item).isBought()) {
 				mBoughtItemsCount++;
 			}
 		}
@@ -110,9 +110,11 @@ public class Category implements Catalog {
 	private double sum(boolean onlyBought) {
 		double sum = 0;
 
-		for (ShoppingList item : mItemsByCategoriesInList) {
-			if ((onlyBought && item.isBought()) || !onlyBought) {
-				sum += item.getSum();
+		for (Object item : mItemsByCategories) {
+			ShoppingList itemInList = ((ShoppingList) item);
+
+			if ((onlyBought && itemInList.isBought()) || !onlyBought) {
+				sum += itemInList.getSum();
 			}
 		}
 

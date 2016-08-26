@@ -2,7 +2,7 @@ package ru.android.ainege.shoppinglist.db.entities;
 
 import java.io.Serializable;
 
-public class ItemData implements Serializable {
+public abstract class ItemData implements Serializable {
 	protected long mIdItemData;
 	protected double mAmount;
 	protected long mIdUnit;
@@ -15,6 +15,9 @@ public class ItemData implements Serializable {
 
 	protected ItemData() {
 	}
+
+	public abstract long getIdItem();
+	public abstract void setIdItem(long id);
 
 	public ItemData(ItemData itemData) {
 		mIdItemData = itemData.getIdItemData();

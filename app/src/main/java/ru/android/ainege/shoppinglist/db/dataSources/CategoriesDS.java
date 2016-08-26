@@ -166,7 +166,7 @@ public class CategoriesDS extends CatalogDS<Category> implements TableInterface.
 				}
 
 				ShoppingList.sort(itemsInCategory);
-				category.setItemsByCategoryInList(itemsInCategory);
+				category.setItemsByCategories(itemsInCategory);
 			}
 
 			return category;

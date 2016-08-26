@@ -3,12 +3,13 @@ package ru.android.ainege.shoppinglist.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.android.ainege.shoppinglist.db.entities.ItemData;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 
 
 public class MultiSelection {
 	private static MultiSelection sInstance;
-	private ArrayList<ShoppingList> mSelectedItems = new ArrayList<>();
+	private ArrayList<ItemData> mSelectedItems = new ArrayList<>();
 
 	public static MultiSelection getInstance() {
 		if (sInstance == null) {
@@ -18,15 +19,15 @@ public class MultiSelection {
 		return sInstance;
 	}
 
-	public ArrayList<ShoppingList> getSelectedItems() {
+	public ArrayList<ItemData> getSelectedItems() {
 		return mSelectedItems;
 	}
 
-	public void setSelectedItems(ArrayList<ShoppingList> selectedItems) {
+	public void setSelectedItems(ArrayList<ItemData> selectedItems) {
 		mSelectedItems = selectedItems;
 	}
 
-	public boolean isContains(ShoppingList item) {
+	public boolean isContains(ItemData item) {
 		return mSelectedItems.contains(item);
 	}
 
@@ -38,11 +39,11 @@ public class MultiSelection {
 		mSelectedItems.clear();
 	}
 
-	public void toggleSelection(ShoppingList item) {
+	public void toggleSelection(ItemData item) {
 		toggleSelection(item, true);
 	}
 
-	private void toggleSelection(ShoppingList item, boolean removeIfExist) {
+	private void toggleSelection(ItemData item, boolean removeIfExist) {
 		if (mSelectedItems.contains(item)) {
 			if (removeIfExist) {
 				for (int i = 0; i < mSelectedItems.size(); i++) {
@@ -61,7 +62,7 @@ public class MultiSelection {
 		boolean isAllSelected = checkAllBoughtSelected(items, isBought);
 
 		for (Object item : items) {
-			if (item instanceof ShoppingList && ((ShoppingList) item).isBought() == isBought) {
+			if (item instanceof ItemData && ((ShoppingList) item).isBought() == isBought) {
 				//if all item selected - remove selection from them
 				//else select items
 				toggleSelection((ShoppingList) item, isAllSelected);
@@ -81,16 +82,16 @@ public class MultiSelection {
 		return true;
 	}
 
-	public void selectAllItemsInCategory(List<ShoppingList> items) {
+	public void selectAllItemsInCategory(List<ItemData> items) {
 		boolean isAllSelected = checkAllSelected(items);
 
-		for (ShoppingList item : items) {
+		for (ItemData item : items) {
 			toggleSelection(item, isAllSelected);
 		}
 	}
 
-	private boolean checkAllSelected(List<ShoppingList> items) {
-		for (ShoppingList item : items) {
+	private boolean checkAllSelected(List<ItemData> items) {
+		for (ItemData item : items) {
 			if (!mSelectedItems.contains(item)) {
 				return false;
 			}

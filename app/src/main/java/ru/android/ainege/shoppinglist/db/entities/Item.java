@@ -1,6 +1,6 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
-public class Item extends ItemData {
+public class Item extends ItemData implements Catalog {
 	private long mId;
 	private String mName;
 	private String mDefaultImagePath;
@@ -32,20 +32,39 @@ public class Item extends ItemData {
 		mIdItemData = idData;
 	}
 
+	@Override
 	public long getId() {
 		return mId;
 	}
 
+	@Override
 	public void setId(long id) {
 		mId = id;
 	}
 
+	@Override
+	public long getIdItem() {
+		return getId();
+	}
+
+	@Override
+	public void setIdItem(long id) {
+		setId(id);
+	}
+
+	@Override
 	public String getName() {
 		return mName;
 	}
 
+	@Override
 	public void setName(String name) {
 		mName = name;
+	}
+
+	@Override
+	public String toString() {
+		return mName;
 	}
 
 	public String getDefaultImagePath() {
