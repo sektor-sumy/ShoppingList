@@ -22,6 +22,7 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 	protected List<Object> mItemList = new ArrayList<>();
 
 	protected Activity mActivity;
+	protected boolean mIsUseCategory;
 
 	protected abstract List<Object> generateParentChildItemList(List<Category> categoryList, boolean isCollapsedCategory);
 	protected abstract RecyclerView.ViewHolder onCreateCategoryViewHolder(ViewGroup parent);

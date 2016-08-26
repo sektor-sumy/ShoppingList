@@ -62,5 +62,8 @@
 
 	<!--navigation drawer-->
 	<dimen name="header_height">160dp</dimen>
+	<!--catalog-->
+	<item name="catalog_name_weight" format="float" type="dimen">0.7</item>
+	<item name="catalog_unit_weight" format="float" type="dimen">0.3</item>
 
 </resources>

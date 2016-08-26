@@ -33,4 +33,8 @@
 	<!--navigation drawer-->
 	<dimen name="header_height">180dp</dimen>
 
+	<!--catalog-->
+	<item name="catalog_name_weight" format="float" type="dimen">0.6</item>
+	<item name="catalog_unit_weight" format="float" type="dimen">0.4</item>
+
 </resources>

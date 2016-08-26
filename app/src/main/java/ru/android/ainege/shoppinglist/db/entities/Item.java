@@ -1,5 +1,9 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 public class Item extends ItemData implements Catalog {
 	private long mId;
 	private String mName;
@@ -85,5 +89,14 @@ public class Item extends ItemData implements Catalog {
 
 	public boolean isNew() {
 		return mId == 0;
+	}
+
+	public static void sort(ArrayList<Item> itemsInList) {
+		Collections.sort(itemsInList, new Comparator<Item>() {
+			@Override
+			public int compare(Item lhs, Item rhs) {
+				return lhs.getName().compareToIgnoreCase(rhs.getName());
+			}
+		});
 	}
 }

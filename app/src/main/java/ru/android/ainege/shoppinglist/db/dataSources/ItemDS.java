@@ -5,36 +5,61 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+
 import ru.android.ainege.shoppinglist.db.TableInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.CategoriesInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.ItemDataInterface;
+import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Item;
-import ru.android.ainege.shoppinglist.db.entities.ItemData;
+import ru.android.ainege.shoppinglist.db.entities.Unit;
 
-public class ItemDS extends GenericDS<Item> implements TableInterface.ItemsInterface {
+public class ItemDS extends CatalogDS<Item> implements TableInterface.ItemsInterface {
 
 	public ItemDS(Context context) {
 		super(context);
 	}
 
 	@Override
-	public EntityCursor<ItemData> getAll() {
+	public ItemCursor getAll() {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
+				ItemDataInterface.TABLE_NAME + ".*, " +
+				TableInterface.UnitsInterface.COLUMN_NAME + ", " +
+				CategoriesInterface.COLUMN_NAME + ", " +
+				CategoriesInterface.COLUMN_COLOR +
+				" FROM " + TABLE_NAME +
+				" INNER JOIN " + ItemDataInterface.TABLE_NAME + " ON " +
+				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
+				" INNER JOIN " + TableInterface.UnitsInterface.TABLE_NAME + " ON " +
+				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_UNIT + " = " + TableInterface.UnitsInterface.TABLE_NAME + "." + TableInterface.UnitsInterface.COLUMN_ID +
+				" INNER JOIN " + CategoriesInterface.TABLE_NAME + " ON " +
+				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " + CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID,
+				null);
+		return new ItemCursor(cursor);
+	}
+
+	@Override // TODO: 25.08.2016  
+	public ItemCursor getAll(long withoutId) {
 		return null;
 	}
 
+	@Override // TODO: 25.08.2016  
+	public boolean isUsed(long id) {
+		return false;
+	}
+
 	public ItemCursor getWithData(long id) {
-		Cursor cursor = getFullData(" WHERE " + TABLE_NAME + "." + COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
-		return new ItemCursor(cursor);
+		return getFullData(" WHERE " + TABLE_NAME + "." + COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 	}
 
 	public ItemCursor getWithData(String name) {
-		Cursor cursor = getFullData(" WHERE " + TABLE_NAME + "." + COLUMN_NAME + " like ?", new String[]{name});
-		return new ItemCursor(cursor);
+		return getFullData(" WHERE " + TABLE_NAME + "." + COLUMN_NAME + " like ?", new String[]{name});
 	}
 
-	private Cursor getFullData(String where, String[] params) {
+	private ItemCursor getFullData(String where, String[] params) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		return db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
+		Cursor cursor = db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
 				ItemDataInterface.COLUMN_AMOUNT + ", " +
 				ItemDataInterface.COLUMN_ID_UNIT + ", " +
 				ItemDataInterface.COLUMN_PRICE + ", " +
@@ -43,11 +68,12 @@ public class ItemDS extends GenericDS<Item> implements TableInterface.ItemsInter
 				" FROM " + TABLE_NAME + " INNER JOIN " + ItemDataInterface.TABLE_NAME + " ON " +
 				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
 				where, params);
+		return new ItemCursor(cursor);
 	}
 
 	public Cursor getNames(String substring) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
+		return db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
 				CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_COLOR +
 				" FROM " + TABLE_NAME +
 				" INNER JOIN " + ItemDataInterface.TABLE_NAME +
@@ -57,7 +83,6 @@ public class ItemDS extends GenericDS<Item> implements TableInterface.ItemsInter
 				" ON " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " +
 				CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID +
 				" WHERE " + COLUMN_NAME + " LIKE '%" + substring + "%'", null);
-		return cursor;
 	}
 
 	@Override
@@ -86,6 +111,11 @@ public class ItemDS extends GenericDS<Item> implements TableInterface.ItemsInter
 		db.delete(TABLE_NAME, COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 	}
 
+	@Override // TODO: 25.08.2016
+	public void delete(long id, long newId) {
+
+	}
+
 	private ContentValues createContentValues(Item item) {
 		ContentValues values = new ContentValues();
 		values.put(COLUMN_NAME, item.getName());
@@ -95,9 +125,33 @@ public class ItemDS extends GenericDS<Item> implements TableInterface.ItemsInter
 		return values;
 	}
 
-	public static class ItemCursor extends EntityCursor<Item> {
+	public static class ItemCursor extends CatalogCursor<Item> {
 		public ItemCursor(Cursor cursor) {
 			super(cursor);
+		}
+
+		public ArrayList<Category> getEntities (ArrayList<Category> categories){
+			ArrayList<Category> res = new ArrayList<>();
+			ArrayList<Item> items = getEntities();
+			Item.sort(items);
+
+			for (Item item : items) {
+				for (Category category : categories) {
+					if (category.getId() == item.getIdCategory()) {
+						item.setCategory(category);
+						category.addItem(item);
+						break;
+					}
+				}
+			}
+
+			for (Category category : categories) {
+				if (category.getItemsByCategories().size() > 0) {
+					res.add(category);
+				}
+			}
+
+			return res;
 		}
 
 		public Item getEntity() {
@@ -111,10 +165,25 @@ public class ItemDS extends GenericDS<Item> implements TableInterface.ItemsInter
 
 			if (getColumnIndex(ItemDataInterface.COLUMN_AMOUNT) != -1) {
 				item.setAmount(getDouble(getColumnIndex(ItemDataInterface.COLUMN_AMOUNT)));
-				item.setIdUnit(getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_UNIT)));
 				item.setPrice(getDouble(getColumnIndex(ItemDataInterface.COLUMN_PRICE)));
-				item.setIdCategory(getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_CATEGORY)));
 				item.setComment(getString(getColumnIndex(ItemDataInterface.COLUMN_COMMENT)));
+
+				long idUnit = getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_UNIT));
+				if (getColumnIndex(TableInterface.UnitsInterface.COLUMN_NAME) != -1) {
+					String unitName = getString(getColumnIndex(TableInterface.UnitsInterface.COLUMN_NAME));
+					item.setUnit(new Unit(idUnit, unitName));
+				} else {
+					item.setIdUnit(idUnit);
+				}
+
+				long idCategory = getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_CATEGORY));
+				if (getColumnIndex(CategoriesInterface.COLUMN_NAME) != -1) {
+					String categoryName = getString(getColumnIndex(CategoriesInterface.COLUMN_NAME));
+					int color = getInt(getColumnIndex(CategoriesInterface.COLUMN_COLOR));
+					item.setCategory(new Category(idCategory, categoryName, color));
+				} else {
+					item.setIdCategory(idCategory);
+				}
 			}
 
 			return item;

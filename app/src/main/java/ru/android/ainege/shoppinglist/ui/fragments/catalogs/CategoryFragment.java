@@ -1,9 +1,13 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
+import android.database.Cursor;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
@@ -20,12 +24,12 @@ public class CategoryFragment extends CatalogFragment<Category> {
 	}
 
 	@Override
-	protected String getTitle() {
+	protected String getTitle(Toolbar toolbar) {
 		return getString(R.string.catalogs_category);
 	}
 
 	@Override
-	protected RecyclerViewAdapter getAdapter() {
+	protected CatalogAdapter getAdapter() {
 		return new CategoryAdapter();
 	}
 
@@ -37,6 +41,11 @@ public class CategoryFragment extends CatalogFragment<Category> {
 	@Override
 	protected GeneralDialogFragment getDialog() {
 		return new CategoryDialogFragment();
+	}
+
+	@Override
+	protected ArrayList getCatalog(Cursor data) {
+		return ((CatalogDS.CatalogCursor<Category>) data).getEntities();
 	}
 
 	private class CategoryAdapter extends RecyclerViewAdapter<CategoryAdapter.CategoryHolder> {

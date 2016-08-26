@@ -6,7 +6,7 @@ public class Category implements Catalog {
 	private long mId;
 	private String mName;
 	private int mColor;
-	private ArrayList mItemsByCategories;
+	private ArrayList mItemsByCategories = new ArrayList();
 
 	private double mSpentSum;
 	private int mBoughtItemsCount;
@@ -68,6 +68,10 @@ public class Category implements Catalog {
 
 	public void setItemsByCategories(ArrayList itemsByCategories) {
 		mItemsByCategories = itemsByCategories;
+	}
+
+	public void addItem(Item item) {
+		mItemsByCategories.add(item);
 	}
 
 	public double getSpentSum() {

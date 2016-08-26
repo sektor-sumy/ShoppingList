@@ -114,8 +114,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 				onLastListSelected();
 				break;
 			case R.id.nav_catalog_items:
-				//onCatalogSelected(R.string.catalogs_key_item);
-				Toast.makeText(getApplicationContext(), getString(R.string.catalogs_items), Toast.LENGTH_SHORT).show();
+				onCatalogSelected(R.string.catalogs_key_item);
 				break;
 			case R.id.nav_catalog_catalogs:
 				onCatalogSelected(R.string.catalogs_key_category);

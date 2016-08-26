@@ -12,8 +12,6 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -41,8 +39,8 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	protected static final String ADD_DATE = "addItemDialog";
 	protected static final String EDIT_DATE = "editItemDialog";
 	protected static final int DATA_LOADER = 0;
-	private static final int DELETE = 3;
-	private static final String DELETE_DATE = "answerListDialog";
+	protected static final int DELETE = 3;
+	protected static final String DELETE_DATE = "answerListDialog";
 	private static final String STATE_LIST = "state_list";
 	private static final String STATE_LAST_EDIT_ID = "state_last_edit_id";
 
@@ -50,17 +48,18 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 
 	protected ArrayList<T> mCatalog;
 	protected ArrayList<T> mSaveListRotate;
-	protected RecyclerViewAdapter mAdapterRV;
+	protected CatalogAdapter mAdapterRV;
 	protected RecyclerView mCatalogRV;
 
 	HashMap<Integer, Long> mLastEditIds;
 	protected long mLastEditId = -1;
 
 	public abstract int getKey();
-	protected abstract String getTitle();
-	protected abstract RecyclerViewAdapter getAdapter();
+	protected abstract String getTitle(Toolbar toolbar);
+	protected abstract CatalogAdapter getAdapter();
 	protected abstract CatalogDS getDS();
 	protected abstract GeneralDialogFragment getDialog();
+	protected abstract ArrayList getCatalog(Cursor data);
 
 	@TargetApi(23)
 	@Override
@@ -104,20 +103,15 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		View v = inflater.inflate(R.layout.fragment_catalog, container, false);
 
 		Toolbar toolbar = (Toolbar) v.findViewById(R.id.main_toolbar);
-		((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
 		boolean isLandscape = getResources().getBoolean(R.bool.isLandscape);
 		boolean isTablet = getResources().getBoolean(R.bool.isTablet);
 
 		if (isTablet || (!isTablet && isLandscape)) {
 			Toolbar cardToolbar = (Toolbar) v.findViewById(R.id.toolbar);
-			cardToolbar.setTitle(getTitle());
+			cardToolbar.setTitle(getTitle(cardToolbar));
 		} else if (!isLandscape) {
-			ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-
-			if (actionBar != null) {
-				actionBar.setTitle(getTitle());
-			}
+			toolbar.setTitle(getTitle(toolbar));
 		}
 
 		FloatingActionButton mFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
@@ -132,7 +126,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 
 		mCatalogRV = (RecyclerView) v.findViewById(R.id.list);
 		mCatalogRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-		mCatalogRV.setAdapter(mAdapterRV);
+		mCatalogRV.setAdapter((RecyclerView.Adapter) mAdapterRV);
 
 		mOnCreateViewListener.onCreateViewListener(this, toolbar);
 
@@ -180,10 +174,10 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
 					mCatalog = mSaveListRotate;
 				} else if (mSaveListRotate == null && data.moveToFirst()) {
-					mCatalog = ((CatalogDS.CatalogCursor<T>) data).getEntities();
+					mCatalog = getCatalog(data);
 				}
 
-				mAdapterRV.notifyDataSetChanged();
+				mAdapterRV.setData(mCatalog);
 
 				if (mLastEditId != -1) {
 					mCatalogRV.scrollToPosition(getPosition(mLastEditId));
@@ -271,7 +265,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
-	private void deleteItem(int position, long newId) {
+	protected void deleteItem(int position, long newId) {
 		if (position != -1) {
 			T d = mCatalog.get(position);
 
@@ -283,6 +277,11 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 
 			mAdapterRV.removeItem(position);
 		}
+	}
+
+	interface CatalogAdapter {
+		void setData(ArrayList catalog);
+		void removeItem(int position);
 	}
 
 	private static class DataCursorLoader extends CursorLoader {
@@ -299,7 +298,17 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		}
 	}
 
-	public abstract class RecyclerViewAdapter<S extends RecyclerViewAdapter.ViewHolder> extends RecyclerView.Adapter<S> {
+	public abstract class RecyclerViewAdapter<S extends RecyclerViewAdapter.ViewHolder> extends RecyclerView.Adapter<S>
+														implements CatalogAdapter {
+		protected ArrayList<T> mCatalog;
+
+		public abstract S onCreateViewHolder(ViewGroup parent, int viewType);
+
+		@Override
+		public void setData(ArrayList catalog) {
+			mCatalog = catalog;
+			notifyDataSetChanged();
+		}
 
 		@Override
 		public void onBindViewHolder(S holder, int position) {
@@ -311,6 +320,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 			return mCatalog != null ? mCatalog.size() : 0;
 		}
 
+		@Override
 		public void removeItem(int position) {
 			mCatalog.remove(position);
 			notifyItemRemoved(position);

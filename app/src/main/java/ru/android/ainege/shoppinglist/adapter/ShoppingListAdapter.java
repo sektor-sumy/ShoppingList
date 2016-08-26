@@ -29,7 +29,6 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 
 public class ShoppingListAdapter extends NestedListAdapter {
 	private String mCurrency;
-	private boolean mIsUseCategory;
 
 	private ShowcaseListener mShowcaseListener;
 	private boolean mIsShowShowcase = false;
@@ -101,6 +100,7 @@ public class ShoppingListAdapter extends NestedListAdapter {
 		} else {
 			category = categoryList.get(0);
 			int childListItemCount = category.getItemsByCategories().size();
+
 			for (int j = 0; j < childListItemCount; j++) {
 				list.add(category.getItemsByCategories().get(j));
 			}
@@ -144,11 +144,6 @@ public class ShoppingListAdapter extends NestedListAdapter {
 	}
 
 	@Override
-	protected GenericDS getDS() {
-		return new ShoppingListDS(mActivity);
-	}
-
-	@Override
 	public void onBindItemViewHolder(ItemVH viewHolder, int position, ItemData item) {
 		ItemViewHolder holder = (ItemViewHolder) viewHolder;
 		ShoppingList itemInList = (ShoppingList) item;
@@ -182,6 +177,11 @@ public class ShoppingListAdapter extends NestedListAdapter {
 
 		holder.mPrice.setText(getValueWithCurrency(itemInList.getPrice()));
 		holder.mIsBought.setVisibility(itemInList.isBought() ? View.VISIBLE : View.GONE);
+	}
+
+	@Override
+	protected GenericDS getDS() {
+		return new ShoppingListDS(mActivity);
 	}
 
 	@Override

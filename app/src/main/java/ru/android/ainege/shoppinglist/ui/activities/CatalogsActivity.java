@@ -13,6 +13,7 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CatalogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CategoryFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CurrencyFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.ItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.UnitFragment;
 
 public class CatalogsActivity extends SingleFragmentActivity {
@@ -37,7 +38,9 @@ public class CatalogsActivity extends SingleFragmentActivity {
 		Intent intent = getIntent();
 		String type = intent.getStringExtra(EXTRA_TYPE);
 
-		if (type.equals(getString(R.string.catalogs_key_currency))) {
+		if (type.equals(getString(R.string.catalogs_key_item))) {
+			mCatalogFragment = new ItemFragment();
+		} else if (type.equals(getString(R.string.catalogs_key_currency))) {
 			mCatalogFragment = new CurrencyFragment();
 		} else if (type.equals(getString(R.string.catalogs_key_unit))) {
 			mCatalogFragment = new UnitFragment();
