@@ -41,18 +41,18 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	protected static final int DATA_LOADER = 0;
 	protected static final int DELETE = 3;
 	protected static final String DELETE_DATE = "answerListDialog";
-	private static final String STATE_LIST = "state_list";
+	private static final String STATE_SCROLL_POSITION = "state_scroll_position";
 	private static final String STATE_LAST_EDIT_ID = "state_last_edit_id";
 
 	private OnCreateViewListener mOnCreateViewListener;
 
 	protected ArrayList<T> mCatalog;
-	protected ArrayList<T> mSaveListRotate;
 	protected CatalogAdapter mAdapterRV;
 	protected RecyclerView mCatalogRV;
 
-	HashMap<Integer, Long> mLastEditIds;
+	protected HashMap<Integer, Long> mLastEditIds;
 	protected long mLastEditId = -1;
+	protected int mScrollToPosition = -1;
 
 	public abstract int getKey();
 	protected abstract String getTitle(Toolbar toolbar);
@@ -91,8 +91,8 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		mAdapterRV = getAdapter();
 
 		if (savedInstanceState != null) {
-			mSaveListRotate = (ArrayList<T>) savedInstanceState.getSerializable(STATE_LIST);
 			mLastEditId = savedInstanceState.getLong(STATE_LAST_EDIT_ID);
+			mScrollToPosition = savedInstanceState.getInt(STATE_SCROLL_POSITION);
 		}
 
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
@@ -150,7 +150,8 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-		outState.putSerializable(STATE_LIST, mCatalog);
+		int firstVisiblePosition = ((LinearLayoutManager) mCatalogRV.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+		outState.putInt(STATE_SCROLL_POSITION, firstVisiblePosition);
 		outState.putLong(STATE_LAST_EDIT_ID, mLastEditId);
 	}
 
@@ -171,16 +172,14 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		switch (loader.getId()) {
 			case DATA_LOADER:
-				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
-					mCatalog = mSaveListRotate;
-				} else if (mSaveListRotate == null && data.moveToFirst()) {
+				if (data.moveToFirst()) {
 					mCatalog = getCatalog(data);
-				}
 
-				mAdapterRV.setData(mCatalog);
+					mAdapterRV.setData(mCatalog);
 
-				if (mLastEditId != -1) {
-					mCatalogRV.scrollToPosition(getPosition(mLastEditId));
+					if (mScrollToPosition != -1) {
+						mCatalogRV.scrollToPosition(mScrollToPosition);
+					}
 				}
 
 				break;
@@ -261,7 +260,6 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	}
 
 	private void updateData() {
-		mSaveListRotate = null;
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 

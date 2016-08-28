@@ -130,7 +130,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 
 	@Override
 	public void onItemSave(long id, boolean isAdded, boolean isClose) {
-		mShoppingListFragment.setItemDetailsId(id);
+		mShoppingListFragment.setLastItemId(id);
 		mShoppingListFragment.updateData();
 
 		if (mState.isLandscape()) {

@@ -50,8 +50,8 @@ import static ru.android.ainege.shoppinglist.db.dataSources.ListsDS.ListCursor;
 public class ListsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final String APP_PREFERENCES = "shopping_list_settings";
 	private static final String APP_PREFERENCES_ID = "idList";
-	private static final String STATE_LISTS = "state_lists";
 	private static final String STATE_IS_UPDATE_DATA = "state_is_update_data";
+	private static final String STATE_SCROLL_POSITION = "state_scroll_position";
 
 	private static final int ADD_LIST = 1;
 	private static final int EDIT_LIST = 2;
@@ -59,7 +59,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final String ADD_LIST_DATE = "addListDialog";
 	private static final String EDIT_LIST_DATE = "editListDialog";
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
-	private static final int DATA_LOADER = 0;
+	private static final int DATA_LOADER = 100;
 	private static final int HANDLER_LOAD_FINISHED = 1;
 
 	private OnCreateViewListener mOnCreateViewListener;
@@ -71,7 +71,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ArrayList<List> mLists = new ArrayList<>();
 	private ListsDS mListsDS;
 	private boolean mIsLandscapeTablet;
-	private long mAddIdList = -1;
+	private long mLastListId = -1;
+	protected int mScrollToPosition = -1;
 
 	private RecyclerView mListsRV;
 	private ListsAdapter mAdapterRV;
@@ -79,7 +80,6 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ProgressBar mProgressBar;
 	private ImageView mEmptyImage;
 
-	private ArrayList<List> mSaveListRotate;
 	private boolean mIsUpdateData = false;
 
 	@SuppressLint("HandlerLeak")
@@ -134,10 +134,11 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mIsLandscapeTablet = getResources().getBoolean(R.bool.isTablet) && getResources().getBoolean(R.bool.isLandscape);
 
 		if (savedInstanceState != null) {
-			mSaveListRotate = (ArrayList<List>) savedInstanceState.getSerializable(STATE_LISTS);
 			mIsUpdateData = savedInstanceState.getBoolean(STATE_IS_UPDATE_DATA);
+			mScrollToPosition = savedInstanceState.getInt(STATE_SCROLL_POSITION);
 		}
 
+		// TODO: 28.08.2016 bug in support lib, not save loader after rotate
 		getLoaderManager().initLoader(DATA_LOADER, null, this);
 	}
 
@@ -211,7 +212,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-		outState.putSerializable(STATE_LISTS, mLists);
+		int firstVisiblePosition = ((LinearLayoutManager) mListsRV.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+		outState.putInt(STATE_SCROLL_POSITION, firstVisiblePosition);
 		outState.putBoolean(STATE_IS_UPDATE_DATA, mIsUpdateData);
 	}
 
@@ -226,14 +228,15 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		switch (requestCode) {
 			case ADD_LIST:
 				updateData();
-				mAddIdList = data.getLongExtra(ListDialogFragment.ID_LIST, -1);
+				mLastListId = data.getLongExtra(ListDialogFragment.ID_LIST, -1);
 
 				if (mIsLandscapeTablet && mOnListSelectListener != null) {
-					mOnListSelectListener.onListClick(mAddIdList);
+					mOnListSelectListener.onListClick(mLastListId);
 				}
 				break;
 			case EDIT_LIST:
 				updateData();
+				mLastListId = data.getLongExtra(ListDialogFragment.ID_LIST, -1);
 
 				if (mOnListChangedListener != null) {
 					mOnListChangedListener.onListUpdated(data.getLongExtra(ListDialogFragment.ID_LIST, -1));
@@ -288,10 +291,8 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 					mProgressBar.setVisibility(View.GONE);
 				}
 
-				if (mSaveListRotate == null && data.moveToFirst()) {
+				if (data.moveToFirst()) {
 					setLists(((ListCursor) data).getEntities());
-				} else if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
-					setLists(mSaveListRotate);
 				} else {
 					showEmptyStates();
 				}
@@ -324,15 +325,30 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 		mOnDialogShownListener = onDialogShownListener;
 	}
 
+	public void scrollToList() {
+		int position;
+
+		if (mIsLandscapeTablet && mOnListChangedListener != null) {
+			position = getPosition(mOnListChangedListener.getLastSelectedListId());
+		} else if (mLastListId != -1){
+			position = getPosition(mLastListId);
+			mLastListId = -1;
+		} else {
+			position = mScrollToPosition;
+		}
+
+		if (position != -1) {
+			mListsRV.scrollToPosition(position);
+		}
+	}
+
 	public void scrollToList(long id) {
 		if (id != -1) {
 			mListsRV.scrollToPosition(getPosition(id));
-			mAddIdList = -1;
 		}
 	}
 
 	public void updateData() {
-		mSaveListRotate = null;
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
@@ -347,13 +363,9 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private void setLists(ArrayList<List> lists) {
 		mLists = lists;
 		mAdapterRV.setDate();
-		hideEmptyStates();
 
-		if (mIsLandscapeTablet && mOnListChangedListener != null) {
-			scrollToList(mOnListChangedListener.getLastSelectedListId());
-		} else {
-			scrollToList(mAddIdList);
-		}
+		hideEmptyStates();
+		scrollToList();
 
 		if (mOnListsLoadFinishedListener != null) {
 			mHandler.sendEmptyMessage(HANDLER_LOAD_FINISHED);

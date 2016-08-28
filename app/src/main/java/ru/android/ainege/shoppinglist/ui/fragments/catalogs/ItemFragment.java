@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ru.android.ainege.shoppinglist.R;
@@ -34,14 +35,24 @@ import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.MultiSelection;
 
 public class ItemFragment extends CatalogFragment<Item>{
+	private static final String STATE_COLLAPSE = "state_collapse";
+
 	private boolean mIsUseCategory;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		mIsUseCategory = mSharedPref.getBoolean(getString(R.string.settings_key_use_category), true);
+		if (savedInstanceState != null) {
+			((ItemAdapter) mAdapterRV).setCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_COLLAPSE));
+		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putSerializable(STATE_COLLAPSE, ((ItemAdapter) mAdapterRV).getCollapseCategoryStates());
 	}
 
 	@Override
@@ -60,7 +71,10 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 	@Override
 	protected CatalogAdapter getAdapter() {
-		return new ItemAdapter(getActivity());
+		SharedPreferences mSharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		mIsUseCategory = mSharedPref.getBoolean(getString(R.string.settings_key_use_category), true);
+
+		return new ItemAdapter(getActivity(), mIsUseCategory);
 	}
 
 	@Override
@@ -115,8 +129,9 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 	private class ItemAdapter extends NestedListAdapter implements CatalogAdapter {
 
-		public ItemAdapter(Activity activity) {
+		public ItemAdapter(Activity activity, boolean isUseCategory) {
 			super(activity);
+			mIsUseCategory = isUseCategory;
 		}
 
 		@Override
@@ -134,7 +149,17 @@ public class ItemFragment extends CatalogFragment<Item>{
 				for (int i = 0; i < categoryList.size(); i++) {
 					category = categoryList.get(i);
 					list.add(category);
-					setCollapseCategoryStates(category.getId(), true);
+
+					if (mCollapseCategoryStates.containsKey(category.getId()) &&
+							!mCollapseCategoryStates.get(category.getId())) {
+						int childListItemCount = category.getItemsByCategories().size();
+
+						for (int j = 0; j < childListItemCount; j++) {
+							list.add(category.getItemsByCategories().get(j));
+						}
+					} else {
+						setCollapseCategoryStates(category.getId(), true);
+					}
 				}
 			} else {
 				category = categoryList.get(0);

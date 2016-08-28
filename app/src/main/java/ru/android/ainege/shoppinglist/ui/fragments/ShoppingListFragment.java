@@ -36,7 +36,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,7 +71,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final String APP_PREFERENCES_ID = "idList";
 	private static final String ID_LIST = "idList";
 	private static final String STATE_COLLAPSE = "state_collapse";
-	private static final String STATE_ITEMS = "state_items";
+	private static final String STATE_SCROLL_POSITION = "state_scroll_position";
 	private static final String STATE_SPENT_SUM = "state_spent_sum";
 	private static final String STATE_TOTAL_SUM = "state_total_sum";
 	private static final String STATE_ACTION_MODE = "state_action_mode";
@@ -84,7 +83,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final int IS_DELETE_LIST = 4;
 	private static final String EDIT_ITEM_DATE = "editListDialog";
 	private static final String IS_DELETE_LIST_DATE = "answerListDialog";
-	private static final int DATA_LOADER = 0;
+	private static final int DATA_LOADER = 200;
 
 	private ListsDS mListsDS;
 	private List mList;
@@ -95,11 +94,11 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private OnItemChangedListener mOnItemChangedListener;
 	private OnDialogShownListener mOnDialogShownListener;
 
-	private java.util.List<Object> mSaveListRotate;
 	private boolean mIsStartActionMode;
 	private double mSaveSpentMoney = 0;
 	private double mSaveTotalMoney = 0;
-	private long mItemDetailsId = -1;
+	private long mLastItemId = -1;
+	protected int mScrollToPosition = -1;
 
 	private CollapsingToolbarLayout mToolbarLayout;
 	private ImageView mListImage;
@@ -247,9 +246,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		if (savedInstanceState != null) {
 			mAdapterRV.setCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_COLLAPSE));
-			mSaveListRotate = (java.util.List<Object>) savedInstanceState.getSerializable(STATE_ITEMS);
 			mSaveSpentMoney = savedInstanceState.getDouble(STATE_SPENT_SUM);
 			mSaveTotalMoney = savedInstanceState.getDouble(STATE_TOTAL_SUM);
+			mScrollToPosition = savedInstanceState.getInt(STATE_SCROLL_POSITION);
 
 			if (savedInstanceState.getBoolean(STATE_ACTION_MODE)) {
 				mIsStartActionMode = true;
@@ -385,8 +384,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
+		int firstVisiblePosition = ((LinearLayoutManager) mItemsListRV.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+		outState.putInt(STATE_SCROLL_POSITION, firstVisiblePosition);
 		outState.putSerializable(STATE_COLLAPSE, mAdapterRV.getCollapseCategoryStates());
-		outState.putSerializable(STATE_ITEMS, (Serializable) mAdapterRV.getItemList());
 		outState.putDouble(STATE_SPENT_SUM, mSaveSpentMoney);
 		outState.putDouble(STATE_TOTAL_SUM, mSaveTotalMoney);
 		outState.putBoolean(STATE_ACTION_MODE, mActionMode != null);
@@ -475,7 +475,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		switch (requestCode) {
 			case ADD_ITEM:
 			case EDIT_ITEM:
-				mItemDetailsId = data.getLongExtra(ItemFragment.ID_ITEM, -1);
+				mLastItemId = data.getLongExtra(ItemFragment.ID_ITEM, -1);
 				mIsUpdateData = true;
 				break;
 			case IS_DELETE_LIST:
@@ -552,8 +552,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		}
 	}
 
-	public void setItemDetailsId(long id) {
-		mItemDetailsId = id;
+	public void setLastItemId(long id) {
+		mLastItemId = id;
 	}
 
 	public void setDrawerOpened(boolean drawerOpened) {
@@ -582,25 +582,22 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 					mProgressBar.setVisibility(View.GONE);
 				}
 
-				if (mSaveListRotate != null && mSaveListRotate.size() > 0) {
-					mAdapterRV.setData(mSaveListRotate, mList.getCurrency().getSymbol(), mIsUseCategory);
-
-					updateSums(mSaveSpentMoney, mSaveTotalMoney);
-					hideEmptyStates();
-				} else if (mSaveListRotate == null && data.moveToFirst()) {
+				if (data.moveToFirst()) {
 					ArrayList<Category> categories = getItemsList((CategoryCursor) data); //create array for adapter
-					ShoppingList item  = getDetailsItem(categories);
+					ShoppingList lastItem  = getDetailsItem(categories);
 
-					if (item != null) {
-						mAdapterRV.setCollapseCategoryStates(item.getIdCategory(), false);
+					if (lastItem != null) {
+						mAdapterRV.setCollapseCategoryStates(lastItem.getIdCategory(), false);
 					}
 
 					mAdapterRV.setData(categories, mList.getCurrency().getSymbol(), mIsUseCategory, mIsCollapsedCategory);     //update data in adapter
 
-					if (item != null) {
-						int itemPosition = mAdapterRV.getItemList().indexOf(item);
-						int position = itemPosition != -1 ? itemPosition : mAdapterRV.getItemList().indexOf(item.getCategory());
+					if (lastItem != null) {
+						int itemPosition = mAdapterRV.getItemList().indexOf(lastItem);
+						int position = itemPosition != -1 ? itemPosition : mAdapterRV.getItemList().indexOf(lastItem.getCategory());
 						mItemsListRV.scrollToPosition(position);
+					} else if (mScrollToPosition != -1) {
+						mItemsListRV.scrollToPosition(mScrollToPosition);
 					}
 
 					updateSums();
@@ -626,7 +623,6 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	public void updateData() {
-		mSaveListRotate = null;
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 
 		if (mOnListChangedListener != null) {
@@ -654,19 +650,19 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	}
 
 	private ShoppingList getDetailsItem(ArrayList<Category> categories) {
-		if (mItemDetailsId != -1) {
+		if (mLastItemId != -1) {
 			for (Category c : categories) {
 				for (Object item : c.getItemsByCategories()) {
 					ShoppingList itemInList = (ShoppingList) item;
 
-					if (itemInList.getIdItem() == mItemDetailsId) {
-						mItemDetailsId = -1;
+					if (itemInList.getIdItem() == mLastItemId) {
+						mLastItemId = -1;
 						return itemInList;
 					}
 				}
 			}
 
-			mItemDetailsId = -1;
+			mLastItemId = -1;
 		}
 
 		return null;
