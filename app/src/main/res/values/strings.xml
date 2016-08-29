@@ -173,7 +173,8 @@
 	<string name="name">Название</string>
 	<string name="error_empty">Не может быть пустым</string>
 	<string name="error_one_item">Что-то должно остаться</string>
-	<string name="ask_delete_item">Значение уже используется. При удалении, оно будет заменено на: </string>
+	<string name="ask_delete_catalog">Значение уже используется. При удалении, оно будет заменено на: </string>
+	<string name="ask_delete_item">Значение уже используется в следующих списках: </string>
 
 	<!--Navigation drawer-->
 	<string name="last_list">Последний список</string>

@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
+import java.util.ArrayList;
+
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.TableInterface.UnitsInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.CurrenciesInterface;
@@ -22,19 +24,25 @@ import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 import ru.android.ainege.shoppinglist.db.entities.Catalog;
+import ru.android.ainege.shoppinglist.db.entities.Item;
+import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
 public class DeleteDialogFragment extends DialogFragment {
 	public static final String POSITION = "position";
-	public static final String REPLACEMENT = "replacement";
-	private static final String CATALOG = "catalog";
+	public static final String CATALOG = "catalog";
+	private static final String LISTS = "lists";
+	public static final String OLD_ID = "old_id";
+	public static final String NEW_ID = "new_id";
 
+	private Catalog mCatalog;
 	private Spinner mSpinner;
 
-	public static DeleteDialogFragment newInstance(Catalog catalog, int position) {
+	public static DeleteDialogFragment newInstance(int position, Catalog catalog, ArrayList lists) {
 		Bundle args = new Bundle();
-		args.putSerializable(CATALOG, catalog);
 		args.putInt(POSITION, position);
+		args.putSerializable(CATALOG, catalog);
+		args.putSerializable(LISTS, lists);
 
 		DeleteDialogFragment fragment = new DeleteDialogFragment();
 		fragment.setArguments(args);
@@ -45,15 +53,30 @@ public class DeleteDialogFragment extends DialogFragment {
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		View v = setupView();
+		String text;
+
+		if (mCatalog instanceof Item) {
+			text = getString(R.string.ask_delete_item);
+
+			for (List list : (ArrayList<List>) getArguments().getSerializable(LISTS)) {
+				text += "\n\"" + list.getName() + "\"";
+			}
+		} else {
+			text = getString(R.string.ask_delete_catalog);
+		}
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(v)
-				.setMessage(getString(R.string.ask_delete_item))
+				.setMessage(text)
 				.setCancelable(false)
 				.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						sendResult(((CatalogDS.CatalogCursor<Catalog>) mSpinner.getSelectedItem()).getEntity());
+						if (mSpinner.getVisibility() == View.VISIBLE) {
+							sendResult(((CatalogDS.CatalogCursor<Catalog>) mSpinner.getSelectedItem()).getEntity().getId());
+						} else {
+							sendResult(-1);
+						}
 					}
 				})
 				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -69,16 +92,17 @@ public class DeleteDialogFragment extends DialogFragment {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_delete_catalog, null);
 
+		mCatalog = (Catalog) getArguments().getSerializable(CATALOG);
 		mSpinner = (Spinner) v.findViewById(R.id.spinner);
 
-		Catalog catalog = (Catalog) getArguments().getSerializable(CATALOG);
-
-		if (catalog instanceof Unit) {
-			mSpinner.setAdapter(getUnitsAdapter(catalog.getId()));
-		} else if (catalog instanceof Category) {
-			mSpinner.setAdapter(getCategoriesAdapter(catalog.getId()));
-		} else if (catalog instanceof Currency) {
-			mSpinner.setAdapter(getCurrenciesAdapter(catalog.getId()));
+		if (mCatalog instanceof Item) {
+			mSpinner.setVisibility(View.GONE);
+		} else if (mCatalog instanceof Unit) {
+			mSpinner.setAdapter(getUnitsAdapter(mCatalog.getId()));
+		} else if (mCatalog instanceof Category) {
+			mSpinner.setAdapter(getCategoriesAdapter(mCatalog.getId()));
+		} else if (mCatalog instanceof Currency) {
+			mSpinner.setAdapter(getCurrenciesAdapter(mCatalog.getId()));
 		}
 
 		return v;
@@ -114,12 +138,14 @@ public class DeleteDialogFragment extends DialogFragment {
 		return spinnerAdapter;
 	}
 
-	protected void sendResult(Catalog replacement) {
+	protected void sendResult(long newID) {
 		if (getTargetFragment() == null)
 			return;
 
 		getTargetFragment().onActivityResult(getTargetRequestCode(), android.app.Activity.RESULT_OK,
-				new Intent().putExtra(REPLACEMENT, replacement).putExtra(POSITION, getArguments().getInt(POSITION)));
+				new Intent().putExtra(POSITION, getArguments().getInt(POSITION))
+						.putExtra(OLD_ID, mCatalog.getId())
+						.putExtra(NEW_ID, newID));
 	}
 
 }

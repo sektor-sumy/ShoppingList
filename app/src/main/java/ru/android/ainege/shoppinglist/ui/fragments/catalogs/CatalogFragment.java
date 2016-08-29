@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +50,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	protected ArrayList<T> mCatalog;
 	protected CatalogAdapter mAdapterRV;
 	protected RecyclerView mCatalogRV;
+	protected ImageView mEmptyImage;
 
 	protected HashMap<Integer, Long> mLastEditIds;
 	protected long mLastEditId = -1;
@@ -128,6 +130,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		mCatalogRV.setLayoutManager(new LinearLayoutManager(getActivity()));
 		mCatalogRV.setAdapter((RecyclerView.Adapter) mAdapterRV);
 
+		mEmptyImage = (ImageView) v.findViewById(R.id.empty_list);
 		mOnCreateViewListener.onCreateViewListener(this, toolbar);
 
 		return v;
@@ -180,6 +183,12 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 					if (mScrollToPosition != -1) {
 						mCatalogRV.scrollToPosition(mScrollToPosition);
 					}
+
+					mCatalogRV.setVisibility(View.VISIBLE);
+					mEmptyImage.setVisibility(View.GONE);
+				} else {
+					mCatalogRV.setVisibility(View.GONE);
+					mEmptyImage.setVisibility(View.VISIBLE);
 				}
 
 				break;
@@ -207,10 +216,14 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 				updateData();
 				break;
 			case DELETE:
-				Catalog catalog = (Catalog) data.getSerializableExtra(DeleteDialogFragment.REPLACEMENT);
-				deleteItem(data.getIntExtra(DeleteDialogFragment.POSITION, -1), catalog.getId());
+				int position = data.getIntExtra(DeleteDialogFragment.POSITION, -1);
+				long oldId = data.getLongExtra(DeleteDialogFragment.OLD_ID, -1);
+				long newId = data.getLongExtra(DeleteDialogFragment.NEW_ID, -1);
+				deleteItem(position, oldId, newId);
 
-				mLastEditId = catalog.getId();
+				if (newId != -1) {
+					mLastEditId = newId;
+				}
 				break;
 		}
 	}
@@ -263,14 +276,13 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		getLoaderManager().getLoader(DATA_LOADER).forceLoad();
 	}
 
-	protected void deleteItem(int position, long newId) {
+	protected void deleteItem(int position, long oldId, long newId) {
 		if (position != -1) {
-			T d = mCatalog.get(position);
 
 			if (newId != -1) {
-				getDS().delete(d.getId(), newId);
+				getDS().delete(oldId, newId);
 			} else {
-				getDS().delete(d.getId());
+				getDS().delete(oldId);
 			}
 
 			mAdapterRV.removeItem(position);
@@ -353,11 +365,11 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 							T d = mCatalog.get(itemPosition);
 
 							if (isEntityUsed(d.getId())) {
-								DeleteDialogFragment dialogFrag = DeleteDialogFragment.newInstance(d, itemPosition);
+								DeleteDialogFragment dialogFrag = DeleteDialogFragment.newInstance(itemPosition, d, null);
 								dialogFrag.setTargetFragment(CatalogFragment.this, DELETE);
 								dialogFrag.show(getFragmentManager(), DELETE_DATE);
 							} else {
-								deleteItem(itemPosition, -1);
+								deleteItem(itemPosition, d.getId(), -1);
 							}
 						}
 					}

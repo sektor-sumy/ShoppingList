@@ -7,14 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 
-import ru.android.ainege.shoppinglist.db.TableInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.CategoriesInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.ItemDataInterface;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 
-public class ItemDS extends CatalogDS<Item> implements TableInterface.ItemsInterface {
+import static ru.android.ainege.shoppinglist.db.TableInterface.*;
+
+public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 
 	public ItemDS(Context context) {
 		super(context);
@@ -24,29 +25,44 @@ public class ItemDS extends CatalogDS<Item> implements TableInterface.ItemsInter
 	public ItemCursor getAll() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
-				ItemDataInterface.TABLE_NAME + ".*, " +
-				TableInterface.UnitsInterface.COLUMN_NAME + ", " +
+				ItemDataInterface.COLUMN_AMOUNT + ", " +
+				ItemDataInterface.COLUMN_ID_UNIT + ", " +
+				ItemDataInterface.COLUMN_PRICE + ", " +
+				ItemDataInterface.COLUMN_ID_CATEGORY + ", " +
+				ItemDataInterface.COLUMN_COMMENT + ", " +
+				UnitsInterface.COLUMN_NAME + ", " +
 				CategoriesInterface.COLUMN_NAME + ", " +
 				CategoriesInterface.COLUMN_COLOR +
 				" FROM " + TABLE_NAME +
 				" INNER JOIN " + ItemDataInterface.TABLE_NAME + " ON " +
 				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
-				" INNER JOIN " + TableInterface.UnitsInterface.TABLE_NAME + " ON " +
-				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_UNIT + " = " + TableInterface.UnitsInterface.TABLE_NAME + "." + TableInterface.UnitsInterface.COLUMN_ID +
+				" INNER JOIN " + UnitsInterface.TABLE_NAME + " ON " +
+				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_UNIT + " = " + UnitsInterface.TABLE_NAME + "." + UnitsInterface.COLUMN_ID +
 				" INNER JOIN " + CategoriesInterface.TABLE_NAME + " ON " +
 				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " + CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID,
 				null);
 		return new ItemCursor(cursor);
 	}
 
-	@Override // TODO: 25.08.2016  
+	@Override //not used
 	public ItemCursor getAll(long withoutId) {
 		return null;
 	}
 
-	@Override // TODO: 25.08.2016  
+	@Override //not used
 	public boolean isUsed(long id) {
 		return false;
+	}
+
+	public ListsDS.ListCursor isUsedInLists(long id) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		Cursor cursor = db.rawQuery("SELECT " + ListsInterface.TABLE_NAME + ".*" +
+				" FROM " + ShoppingListsInterface.TABLE_NAME + " INNER JOIN " +
+				ListsInterface.TABLE_NAME + " ON " +
+				ShoppingListsInterface.TABLE_NAME + "." + ShoppingListsInterface.COLUMN_ID_LIST + " = " +
+				ListsInterface.TABLE_NAME + "." + ListsInterface.COLUMN_ID +
+				" WHERE " + ShoppingListsInterface.COLUMN_ID_ITEM + " =  ?",  new String[] { String.valueOf(id) });
+		return new ListsDS.ListCursor(cursor);
 	}
 
 	public ItemCursor getWithData(long id) {
@@ -111,7 +127,7 @@ public class ItemDS extends CatalogDS<Item> implements TableInterface.ItemsInter
 		db.delete(TABLE_NAME, COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 	}
 
-	@Override // TODO: 25.08.2016
+	@Override //not used
 	public void delete(long id, long newId) {
 
 	}
@@ -169,8 +185,8 @@ public class ItemDS extends CatalogDS<Item> implements TableInterface.ItemsInter
 				item.setComment(getString(getColumnIndex(ItemDataInterface.COLUMN_COMMENT)));
 
 				long idUnit = getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_UNIT));
-				if (getColumnIndex(TableInterface.UnitsInterface.COLUMN_NAME) != -1) {
-					String unitName = getString(getColumnIndex(TableInterface.UnitsInterface.COLUMN_NAME));
+				if (getColumnIndex(UnitsInterface.COLUMN_NAME) != -1) {
+					String unitName = getString(getColumnIndex(UnitsInterface.COLUMN_NAME));
 					item.setUnit(new Unit(idUnit, unitName));
 				} else {
 					item.setIdUnit(idUnit);

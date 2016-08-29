@@ -14,7 +14,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +23,8 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.adapter.NestedListAdapter;
 import ru.android.ainege.shoppinglist.db.dataSources.CatalogDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
-import ru.android.ainege.shoppinglist.db.dataSources.GenericDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
+import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
@@ -220,14 +219,18 @@ public class ItemFragment extends CatalogFragment<Item>{
 		}
 
 		@Override
-		protected GenericDS getDS() {
+		protected CatalogDS<Item> getDS() {
 			return new ItemDS(mActivity);
 		}
 
 		@Override
 		public void removeItem(int position) {
-			mCatalog.remove(position);
-			notifyItemRemoved(position);
+			removeItem((Item) mItemList.get(position));
+
+			if (mItemList.size() == 0) {
+				mCatalogRV.setVisibility(View.GONE);
+				mEmptyImage.setVisibility(View.VISIBLE);
+			}
 		}
 
 		public class CategoryViewHolder extends CategoryVH {
@@ -271,19 +274,19 @@ public class ItemFragment extends CatalogFragment<Item>{
 				mDelete.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						if (mCatalog.size() == 1) {
-							Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_one_item), Toast.LENGTH_SHORT).show();
-						} else {
-							int itemPosition = getAdapterPosition();
-							Item d = mCatalog.get(itemPosition);
+						int itemPosition = getAdapterPosition();
+						Item d = (Item) mItemList.get(itemPosition);
 
-							if (isEntityUsed(d.getId())) {
-								DeleteDialogFragment dialogFrag = DeleteDialogFragment.newInstance(d, itemPosition);
-								dialogFrag.setTargetFragment(ItemFragment.this, DELETE);
-								dialogFrag.show(getFragmentManager(), DELETE_DATE);
-							} else {
-								deleteItem(itemPosition, -1);
-							}
+						ListsDS.ListCursor cursor = ((ItemDS) getDS()).isUsedInLists(d.getId());
+
+						if (cursor.moveToFirst()) {
+							ArrayList lists = cursor.getEntities();
+
+							DeleteDialogFragment dialogFrag = DeleteDialogFragment.newInstance(itemPosition, d, lists);
+							dialogFrag.setTargetFragment(ItemFragment.this, DELETE);
+							dialogFrag.show(getFragmentManager(), DELETE_DATE);
+						} else {
+							deleteItem(itemPosition, d.getId(), -1);
 						}
 					}
 				});
