@@ -2,11 +2,10 @@ package ru.android.ainege.shoppinglist.ui.fragments.item;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.transition.Fade;
 import android.view.View;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
@@ -46,18 +45,6 @@ public class EditItemFragment extends ItemFragment {
 		super.onCreate(savedInstanceState);
 		mOriginalItem = new ShoppingList((ShoppingList) getArguments().getSerializable(ITEM_IN_LIST));
 		mItemInList = new ShoppingList((ShoppingList) getArguments().getSerializable(ITEM_IN_LIST));
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			getActivity().getWindow().setEnterTransition(new Fade());
-		} else {
-			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-		}
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 	}
 
 	@Override
@@ -118,24 +105,42 @@ public class EditItemFragment extends ItemFragment {
 					mNameInputLayout.setError(getString(R.string.error_name));
 				} else if (s.toString().equals(s.toString().trim())) {
 					disableError(mNameInputLayout);
-					//Check is the item in the list or catalog of items. If there is a warning display
+					//Check is the item in the list. If there is a warning display
+					//If it isn`t, check is it in the catalog of items. If there is select it
 					ShoppingListCursor cursor = mItemsInListDS.getByName(s.toString().trim(), mItemInList.getIdList());
-					showInfo(cursor.moveToFirst() && !cursor.getEntity().getItem().getName().equals(mItemInList.getItem().getName()));
-					cursor.close();
-					if (mIsProposedItem) {
-						ItemCursor cursorItem = mItemDS.getWithData(s.toString().trim());
-						showInfo(cursorItem.moveToFirst() && !cursorItem.getEntity().getName().equals(mItemInList.getItem().getName()));
-						cursorItem.close();
+
+					if (cursor.moveToFirst() && !(s.toString().equals(mOriginalItem.getItem().getName()))) {
+						mInfo.setText(R.string.info_exit_item_in_list);
+						mInfo.setTextColor(Color.RED);
+						mInfo.setVisibility(View.VISIBLE);
+
+						ShoppingList itemInList = cursor.getEntity();
+						mItemInList.setIdItemData(itemInList.getIdItemData());
+						setDefaultData(itemInList.getItem());
+					} else {
+						mInfo.setVisibility(View.GONE);
+						mItemInList.setIdItemData(mOriginalItem.getIdItemData());
+
+						if (mIsProposedItem) {
+							ItemCursor cursorItem = mItemDS.getWithData(s.toString().trim());
+
+							if (cursorItem.moveToFirst()) {
+								setDefaultData(cursorItem.getEntity());
+							}
+
+							cursorItem.close();
+						}
 					}
+					cursor.close();
 				}
 			}
 
-			private void showInfo(boolean condition) {
-				if (condition) {
-					mNameInputLayout.setError(getString(R.string.info_exit_item));
-				} else {
-					disableError(mNameInputLayout);
-				}
+			private void setDefaultData(Item item) {
+				loadImage(item.getImagePath());
+				setSelectionUnit(item.getIdUnit());
+				setSelectionCategory(item.getIdCategory());
+
+				mItemInList.setItem(item);
 			}
 		};
 	}
@@ -149,6 +154,7 @@ public class EditItemFragment extends ItemFragment {
 
 				if (charSequence != null && !charSequence.toString().trim().equals(mItemInList.getItem().getName())) {
 					managedCursor = mItemDS.getNames(charSequence.toString().trim());
+
 					if (managedCursor.moveToFirst()) {
 						mIsProposedItem = true;
 					}
@@ -175,15 +181,21 @@ public class EditItemFragment extends ItemFragment {
 		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
 				!mPriceInputLayout.isErrorEnabled()) {
 			updatedItem();
-			boolean isItemChanged = mItemInList.getItem().isNew();
 			mItemInList.updateItem(getActivity());
-			String originImagePath = mOriginalItem.getItem().getImagePath();
+			boolean isItemChanged = mOriginalItem.getIdItem() != mItemInList.getIdItem();
 
-			if (!isItemChanged) {
+			if (isItemChanged) {
+				if (mInfo.getVisibility() == View.VISIBLE) {        //if item in list - update it and delete original
+					mItemsInListDS.update(mItemInList);
+					mItemsInListDS.delete(mOriginalItem.getIdItemData());
+				} else {                                            //if item was changed - update with new one
+					mItemsInListDS.update(mItemInList, mOriginalItem.getIdItem());
+				}
+			} else {                                                //if item was not changed - update it
 				mItemsInListDS.update(mItemInList);
-			} else {
-				mItemsInListDS.update(mItemInList, mOriginalItem.getIdItem());
 			}
+
+			String originImagePath = mOriginalItem.getItem().getImagePath();
 
 			if (!originImagePath.contains(Image.ASSETS_IMAGE_PATH) &&
 					!originImagePath.equals(mItemInList.getItem().getImagePath()) &&
@@ -205,7 +217,8 @@ public class EditItemFragment extends ItemFragment {
 
 	@Override
 	protected ShoppingList updatedItem() {
-		if (!getName().equals(mItemInList.getItem().getName())) {
+		//if item was changed for new one (not from db) - update item
+		if (!getName().equals(mOriginalItem.getItem().getName()) && mOriginalItem.getIdItem() == mItemInList.getIdItem()) {
 			mItemInList.setItem(new Item(getName(), mItemInList.getItem().getImagePath(), mItemInList.getItem().getImagePath()));
 		}
 

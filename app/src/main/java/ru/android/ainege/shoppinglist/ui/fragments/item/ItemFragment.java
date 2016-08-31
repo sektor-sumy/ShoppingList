@@ -26,6 +26,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Fade;
 import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -39,7 +40,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -191,6 +191,12 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			getActivity().getWindow().setEnterTransition(new Fade());
+		} else {
+			getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+		}
+
 		mItemDS = new ItemDS(getActivity());
 		mItemsInListDS = new ShoppingListDS(getActivity());
 
@@ -320,6 +326,7 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	public void onPause() {
 		super.onPause();
 
+		getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 		closeKeyboard();
 	}
 
@@ -731,11 +738,13 @@ public abstract class ItemFragment extends Fragment implements OnBackPressedList
 	}
 
 	protected void setSelectionUnit(long idUnit) {
-		if (idUnit != -1) {
-			mIdSelectedUnit = idUnit;
-		}
+		if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_amount), true)) {
+			if (idUnit != -1) {
+				mIdSelectedUnit = idUnit;
+			}
 
-		mUnit.setSelection(getPosition(mUnit, mIdSelectedUnit));
+			mUnit.setSelection(getPosition(mUnit, mIdSelectedUnit));
+		}
 	}
 
 	protected void setSelectionCategory(long idCategory) {
