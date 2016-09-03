@@ -202,7 +202,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	@Override
 	public void onItemSetBought(ShoppingList item) {
 		if (mState.getLastSelectedItemId() == item.getIdItem()) {
-			mItemFragment.setIsBought(item.isBought());
+			mItemFragment.setIsBoughtButton(item.isBought());
 		}
 	}
 
@@ -214,7 +214,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	@Override
 	public void updateCatalogs(String catalogKey) {
 		if (catalogKey.equals(mState.getListsActivity().getString(R.string.catalogs_key_currency))) {
-			mItemFragment.setCurrency();
+			mItemFragment.updateCurrency();
 		}
 	}
 

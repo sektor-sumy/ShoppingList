@@ -10,6 +10,7 @@ import ru.android.ainege.shoppinglist.db.TableInterface.ListsInterface;
 import ru.android.ainege.shoppinglist.db.entities.Currency;
 
 public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.CurrenciesInterface {
+
 	public CurrenciesDS(Context context) {
 		super(context);
 	}
@@ -19,6 +20,7 @@ public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_NAME, null, null,
 				null, null, null, COLUMN_NAME);
+
 		return new CurrencyCursor(cursor);
 	}
 
@@ -27,6 +29,7 @@ public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_NAME, null, COLUMN_ID + " != " + withoutId,
 				null, null, null, COLUMN_NAME);
+
 		return new CurrencyCursor(cursor);
 	}
 
@@ -34,6 +37,7 @@ public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME + " = '" + name + "'",
 				null, null, null, null);
+
 		return new CurrencyCursor(cursor);
 	}
 
@@ -43,6 +47,7 @@ public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.
 				" INNER JOIN " + ListsInterface.TABLE_NAME + " ON " +
 				TABLE_NAME + "." + COLUMN_ID + " = " + ListsInterface.TABLE_NAME + "." + ListsInterface.COLUMN_ID_CURRENCY +
 				" where " + ListsInterface.TABLE_NAME + " . " + ListsInterface.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
+
 		return new CurrencyCursor(cursor);
 	}
 
@@ -53,6 +58,7 @@ public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.
 				null, null, null, null);
 		boolean result = cursor.getCount() > 0;
 		cursor.close();
+
 		return result;
 	}
 
@@ -60,22 +66,23 @@ public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.
 	public int update(Currency currency) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(currency);
-		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?",
-				new String[]{String.valueOf(currency.getId())});
+
+		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?", new String[]{String.valueOf(currency.getId())});
 	}
 
 	public int update(String newSymbol, String oldSymbol) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(COLUMN_SYMBOL, newSymbol);
-		return db.update(TABLE_NAME, values, COLUMN_SYMBOL + " = ?",
-				new String[]{oldSymbol});
+
+		return db.update(TABLE_NAME, values, COLUMN_SYMBOL + " = ?", new String[]{oldSymbol});
 	}
 
 	@Override
 	public long add(Currency currency) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(currency);
+
 		return db.insert(TABLE_NAME, null, values);
 	}
 
@@ -103,10 +110,12 @@ public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.
 		ContentValues values = new ContentValues();
 		values.put(COLUMN_NAME, currency.getName());
 		values.put(COLUMN_SYMBOL, currency.getSymbol());
+
 		return values;
 	}
 
 	public static class CurrencyCursor extends CatalogCursor<Currency> {
+
 		public CurrencyCursor(Cursor cursor) {
 			super(cursor);
 		}

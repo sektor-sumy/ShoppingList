@@ -17,7 +17,7 @@ public class AddListDialogFragment extends ListDialogFragment {
 	}
 
 	@Override
-	protected boolean isDeleteImage(String newPath) {
+	public boolean isDeleteImage(String newPath) {
 		return super.isDeleteImage(newPath) &&
 				!mImagePath.contains(Image.ASSETS_IMAGE_PATH) &&
 				!newPath.equals(mImagePath);

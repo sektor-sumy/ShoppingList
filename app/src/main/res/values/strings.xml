@@ -22,7 +22,6 @@
 	<string name="showcase_open_list_desc">Нажмите на карточку списка для его просмотра</string>
 	<string name="error_delete">Ошибка удаления</string>
 	<!--menu-->
-	<string name="add_list">"Добавить</string>
 	<string name="take_photo">"Сделать снимок</string>
 	<string name="select_from_gallery">Выбрать из галереи</string>
 	<string name="random_image">Случайное</string>
@@ -60,7 +59,7 @@
 	<string name="error_length_name">Не меньше 3 символов</string>
 	<string name="error_value">Неверное значение</string>
 	<string name="finish_price">Итоговая сумма:&#160;</string>
-	<string name="add">Добавить:</string>
+	<string name="add">Добавить</string>
 	<string name="wait_load_image">Подождите загрузки картинки</string>
 	<string name="ask_save_item">Сохранить изменения?</string>
 	<string name="item_image">Изображение товара</string>

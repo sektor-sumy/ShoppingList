@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -47,17 +48,20 @@ public class RetainedFragment extends Fragment implements OnFinishedImageListene
 		return mIsLoading;
 	}
 
-	public void execute(ImageView view, String imagePath, File file, int widthImageView) {
-		execute(view, imagePath, file, null, widthImageView);
+	public void execute(ImageView view, String imagePath, File file) {
+		execute(view, imagePath, file, null);
 	}
 
-	public void execute(ImageView view, String imagePath, File file, Bitmap bitmap, int widthImageView) {
+	public void execute(ImageView view, String imagePath, File file, Bitmap bitmap) {
+		DisplayMetrics metrics = new DisplayMetrics();
+		mActivity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
 		mImagePath = imagePath;
 		mImageView = view;
 
 		mIsLoading = true;
 		Image.create().insertImageToView(mActivity, Image.getPathFromResource(Image.mLoadingImage), mImageView);
-		new Image.BitmapWorkerTask(file, bitmap, widthImageView, this).execute();
+		new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, this).execute();
 	}
 
 	@Override
@@ -76,7 +80,7 @@ public class RetainedFragment extends Fragment implements OnFinishedImageListene
 		}
 	}
 
-	public void setOnLoadedFinish(OnFinishedImageListener load){
-		mLoadingListener = load;
+	public void setOnLoadedFinish(OnFinishedImageListener listener){
+		mLoadingListener = listener;
 	}
 }

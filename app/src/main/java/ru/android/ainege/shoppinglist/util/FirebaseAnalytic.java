@@ -11,8 +11,7 @@ public class FirebaseAnalytic {
 	public static final String DELETE_LIST_IN_SL = "delete_list_in_SL";
 	public static final String COLLAPSE_CATEGORY = "collapse_category";
 	public static final String NEW_ITEM = "new_item";
-	public static final String TRANSITION_TO_SETTINGS_IN_ITEM = "transition_to_settings";
-	public static final String ADD_CATALOG_IN_ITEM = "add_catalog_in_item";
+	public static final String ADD_CATALOG_FROM_SPINNER = "add_catalog_from_spinner";
 	public static final String ADD_UNIT = "add_unit";
 	public static final String ADD_CATEGORY = "add_category";
 	public static final String ADD_CURRENCY = "add_currency";
@@ -30,7 +29,6 @@ public class FirebaseAnalytic {
 	public static final String IS_BOUGHT_END = "is_bought_end";
 	public static final String USE_CATEGORY = "use_category";
 	public static final String AUTO_COMPLETE_DATA = "auto_complete_data";
-	public static final String TRANSITION_TO_SETTINGS = "transition_to_settings";
 	public static final String FAST_EDIT_CATALOGS = "fast_edit_catalogs";
 
 	private Bundle mBundle;

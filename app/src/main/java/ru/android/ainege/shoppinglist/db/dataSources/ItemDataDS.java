@@ -22,8 +22,8 @@ public class ItemDataDS extends GenericDS<ItemData> implements TableInterface.It
 	public int update(ItemData data) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(data);
-		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?",
-				new String[]{String.valueOf(data.getIdItemData())});
+
+		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?", new String[]{String.valueOf(data.getIdItemData())});
 	}
 
 	public void changeUnit(long oldId, long newId) {
@@ -48,6 +48,7 @@ public class ItemDataDS extends GenericDS<ItemData> implements TableInterface.It
 	public long add(ItemData data) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(data);
+
 		return db.insert(TABLE_NAME, null, values);
 	}
 

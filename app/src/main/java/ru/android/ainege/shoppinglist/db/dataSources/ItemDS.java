@@ -41,15 +41,16 @@ public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 				" INNER JOIN " + CategoriesInterface.TABLE_NAME + " ON " +
 				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " + CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID,
 				null);
+
 		return new ItemCursor(cursor);
 	}
 
-	@Override //not used
+	@Override
 	public ItemCursor getAll(long withoutId) {
 		return null;
 	}
 
-	@Override //not used
+	@Override
 	public boolean isUsed(long id) {
 		return false;
 	}
@@ -62,7 +63,22 @@ public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 				ShoppingListsInterface.TABLE_NAME + "." + ShoppingListsInterface.COLUMN_ID_LIST + " = " +
 				ListsInterface.TABLE_NAME + "." + ListsInterface.COLUMN_ID +
 				" WHERE " + ShoppingListsInterface.COLUMN_ID_ITEM + " =  ?",  new String[] { String.valueOf(id) });
+
 		return new ListsDS.ListCursor(cursor);
+	}
+
+	public Cursor getNames(String substring) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		return db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
+				CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_COLOR +
+				" FROM " + TABLE_NAME +
+				" INNER JOIN " + ItemDataInterface.TABLE_NAME +
+				" ON " + TABLE_NAME + "." + COLUMN_ID_DATA + " = " +
+				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
+				" INNER JOIN " + CategoriesInterface.TABLE_NAME +
+				" ON " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " +
+				CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID +
+				" WHERE " + COLUMN_NAME + " LIKE '%" + substring + "%'", null);
 	}
 
 	public ItemCursor getWithData(long id) {
@@ -84,21 +100,8 @@ public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 				" FROM " + TABLE_NAME + " INNER JOIN " + ItemDataInterface.TABLE_NAME + " ON " +
 				TABLE_NAME + "." + COLUMN_ID_DATA + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
 				where, params);
-		return new ItemCursor(cursor);
-	}
 
-	public Cursor getNames(String substring) {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		return db.rawQuery("SELECT " + TABLE_NAME + ".*, " +
-				CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_COLOR +
-				" FROM " + TABLE_NAME +
-				" INNER JOIN " + ItemDataInterface.TABLE_NAME +
-				" ON " + TABLE_NAME + "." + COLUMN_ID_DATA + " = " +
-				ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
-				" INNER JOIN " + CategoriesInterface.TABLE_NAME +
-				" ON " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " +
-				CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID +
-				" WHERE " + COLUMN_NAME + " LIKE '%" + substring + "%'", null);
+		return new ItemCursor(cursor);
 	}
 
 	@Override
@@ -107,8 +110,8 @@ public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(item);
-		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?",
-				new String[]{String.valueOf(item.getId())});
+
+		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?", new String[]{String.valueOf(item.getId())});
 	}
 
 	@Override
@@ -118,6 +121,7 @@ public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(item);
+
 		return db.insert(TABLE_NAME, null, values);
 	}
 
@@ -127,7 +131,7 @@ public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 		db.delete(TABLE_NAME, COLUMN_ID + " = ? ", new String[]{String.valueOf(id)});
 	}
 
-	@Override //not used
+	@Override
 	public void delete(long id, long newId) {
 
 	}
@@ -138,10 +142,12 @@ public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 		values.put(COLUMN_DEFAULT_IMAGE_PATH, item.getDefaultImagePath());
 		values.put(COLUMN_IMAGE_PATH, item.getImagePath());
 		values.put(COLUMN_ID_DATA, item.getIdItemData());
+
 		return values;
 	}
 
 	public static class ItemCursor extends CatalogCursor<Item> {
+
 		public ItemCursor(Cursor cursor) {
 			super(cursor);
 		}

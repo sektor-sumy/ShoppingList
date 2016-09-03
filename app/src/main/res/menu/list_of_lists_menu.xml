@@ -4,7 +4,7 @@
 	<item
 		android:id="@+id/add_list"
 		android:icon="@drawable/ic_add_white_24dp"
-		android:title="@string/add_list"
+		android:title="@string/add"
 		android:visible="@bool/menu_add_list_visibility"
 		app:actionViewClass="android.widget.ImageButton"
 		app:showAsAction="always"/>

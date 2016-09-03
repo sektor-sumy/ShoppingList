@@ -10,17 +10,22 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.TableInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.ItemDataInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.ShoppingListsInterface;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Category;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
+import ru.android.ainege.shoppinglist.ui.view.spinners.GeneralSpinner;
 
 public class CategoriesDS extends CatalogDS<Category> implements TableInterface.CategoriesInterface {
 
-	public CategoriesDS(Context context) {
-		super(context);
+	public static CategoryCursor getAll(SQLiteDatabase db) {
+		Cursor cursor = db.query(TABLE_NAME, null, null,
+				null, null, null, COLUMN_NAME);
+
+		return new CategoryCursor(cursor);
 	}
 
 	public static HashMap<String, Category> getCategories(SQLiteDatabase db) {
@@ -34,10 +39,8 @@ public class CategoriesDS extends CatalogDS<Category> implements TableInterface.
 		return unit;
 	}
 
-	public static CategoryCursor getAll(SQLiteDatabase db) {
-		Cursor cursor = db.query(TABLE_NAME, null, null,
-				null, null, null, COLUMN_NAME);
-		return new CategoryCursor(cursor);
+	public CategoriesDS(Context context) {
+		super(context);
 	}
 
 	@Override
@@ -45,14 +48,13 @@ public class CategoriesDS extends CatalogDS<Category> implements TableInterface.
 		return getAll(mDbHelper.getReadableDatabase());
 	}
 
+	@Override
 	public CategoryCursor getAllForSpinner() {
-		SQLiteDatabase  db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_NAME, null, null,
-				null, null, null, COLUMN_NAME);
+		Cursor cursor = getAll();
 
 		MatrixCursor extras = new MatrixCursor(new String[] { COLUMN_ID,
 				COLUMN_NAME, COLUMN_COLOR });
-		extras.addRow(new String[] { "-1", "Добавить", "0" });
+		extras.addRow(new String[] { String.valueOf(GeneralSpinner.ID_ADD_CATALOG), mContext.getString(R.string.add), "0" });
 		Cursor[] cursors = { extras, cursor };
 
 		return new CategoryCursor(new MergeCursor(cursors));
@@ -63,6 +65,7 @@ public class CategoriesDS extends CatalogDS<Category> implements TableInterface.
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_NAME, null, COLUMN_ID + " != " + withoutId,
 				null, null, null, COLUMN_NAME);
+
 		return new CategoryCursor(cursor);
 	}
 
@@ -78,6 +81,7 @@ public class CategoriesDS extends CatalogDS<Category> implements TableInterface.
 				" GROUP BY " + TABLE_NAME + "." + COLUMN_NAME +
 				" ORDER BY " + COLUMN_NAME;
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(idList)});
+
 		return new CategoryCursor(cursor);
 	}
 
@@ -88,6 +92,7 @@ public class CategoriesDS extends CatalogDS<Category> implements TableInterface.
 				null, null, null, null);
 		boolean result = cursor.getCount() > 0;
 		cursor.close();
+
 		return result;
 	}
 
@@ -95,14 +100,15 @@ public class CategoriesDS extends CatalogDS<Category> implements TableInterface.
 	public int update(Category category) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(category);
-		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?",
-				new String[]{String.valueOf(category.getId())});
+
+		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?", new String[]{String.valueOf(category.getId())});
 	}
 
 	@Override
 	public long add(Category category) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(category);
+
 		return db.insert(TABLE_NAME, null, values);
 	}
 
@@ -116,6 +122,7 @@ public class CategoriesDS extends CatalogDS<Category> implements TableInterface.
 	public void delete(long id, long newId) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		db.beginTransaction();
+
 		try {
 			new ItemDataDS(mContext).changeCategory(id, newId);
 
@@ -130,6 +137,7 @@ public class CategoriesDS extends CatalogDS<Category> implements TableInterface.
 		ContentValues values = new ContentValues();
 		values.put(COLUMN_NAME, category.getName());
 		values.put(COLUMN_COLOR, category.getColor());
+
 		return values;
 	}
 

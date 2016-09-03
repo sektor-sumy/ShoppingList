@@ -1,6 +1,5 @@
 package ru.android.ainege.shoppinglist.ui.fragments.list;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,28 +7,19 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.ContextCompat;
-import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
 import java.util.Random;
@@ -39,58 +29,57 @@ import ru.android.ainege.shoppinglist.db.TableInterface.CurrenciesInterface;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
-import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
+import ru.android.ainege.shoppinglist.ui.view.PictureView;
 import ru.android.ainege.shoppinglist.util.Image;
 
 import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
 
-public abstract class ListDialogFragment extends DialogFragment {
+public abstract class ListDialogFragment extends DialogFragment implements PictureView.PictureInterface {
 	public static final String ID_LIST = "idList";
-	protected static final String RETAINED_FRAGMENT = "retained_fragment_list";
-	private static final int TAKE_PHOTO = 0;
-	private static final int LOAD_IMAGE = 1;
 	private static final String STATE_FILE = "state_file";
 
-	private ImageView mImageList;
-	private TextInputLayout mNameInputLayout;
-	protected EditText mName;
-	protected Spinner mCurrency;
-
-	private File mFile;
+	protected EditText mNameEditText;
+	protected Spinner mCurrencySpinner;
+	protected PictureView mPictureView;
 	protected String mImagePath;
-
-	protected RetainedFragment mDataFragment;
+	private TextInputLayout mNameInputLayout;
 
 	protected abstract long save(ListsDS listDS, String name, long idCurrency);
 	protected abstract void setDataToView();
 
 	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setView(createView(savedInstanceState))
+				.setCancelable(true)
+				.setPositiveButton(R.string.save, null)
+				.setNegativeButton(R.string.cancel, null);
+
+		return builder.create();
+	}
+
+	@Override
 	public void onStart() {
 		super.onStart();
-
-		if (getDialog() == null) {
-			return;
-		}
-
 		final AlertDialog dialog = (AlertDialog) getDialog();
 
-		Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-		positiveButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Boolean wantToCloseDialog = saveData();
-				if (wantToCloseDialog) {
-					dialog.dismiss();
+		if (dialog != null) {
+			Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+			positiveButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (saveData()) {
+						dialog.dismiss();
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		mName.setSelection(mName.getText().length());
+		mNameEditText.setSelection(mNameEditText.getText().length());
 	}
 
 	@Override
@@ -102,24 +91,21 @@ public abstract class ListDialogFragment extends DialogFragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		mDataFragment.setImagePath(mImagePath);
+		mPictureView.setImagePath(mImagePath);
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-
-		outState.putSerializable(STATE_FILE, mFile);
+		outState.putSerializable(STATE_FILE, mPictureView.getFile());
 	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
+		mPictureView.onCreateContextMenu(menu, R.id.random_image, getString(R.string.list_image));
 
-		getActivity().getMenuInflater().inflate(R.menu.image_menu, menu);
-		menu.findItem(R.id.random_image).setVisible(true);
-		menu.setHeaderTitle(getString(R.string.list_image));
-
+		// TODO: 03.09.2016 android bug
 		MenuItem.OnMenuItemClickListener listener = new MenuItem.OnMenuItemClickListener() {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
@@ -134,108 +120,45 @@ public abstract class ListDialogFragment extends DialogFragment {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.take_photo:
-				if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-					takePhoto();
-				} else {
-					requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, TAKE_PHOTO);
-				}
-				break;
-			case R.id.select_from_gallery:
-				if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-					selectFromGallery();
-				} else {
-					requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, LOAD_IMAGE);
-				}
-				break;
-			case R.id.random_image:
-				setRandomImage();
-				break;
-			default:
-				return super.onContextItemSelected(item);
-		}
-		return true;
+		return mPictureView.onContextItemSelected(item, null) || super.onOptionsItemSelected(item);
 	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode != Activity.RESULT_OK) {
-			return;
-		}
-
-		DisplayMetrics metrics = new DisplayMetrics();
-		getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-		switch (requestCode) {
-			case TAKE_PHOTO:
-				Image.create().deletePhotoFromGallery(getActivity(), mFile);
-				mDataFragment.execute(mImageList, mImagePath, mFile, metrics.widthPixels - 30);
-				break;
-			case LOAD_IMAGE:
-				File file = Image.create().createImageFile(getActivity());
-
-				try {
-					if (file != null) {
-						Uri selectedImage = data.getData();
-						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
-						mDataFragment.execute(mImageList, mImagePath, file, bitmap, metrics.widthPixels - 30);
-					} else {
-						Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
-					}
-				} catch (OutOfMemoryError | Exception e) {
-					e.printStackTrace();
-					FirebaseCrash.report(new Exception(getResources().getString(R.string.catched_exception), e));
-					Image.deleteFile(file.getAbsolutePath());
-				}
-
-				break;
+		if (resultCode == Activity.RESULT_OK) {
+			switch (requestCode) {
+				case PictureView.TAKE_PHOTO:
+					mPictureView.takePhotoResult(mImagePath);
+					break;
+				case PictureView.FROM_GALLERY:
+					mPictureView.fromGalleryResult(mImagePath, data.getData());
+					break;
+			}
 		}
 	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-		switch (requestCode) {
-			case TAKE_PHOTO:
-				if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-					takePhoto();
-				}
-				break;
-			case LOAD_IMAGE:
-				if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-					selectFromGallery();
-				}
-				break;
-
-			default:
-				break;
-		}
+		mPictureView.onRequestPermissionsResult(requestCode, permissions, grantResults);
 	}
 
-	public int getPosition(Spinner spinner, long idCurrency) {
-		int index = 0;
-		for (int i = 0; i < spinner.getCount(); i++) {
-			long id = ((CurrencyCursor) spinner.getItemAtPosition(i)).getEntity().getId();
-			if (id == idCurrency) {
-				index = i;
-				break;
-			}
-		}
-		return index;
+	@Override
+	public boolean isDeleteImage(String newPath) {
+		return mImagePath != null;
 	}
 
-	public void loadImage(String imagePath) {
-		if (isDeleteImage(imagePath)) {
-			Image.deleteFile(mImagePath);
-		}
+	@Override
+	public void resetImage() {
+		setRandomImage();
+	}
 
+	protected void loadImage(String imagePath) {
+		mPictureView.loadImage(imagePath, mImagePath);
 		mImagePath = imagePath;
-		Image.create().insertImageToView(getActivity(), mImagePath, mImageList);
 	}
 
-	public void setRandomImage() {
+	protected void setRandomImage() {
 		String path;
 
 		do {
@@ -245,72 +168,56 @@ public abstract class ListDialogFragment extends DialogFragment {
 		loadImage(path);
 	}
 
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
+	protected int getPosition(Spinner spinner, long idCurrency) {
+		int index = 0;
+
+		for (int i = 0; i < spinner.getCount(); i++) {
+			long id = ((CurrencyCursor) spinner.getItemAtPosition(i)).getEntity().getId();
+
+			if (id == idCurrency) {
+				index = i;
+				break;
+			}
+		}
+
+		return index;
+	}
+
+	private View createView(Bundle savedInstanceState) {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_list, null);
 
-		mImageList = (ImageView) v.findViewById(R.id.image);
-		registerForContextMenu(mImageList);
-		mImageList.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				v.showContextMenu();
-			}
-		});
-
-		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
-		mName = (EditText) v.findViewById(R.id.name);
-		mCurrency = (Spinner) v.findViewById(R.id.currency);
-		mCurrency.setAdapter(getSpinnerAdapter());
-		mCurrency.setSelection(getPosition(mCurrency, getDefaultIdCurrency()));
-
-		mDataFragment = (RetainedFragment) getFragmentManager().findFragmentByTag(RETAINED_FRAGMENT);
-
-		if (mDataFragment == null || savedInstanceState == null) {
-			mDataFragment = new RetainedFragment(getActivity());
-			getFragmentManager().beginTransaction().add(mDataFragment, RETAINED_FRAGMENT).commit();
-
-			setDataToView();
-		} else {
-			loadImage(mDataFragment.getImagePath());
-		}
-
-		mDataFragment.setOnLoadedFinish(new OnFinishedImageListener() {
-			@Override
-			public void onFinished(boolean isSuccess, String path) {
-				loadImage(path);
-			}
-
-			@Override
-			public Activity getActivity() {
-				return getActivity();
-			}
-		});
-
-		if (savedInstanceState != null) {
-			mFile = (File) savedInstanceState.getSerializable(STATE_FILE);
-		}
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setView(v)
-				.setCancelable(true)
-				.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+		mPictureView = new PictureView(this, savedInstanceState, this,
+				new OnFinishedImageListener() {
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
+					public void onFinished(boolean isSuccess, String path) {
+						loadImage(path);
 					}
-				})
-				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
+
+					@Override
+					public Activity getActivity() {
+						return getActivity();
 					}
 				});
+		mPictureView.setImage(v.findViewById(R.id.image));
 
-		return builder.create();
-	}
+		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
+		mNameEditText = (EditText) v.findViewById(R.id.name);
+		mCurrencySpinner = (Spinner) v.findViewById(R.id.currency);
+		mCurrencySpinner.setAdapter(getSpinnerAdapter());
+		mCurrencySpinner.setSelection(getPosition(mCurrencySpinner, getDefaultIdCurrency()));
 
-	protected boolean isDeleteImage(String newPath) {
-		return mImagePath != null;
+		if (savedInstanceState == null) {
+			setDataToView();
+		} else {
+			loadImage(mPictureView.getImagePath());
+		}
+
+		if (savedInstanceState != null) {
+			mPictureView.setFile((File) savedInstanceState.getSerializable(STATE_FILE));
+		}
+
+		return v;
 	}
 
 	private SimpleCursorAdapter getSpinnerAdapter() {
@@ -330,24 +237,11 @@ public abstract class ListDialogFragment extends DialogFragment {
 
 	private boolean saveData() {
 		boolean isSave = false;
-		String name = mName.getText().toString().trim();
 
-		if (name.length() == 0) {
-			mNameInputLayout.setError(getString(R.string.error_name));
-		} else {
-			mNameInputLayout.setError(null);
-			mNameInputLayout.setErrorEnabled(false);
-		}
-
-		if (mDataFragment.isLoading()) {
-			Toast.makeText(getActivity().getApplicationContext(), "Подождите загрузке картинки", Toast.LENGTH_SHORT).show();
-			return false;
-		}
-
-		if (!mNameInputLayout.isErrorEnabled()) {
-			long idCurrency = ((CurrencyCursor) mCurrency.getSelectedItem()).getEntity().getId();
+		if (isValidData()) {
+			long idCurrency = ((CurrencyCursor) mCurrencySpinner.getSelectedItem()).getEntity().getId();
 			ListsDS listDS = new ListsDS(getActivity());
-			long id = save(listDS, name, idCurrency);
+			long id = save(listDS, mNameEditText.getText().toString().trim(), idCurrency);
 
 			sendResult(Activity.RESULT_OK, new Intent().putExtra(ID_LIST, id));
 			isSave = true;
@@ -356,31 +250,28 @@ public abstract class ListDialogFragment extends DialogFragment {
 		return isSave;
 	}
 
-	private void sendResult(int resultCode, Intent intent) {
-		if (getTargetFragment() == null)
-			return;
+	private boolean isValidData() {
+		boolean isValid = true;
 
-		getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
-	}
-
-	private boolean hasPermission(String permission){
-		return ContextCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
-	}
-
-	private void takePhoto(){
-		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		mFile = Image.create().createImageFile(getActivity());
-
-		if (mFile != null) {
-			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
-			startActivityForResult(cameraIntent, TAKE_PHOTO);
+		if (mNameEditText.getText().toString().trim().length() == 0) {
+			mNameInputLayout.setError(getString(R.string.error_name));
+			isValid = false;
 		} else {
-			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+			mNameInputLayout.setError(null);
+			mNameInputLayout.setErrorEnabled(false);
 		}
+
+		if (mPictureView.isLoading()) {
+			Toast.makeText(getActivity().getApplicationContext(), "Подождите загрузке картинки", Toast.LENGTH_SHORT).show();
+			isValid = false;
+		}
+
+		return isValid;
 	}
 
-	private void selectFromGallery() {
-		Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-		startActivityForResult(galleryIntent, LOAD_IMAGE);
+	private void sendResult(int resultCode, Intent intent) {
+		if (getTargetFragment() != null) {
+			getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+		}
 	}
 }

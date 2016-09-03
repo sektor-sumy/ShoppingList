@@ -10,18 +10,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.CategoriesDS;
-import ru.android.ainege.shoppinglist.db.dataSources.GenericDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
-import ru.android.ainege.shoppinglist.db.dataSources.UnitsDS;
-import ru.android.ainege.shoppinglist.db.entities.Catalog;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.util.Image;
@@ -82,21 +77,20 @@ public class AddItemFragment extends ItemFragment {
 	protected void setupView(View v, Bundle savedInstanceState) {
 		super.setupView(v, savedInstanceState);
 
-		if (savedInstanceState != null && dataFragment.getImagePath() != null) {
-			loadImage(dataFragment.getImagePath());
+		// TODO: 03.09.2016 lost image (assets) after retained
+		if (savedInstanceState != null) {
+			loadImage(mPictureView.getImagePath());
 		}
 
-		mUnit.setSelection(getPosition(mUnit, getActivity().getResources().getStringArray(R.array.units)[0]));
-		mIdSelectedUnit = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
+		mUnitSpinner.setSelected(getActivity().getResources().getStringArray(R.array.units)[0]);
 
 		if (savedInstanceState != null && !mIsUseCategory) {
-			setSelectionCategory(savedInstanceState.getLong(STATE_CATEGORY_ID));
+			mCategorySpinner.setSelected(savedInstanceState.getLong(STATE_CATEGORY_ID));
 		} else {
-			mCategory.setSelection(getPosition(mCategory, (getActivity().getResources().getStringArray(R.array.categories)[0]).split("—")[0]));
-			mIdSelectedCategory = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
+			mCategorySpinner.setSelected(getActivity().getResources().getStringArray(R.array.categories)[0].split("—")[0]);
 		}
 
-		mName.setOnItemClickListener(getOnNameClickListener());
+		mNameTextView.setOnItemClickListener(getOnNameClickListener());
 		mCollapsingToolbarLayout.setTitle(getString(R.string.add));
 		mCollapsingToolbarLayout.setCollapsedTitleTextColor(ContextCompat.getColor(getActivity(), android.R.color.transparent));
 	}
@@ -134,11 +128,11 @@ public class AddItemFragment extends ItemFragment {
 					//If selected a existent item and default data are used,
 					//when changing item, fill in the data that have been previously introduced
 					if (mIsUseDefaultData && mIsSelectedItem && !mItemName.equals(s.toString().trim())) {
-						mAmount.setText(mAddedAmount);
-						setSelectionUnit(mIdAddedUnit);
-						mPrice.setText(mAddedPrice);
-						setSelectionCategory(mIdAddedCategory);
-						mComment.setText(mAddedComment);
+						mAmountEditText.setText(mAddedAmount);
+						mUnitSpinner.setSelected(mIdAddedUnit);
+						mPriceEditText.setText(mAddedPrice);
+						mCategorySpinner.setSelected(mIdAddedCategory);
+						mCommentEditText.setText(mAddedComment);
 						mItemInList.setIdItem(0);
 						mIsSelectedItem = false;
 					}
@@ -146,15 +140,15 @@ public class AddItemFragment extends ItemFragment {
 					//If it isn`t, check is it in the catalog of items. If there is select it
 					ShoppingListCursor cursor = mItemsInListDS.getByName(s.toString().trim(), getIdList());
 					if (cursor.moveToFirst()) {
-						mInfo.setText(R.string.info_exit_item_in_list);
-						mInfo.setTextColor(Color.RED);
-						mInfo.setVisibility(View.VISIBLE);
+						mInfoTextView.setText(R.string.info_exit_item_in_list);
+						mInfoTextView.setTextColor(Color.RED);
+						mInfoTextView.setVisibility(View.VISIBLE);
 
 						ShoppingList itemInList = cursor.getEntity();
 						mItemInList.setIdItemData(itemInList.getIdItemData());
 						setDefaultData(itemInList.getItem());
 					} else {
-						mInfo.setVisibility(View.GONE);
+						mInfoTextView.setVisibility(View.GONE);
 						mItemInList.setIdItem(0);
 
 						if (mIsProposedItem) {
@@ -175,8 +169,8 @@ public class AddItemFragment extends ItemFragment {
 				mItemInList.getItem().setIdItemData(item.getIdItemData());
 
 				loadImage(item.getImagePath());
-				setSelectionUnit(item.getIdUnit());
-				setSelectionCategory(item.getIdCategory());
+				mUnitSpinner.setSelected(item.getIdUnit());
+				mCategorySpinner.setSelected(item.getIdCategory());
 			}
 		};
 	}
@@ -207,11 +201,11 @@ public class AddItemFragment extends ItemFragment {
 				//If default data are used, they fill in the fields
 				// and save previously introduced data
 				if (mIsUseDefaultData) {
-					mAddedAmount = mAmount.getText().toString();
-					mIdAddedUnit = ((UnitsDS.UnitCursor) mUnit.getSelectedItem()).getEntity().getId();
-					mAddedPrice = mPrice.getText().toString();
-					mIdAddedCategory = ((CategoriesDS.CategoryCursor) mCategory.getSelectedItem()).getEntity().getId();
-					mAddedComment = mComment.getText().toString();
+					mAddedAmount = mAmountEditText.getText().toString();
+					mIdAddedUnit = mUnitSpinner.getSelected().getId();
+					mAddedPrice = mPriceEditText.getText().toString();
+					mIdAddedCategory = mCategorySpinner.getSelected().getId();
+					mAddedComment = mCommentEditText.getText().toString();
 
 					ItemCursor c = mItemDS.getWithData(mItemInList.getIdItem());
 					c.moveToFirst();
@@ -220,64 +214,32 @@ public class AddItemFragment extends ItemFragment {
 
 					mItemName = item.getName();
 
-					if (mInfo.getVisibility() == View.GONE) {
+					if (mInfoTextView.getVisibility() == View.GONE) {
 						mItemInList.getItem().setDefaultImagePath(item.getDefaultImagePath());
 						mItemInList.getItem().setIdItemData(item.getIdItemData());
 						loadImage(item.getImagePath());
 					}
 
 					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_amount), true) && item.getAmount() != 0) {
-						mAmount.setText(new DecimalFormat("#.######").format(item.getAmount()));
+						mAmountEditText.setText(new DecimalFormat("#.######").format(item.getAmount()));
 					}
 
 					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_unit), true)) {
-						setSelectionUnit(item.getIdUnit());
+						mUnitSpinner.setSelected(item.getIdUnit());
 					}
 
 					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_price), true) && item.getPrice() != 0) {
-						mPrice.setText(String.format("%.2f", item.getPrice()));
+						mPriceEditText.setText(String.format("%.2f", item.getPrice()));
 					}
 
-					setSelectionCategory(item.getIdCategory());
+					mCategorySpinner.setSelected(item.getIdCategory());
 
 					if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_comment), true)) {
-						mComment.setText(item.getComment());
+						mCommentEditText.setText(item.getComment());
 					}
 				}
 			}
 		};
-	}
-
-	@Override
-	protected boolean saveData() {
-		boolean isSave = false;
-
-		if (mName.length() == 0) {
-			mNameInputLayout.setError(getString(R.string.error_value));
-		} else if (mName.length() < 3) {
-			mNameInputLayout.setError(getString(R.string.error_length_name));
-		}
-
-		if (dataFragment.isLoading()) {
-			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
-			return false;
-		}
-
-		if (!mNameInputLayout.isErrorEnabled() && !mAmountInputLayout.isErrorEnabled() &&
-				!mPriceInputLayout.isErrorEnabled()) {
-			updatedItem();
-			mItemInList.updateItem(getActivity());
-
-			if (mInfo.getVisibility() == View.VISIBLE) { //If item in list, update it
-				mItemsInListDS.update(mItemInList);
-			} else { //Add new item to list
-				mItemsInListDS.add(mItemInList);
-			}
-
-			sendResult(mItemInList.getIdItem());
-			isSave = true;
-		}
-		return isSave;
 	}
 
 	@Override
@@ -286,7 +248,28 @@ public class AddItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected ShoppingList updatedItem() {
+	protected boolean saveData() {
+		boolean isSave = false;
+
+		if (isValidData()) {
+			refreshItem();
+			mItemInList.updateItem(getActivity());
+
+			if (mInfoTextView.getVisibility() == View.VISIBLE) { //If item in list, update it
+				mItemsInListDS.update(mItemInList);
+			} else { //Add new item to list
+				mItemsInListDS.add(mItemInList);
+			}
+
+			sendResult(mItemInList.getIdItem());
+			isSave = true;
+		}
+
+		return isSave;
+	}
+
+	@Override
+	protected ShoppingList refreshItem() {
 		if (mItemInList.getItem().isNew()) {
 			String image = mItemInList.getItem().getImagePath();
 			String defaultImage = mItemInList.getItem().getDefaultImagePath();
@@ -300,11 +283,11 @@ public class AddItemFragment extends ItemFragment {
 			mItemInList.getItem().setName(getName());
 		}
 
-		return super.updatedItem();
+		return super.refreshItem();
 	}
 
 	@Override
-	protected void resetImage() {
+	public void resetImage() {
 		if (!mItemInList.getItem().isNew() && mItemInList.getItem().getDefaultImagePath() != null) {
 			loadImage(mItemInList.getItem().getDefaultImagePath());
 		} else {
@@ -313,13 +296,13 @@ public class AddItemFragment extends ItemFragment {
 			}
 
 			mItemInList.getItem().setImagePath(Image.getPathFromResource(R.drawable.no_image));
-			mAppBarImage.setImageResource(R.drawable.no_image);
+			mPictureView.getImage().setImageResource(R.drawable.no_image);
 			mCollapsingToolbarLayout.setTitle(getString(R.string.add));
 		}
 	}
 
 	@Override
-	protected boolean isDeleteImage(String newPath) {
+	public boolean isDeleteImage(String newPath) {
 		boolean result = true;
 
 		if(mItemInList.getItem() == null) {
@@ -343,20 +326,26 @@ public class AddItemFragment extends ItemFragment {
 		return result;
 	}
 
-	private int getPosition(Spinner spinner, String name) {
-		int index = -1;
+	private boolean isValidData() {
+		boolean isValid = true;
 
-		for (int i = 0; i < spinner.getCount(); i++) {
-			if (((GenericDS.EntityCursor<Catalog>) spinner.getItemAtPosition(i)).getEntity().getName().equals(name)) {
-				index = i;
-				break;
-			}
+		if (mNameTextView.length() == 0) {
+			mNameInputLayout.setError(getString(R.string.error_value));
+			isValid = false;
+		} else if (mNameTextView.length() < 3) {
+			mNameInputLayout.setError(getString(R.string.error_length_name));
+			isValid = false;
 		}
 
-		if (index == -1) {
-			index = mIsUseNewItemInSpinner ? 1 : 0;
+		if (mPictureView.isLoading()) {
+			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
+			isValid = false;
 		}
 
-		return index;
+		if (mNameInputLayout.isErrorEnabled() || mAmountInputLayout.isErrorEnabled() || mPriceInputLayout.isErrorEnabled()) {
+			isValid = false;
+		}
+
+		return isValid;
 	}
 }

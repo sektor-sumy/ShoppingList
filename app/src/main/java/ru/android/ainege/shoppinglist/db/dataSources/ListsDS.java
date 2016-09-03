@@ -32,6 +32,7 @@ public class ListsDS extends GenericDS<List> implements TableInterface.ListsInte
 				"GROUP BY " + TABLE_NAME + "." + COLUMN_ID +
 				" ORDER BY " + COLUMN_ID + " DESC";
 		Cursor cursor = db.rawQuery(selectQuery, null);
+
 		return new ListCursor(cursor);
 	}
 
@@ -45,6 +46,7 @@ public class ListsDS extends GenericDS<List> implements TableInterface.ListsInte
 				CurrenciesInterface.TABLE_NAME + "." + CurrenciesInterface.COLUMN_ID + " " +
 				"WHERE " + TABLE_NAME + "." + COLUMN_ID + " = ?";
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
+
 		return new ListCursor(cursor);
 	}
 
@@ -52,6 +54,7 @@ public class ListsDS extends GenericDS<List> implements TableInterface.ListsInte
 	public int update(List list) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(list);
+
 		return db.update(TABLE_NAME, values, COLUMN_ID + " = ? ", new String[]{String.valueOf(list.getId())});
 	}
 
@@ -68,6 +71,7 @@ public class ListsDS extends GenericDS<List> implements TableInterface.ListsInte
 	public long add(List list) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(list);
+
 		return db.insert(TABLE_NAME, null, values);
 	}
 
@@ -82,6 +86,7 @@ public class ListsDS extends GenericDS<List> implements TableInterface.ListsInte
 		values.put(COLUMN_NAME, list.getName());
 		values.put(COLUMN_ID_CURRENCY, list.getIdCurrency());
 		values.put(COLUMN_IMAGE_PATH, list.getImagePath());
+
 		return values;
 	}
 

@@ -50,12 +50,14 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingL
 		String selectQuery = selectItemsQuery +
 				" AND " + TABLE_NAME + "." + COLUMN_ID_ITEM + " = ? " ;
 		Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(idList), String.valueOf(idItem)});
+
 		return new ShoppingListCursor(cursor);
 	}
 
 	public ShoppingListCursor getItemsInList(long id) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery(selectItemsQuery, new String[]{String.valueOf(id)});
+
 		return new ShoppingListCursor(cursor);
 	}
 
@@ -73,6 +75,7 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingL
 				" ON " + ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
 				" WHERE " + ItemsInterface.COLUMN_NAME + " LIKE '" + name +
 				"' AND " + COLUMN_ID_LIST + " = " + idList, null);
+
 		return new ShoppingListCursor(cursor);
 	}
 
@@ -96,6 +99,7 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingL
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(shoppingList.isBought());
 		values.put(COLUMN_ID_ITEM, shoppingList.getIdItem());
+
 		return db.update(TABLE_NAME, values,
 				COLUMN_ID_ITEM + " = ? AND " + COLUMN_ID_LIST + " = ?",
 				new String[]{String.valueOf(idOldItem), String.valueOf(shoppingList.getIdList())});
@@ -108,6 +112,7 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingL
 
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(shoppingList);
+
 		return db.insert(TABLE_NAME, null, values);
 	}
 
@@ -119,6 +124,7 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingL
 	private ContentValues createContentValues(boolean isBought) {
 		ContentValues values = new ContentValues();
 		values.put(COLUMN_IS_BOUGHT, isBought);
+
 		return values;
 	}
 
@@ -128,10 +134,12 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingL
 		values.put(COLUMN_ID_LIST, shoppingList.getIdList());
 		values.put(COLUMN_ID_DATA, shoppingList.getIdItemData());
 		values.put(COLUMN_DATE, System.currentTimeMillis() / 1000);
+
 		return values;
 	}
 
 	public static class ShoppingListCursor extends EntityCursor<ShoppingList> {
+
 		public ShoppingListCursor(Cursor cursor) {
 			super(cursor);
 		}
@@ -155,6 +163,7 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingL
 				if (getColumnIndex(ItemDataInterface.COLUMN_ID_CATEGORY + "Item") != -1) {
 					item.setIdCategory(getLong(getColumnIndex(ItemDataInterface.COLUMN_ID_CATEGORY + "Item")));
 				}
+
 				shoppingList.setItem(item);
 			}
 

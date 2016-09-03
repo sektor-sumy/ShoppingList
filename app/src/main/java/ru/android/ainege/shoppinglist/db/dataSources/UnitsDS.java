@@ -10,14 +10,19 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.entities.Unit;
 import ru.android.ainege.shoppinglist.db.TableInterface;
 import ru.android.ainege.shoppinglist.db.TableInterface.ItemDataInterface;
+import ru.android.ainege.shoppinglist.ui.view.spinners.GeneralSpinner;
 
 public class UnitsDS extends CatalogDS<Unit> implements TableInterface.UnitsInterface {
 
-	public UnitsDS(Context context) {
-		super(context);
+	public static UnitCursor getAll(SQLiteDatabase db) {
+		Cursor cursor = db.query(TABLE_NAME, null, null,
+				null, null, null, COLUMN_NAME);
+
+		return new UnitCursor(cursor);
 	}
 
 	public static HashMap<String, Unit> getUnit(SQLiteDatabase db) {
@@ -31,10 +36,8 @@ public class UnitsDS extends CatalogDS<Unit> implements TableInterface.UnitsInte
 		return unit;
 	}
 
-	public static UnitCursor getAll(SQLiteDatabase db) {
-		Cursor cursor = db.query(TABLE_NAME, null, null,
-				null, null, null, COLUMN_NAME);
-		return new UnitCursor(cursor);
+	public UnitsDS(Context context) {
+		super(context);
 	}
 
 	@Override
@@ -42,13 +45,12 @@ public class UnitsDS extends CatalogDS<Unit> implements TableInterface.UnitsInte
 		return getAll(mDbHelper.getReadableDatabase());
 	}
 
+	@Override
 	public UnitCursor getAllForSpinner() {
-		SQLiteDatabase  db = mDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_NAME, null, null,
-				null, null, null, COLUMN_NAME);
+		Cursor cursor = getAll();
 
 		MatrixCursor extras = new MatrixCursor(new String[] { COLUMN_ID, COLUMN_NAME });
-		extras.addRow(new String[] { "-1", "Добавить" });
+		extras.addRow(new String[] { String.valueOf(GeneralSpinner.ID_ADD_CATALOG), mContext.getString(R.string.add) });
 		Cursor[] cursors = { extras, cursor };
 
 		return new UnitCursor(new MergeCursor(cursors));
@@ -59,6 +61,7 @@ public class UnitsDS extends CatalogDS<Unit> implements TableInterface.UnitsInte
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_NAME, null, COLUMN_ID + " != " + withoutId,
 				null, null, null, COLUMN_NAME);
+
 		return new UnitCursor(cursor);
 	}
 
@@ -69,6 +72,7 @@ public class UnitsDS extends CatalogDS<Unit> implements TableInterface.UnitsInte
 				null, null, null, null);
 		boolean result = cursor.getCount() > 0;
 		cursor.close();
+
 		return result;
 	}
 
@@ -76,14 +80,15 @@ public class UnitsDS extends CatalogDS<Unit> implements TableInterface.UnitsInte
 	public int update(Unit unit) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(unit);
-		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?",
-				new String[]{String.valueOf(unit.getId())});
+
+		return db.update(TABLE_NAME, values, COLUMN_ID + " = ?", new String[]{String.valueOf(unit.getId())});
 	}
 
 	@Override
 	public long add(Unit unit) {
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		ContentValues values = createContentValues(unit);
+
 		return db.insert(TABLE_NAME, null, values);
 	}
 
@@ -110,10 +115,12 @@ public class UnitsDS extends CatalogDS<Unit> implements TableInterface.UnitsInte
 	private ContentValues createContentValues(Unit unit) {
 		ContentValues values = new ContentValues();
 		values.put(COLUMN_NAME, unit.getName());
+
 		return values;
 	}
 
 	public static class UnitCursor extends CatalogCursor<Unit> {
+
 		public UnitCursor(Cursor cursor) {
 			super(cursor);
 		}

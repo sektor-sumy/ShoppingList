@@ -1,12 +1,10 @@
 package ru.android.ainege.shoppinglist.ui.fragments.list;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
-import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 
 public class EditListDialogFragment extends ListDialogFragment {
@@ -37,10 +35,10 @@ public class EditListDialogFragment extends ListDialogFragment {
 	protected void setDataToView() {
 		loadImage(mEditList.getImagePath());
 
-		mName.setText(mEditList.getName());
-		mName.setSelection(mName.getText().length());
+		mNameEditText.setText(mEditList.getName());
+		mNameEditText.setSelection(mNameEditText.getText().length());
 
-		mCurrency.setSelection(getPosition(mCurrency, mEditList.getIdCurrency()));
+		mCurrencySpinner.setSelection(getPosition(mCurrencySpinner, mEditList.getIdCurrency()));
 	}
 
 	@Override
@@ -56,7 +54,7 @@ public class EditListDialogFragment extends ListDialogFragment {
 	}
 
 	@Override
-	protected boolean isDeleteImage(String newPath) {
+	public boolean isDeleteImage(String newPath) {
 		return super.isDeleteImage(newPath) &&
 				!mImagePath.contains(Image.ASSETS_IMAGE_PATH) &&
 				!newPath.equals(mImagePath) &&
