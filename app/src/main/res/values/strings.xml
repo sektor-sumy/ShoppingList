@@ -3,6 +3,7 @@
 
 	<string name="catched_exception">Catched exception</string>
 	<string name="error_file_not_create">Не удалось создать файл</string>
+	<string name="error_out_of_memory">Нехватки памяти для обработки картинки</string>
 	<string name="error_bitmap">Произошла ошибка обработки</string>
 	<string name="error_name">Введите название</string>
 	<string name="next">Далее</string>

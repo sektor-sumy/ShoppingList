@@ -192,7 +192,7 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 		mPictureView = new PictureView(this, savedInstanceState, this,
 				new OnFinishedImageListener() {
 					@Override
-					public void onFinished(boolean isSuccess, String path) {
+					public void onFinished(int resultCode, String path) {
 						loadImage(path);
 					}
 				});

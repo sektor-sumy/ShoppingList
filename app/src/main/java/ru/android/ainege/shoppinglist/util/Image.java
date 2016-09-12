@@ -24,6 +24,7 @@ import java.util.Date;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
+import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
 
 import static android.graphics.Bitmap.CompressFormat;
 import static android.graphics.Bitmap.createBitmap;
@@ -252,6 +253,8 @@ public class Image {
 		private int mWidthImageView;
 		private OnFinishedImageListener mOnFinishedImageListener;
 
+		private int mResultCode = RetainedFragment.RESULT_OK;
+
 		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, OnFinishedImageListener onFinishedImageListener) {
 			mFile = file;
 			mWidthImageView = widthImageView;
@@ -270,6 +273,12 @@ public class Image {
 					result = Image.create().postProcessingToFile(mFile, mBitmap, mWidthImageView);
 				}
 			} catch (OutOfMemoryError | Exception e) {
+				if (e instanceof OutOfMemoryError) {
+					mResultCode = RetainedFragment.ERROR_OUT_MEMORY;
+				} else {
+					mResultCode = RetainedFragment.ERROR_PROCESSING;
+				}
+
 				e.printStackTrace();
 				FirebaseCrash.report(new Exception("Catched exception", e));
 				deleteFile(mFile.getAbsolutePath());
@@ -281,7 +290,7 @@ public class Image {
 
 		@Override
 		protected void onPostExecute(Boolean isSuccess) {
-			mOnFinishedImageListener.onFinished(isSuccess, Image.PATH_PROTOCOL + mFile.getAbsolutePath());
+			mOnFinishedImageListener.onFinished(mResultCode, Image.PATH_PROTOCOL + mFile.getAbsolutePath());
 		}
 	}
 }

@@ -28,6 +28,10 @@ import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 
 public class PictureView {
+	public static final int RESULT_OK = RetainedFragment.RESULT_OK;
+	public static final int ERROR_OUT_MEMORY = RetainedFragment.ERROR_OUT_MEMORY;
+	public static final int ERROR_PROCESSING = RetainedFragment.ERROR_PROCESSING;
+
 	private static final String RETAINED_FRAGMENT = "retained_fragment_item";
 	public static final int TAKE_PHOTO = 404;
 	public static final int FROM_GALLERY = 405;

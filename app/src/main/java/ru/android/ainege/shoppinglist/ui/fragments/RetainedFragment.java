@@ -15,6 +15,9 @@ import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.util.Image;
 
 public class RetainedFragment extends Fragment implements OnFinishedImageListener {
+	public static final int RESULT_OK = 1;
+	public static final int ERROR_OUT_MEMORY = 2;
+	public static final int ERROR_PROCESSING = 3;
 	private Activity mActivity;
 	private OnFinishedImageListener mLoadingListener;
 	private String mImagePath;
@@ -66,18 +69,29 @@ public class RetainedFragment extends Fragment implements OnFinishedImageListene
 	}
 
 	@Override
-	public void onFinished(boolean isSuccess, String path) {
+	public void onFinished(int resultCode, String path) {
 		mIsLoading = false;
 
-		if (isSuccess) {
+		if (resultCode == RESULT_OK) {
 			mImagePath = path;
 
 			if (mLoadingListener != null) {
-				mLoadingListener.onFinished(isSuccess, mImagePath);
+				mLoadingListener.onFinished(resultCode, mImagePath);
 			}
 		} else {
 			Image.create().insertImageToView(mActivity, mImagePath, mImageView);
-			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_bitmap), Toast.LENGTH_SHORT).show();
+			String message;
+
+			switch (resultCode) {
+				case ERROR_OUT_MEMORY:
+					message = getString(R.string.error_out_of_memory);
+					break;
+				case ERROR_PROCESSING:
+				default:
+					message = getString(R.string.error_bitmap);
+			}
+
+			Toast.makeText(mActivity, message, Toast.LENGTH_SHORT).show();
 		}
 	}
 

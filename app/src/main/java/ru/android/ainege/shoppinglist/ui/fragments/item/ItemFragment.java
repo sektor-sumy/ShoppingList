@@ -164,7 +164,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 		mPictureView = new PictureView(this, savedInstanceState, this, new OnFinishedImageListener() {
 			@Override
-			public void onFinished(boolean isSuccess, String path) {
+			public void onFinished(int resultCode, String path) {
 				loadImage(path);
 			}
 		});
