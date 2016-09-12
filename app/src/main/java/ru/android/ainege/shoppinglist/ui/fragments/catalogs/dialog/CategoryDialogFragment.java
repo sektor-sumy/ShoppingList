@@ -1,5 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -20,15 +22,8 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 	private LobsterPicker mLobsterPicker;
 
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-
-		outState.putInt(STATE_COLOR, mLobsterPicker.getColor());
-	}
-
-	@Override
-	protected View setupView() {
-		View v = super.setupView();
+	protected View setupView(Bundle savedInstanceState) {
+		View v = super.setupView(savedInstanceState);
 
 		LinearLayout mColorPicker = (LinearLayout) v.findViewById(R.id.color_picker);
 		mLobsterPicker = (LobsterPicker) v.findViewById(R.id.lobster_picker);
@@ -44,7 +39,17 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 			v.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		}
 
+		if (mIsEditDialog || savedInstanceState != null) {
+			setDataToView(savedInstanceState);
+		}
+
 		return v;
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt(STATE_COLOR, mLobsterPicker.getColor());
 	}
 
 	@Override
@@ -92,7 +97,7 @@ public class CategoryDialogFragment extends GeneralDialogFragment<Category> {
 				categoryDS.update(new Category(id, name, color));
 			}
 
-			sendResult(id);
+			sendResult(Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
 			isSave = true;
 		}
 

@@ -1,5 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -13,10 +15,16 @@ import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 
 	@Override
-	protected View setupView() {
-		View v = super.setupView();
+	protected View setupView(Bundle savedInstanceState) {
+		View v = super.setupView(savedInstanceState);
+
 		mName.setFilters(new InputFilter[]{new InputFilter.LengthFilter(5)});
 		mName.setRawInputType(InputType.TYPE_CLASS_TEXT);
+
+		if (mIsEditDialog) {
+			setDataToView(savedInstanceState);
+		}
+
 		return v;
 	}
 
@@ -49,7 +57,7 @@ public class UnitDialogFragment extends GeneralDialogFragment<Unit> {
 				unitDS.update(new Unit(id, name));
 			}
 
-			sendResult(id);
+			sendResult(Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
 			isSave = true;
 		}
 

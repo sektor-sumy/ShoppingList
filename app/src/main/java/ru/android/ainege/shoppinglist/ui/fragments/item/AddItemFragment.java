@@ -56,7 +56,7 @@ public class AddItemFragment extends ItemFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mItemInList = new ShoppingList(getIdList());
-		mItemInList.getItem().setImagePath(Image.getPathFromResource(R.drawable.no_image));
+		mItemInList.getItem().setImagePath(Image.getPathFromResource(getActivity(), R.drawable.no_image));
 
 		mIsUseDefaultData = mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_data), true);
 		mIsAdded = true;
@@ -77,7 +77,6 @@ public class AddItemFragment extends ItemFragment {
 	protected void setupView(View v, Bundle savedInstanceState) {
 		super.setupView(v, savedInstanceState);
 
-		// TODO: 03.09.2016 lost image (assets) after retained
 		if (savedInstanceState != null) {
 			loadImage(mPictureView.getImagePath());
 		}
@@ -274,7 +273,7 @@ public class AddItemFragment extends ItemFragment {
 			String image = mItemInList.getItem().getImagePath();
 			String defaultImage = mItemInList.getItem().getDefaultImagePath();
 
-			if (image == null || image.equals(Image.getPathFromResource(R.drawable.no_image))) {
+			if (image == null || image.equals(Image.getPathFromResource(getActivity(), R.drawable.no_image))) {
 				defaultImage = image = Image.CHARACTER_IMAGE_PATH + (int) getName().toUpperCase().charAt(0) + ".png";
 			}
 
@@ -288,39 +287,31 @@ public class AddItemFragment extends ItemFragment {
 
 	@Override
 	public void resetImage() {
-		if (!mItemInList.getItem().isNew() && mItemInList.getItem().getDefaultImagePath() != null) {
-			loadImage(mItemInList.getItem().getDefaultImagePath());
-		} else {
-			if (!mItemInList.getItem().getImagePath().contains(Image.ASSETS_IMAGE_PATH)) {
-				Image.deleteFile(mItemInList.getItem().getImagePath());
-			}
+		String path;
 
-			mItemInList.getItem().setImagePath(Image.getPathFromResource(R.drawable.no_image));
-			mPictureView.getImage().setImageResource(R.drawable.no_image);
+		if (!mItemInList.getItem().isNew() && mItemInList.getItem().getDefaultImagePath() != null) {
+			path = mItemInList.getItem().getDefaultImagePath();
+		} else {
+			path = Image.getPathFromResource(getActivity(), R.drawable.no_image);
 			mCollapsingToolbarLayout.setTitle(getString(R.string.add));
 		}
+
+		loadImage(path);
 	}
 
 	@Override
 	public boolean isDeleteImage(String newPath) {
 		boolean result = true;
 
-		if(mItemInList.getItem() == null) {
-			return false;
-		}
 		String imagePath = mItemInList.getItem().getImagePath();
-		String dPath  = mItemInList.getItem().getDefaultImagePath();
+		String defaultImagePath  = mItemInList.getItem().getDefaultImagePath();
 
-		if (dPath == null && imagePath == null) {
-			result = false;
-		} else{
-			if (imagePath != null) {
-				result = !imagePath.contains(Image.ASSETS_IMAGE_PATH);
-			}
+		if (imagePath != null) {
+			result = !imagePath.contains(Image.ASSETS_IMAGE_PATH);
+		}
 
-			if (dPath != null) {
-				result = result && !newPath.equals(imagePath) && !dPath.equals(imagePath);
-			}
+		if (defaultImagePath != null) {
+			result = result && !imagePath.equals(newPath) && !imagePath.equals(defaultImagePath);
 		}
 
 		return result;

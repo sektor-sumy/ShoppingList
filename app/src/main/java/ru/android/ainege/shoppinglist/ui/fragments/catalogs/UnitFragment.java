@@ -38,7 +38,12 @@ public class UnitFragment extends CatalogFragment<Unit> {
 	}
 
 	@Override
-	protected GeneralDialogFragment getDialog() {
+	protected GeneralDialogFragment getAddDialog() {
+		return new UnitDialogFragment();
+	}
+
+	@Override
+	protected GeneralDialogFragment getEditDialog() {
 		return new UnitDialogFragment();
 	}
 

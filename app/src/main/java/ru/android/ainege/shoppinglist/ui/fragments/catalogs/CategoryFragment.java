@@ -39,7 +39,12 @@ public class CategoryFragment extends CatalogFragment<Category> {
 	}
 
 	@Override
-	protected GeneralDialogFragment getDialog() {
+	protected GeneralDialogFragment getAddDialog() {
+		return new CategoryDialogFragment();
+	}
+
+	@Override
+	protected GeneralDialogFragment getEditDialog() {
 		return new CategoryDialogFragment();
 	}
 

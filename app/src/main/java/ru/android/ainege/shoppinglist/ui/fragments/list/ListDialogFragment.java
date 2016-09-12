@@ -145,7 +145,9 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 
 	@Override
 	public boolean isDeleteImage(String newPath) {
-		return mImagePath != null;
+		return mImagePath != null &&
+				!mImagePath.contains(Image.ASSETS_IMAGE_PATH) &&
+				!mImagePath.equals(newPath);
 	}
 
 	@Override
@@ -193,11 +195,6 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 					public void onFinished(boolean isSuccess, String path) {
 						loadImage(path);
 					}
-
-					@Override
-					public Activity getActivity() {
-						return getActivity();
-					}
 				});
 		mPictureView.setImage(v.findViewById(R.id.image));
 
@@ -211,9 +208,6 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 			setDataToView();
 		} else {
 			loadImage(mPictureView.getImagePath());
-		}
-
-		if (savedInstanceState != null) {
 			mPictureView.setFile((File) savedInstanceState.getSerializable(STATE_FILE));
 		}
 

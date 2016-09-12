@@ -46,7 +46,7 @@ public class EditListDialogFragment extends ListDialogFragment {
 		long id = mEditList.getId();
 		listDS.update(new List(id, name, idCurrency, mImagePath));
 
-		if (!mOriginalList.getImagePath().contains(Image.ASSETS_IMAGE_PATH) && !mImagePath.equals(mOriginalList.getImagePath())) {
+		if (!mOriginalList.getImagePath().contains(Image.ASSETS_IMAGE_PATH) && !mOriginalList.getImagePath().equals(mImagePath)) {
 			Image.deleteFile(mOriginalList.getImagePath());
 		}
 
@@ -56,8 +56,6 @@ public class EditListDialogFragment extends ListDialogFragment {
 	@Override
 	public boolean isDeleteImage(String newPath) {
 		return super.isDeleteImage(newPath) &&
-				!mImagePath.contains(Image.ASSETS_IMAGE_PATH) &&
-				!newPath.equals(mImagePath) &&
-				!mOriginalList.getImagePath().equals(mImagePath);
+				!mImagePath.equals(mOriginalList.getImagePath());
 	}
 }

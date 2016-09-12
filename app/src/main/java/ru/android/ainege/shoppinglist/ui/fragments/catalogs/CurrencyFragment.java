@@ -45,7 +45,12 @@ public class CurrencyFragment extends CatalogFragment<Currency> {
 	}
 
 	@Override
-	protected GeneralDialogFragment getDialog() {
+	protected GeneralDialogFragment getAddDialog() {
+		return new CurrencyDialogFragment();
+	}
+
+	@Override
+	protected GeneralDialogFragment getEditDialog() {
 		return new CurrencyDialogFragment();
 	}
 

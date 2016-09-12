@@ -60,7 +60,8 @@ public class RetainedFragment extends Fragment implements OnFinishedImageListene
 		mImageView = view;
 
 		mIsLoading = true;
-		Image.create().insertImageToView(mActivity, Image.getPathFromResource(Image.mLoadingImage), mImageView);
+		String path = Image.getPathFromResource(mActivity, Image.mLoadingImage);
+		Image.create().insertImageToView(mActivity, path, mImageView);
 		new Image.BitmapWorkerTask(file, bitmap, metrics.widthPixels - 30, this).execute();
 	}
 

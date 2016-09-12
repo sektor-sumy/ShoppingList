@@ -25,9 +25,9 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 	protected EditText mName;
 
 	protected T mEditItem;
+	protected boolean mIsEditDialog = false;
 
 	protected abstract String getTitle();
-
 	protected abstract boolean saveData();
 
 	public static GeneralDialogFragment newInstance(GeneralDialogFragment fragment, Catalog catalog) {
@@ -40,27 +40,12 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		View v = setupView();
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getTitle())
-				.setView(v)
+				.setView(setupView(savedInstanceState))
 				.setCancelable(true)
-				.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
-					}
-				})
-				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
-
-		if (getArguments() != null || savedInstanceState != null) {
-			setDataToView(savedInstanceState);
-		}
+				.setPositiveButton(R.string.save, null)
+				.setNegativeButton(R.string.cancel, null);
 
 		return builder.create();
 	}
@@ -68,41 +53,35 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 	@Override
 	public void onStart() {
 		super.onStart();
-
-		if (getDialog() == null) {
-			return;
-		}
-
 		final AlertDialog dialog = (AlertDialog) getDialog();
 
-		Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-		positiveButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Boolean wantToCloseDialog = saveData();
-
-				if (wantToCloseDialog) {
-					dialog.dismiss();
+		if (dialog != null) {
+			Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+			positiveButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (saveData()) {
+						dialog.dismiss();
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	@Override
 	public void onCancel(DialogInterface dialog) {
 		super.onCancel(dialog);
-
-		sendCancelResult();
+		sendResult(Activity.RESULT_CANCELED, null);
 	}
 
-	@Override
-	public void onDismiss(DialogInterface dialog) {
-		super.onDismiss(dialog);
-	}
-
-	protected View setupView() {
+	protected View setupView(Bundle savedInstanceState) {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_catalogs, null);
+
+		if (getArguments() != null) {
+			mIsEditDialog = true;
+			mEditItem = (T) getArguments().getSerializable(ITEM);
+		}
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
 		mName = (EditText) v.findViewById(R.id.name);
@@ -111,7 +90,7 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 	}
 
 	protected void setDataToView(Bundle savedInstanceState) {
-		if (getArguments() != null) {
+		if (mIsEditDialog) {
 			mEditItem = (T) getArguments().getSerializable(ITEM);
 		}
 
@@ -122,19 +101,10 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 		mName.setSelection(mName.getText().length());
 	}
 
-	protected void sendResult(long id) {
-		if (getTargetFragment() == null)
-			return;
-
-		getTargetFragment().onActivityResult(getTargetRequestCode(), android.app.Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
-	}
-
-	protected void sendCancelResult() {
-		if (getTargetFragment() == null) {
-			return;
+	protected void sendResult(int resultCode, Intent intent) {
+		if (getTargetFragment() != null) {
+			getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
 		}
-
-		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
 	}
 
 	protected void addAnalytics(String catalog, String name) {

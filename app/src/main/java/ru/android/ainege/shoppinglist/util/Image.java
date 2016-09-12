@@ -35,7 +35,6 @@ public class Image {
 	public static final String CHARACTER_IMAGE_PATH = ASSETS_IMAGE_PATH + "character/";
 	public static final String LIST_IMAGE_PATH = ASSETS_IMAGE_PATH + "list/";
 	public static final String ITEM_IMAGE_PATH = ASSETS_IMAGE_PATH + "item/";
-	public static final String RESOURCE_PATH = "android.resource://ru.android.ainege.shoppinglist/";
 	private static final double MIN_RATIO = 1.25;
 	private static final double MAX_RATIO = 2;
 
@@ -59,8 +58,8 @@ public class Image {
 		return result;
 	}
 
-	public static String getPathFromResource(int resource) {
-		return RESOURCE_PATH + resource;
+	public static String getPathFromResource(Context context, int resource) {
+		return "android.resource://"+ context.getPackageName() + "/" + resource;
 	}
 
 	public Image insertImageToView(Context context, String path, ImageView image) {
@@ -251,17 +250,13 @@ public class Image {
 		private File mFile;
 		private Bitmap mBitmap;
 		private int mWidthImageView;
-		private OnFinishedImageListener mFragment;
+		private OnFinishedImageListener mOnFinishedImageListener;
 
-		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, OnFinishedImageListener fragment) {
-			this(file, widthImageView, fragment);
-			mBitmap = bitmap;
-		}
-
-		public BitmapWorkerTask(File file, int widthImageView, OnFinishedImageListener fragment) {
+		public BitmapWorkerTask(File file, Bitmap bitmap, int widthImageView, OnFinishedImageListener onFinishedImageListener) {
 			mFile = file;
 			mWidthImageView = widthImageView;
-			mFragment = fragment;
+			mOnFinishedImageListener = onFinishedImageListener;
+			mBitmap = bitmap;
 		}
 
 		@Override
@@ -276,7 +271,7 @@ public class Image {
 				}
 			} catch (OutOfMemoryError | Exception e) {
 				e.printStackTrace();
-				FirebaseCrash.report(new Exception(mFragment.getActivity().getResources().getString(R.string.catched_exception), e));
+				FirebaseCrash.report(new Exception("Catched exception", e));
 				deleteFile(mFile.getAbsolutePath());
 				result = false;
 			}
@@ -286,7 +281,7 @@ public class Image {
 
 		@Override
 		protected void onPostExecute(Boolean isSuccess) {
-			mFragment.onFinished(isSuccess, Image.PATH_PROTOCOL + mFile.getAbsolutePath());
+			mOnFinishedImageListener.onFinished(isSuccess, Image.PATH_PROTOCOL + mFile.getAbsolutePath());
 		}
 	}
 }

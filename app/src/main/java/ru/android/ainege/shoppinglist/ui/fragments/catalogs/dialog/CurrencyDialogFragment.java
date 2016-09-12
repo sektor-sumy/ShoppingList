@@ -1,5 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.view.View;
@@ -15,12 +17,16 @@ public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 	private EditText mSymbol;
 
 	@Override
-	protected View setupView() {
-		View v = super.setupView();
+	protected View setupView(Bundle savedInstanceState) {
+		View v = super.setupView(savedInstanceState);
 
 		mSymbolInputLayout = (TextInputLayout) v.findViewById(R.id.symbol_input_layout);
 		mSymbolInputLayout.setVisibility(View.VISIBLE);
 		mSymbol = (EditText) v.findViewById(R.id.symbol);
+
+		if (mIsEditDialog) {
+			setDataToView(savedInstanceState);
+		}
 
 		return v;
 	}
@@ -71,7 +77,7 @@ public class CurrencyDialogFragment extends GeneralDialogFragment<Currency> {
 				currencyDS.update(new Currency(id, name, symbol));
 			}
 
-			sendResult(id);
+			sendResult(Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
 			isSave = true;
 		}
 

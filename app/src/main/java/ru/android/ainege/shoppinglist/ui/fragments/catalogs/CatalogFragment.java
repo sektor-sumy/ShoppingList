@@ -60,7 +60,8 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	protected abstract String getTitle(Toolbar toolbar);
 	protected abstract CatalogAdapter getAdapter();
 	protected abstract CatalogDS getDS();
-	protected abstract GeneralDialogFragment getDialog();
+	protected abstract GeneralDialogFragment getAddDialog();
+	protected abstract GeneralDialogFragment getEditDialog();
 	protected abstract ArrayList getCatalog(Cursor data);
 
 	@TargetApi(23)
@@ -120,7 +121,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		mFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				GeneralDialogFragment addItemDialog = getDialog();
+				GeneralDialogFragment addItemDialog = getAddDialog();
 				addItemDialog.setTargetFragment(CatalogFragment.this, ADD);
 				addItemDialog.show(getFragmentManager(), ADD_DATE);
 			}
@@ -177,12 +178,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 			case DATA_LOADER:
 				if (data.moveToFirst()) {
 					mCatalog = getCatalog(data);
-
-					mAdapterRV.setData(mCatalog);
-
-					if (mScrollToPosition != -1) {
-						mCatalogRV.scrollToPosition(mScrollToPosition);
-					}
+					loadData();
 
 					mCatalogRV.setVisibility(View.VISIBLE);
 					mEmptyImage.setVisibility(View.GONE);
@@ -200,6 +196,14 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 
+	}
+
+	protected void loadData() {
+		mAdapterRV.setData(mCatalog);
+
+		if (mScrollToPosition != -1) {
+			mCatalogRV.scrollToPosition(mScrollToPosition);
+		}
 	}
 
 	@Override
@@ -262,8 +266,8 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		return getDS().isUsed(id);
 	}
 
-	protected void showEditDialog(int position) {
-		GeneralDialogFragment editItemDialog = GeneralDialogFragment.newInstance(getDialog(), mCatalog.get(position));
+	protected void showEditDialog(T catalog) {
+		GeneralDialogFragment editItemDialog = GeneralDialogFragment.newInstance(getEditDialog(), catalog);
 		editItemDialog.setTargetFragment(CatalogFragment.this, EDIT);
 		editItemDialog.show(getFragmentManager(), EDIT_DATE);
 	}
@@ -351,7 +355,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 				mEdit.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						showEditDialog(getAdapterPosition());
+						showEditDialog(mCatalog.get(getAdapterPosition()));
 					}
 				});
 
@@ -378,7 +382,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 				v.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						showEditDialog(getAdapterPosition());
+						showEditDialog(mCatalog.get(getAdapterPosition()));
 					}
 				});
 			}

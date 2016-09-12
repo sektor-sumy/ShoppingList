@@ -167,11 +167,6 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 			public void onFinished(boolean isSuccess, String path) {
 				loadImage(path);
 			}
-
-			@Override
-			public Activity getActivity() {
-				return getActivity();
-			}
 		});
 		mUnitSpinner = new UnitSpinner(this);
 		mCategorySpinner = new CategorySpinner(this);
@@ -251,7 +246,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 					if (modifyCatalog != null) {
 						if (modifyCatalog.containsKey(R.string.catalogs_key_item)) {
-
+							// TODO: 12.09.2016  
 						}
 
 						if (modifyCatalog.containsKey(R.string.catalogs_key_category)) {

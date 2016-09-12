@@ -30,6 +30,8 @@ import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ItemData;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.DeleteDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.item.AddItemDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.item.EditItemDialogFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.MultiSelection;
 
@@ -82,9 +84,13 @@ public class ItemFragment extends CatalogFragment<Item>{
 	}
 
 	@Override
-	protected GeneralDialogFragment getDialog() {
-		// TODO: 25.08.2016
-		return null;
+	protected GeneralDialogFragment getAddDialog() {
+		return new AddItemDialogFragment();
+	}
+
+	@Override
+	protected GeneralDialogFragment getEditDialog() {
+		return new EditItemDialogFragment();
 	}
 
 	@Override
@@ -106,6 +112,41 @@ public class ItemFragment extends CatalogFragment<Item>{
 		}
 
 		return categories;
+	}
+
+	protected void loadData() {
+		Item item = getLastEditItem(mCatalog);
+		mAdapterRV.setData(mCatalog);
+
+		if (item != null) {
+			setScrollPosition(item);
+		}
+
+		if (mScrollToPosition != -1) {
+			mCatalogRV.scrollToPosition(mScrollToPosition);
+		}
+	}
+
+	private Item getLastEditItem(ArrayList categories) {
+		if (mLastEditId != -1) {
+			for (Object c : categories) {
+				for (Object i : ((Category) c).getItemsByCategories()) {
+					Item item = (Item) i;
+
+					if (item.getIdItem() == mLastEditId) {
+						((ItemAdapter) mAdapterRV).setCollapseCategoryStates(item.getIdCategory(), false);
+						return item;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private void setScrollPosition(Item item) {
+		int itemPosition = ((ItemAdapter) mAdapterRV).getItemList().indexOf(item);
+		mScrollToPosition = itemPosition != -1 ? itemPosition : ((ItemAdapter) mAdapterRV).getItemList().indexOf(item.getCategory());
 	}
 
 	private Toolbar.OnMenuItemClickListener onMenuItemClickListener () {
@@ -294,7 +335,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 				v.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						showEditDialog(getAdapterPosition());
+						showEditDialog((Item) mItemList.get(getAdapterPosition()));
 					}
 				});
 			}
