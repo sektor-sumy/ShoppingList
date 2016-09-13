@@ -266,7 +266,16 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 		@Override
 		public void removeItem(int position) {
-			removeItem((Item) mItemList.get(position));
+			Item item = (Item) mItemList.get(position);
+			removeItem(item);
+
+			if (!item.getImagePath().contains(Image.ASSETS_IMAGE_PATH)) {
+				Image.deleteFile(item.getImagePath());
+			}
+
+			if (!item.getDefaultImagePath().contains(Image.ASSETS_IMAGE_PATH)) {
+				Image.deleteFile(item.getDefaultImagePath());
+			}
 
 			if (mItemList.size() == 0) {
 				mCatalogRV.setVisibility(View.GONE);
