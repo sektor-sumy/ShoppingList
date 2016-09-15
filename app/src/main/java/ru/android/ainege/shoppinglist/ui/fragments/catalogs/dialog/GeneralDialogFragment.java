@@ -45,7 +45,12 @@ public abstract class GeneralDialogFragment<T extends Catalog> extends DialogFra
 				.setView(setupView(savedInstanceState))
 				.setCancelable(true)
 				.setPositiveButton(R.string.save, null)
-				.setNegativeButton(R.string.cancel, null);
+				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						dialogInterface.cancel();
+					}
+				});
 
 		return builder.create();
 	}

@@ -53,7 +53,12 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 		builder.setView(createView(savedInstanceState))
 				.setCancelable(true)
 				.setPositiveButton(R.string.save, null)
-				.setNegativeButton(R.string.cancel, null);
+				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						dialogInterface.cancel();
+					}
+				});
 
 		return builder.create();
 	}
@@ -85,6 +90,11 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 	@Override
 	public void onCancel(DialogInterface dialog) {
 		super.onCancel(dialog);
+
+		if (isDeleteImage(null)) {
+			Image.deleteFile(mImagePath);
+		}
+
 		sendResult(Activity.RESULT_CANCELED, null);
 	}
 

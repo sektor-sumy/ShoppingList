@@ -64,6 +64,7 @@ import ru.android.ainege.shoppinglist.ui.view.spinners.CategorySpinner;
 import ru.android.ainege.shoppinglist.ui.view.spinners.GeneralSpinner;
 import ru.android.ainege.shoppinglist.ui.view.spinners.UnitSpinner;
 import ru.android.ainege.shoppinglist.util.AndroidBug5497Workaround;
+import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import ru.android.ainege.shoppinglist.util.Validation;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -271,6 +272,10 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		} else {
 			switch (requestCode) {
 				case IS_SAVE_CHANGES:
+					if (isDeleteImage(null)) {
+						Image.deleteFile(mItemInList.getItem().getImagePath());
+					}
+
 					if (mOnClickListener != null) {
 						mOnClickListener.onNotSave();
 					}
@@ -312,6 +317,8 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 			dialogFrag.show(getFragmentManager(), IS_SAVE_CHANGES_DATE);
 
 			result = false;
+		} else if (mIsAdded && isDeleteImage(null)) {
+			Image.deleteFile(mItemInList.getItem().getImagePath());
 		}
 
 		return result;

@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.item;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +27,7 @@ import ru.android.ainege.shoppinglist.ui.view.PictureView;
 import ru.android.ainege.shoppinglist.ui.view.spinners.CategorySpinner;
 import ru.android.ainege.shoppinglist.ui.view.spinners.GeneralSpinner;
 import ru.android.ainege.shoppinglist.ui.view.spinners.UnitSpinner;
+import ru.android.ainege.shoppinglist.util.Image;
 
 public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> implements PictureView.PictureInterface{
 	private static final String STATE_FILE = "state_file";
@@ -72,6 +74,15 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 	@Override
 	protected String getTitle() {
 		return getString(R.string.catalogs_items);
+	}
+
+	@Override
+	public void onCancel(DialogInterface dialog) {
+		super.onCancel(dialog);
+
+		if (isDeleteImage(null)) {
+			Image.deleteFile(mEditItem.getImagePath());
+		}
 	}
 
 	@Override

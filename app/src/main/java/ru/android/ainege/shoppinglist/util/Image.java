@@ -33,6 +33,7 @@ import static android.graphics.Bitmap.createScaledBitmap;
 public class Image {
 	public static final String PATH_PROTOCOL = "file://";
 	public static final String ASSETS_IMAGE_PATH = PATH_PROTOCOL + "/android_asset/images/";
+	public static final String RESOURCE_IMAGE_PATH = PATH_PROTOCOL + "android.resource://";
 	public static final String CHARACTER_IMAGE_PATH = ASSETS_IMAGE_PATH + "character/";
 	public static final String LIST_IMAGE_PATH = ASSETS_IMAGE_PATH + "list/";
 	public static final String ITEM_IMAGE_PATH = ASSETS_IMAGE_PATH + "item/";
@@ -52,7 +53,7 @@ public class Image {
 
 	public static boolean deleteFile(String path) {
 		boolean result = false;
-		if (path != null && !path.contains(Image.ASSETS_IMAGE_PATH)) {
+		if (path != null && !path.contains(Image.ASSETS_IMAGE_PATH) && !path.contains(RESOURCE_IMAGE_PATH)) {
 			File f = new File(Uri.parse(path).getPath());
 			result = f.delete();
 		}
@@ -60,7 +61,7 @@ public class Image {
 	}
 
 	public static String getPathFromResource(Context context, int resource) {
-		return "android.resource://"+ context.getPackageName() + "/" + resource;
+		return RESOURCE_IMAGE_PATH + context.getPackageName() + "/" + resource;
 	}
 
 	public Image insertImageToView(Context context, String path, ImageView image) {
