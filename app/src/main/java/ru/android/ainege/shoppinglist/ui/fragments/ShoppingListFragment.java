@@ -142,6 +142,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 
 			mFAB.setVisibility(View.GONE);
+			mSLMenu.setVisibility(View.INVISIBLE);
 
 			if (!mIsStartActionMode) {
 				mAdapterRV.extendAllCategory(false);
@@ -170,6 +171,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
 			mFAB.setVisibility(View.VISIBLE);
+			mSLMenu.setVisibility(View.VISIBLE);
 			mActionMode = null;
 			mIsStartActionMode = false;
 
@@ -430,7 +432,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 	private void showPopupMenu(View v) {
 		PopupMenu popupMenu = new PopupMenu(getActivity(), v);
-		popupMenu.inflate(R.menu.shopping_list_menu);
+		popupMenu.inflate(R.menu.collapse_category);
 
 		popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			@Override

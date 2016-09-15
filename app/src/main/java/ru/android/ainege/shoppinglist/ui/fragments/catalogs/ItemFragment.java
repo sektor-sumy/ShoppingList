@@ -140,7 +140,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 	}
 
 	private void setMenu(Toolbar toolbar) {
-		toolbar.inflateMenu(R.menu.shopping_list_menu);
+		toolbar.inflateMenu(R.menu.collapse_category);
 
 		final Menu menu = toolbar.getMenu();
 		menu.setGroupVisible(R.id.collapse_category, mIsUseCategory);
@@ -149,6 +149,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 		SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
 		MenuItem searchItem = menu.findItem(R.id.action_search);
+		searchItem.setVisible(true);
 		mSearchView = (SearchView) searchItem.getActionView();
 
 		mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
