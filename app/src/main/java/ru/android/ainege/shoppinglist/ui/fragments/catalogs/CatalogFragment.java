@@ -199,7 +199,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	}
 
 	protected void loadData() {
-		mAdapterRV.setData(mCatalog);
+		mAdapterRV.setData(mCatalog, true);
 
 		if (mScrollToPosition != -1) {
 			mCatalogRV.scrollToPosition(mScrollToPosition);
@@ -294,7 +294,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	}
 
 	interface CatalogAdapter {
-		void setData(ArrayList catalog);
+		void setData(ArrayList catalog, boolean isUpdate);
 		void removeItem(int position);
 	}
 
@@ -319,7 +319,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 		public abstract S onCreateViewHolder(ViewGroup parent, int viewType);
 
 		@Override
-		public void setData(ArrayList catalog) {
+		public void setData(ArrayList catalog, boolean isUpdate) {
 			mCatalog = catalog;
 			notifyDataSetChanged();
 		}

@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
 	<item
-		android:id="@+id/collapse_all"
-		android:title="@string/collapsed_all"/>
-	<item
-		android:id="@+id/expanded_all"
-		android:title="@string/expanded_all"/>
+		android:id="@+id/action_search"
+		android:icon="@drawable/ic_search_white_24dp"
+		android:title="@android:string/search_go"
+		app:actionViewClass="android.support.v7.widget.SearchView"
+		app:showAsAction="ifRoom|collapseActionView"/>
+
+	<group android:id="@+id/collapse_category">
+		<item
+			android:id="@+id/collapse_all"
+			android:title="@string/collapsed_all"/>
+		<item
+			android:id="@+id/expanded_all"
+			android:title="@string/expanded_all"/>
+	</group>
 </menu>

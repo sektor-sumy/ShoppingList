@@ -19,7 +19,7 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 	protected static final int TYPE_ITEM = 1;
 
 	protected HashMap<Long, Boolean> mCollapseCategoryStates = new HashMap<>();
-	protected List<Object> mItemList = new ArrayList<>();
+	protected ArrayList<Object> mItemList = new ArrayList<>();
 
 	protected Activity mActivity;
 	protected boolean mIsUseCategory;
@@ -94,7 +94,7 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 		return mItemList.get(position);
 	}
 
-	public List<Object> getItemList() {
+	public ArrayList<Object> getItemList() {
 		return mItemList;
 	}
 
@@ -103,7 +103,6 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 		mItemList.remove(item);
 		item.getCategory().getItemsByCategories().remove(item);
 		notifyItemRemoved(position);
-
 
 		int categoryPosition = mItemList.indexOf(item.getCategory());
 
@@ -197,7 +196,6 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 	public void setCollapseCategoryStates(HashMap<Long, Boolean> collapseState) {
 		mCollapseCategoryStates = collapseState;
 	}
-
 
 	public HashMap<Long, Boolean> getCollapseCategoryStates() {
 		return mCollapseCategoryStates;

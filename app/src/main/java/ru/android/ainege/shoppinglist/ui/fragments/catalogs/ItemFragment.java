@@ -1,15 +1,22 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
 import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,6 +45,7 @@ import ru.android.ainege.shoppinglist.util.MultiSelection;
 public class ItemFragment extends CatalogFragment<Item>{
 	private static final String STATE_COLLAPSE = "state_collapse";
 
+	private SearchView mSearchView;
 	private boolean mIsUseCategory;
 
 	@Override
@@ -63,10 +71,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 	@Override
 	protected String getTitle(Toolbar toolbar) {
-		if (mIsUseCategory) {
-			toolbar.inflateMenu(R.menu.shopping_list_menu);
-			toolbar.setOnMenuItemClickListener(onMenuItemClickListener());
-		}
+		setMenu(toolbar);
 		return getString(R.string.catalogs_items);
 	}
 
@@ -115,16 +120,69 @@ public class ItemFragment extends CatalogFragment<Item>{
 	}
 
 	protected void loadData() {
-		Item item = getLastEditItem(mCatalog);
-		mAdapterRV.setData(mCatalog);
+		if (mSearchView.getQuery().length() != 0) {
+			mAdapterRV.setData(mCatalog, false);
 
-		if (item != null) {
-			setScrollPosition(item);
-		}
+			((ItemAdapter) mAdapterRV).saveOriginalList();
+			((ItemAdapter) mAdapterRV).getFilter().filter(mSearchView.getQuery());
+		} else {
+			Item item = getLastEditItem(mCatalog);
+			mAdapterRV.setData(mCatalog, true);
 
-		if (mScrollToPosition != -1) {
-			mCatalogRV.scrollToPosition(mScrollToPosition);
+			if (item != null) {
+				setScrollPosition(item);
+			}
+
+			if (mScrollToPosition != -1) {
+				mCatalogRV.scrollToPosition(mScrollToPosition);
+			}
 		}
+	}
+
+	private void setMenu(Toolbar toolbar) {
+		toolbar.inflateMenu(R.menu.shopping_list_menu);
+
+		final Menu menu = toolbar.getMenu();
+		menu.setGroupVisible(R.id.collapse_category, mIsUseCategory);
+
+		toolbar.setOnMenuItemClickListener(onMenuItemClickListener(menu));
+
+		SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+		MenuItem searchItem = menu.findItem(R.id.action_search);
+		mSearchView = (SearchView) searchItem.getActionView();
+
+		mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+		mSearchView.setIconifiedByDefault(false);
+
+		mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				return false;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				((ItemAdapter) mAdapterRV).getFilter().filter(newText);
+
+				return true;
+			}
+		});
+
+		MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+			@Override
+			public boolean onMenuItemActionExpand(MenuItem item) {
+				((ItemAdapter) mAdapterRV).saveOriginalList();
+				menu.setGroupVisible(R.id.collapse_category, false);
+				return true;
+			}
+
+			@Override
+			public boolean onMenuItemActionCollapse(MenuItem item) {
+				((ItemAdapter) mAdapterRV).recoveryFromOriginalList();
+				menu.setGroupVisible(R.id.collapse_category, mIsUseCategory);
+				return true;
+			}
+		});
 	}
 
 	private Item getLastEditItem(ArrayList categories) {
@@ -149,7 +207,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 		mScrollToPosition = itemPosition != -1 ? itemPosition : ((ItemAdapter) mAdapterRV).getItemList().indexOf(item.getCategory());
 	}
 
-	private Toolbar.OnMenuItemClickListener onMenuItemClickListener () {
+	private Toolbar.OnMenuItemClickListener onMenuItemClickListener (final Menu menu) {
 		return new Toolbar.OnMenuItemClickListener() {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
@@ -167,7 +225,10 @@ public class ItemFragment extends CatalogFragment<Item>{
 		};
 	}
 
-	private class ItemAdapter extends NestedListAdapter implements CatalogAdapter {
+	private class ItemAdapter extends NestedListAdapter implements CatalogAdapter, Filterable {
+		private SearchFilter mSearchFilter;
+		private ArrayList mOriginalList = new ArrayList();
+		protected HashMap<Long, Boolean> mOriginalCollapseCategoryStates = new HashMap<>();
 
 		public ItemAdapter(Activity activity, boolean isUseCategory) {
 			super(activity);
@@ -175,19 +236,20 @@ public class ItemFragment extends CatalogFragment<Item>{
 		}
 
 		@Override
-		public void setData(ArrayList categoryList) {
+		public void setData(ArrayList categoryList, boolean isUpdate) {
 			mItemList = generateParentChildItemList(categoryList, true);
-			notifyDataSetChanged();
+
+			if (isUpdate) {
+				notifyDataSetChanged();
+			}
 		}
 
 		@Override
-		protected List<Object> generateParentChildItemList(List<Category> categoryList, boolean isCollapsedCategory) {
-			List<Object> list = new ArrayList<>();
-			Category category;
+		protected ArrayList<Object> generateParentChildItemList(List<Category> categoryList, boolean isCollapsedCategory) {
+			ArrayList<Object> list = new ArrayList<>();
 
 			if (mIsUseCategory) {
-				for (int i = 0; i < categoryList.size(); i++) {
-					category = categoryList.get(i);
+				for (Category category : categoryList) {
 					list.add(category);
 
 					if (mCollapseCategoryStates.containsKey(category.getId()) &&
@@ -202,7 +264,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 					}
 				}
 			} else {
-				category = categoryList.get(0);
+				Category category = categoryList.get(0);
 				int childListItemCount = category.getItemsByCategories().size();
 
 				for (int j = 0; j < childListItemCount; j++) {
@@ -264,6 +326,24 @@ public class ItemFragment extends CatalogFragment<Item>{
 			return new ItemDS(mActivity);
 		}
 
+		public Item getItemById(long id, ArrayList list) {
+			if (id > 0) {
+				for (Object c : list) {
+					if (c instanceof Category) {
+						for (Object i : ((Category) c).getItemsByCategories()) {
+							Item item = (Item) i;
+
+							if (item.getIdItem() == id) {
+								return item;
+							}
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
 		@Override
 		public void removeItem(int position) {
 			Item item = (Item) mItemList.get(position);
@@ -277,9 +357,98 @@ public class ItemFragment extends CatalogFragment<Item>{
 				Image.deleteFile(item.getDefaultImagePath());
 			}
 
-			if (mItemList.size() == 0) {
-				mCatalogRV.setVisibility(View.GONE);
-				mEmptyImage.setVisibility(View.VISIBLE);
+			if (mSearchView.getQuery().length() > 0) {
+				Item originalItem = getItemById(item.getId(), mOriginalList);
+				mOriginalList.remove(originalItem);
+				originalItem.getCategory().getItemsByCategories().remove(originalItem);
+
+				if (originalItem.getCategory().getItemsByCategories().size() == 0) {
+					mOriginalList.remove(originalItem.getCategory());
+					mOriginalCollapseCategoryStates.remove(originalItem.getCategory().getId());
+				}
+			} else {
+				if (mItemList.size() == 0) {
+					mCatalogRV.setVisibility(View.GONE);
+					mEmptyImage.setVisibility(View.VISIBLE);
+				}
+			}
+		}
+
+		@Override
+		public Filter getFilter() {
+			if (mSearchFilter == null) {
+				mSearchFilter = new SearchFilter();
+			}
+
+			return mSearchFilter;
+		}
+
+		public void saveOriginalList() {
+			mOriginalList = new ArrayList(mItemList);
+			mOriginalCollapseCategoryStates = new HashMap<>(mCollapseCategoryStates);
+		}
+
+		public List recoveryFromOriginalList() {
+			mCollapseCategoryStates = mOriginalCollapseCategoryStates;
+			return null;
+		}
+
+		public class SearchFilter extends Filter {
+
+			@Override
+			protected Filter.FilterResults performFiltering(CharSequence charSequence) {
+				Filter.FilterResults results = new Filter.FilterResults();
+
+				if (charSequence == null || charSequence.length() == 0) {
+					results.values = mOriginalList != null ? mOriginalList : mItemList;
+					results.count = mOriginalList.size();
+				} else {
+					ArrayList filteredItems = new ArrayList();
+
+					for (Object c : mOriginalList) {
+						if (c instanceof Category) {
+							Category category = new Category((Category) c);
+
+							for (Object i : ((Category) c).getItemsByCategories()) {
+								Item item = new Item((Item) i);
+
+								if (((Item) i).getName().toUpperCase().contains(charSequence.toString().toUpperCase())) {
+
+									if (mIsUseCategory && !filteredItems.contains(category)) {
+										category = new Category((Category) c);
+										filteredItems.add(category);
+										mCollapseCategoryStates.put(category.getId(), false);
+										item.setCategory(category);
+									}
+
+									filteredItems.add(item);
+									category.getItemsByCategories().add(item);
+								}
+							}
+						}
+					}
+
+					results.values = filteredItems;
+					results.count = filteredItems.size();
+				}
+
+				return results;
+			}
+
+			@Override
+			protected void publishResults(CharSequence charSequence, Filter.FilterResults filterResults) {
+				mItemList = (ArrayList) filterResults.values;
+				notifyDataSetChanged();
+
+				Item item = getItemById(mLastEditId, mItemList);
+
+				if (item != null) {
+					setScrollPosition(item);
+				}
+
+				if (mScrollToPosition != -1) {
+					mCatalogRV.scrollToPosition(mScrollToPosition);
+				}
 			}
 		}
 

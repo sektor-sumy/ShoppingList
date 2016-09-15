@@ -45,12 +45,12 @@ public class ShoppingListAdapter extends NestedListAdapter {
 
 	public void setData(List<Category> categoryList, String currency, boolean isUseCategory, boolean isCollapsedCategory) {
 		mIsUseCategory = isUseCategory;
-		List<Object> items = generateParentChildItemList(categoryList, isCollapsedCategory);
+		ArrayList<Object> items = generateParentChildItemList(categoryList, isCollapsedCategory);
 
 		setData(items, currency, isUseCategory);
 	}
 
-	public void setData(List<Object> categoryList, String currency, boolean isUseCategory) {
+	public void setData(ArrayList<Object> categoryList, String currency, boolean isUseCategory) {
 		mCurrency = currency;
 		mIsUseCategory = isUseCategory;
 		mItemList = categoryList;
@@ -71,8 +71,8 @@ public class ShoppingListAdapter extends NestedListAdapter {
 
 	//Converts the source list on the list to work with the adapter
 	@Override
-	protected List<Object> generateParentChildItemList(List<Category> categoryList, boolean isCollapsedCategory) {
-		List<Object> list = new ArrayList<>();
+	protected ArrayList<Object> generateParentChildItemList(List<Category> categoryList, boolean isCollapsedCategory) {
+		ArrayList<Object> list = new ArrayList<>();
 		Category category;
 
 		if (mIsUseCategory) {
