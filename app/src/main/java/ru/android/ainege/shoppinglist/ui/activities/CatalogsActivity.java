@@ -79,6 +79,8 @@ public class CatalogsActivity extends SingleFragmentActivity {
 		} else {
 			startActivity(i);
 		}
+
+		finish();
 	}
 
 	@Override
