@@ -134,9 +134,9 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 		List<ItemData> itemInList = category.getItemsByCategories();
 
 		if (itemInList != null) {
-			for (int i = itemInList.size(); i > 0; i--) {
-				mItemList.remove(position + i);
-				notifyItemRemoved(position + i);
+			for (int i = itemInList.size() + position; i > position; i--) {
+				mItemList.remove(i);
+				notifyItemRemoved(i);
 			}
 		}
 	}
@@ -165,7 +165,7 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 	}
 
 	public void collapseAllCategory(boolean isSave) {
-		for (int i = 0; i < mItemList.size(); i++) {
+		for (int i = mItemList.size() - 1; i >= 0; i--) {
 			if (mItemList.get(i) instanceof Category && !mCollapseCategoryStates.get(((Category) mItemList.get(i)).getId())) {
 				collapseCategory((Category) mItemList.get(i), i);
 
@@ -177,12 +177,11 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 	}
 
 	public void recoveryCollapseAllCategory() {
-		for (int i = 0; i < mItemList.size(); i++) {
+		for (int i = mItemList.size() - 1; i >= 0; i--) {
 			if (mItemList.get(i) instanceof Category && mCollapseCategoryStates.get(((Category) mItemList.get(i)).getId())) {
 				collapseCategory((Category) mItemList.get(i), i);
 			} else {
 				if (mItemList.get(i) instanceof ItemData && MultiSelection.getInstance().getSelectedItems().contains(mItemList.get(i))) {
-					MultiSelection.getInstance().delete(mItemList.get(i));
 					notifyItemChanged(i);
 				}
 			}
