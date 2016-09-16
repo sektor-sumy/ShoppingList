@@ -61,8 +61,6 @@ public class EditItemFragment extends ItemFragment {
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
 		switch (requestCode) {
 			case SingleFragmentActivity.CATALOGS:
 			case SingleFragmentActivity.SETTINGS:
@@ -78,6 +76,8 @@ public class EditItemFragment extends ItemFragment {
 					cursor.close();
 				}
 		}
+
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	@Override
@@ -202,7 +202,7 @@ public class EditItemFragment extends ItemFragment {
 	@Override
 	protected ShoppingList refreshItem() {
 		//if item was changed for new one (not from db) - update item
-		if (!getName().equals(mOriginalItem.getItem().getName()) && mOriginalItem.getIdItem() == mItemInList.getIdItem()) {
+		if (!getName().trim().equals(mOriginalItem.getItem().getName()) && mOriginalItem.getIdItem() == mItemInList.getIdItem()) {
 			mItemInList.setItem(new Item(getName(), mItemInList.getItem().getImagePath(), mItemInList.getItem().getImagePath()));
 		}
 

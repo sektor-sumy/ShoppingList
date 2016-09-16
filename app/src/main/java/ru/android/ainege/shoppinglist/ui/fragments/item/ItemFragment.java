@@ -51,6 +51,7 @@ import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.CurrencyCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
+import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
 import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
@@ -246,8 +247,19 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 					HashMap<Integer, Long> modifyCatalog = (HashMap<Integer, Long>) data.getSerializableExtra(CatalogsActivity.LAST_EDIT);
 
 					if (modifyCatalog != null) {
-						if (modifyCatalog.containsKey(R.string.catalogs_key_item)) {
-							// TODO: 12.09.2016  
+						if (modifyCatalog.containsKey(R.string.catalogs_key_item) &&
+								mItemInList.getIdItem() == modifyCatalog.get(R.string.catalogs_key_item)) {
+							ItemDS.ItemCursor itemCursor = mItemDS.getWithData(mItemInList.getIdItem());
+
+							if (itemCursor.moveToFirst()) {
+								Item item = itemCursor.getEntity();
+
+								loadImage(item.getImagePath());
+								mNameTextView.setText(item.getName());
+								mItemInList.getItem().setName(item.getName());
+							}
+
+							itemCursor.close();
 						}
 
 						if (modifyCatalog.containsKey(R.string.catalogs_key_category)) {

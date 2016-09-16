@@ -56,7 +56,7 @@
 	<string name="info_exit_item">Такой товар уже существует.\nНазвание товара должно быть уникальным</string>
 	<string name="info_wrong_value">Проверьте ввод данных</string>
 	<string name="info_data_is_save">Данные сохранены</string>
-	<string name="info_exit_item_in_list">Товар есть в списке и будет перезаписан,\n а оригинал будет удален</string>
+	<string name="info_exit_item_in_list">Товар есть в списке и будет перезаписан, а оригинал будет удален</string>
 	<string name="error_length_name">Не меньше 3 символов</string>
 	<string name="error_value">Неверное значение</string>
 	<string name="finish_price">Итоговая сумма:&#160;</string>
