@@ -70,7 +70,7 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 
 	@Override
 	public void onItemSave(long id, boolean isAdded, boolean isClose) {
-		super.onBackPressed();
+		toPreviousScreen();
 	}
 
 	@Override
@@ -80,6 +80,11 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 
 	@Override
 	public void onNotSave() {
+		toPreviousScreen();
+	}
+
+	@Override
+	public void toPreviousScreen() {
 		super.onBackPressed();
 	}
 

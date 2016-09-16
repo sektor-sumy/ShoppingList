@@ -182,6 +182,19 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	}
 
 	@Override
+	public void toPreviousScreen() {
+		mItemFragment.getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+		mState.getShoppingListScreen().hideDrawerIcon();
+		mState.getListsScreen().updateList();
+		mState.toScreen(mState.getShoppingListScreen());
+		mState.closeShowcase();
+		mState.setFragmentTagForRemove(TabletState.ITEM_TAG);
+
+		mShoppingListFragment.setOnItemChangedListener(null);
+	}
+
+	@Override
 	public void onItemAdd(long idList) {
 		if (isItemChanged()) {
 			mIdForAdd = idList;
@@ -225,17 +238,5 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 
 	private boolean isItemChanged() {
 		return !(mOnBackPressedListener == null || (mOnBackPressedListener != null && mOnBackPressedListener.onBackPressed()));
-	}
-
-	private void toPreviousScreen() {
-		mItemFragment.getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-
-		mState.getShoppingListScreen().hideDrawerIcon();
-		mState.getListsScreen().updateList();
-		mState.toScreen(mState.getShoppingListScreen());
-		mState.closeShowcase();
-		mState.setFragmentTagForRemove(TabletState.ITEM_TAG);
-
-		mShoppingListFragment.setOnItemChangedListener(null);
 	}
 }

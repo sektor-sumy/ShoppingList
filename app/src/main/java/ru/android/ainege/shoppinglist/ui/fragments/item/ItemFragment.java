@@ -125,6 +125,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		void onItemSave(long id, boolean isAdded, boolean isClose);
 		void onImageClick();
 		void onNotSave();
+		void toPreviousScreen();
 	}
 
 	public interface OnItemChangedListener {
@@ -257,6 +258,10 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 								loadImage(item.getImagePath());
 								mNameTextView.setText(item.getName());
 								mItemInList.getItem().setName(item.getName());
+							} else {
+								if (mOnClickListener != null) {
+									mOnClickListener.toPreviousScreen();
+								}
 							}
 
 							itemCursor.close();

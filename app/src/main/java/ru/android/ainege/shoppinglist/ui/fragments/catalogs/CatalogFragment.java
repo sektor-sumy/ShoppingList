@@ -225,9 +225,6 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 				long newId = data.getLongExtra(DeleteDialogFragment.NEW_ID, -1);
 				deleteItem(position, oldId, newId);
 
-				if (newId != -1) {
-					mLastEditId = newId;
-				}
 				break;
 		}
 	}
@@ -285,8 +282,10 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 
 			if (newId != -1) {
 				getDS().delete(oldId, newId);
+				mLastEditId = newId;
 			} else {
 				getDS().delete(oldId);
+				mLastEditId = oldId;
 			}
 
 			mAdapterRV.removeItem(position);
