@@ -1,5 +1,7 @@
 package ru.android.ainege.shoppinglist.db.entities;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -84,6 +86,11 @@ public class Item extends ItemData implements Catalog {
 	}
 
 	public void setImagePath(String imagePath) {
+		if (imagePath == null) {
+			FirebaseCrash.report(new Exception("Catched exception: Item.setImagePath(null)"));
+			return;
+		}
+
 		mImagePath = imagePath;
 	}
 

@@ -118,7 +118,7 @@ public class AddItemDialogFragment extends ItemDialogFragment {
 			String image = mEditItem.getImagePath();
 			String defaultImage = mEditItem.getDefaultImagePath();
 
-			if (image == null || image.equals(Image.getPathFromResource(getActivity(), R.drawable.no_image))) {
+			if (image.equals(Image.getPathFromResource(getActivity(), R.drawable.no_image))) {
 				String name = mName.getText().toString().trim();
 				defaultImage = image = Image.CHARACTER_IMAGE_PATH + (int) name.toUpperCase().charAt(0) + ".png";
 			}
