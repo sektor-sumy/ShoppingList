@@ -101,7 +101,7 @@ public class ListsActivity extends SingleFragmentActivity {
 		boolean isShould = false;
 
 		if (prefs.getBoolean(getString(R.string.settings_key_open_last_list), false)) {
-			isShould = getSaveListId() != -1;
+			isShould = getSavedListId() != -1;
 		}
 
 		return isShould;

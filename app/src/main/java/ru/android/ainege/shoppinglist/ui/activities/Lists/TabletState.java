@@ -322,7 +322,7 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 	}
 
 	public boolean openLastList() {
-		long id = mListsActivity.getSaveListId();
+		long id = mListsActivity.getSavedListId();
 		boolean result = false;
 
 		if (id != -1) {

@@ -36,6 +36,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -746,6 +748,9 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 		if (cursor.moveToFirst()) {
 			mList = cursor.getEntity();
+		} else {
+			FirebaseCrash.log("ID_LIST = " + String.valueOf(getArguments().getLong(ID_LIST)));
+			FirebaseCrash.report(new Exception("ShoppingList.setList list not found"));
 		}
 
 		cursor.close();
