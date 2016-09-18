@@ -2,6 +2,7 @@ package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ public class CurrencyFragment extends CatalogFragment<Currency> {
 	}
 
 	@Override
-	protected String getTitle(Toolbar toolbar) {
+	protected String getTitle(Toolbar toolbar, Bundle savedInstanceState) {
 		return getString(R.string.catalogs_currency);
 	}
 

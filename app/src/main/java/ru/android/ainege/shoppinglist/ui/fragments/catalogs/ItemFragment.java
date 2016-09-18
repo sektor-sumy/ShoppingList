@@ -44,6 +44,7 @@ import ru.android.ainege.shoppinglist.util.MultiSelection;
 
 public class ItemFragment extends CatalogFragment<Item>{
 	private static final String STATE_COLLAPSE = "state_collapse";
+	private static final String STATE_SEARCH = "state_search";
 
 	private SearchView mSearchView;
 	private boolean mIsUseCategory;
@@ -62,6 +63,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 		super.onSaveInstanceState(outState);
 
 		outState.putSerializable(STATE_COLLAPSE, ((ItemAdapter) mAdapterRV).getCollapseCategoryStates());
+		outState.putCharSequence(STATE_SEARCH, mSearchView.getQuery());
 	}
 
 	@Override
@@ -70,8 +72,8 @@ public class ItemFragment extends CatalogFragment<Item>{
 	}
 
 	@Override
-	protected String getTitle(Toolbar toolbar) {
-		setMenu(toolbar);
+	protected String getTitle(Toolbar toolbar, Bundle savedInstanceState) {
+		setMenu(toolbar, savedInstanceState);
 		return getString(R.string.catalogs_items);
 	}
 
@@ -139,7 +141,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 		}
 	}
 
-	private void setMenu(Toolbar toolbar) {
+	private void setMenu(Toolbar toolbar, Bundle savedInstanceState) {
 		toolbar.inflateMenu(R.menu.collapse_category);
 
 		final Menu menu = toolbar.getMenu();
@@ -151,6 +153,12 @@ public class ItemFragment extends CatalogFragment<Item>{
 		MenuItem searchItem = menu.findItem(R.id.action_search);
 		searchItem.setVisible(true);
 		mSearchView = (SearchView) searchItem.getActionView();
+
+		if (savedInstanceState != null) {
+			MenuItemCompat.expandActionView(searchItem);
+			afterExpandedSearchView(menu);
+			mSearchView.setQuery(savedInstanceState.getCharSequence(STATE_SEARCH), false);
+		}
 
 		mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
 		mSearchView.setIconifiedByDefault(false);
@@ -172,8 +180,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 		MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
-				((ItemAdapter) mAdapterRV).saveOriginalList();
-				menu.setGroupVisible(R.id.collapse_category, false);
+				afterExpandedSearchView(menu);
 				return true;
 			}
 
@@ -184,6 +191,11 @@ public class ItemFragment extends CatalogFragment<Item>{
 				return true;
 			}
 		});
+	}
+
+	private void afterExpandedSearchView(Menu menu) {
+		((ItemAdapter) mAdapterRV).saveOriginalList();
+		menu.setGroupVisible(R.id.collapse_category, false);
 	}
 
 	private Item getLastEditItem(ArrayList categories) {

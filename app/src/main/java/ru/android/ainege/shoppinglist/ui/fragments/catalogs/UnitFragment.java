@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +24,7 @@ public class UnitFragment extends CatalogFragment<Unit> {
 	}
 
 	@Override
-	protected String getTitle(Toolbar toolbar) {
+	protected String getTitle(Toolbar toolbar, Bundle savedInstanceState) {
 		return getString(R.string.catalogs_unit);
 	}
 

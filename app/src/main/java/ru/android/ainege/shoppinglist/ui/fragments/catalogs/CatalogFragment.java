@@ -57,7 +57,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	protected int mScrollToPosition = -1;
 
 	public abstract int getKey();
-	protected abstract String getTitle(Toolbar toolbar);
+	protected abstract String getTitle(Toolbar toolbar, Bundle savedInstanceState);
 	protected abstract CatalogAdapter getAdapter();
 	protected abstract CatalogDS getDS();
 	protected abstract GeneralDialogFragment getAddDialog();
@@ -112,9 +112,9 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 
 		if (isTablet || (!isTablet && isLandscape)) {
 			Toolbar cardToolbar = (Toolbar) v.findViewById(R.id.toolbar);
-			cardToolbar.setTitle(getTitle(cardToolbar));
+			cardToolbar.setTitle(getTitle(cardToolbar, savedInstanceState));
 		} else if (!isLandscape) {
-			toolbar.setTitle(getTitle(toolbar));
+			toolbar.setTitle(getTitle(toolbar, savedInstanceState));
 		}
 
 		FloatingActionButton mFAB = (FloatingActionButton) v.findViewById(R.id.add_fab);
