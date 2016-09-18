@@ -78,7 +78,7 @@ public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 				" INNER JOIN " + CategoriesInterface.TABLE_NAME +
 				" ON " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID_CATEGORY + " = " +
 				CategoriesInterface.TABLE_NAME + "." + CategoriesInterface.COLUMN_ID +
-				" WHERE " + COLUMN_NAME + " LIKE '%" + substring + "%'", null);
+				" WHERE " + COLUMN_NAME + " LIKE ?", new String[] {"%" + substring + "%"});
 	}
 
 	public ItemCursor getWithData(long id) {
@@ -86,7 +86,7 @@ public class ItemDS extends CatalogDS<Item> implements ItemsInterface {
 	}
 
 	public ItemCursor getWithData(String name) {
-		return getFullData(" WHERE " + TABLE_NAME + "." + COLUMN_NAME + " like ?", new String[]{name});
+		return getFullData(" WHERE " + TABLE_NAME + "." + COLUMN_NAME + " LIKE ?", new String[]{name});
 	}
 
 	private ItemCursor getFullData(String where, String[] params) {

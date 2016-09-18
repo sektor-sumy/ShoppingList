@@ -46,7 +46,7 @@ public class CurrenciesDS extends CatalogDS<Currency> implements TableInterface.
 		Cursor cursor = db.rawQuery("Select " + TABLE_NAME + ".* from " + TABLE_NAME +
 				" INNER JOIN " + ListsInterface.TABLE_NAME + " ON " +
 				TABLE_NAME + "." + COLUMN_ID + " = " + ListsInterface.TABLE_NAME + "." + ListsInterface.COLUMN_ID_CURRENCY +
-				" where " + ListsInterface.TABLE_NAME + " . " + ListsInterface.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
+				" WHERE " + ListsInterface.TABLE_NAME + " . " + ListsInterface.COLUMN_ID + " = ?", new String[]{String.valueOf(idList)});
 
 		return new CurrencyCursor(cursor);
 	}

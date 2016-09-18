@@ -73,8 +73,8 @@ public class ShoppingListDS extends GenericDS<ShoppingList> implements ShoppingL
 				" ON " + TABLE_NAME + "." + COLUMN_ID_ITEM + " = " + ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID +
 				" INNER JOIN " + ItemDataInterface.TABLE_NAME +
 				" ON " + ItemsInterface.TABLE_NAME + "." + ItemsInterface.COLUMN_ID + " = " + ItemDataInterface.TABLE_NAME + "." + ItemDataInterface.COLUMN_ID +
-				" WHERE " + ItemsInterface.COLUMN_NAME + " LIKE '" + name +
-				"' AND " + COLUMN_ID_LIST + " = " + idList, null);
+				" WHERE " + ItemsInterface.COLUMN_NAME + " LIKE ?" +
+				" AND " + COLUMN_ID_LIST + " = " + idList, new String[] {name});
 
 		return new ShoppingListCursor(cursor);
 	}
