@@ -54,7 +54,6 @@ import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnBackPressedListener;
-import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.ui.activities.CatalogsActivity;
 import ru.android.ainege.shoppinglist.ui.activities.SingleFragmentActivity;
 import ru.android.ainege.shoppinglist.ui.fragments.OnCreateViewListener;
@@ -165,12 +164,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefs.registerOnSharedPreferenceChangeListener(this);
 
-		mPictureView = new PictureView(this, savedInstanceState, this, new OnFinishedImageListener() {
-			@Override
-			public void onFinished(int resultCode, String path) {
-				loadImage(path);
-			}
-		});
+		mPictureView = new PictureView(this, savedInstanceState, this);
 		mUnitSpinner = new UnitSpinner(this);
 		mCategorySpinner = new CategorySpinner(this);
 
@@ -353,6 +347,13 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		}
 	}
 
+	@Override
+	public void loadImage(String path) {
+		mPictureView.loadImage(path, mItemInList.getItem().getImagePath());
+		mItemInList.getItem().setImagePath(path);
+		mCollapsingToolbarLayout.setTitle("");
+	}
+
 	public void setListeners(OnClickListener onClickListener, OnItemChangedListener onItemChangedListener) {
 		setOnClickListener(onClickListener);
 		setOnItemChangedListener(onItemChangedListener);
@@ -463,12 +464,6 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		if (mPrefs.getBoolean(getString(R.string.settings_key_text_selection_comment), false)) {
 			mCommentEditText.setSelectAllOnFocus(true);
 		}
-	}
-
-	protected void loadImage(String path) {
-		mPictureView.loadImage(path, mItemInList.getItem().getImagePath());
-		mItemInList.getItem().setImagePath(path);
-		mCollapsingToolbarLayout.setTitle("");
 	}
 
 	protected SimpleCursorAdapter getCompleteTextAdapter(FilterQueryProvider provider) {

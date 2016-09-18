@@ -28,7 +28,6 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.TableInterface.CurrenciesInterface;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
-import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.ui.view.PictureView;
 import ru.android.ainege.shoppinglist.util.Image;
 
@@ -165,7 +164,8 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 		setRandomImage();
 	}
 
-	protected void loadImage(String imagePath) {
+	@Override
+	public void loadImage(String imagePath) {
 		mPictureView.loadImage(imagePath, mImagePath);
 		mImagePath = imagePath;
 	}
@@ -199,13 +199,7 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_list, null);
 
-		mPictureView = new PictureView(this, savedInstanceState, this,
-				new OnFinishedImageListener() {
-					@Override
-					public void onFinished(int resultCode, String path) {
-						loadImage(path);
-					}
-				});
+		mPictureView = new PictureView(this, savedInstanceState, this);
 		mPictureView.setImage(v.findViewById(R.id.image));
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);

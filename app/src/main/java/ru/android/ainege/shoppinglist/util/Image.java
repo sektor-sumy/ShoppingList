@@ -61,13 +61,20 @@ public class Image {
 	}
 
 	public static String getPathFromResource(Context context, int resource) {
-		return RESOURCE_IMAGE_PATH + context.getPackageName() + "/" + resource;
+		String packageName = "ru.android.ainege.shoppinglist";
+
+		if (context != null) {
+			packageName = context.getPackageName();
+		}
+
+		return RESOURCE_IMAGE_PATH + packageName + "/" + resource;
 	}
 
 	public Image insertImageToView(Context context, String path, ImageView image) {
 		if (path != null) {
 			insertImageToView(context, Uri.parse(path), image);
 		}
+
 		return this;
 	}
 

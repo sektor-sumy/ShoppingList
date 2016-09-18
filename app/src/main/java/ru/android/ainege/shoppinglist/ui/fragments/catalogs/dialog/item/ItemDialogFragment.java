@@ -21,7 +21,6 @@ import java.io.File;
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ItemDS;
 import ru.android.ainege.shoppinglist.db.entities.Item;
-import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialogFragment;
 import ru.android.ainege.shoppinglist.ui.view.PictureView;
 import ru.android.ainege.shoppinglist.ui.view.spinners.CategorySpinner;
@@ -45,12 +44,7 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_item_catalog, null);
 
-		mPictureView = new PictureView(this, savedInstanceState, this, new OnFinishedImageListener() {
-			@Override
-			public void onFinished(int resultCode, String path) {
-				loadImage(path);
-			}
-		});
+		mPictureView = new PictureView(this, savedInstanceState, this);
 		mUnitSpinner = new UnitSpinner(this);
 		mCategorySpinner = new CategorySpinner(this);
 
@@ -176,14 +170,15 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 		return isSave;
 	}
 
+	@Override
+	public void loadImage(String path) {
+		mPictureView.loadImage(path, mEditItem.getImagePath());
+		mEditItem.setImagePath(path);
+	}
+
 	protected long addItem() {
 		FirebaseCrash.report(new Exception("Catched exception: has entered in ItemDialogFragment.addItem(). Edit mode."));
 		return 0;
-	}
-
-	protected void loadImage(String path) {
-		mPictureView.loadImage(path, mEditItem.getImagePath());
-		mEditItem.setImagePath(path);
 	}
 
 	protected void refreshItem() {

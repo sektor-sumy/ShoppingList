@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +28,7 @@ import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 
-public class PictureView {
+public class PictureView implements OnFinishedImageListener {
 	public static final int RESULT_OK = RetainedFragment.RESULT_OK;
 	public static final int ERROR_OUT_MEMORY = RetainedFragment.ERROR_OUT_MEMORY;
 	public static final int ERROR_PROCESSING = RetainedFragment.ERROR_PROCESSING;
@@ -46,12 +47,22 @@ public class PictureView {
 	public interface PictureInterface {
 		boolean isDeleteImage(String newPath);
 		void resetImage();
+		void loadImage(String path);
 	}
 
-	public PictureView(Fragment fragment, Bundle savedInstanceState, PictureInterface pictureInterface, OnFinishedImageListener listener) {
+	public PictureView(Fragment fragment, Bundle savedInstanceState, PictureInterface pictureInterface) {
 		mFragment = fragment;
 		mPictureInterface = pictureInterface;
-		setRetainedFragment(savedInstanceState, listener);
+		setRetainedFragment(savedInstanceState, this);
+	}
+
+	@Override
+	public void onFinished(int resultCode, String path) {
+		if (resultCode == PictureView.RESULT_OK) {
+			mPictureInterface.loadImage(path);
+		} else {
+			errirLoadingImage(resultCode);
+		}
 	}
 
 	public ImageView getImage() {
@@ -159,7 +170,7 @@ public class PictureView {
 
 	public void takePhotoResult(String imagePath) {
 		Image.create().deletePhotoFromGallery(mFragment.getActivity(), mFile);
-		mRetainedFragment.execute(mImageView, imagePath, mFile);
+		executeLoadImage(imagePath, mFile, null);
 	}
 
 	public void fromGalleryResult(String imagePath, Uri selectedImage) {
@@ -168,7 +179,7 @@ public class PictureView {
 		try {
 			if (file != null) {
 				Bitmap bitmap = MediaStore.Images.Media.getBitmap(mFragment.getActivity().getContentResolver(), selectedImage);
-				mRetainedFragment.execute(mImageView, imagePath, file, bitmap);
+				executeLoadImage(imagePath, file, bitmap);
 			} else {
 				Toast.makeText(mFragment.getActivity(), mFragment.getActivity().getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
 			}
@@ -179,12 +190,36 @@ public class PictureView {
 		}
 	}
 
+	private void executeLoadImage(String imagePath, File file, Bitmap bitmap) {
+		String path = Image.getPathFromResource(mFragment.getActivity(), Image.mLoadingImage);
+		Image.create().insertImageToView(mFragment.getActivity(), path, mImageView);
+
+		DisplayMetrics metrics = mFragment.getResources().getDisplayMetrics();
+		mRetainedFragment.execute(imagePath, file, bitmap, metrics);
+	}
+
+	private void errirLoadingImage(int resultCode) {
+		Image.create().insertImageToView(mFragment.getActivity(), mRetainedFragment.getImagePath(), mImageView);
+		String message;
+
+		switch (resultCode) {
+			case ERROR_OUT_MEMORY:
+				message = mFragment.getString(R.string.error_out_of_memory);
+				break;
+			case ERROR_PROCESSING:
+			default:
+				message = mFragment.getString(R.string.error_bitmap);
+		}
+
+		Toast.makeText(mFragment.getActivity(), message, Toast.LENGTH_SHORT).show();
+	}
+
 	private void setRetainedFragment(Bundle savedInstanceState, OnFinishedImageListener listener) {
 		FragmentManager fm = mFragment.getFragmentManager();
 		mRetainedFragment = (RetainedFragment) fm.findFragmentByTag(RETAINED_FRAGMENT);
 
 		if (mRetainedFragment == null || savedInstanceState == null) {
-			mRetainedFragment = new RetainedFragment(mFragment.getActivity());
+			mRetainedFragment = new RetainedFragment();
 			fm.beginTransaction().add(mRetainedFragment, RETAINED_FRAGMENT).commit();
 		}
 
