@@ -288,7 +288,9 @@ public class Image {
 				}
 
 				e.printStackTrace();
-				FirebaseCrash.report(new Exception("Catched exception", e));
+				FirebaseCrash.log("Catched exception");
+				FirebaseCrash.report(e);
+
 				deleteFile(mFile.getAbsolutePath());
 				result = false;
 			}

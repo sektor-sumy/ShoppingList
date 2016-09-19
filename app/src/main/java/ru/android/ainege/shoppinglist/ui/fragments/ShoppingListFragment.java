@@ -29,6 +29,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -750,6 +751,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		if (cursor.moveToFirst()) {
 			mList = cursor.getEntity();
 		} else {
+			FirebaseCrash.log(getActivity().getResources().getString(R.string.catched_exception));
 			FirebaseCrash.log("ID_LIST = " + String.valueOf(getArguments().getLong(ID_LIST)));
 			FirebaseCrash.report(new Exception("ShoppingList.setList list not found"));
 		}

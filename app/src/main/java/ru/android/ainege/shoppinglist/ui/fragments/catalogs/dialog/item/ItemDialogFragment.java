@@ -177,7 +177,8 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 	}
 
 	protected long addItem() {
-		FirebaseCrash.report(new Exception("Catched exception: has entered in ItemDialogFragment.addItem(). Edit mode."));
+		FirebaseCrash.log(getActivity().getResources().getString(R.string.catched_exception));
+		FirebaseCrash.report(new Exception("Has entered in ItemDialogFragment.addItem(). Edit mode."));
 		return 0;
 	}
 

@@ -87,7 +87,8 @@ public class Item extends ItemData implements Catalog {
 
 	public void setImagePath(String imagePath) {
 		if (imagePath == null) {
-			FirebaseCrash.report(new Exception("Catched exception: Item.setImagePath(null)"));
+			FirebaseCrash.log("Catched exception");
+			FirebaseCrash.report(new Exception("Item.setImagePath(null)"));
 			return;
 		}
 

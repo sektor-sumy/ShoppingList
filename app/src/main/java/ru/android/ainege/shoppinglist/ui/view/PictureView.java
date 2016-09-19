@@ -185,7 +185,8 @@ public class PictureView implements OnFinishedImageListener {
 			}
 		} catch (OutOfMemoryError | Exception e) {
 			e.printStackTrace();
-			FirebaseCrash.report(new Exception(mFragment.getActivity().getResources().getString(R.string.catched_exception), e));
+			FirebaseCrash.log(mFragment.getActivity().getResources().getString(R.string.catched_exception));
+			FirebaseCrash.report(e);
 			Image.deleteFile(file.getAbsolutePath());
 		}
 	}
