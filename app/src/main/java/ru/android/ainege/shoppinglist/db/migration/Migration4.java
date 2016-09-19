@@ -32,7 +32,7 @@ public class Migration4 extends UpgradeDB {
 
 			if (images != null) {
 				for (File image : images) {
-					if (imagesFromDB.contains(Image.PATH_PROTOCOL + image.getAbsolutePath())) {
+					if (imagesFromDB.contains(Image.getFilePath(image))) {
 						image.renameTo(new File(newPath, image.getName()));
 					} else {
 						image.delete();

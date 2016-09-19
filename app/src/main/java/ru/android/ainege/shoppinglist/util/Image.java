@@ -33,7 +33,7 @@ import static android.graphics.Bitmap.createScaledBitmap;
 public class Image {
 	public static final String PATH_PROTOCOL = "file://";
 	public static final String ASSETS_IMAGE_PATH = PATH_PROTOCOL + "/android_asset/images/";
-	public static final String RESOURCE_IMAGE_PATH = PATH_PROTOCOL + "android.resource://";
+	public static final String RESOURCE_IMAGE_PATH = "android.resource://";
 	public static final String CHARACTER_IMAGE_PATH = ASSETS_IMAGE_PATH + "character/";
 	public static final String LIST_IMAGE_PATH = ASSETS_IMAGE_PATH + "list/";
 	public static final String ITEM_IMAGE_PATH = ASSETS_IMAGE_PATH + "item/";
@@ -300,7 +300,7 @@ public class Image {
 
 		@Override
 		protected void onPostExecute(Boolean isSuccess) {
-			mOnFinishedImageListener.onFinished(mResultCode, Image.PATH_PROTOCOL + mFile.getAbsolutePath());
+			mOnFinishedImageListener.onFinished(mResultCode, getFilePath(mFile));
 		}
 	}
 }
