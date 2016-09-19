@@ -25,4 +25,8 @@
 
 	<!--navigation drawer-->
 	<dimen name="header_height">200dp</dimen>
+
+	<!--catalog-->
+	<dimen name="padding_item_dialog">75dp</dimen>
+
 </resources>

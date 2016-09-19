@@ -65,5 +65,6 @@
 	<!--catalog-->
 	<item name="catalog_name_weight" format="float" type="dimen">0.7</item>
 	<item name="catalog_unit_weight" format="float" type="dimen">0.3</item>
+	<dimen name="padding_item_dialog">16dp</dimen>
 
 </resources>

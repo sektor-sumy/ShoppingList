@@ -21,4 +21,8 @@
 
 	<!--settings-->
 	<dimen name="card_view_toolbar_spacer">150dp</dimen>
+
+	<!--catalog-->
+	<dimen name="padding_item_dialog">16dp</dimen>
+
 </resources>

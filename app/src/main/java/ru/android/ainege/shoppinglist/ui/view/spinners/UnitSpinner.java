@@ -36,8 +36,16 @@ public class UnitSpinner extends GeneralSpinner {
 
 	@Override
 	protected SimpleCursorAdapter getAdapter() {
+		int layout;
+
+		if (mIsCenterGravity) {
+			layout = R.layout.spinner_unit;
+		} else {
+			layout = android.R.layout.simple_spinner_item;
+		}
+
 		SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(mFragment.getActivity(),
-				R.layout.spinner_unit,
+				layout,
 				getData(),
 				new String[]{TableInterface.UnitsInterface.COLUMN_NAME},
 				new int[]{android.R.id.text1}, 0);

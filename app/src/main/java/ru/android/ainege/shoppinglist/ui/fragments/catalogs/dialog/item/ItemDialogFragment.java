@@ -53,8 +53,8 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 		mName = (EditText) v.findViewById(R.id.name);
 		mName.addTextChangedListener(getNameChangedListener());
 		mInfoTextView = (TextView) v.findViewById(R.id.info);
-		mUnitSpinner.setSpinner(v.findViewById(R.id.unit));
-		mCategorySpinner.setSpinner(v.findViewById(R.id.category));
+		mUnitSpinner.setSpinner(v.findViewById(R.id.unit), false);
+		mCategorySpinner.setSpinner(v.findViewById(R.id.category), false);
 
 		if (savedInstanceState != null) {
 			mPictureView.setFile((File) savedInstanceState.getSerializable(STATE_FILE));
@@ -67,7 +67,7 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 
 	@Override
 	protected String getTitle() {
-		return getString(R.string.catalogs_items);
+		return getString(R.string.item_info);
 	}
 
 	@Override

@@ -169,8 +169,10 @@
 	<string name="catalogs_key_category">catalogs_key_category</string>
 	<string name="catalogs_category">Категории товаров</string>
 	<string name="category_info">Категория товаров</string>
+	<string name="item_info">Товар</string>
 	<string name="error_add_exist_item">Товар уже есть в базе и будет обновлен</string>
 	<string name="error_edit_exist_item">Товар с таким именем уже существует</string>
+	<string name="auto_complete_data">Данные для автозаполнения: </string>
 
 	<string name="name">Название</string>
 	<string name="error_empty">Не может быть пустым</string>

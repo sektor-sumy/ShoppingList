@@ -25,6 +25,7 @@ public abstract class GeneralSpinner {
 	protected Spinner mSpinner;
 	protected long mIdSelectedItem;
 	protected boolean mIsUseNewItemInSpinner;
+	protected boolean mIsCenterGravity = false;
 
 	protected abstract int getCode();
 	protected abstract String getTeg();
@@ -43,7 +44,8 @@ public abstract class GeneralSpinner {
 		return mSpinner;
 	}
 
-	public void setSpinner(View spinner) {
+	public void setSpinner(View spinner, boolean isCenterGravity) {
+		mIsCenterGravity = isCenterGravity;
 		mSpinner = (Spinner) spinner;
 		mSpinner.setAdapter(getAdapter());
 

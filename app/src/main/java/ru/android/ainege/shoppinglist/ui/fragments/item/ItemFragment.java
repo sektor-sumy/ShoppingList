@@ -427,7 +427,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 			mAmountEditText.setSelectAllOnFocus(true);
 		}
 
-		mUnitSpinner.setSpinner(v.findViewById(R.id.amount_unit));
+		mUnitSpinner.setSpinner(v.findViewById(R.id.amount_unit), true);
 
 		mPriceInputLayout = (TextInputLayout) v.findViewById(R.id.price_input_layout);
 		mPriceEditText = (EditText) v.findViewById(R.id.new_item_price);
@@ -449,7 +449,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 		mFinishPriceTextView = (TextView) v.findViewById(R.id.finish_price);
 
-		mCategorySpinner.setSpinner(v.findViewById(R.id.category));
+		mCategorySpinner.setSpinner(v.findViewById(R.id.category), false);
 		updateUseCategory(v);
 
 		mCommentEditText = (EditText) v.findViewById(R.id.comment);
