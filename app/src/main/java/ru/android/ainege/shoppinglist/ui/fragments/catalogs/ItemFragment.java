@@ -155,9 +155,13 @@ public class ItemFragment extends CatalogFragment<Item>{
 		mSearchView = (SearchView) searchItem.getActionView();
 
 		if (savedInstanceState != null) {
-			MenuItemCompat.expandActionView(searchItem);
-			afterExpandedSearchView(menu);
-			mSearchView.setQuery(savedInstanceState.getCharSequence(STATE_SEARCH), false);
+			CharSequence query = savedInstanceState.getCharSequence(STATE_SEARCH);
+
+			if (query.length() > 0) {
+				MenuItemCompat.expandActionView(searchItem);
+				afterExpandedSearchView(menu);
+				mSearchView.setQuery(savedInstanceState.getCharSequence(STATE_SEARCH), false);
+			}
 		}
 
 		mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
