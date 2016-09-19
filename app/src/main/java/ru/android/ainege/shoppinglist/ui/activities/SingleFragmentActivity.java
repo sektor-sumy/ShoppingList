@@ -54,7 +54,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(getLayout());
-		adsInitialize();
 
 		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
@@ -87,7 +86,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 			navigationView.setCheckedItem(R.id.nav_catalog_currencies);
 		}
 
-		if (getSaveListId() == -1) {
+		if (getSavedListId() == -1) {
 			navigationView.getMenu().findItem(R.id.nav_last_list).setEnabled(false);
 		}
 
@@ -193,14 +192,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		Intent i = new Intent(this, ListsActivity.class);
 		i.putExtra(ListsActivity.LISTS_SELECT, true);
 
-		openCatalog(i, new int[] {Intent.FLAG_ACTIVITY_CLEAR_TOP}, LISTS);
+		openActivity(i, new int[] {Intent.FLAG_ACTIVITY_CLEAR_TOP}, LISTS);
 	}
 
 	protected void onLastListSelected() {
 		if (getResources().getBoolean(R.bool.isTablet)) {
 			Intent i = new Intent(this, ListsActivity.class);
 			i.putExtra(ListsActivity.LAST_LIST_SELECT, true);
-			openCatalog(i, new int[] {Intent.FLAG_ACTIVITY_CLEAR_TOP}, LISTS);
+			openActivity(i, new int[] {Intent.FLAG_ACTIVITY_CLEAR_TOP}, LISTS);
 		} else {
 			openLastList();
 		}
@@ -210,11 +209,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		Intent i = new Intent(this, CatalogsActivity.class);
 		i.putExtra(CatalogsActivity.EXTRA_TYPE, getString(key));
 
-		openCatalog(i, null, CATALOGS);
+		openActivity(i, null, CATALOGS);
 	}
 
 	protected void onSettingsSelect() {
-		openCatalog(new Intent(this, SettingsActivity.class), null, SETTINGS);
+		openActivity(new Intent(this, SettingsActivity.class), null, SETTINGS);
 	}
 
 	protected void injectFragment(Integer container, Fragment fragment, String tag) {
@@ -251,13 +250,13 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		});
 	}
 
-	public long getSaveListId() {
+	public long getSavedListId() {
 		SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
 		return mSettings.getLong(APP_PREFERENCES_ID, -1);
 	}
 
 	public boolean openLastList() {
-		long id = getSaveListId();
+		long id = getSavedListId();
 		boolean result = false;
 
 		if (id != -1) {
@@ -280,7 +279,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		return false;
 	}
 
-	private void openCatalog(Intent i, int[] flags, int requestCode) {
+	private void openActivity(Intent i, int[] flags, int requestCode) {
 		if (flags != null) {
 			for (int flag : flags) {
 				i.addFlags(flag);

@@ -15,7 +15,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,15 +29,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import com.google.android.gms.ads.AdView;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -518,20 +513,15 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 	private void initKeyboardListener(final View v) {
 		if (getResources().getBoolean(R.bool.isLandscape) && getResources().getBoolean(R.bool.isPhone)) {
-			//TODO: 15.08.2016  AdMob on it
 			mIsCollapsedMode = false;
 		} else {
 			mIsCollapsedMode = true;
-			View view = ((FrameLayout)  getActivity().findViewById(android.R.id.content)).getChildAt(0);
-			final AdView adView = (AdView) ((RelativeLayout) ((DrawerLayout) view).getChildAt(0)).getChildAt(1);
-
 			AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboardListener() {
 				@Override
 				public void isOpen(int screenAppHeight) {
 					mIsOpenedKeyboard = true;
 					mScreenAppHeight = screenAppHeight;
 
-					adView.setVisibility(View.GONE);
 					View focusedView = v.findFocus();
 
 					if (focusedView != null && !(focusedView instanceof LinearLayout) && !isViewVisible(focusedView)) {
@@ -541,10 +531,6 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 				@Override
 				public void isClose() {
-					if (mIsOpenedKeyboard) {
-						adView.setVisibility(View.VISIBLE);
-					}
-
 					mIsOpenedKeyboard = false;
 					View focusedView = v.findFocus();
 
