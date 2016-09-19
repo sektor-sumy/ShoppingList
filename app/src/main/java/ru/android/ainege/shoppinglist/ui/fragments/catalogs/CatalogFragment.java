@@ -200,9 +200,13 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 
 	protected void loadData() {
 		mAdapterRV.setData(mCatalog, true);
+		scrollToPosition();
+	}
 
+	protected void scrollToPosition() {
 		if (mScrollToPosition != -1) {
 			mCatalogRV.scrollToPosition(mScrollToPosition);
+			mScrollToPosition = -1;
 		}
 	}
 

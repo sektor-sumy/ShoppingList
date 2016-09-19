@@ -48,6 +48,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 	private SearchView mSearchView;
 	private boolean mIsUseCategory;
+	private boolean mIsLastEdit = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -123,9 +124,10 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 	protected void loadData() {
 		if (mSearchView.getQuery().length() != 0) {
+			mIsLastEdit = true;
 			mAdapterRV.setData(mCatalog, false);
 
-			((ItemAdapter) mAdapterRV).saveOriginalList();
+			((ItemAdapter) mAdapterRV).saveOriginalList(false);
 			((ItemAdapter) mAdapterRV).getFilter().filter(mSearchView.getQuery());
 		} else {
 			Item item = getLastEditItem(mCatalog);
@@ -135,9 +137,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 				setScrollPosition(item);
 			}
 
-			if (mScrollToPosition != -1) {
-				mCatalogRV.scrollToPosition(mScrollToPosition);
-			}
+			scrollToPosition();
 		}
 	}
 
@@ -194,7 +194,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 	}
 
 	private void afterExpandedSearchView(Menu menu) {
-		((ItemAdapter) mAdapterRV).saveOriginalList();
+		((ItemAdapter) mAdapterRV).saveOriginalList(true);
 		menu.setGroupVisible(R.id.collapse_category, false);
 	}
 
@@ -260,13 +260,21 @@ public class ItemFragment extends CatalogFragment<Item>{
 		@Override
 		protected ArrayList<Object> generateParentChildItemList(List<Category> categoryList, boolean isCollapsedCategory) {
 			ArrayList<Object> list = new ArrayList<>();
+			HashMap<Long, Boolean> collapseStates;
+
+			if (mSearchView.getQuery().length() > 0) {
+				collapseStates = mOriginalCollapseCategoryStates;
+			}
+			else {
+				collapseStates = mCollapseCategoryStates;
+			}
 
 			if (mIsUseCategory) {
 				for (Category category : categoryList) {
 					list.add(category);
 
-					if (mCollapseCategoryStates.containsKey(category.getId()) &&
-							!mCollapseCategoryStates.get(category.getId())) {
+					if (collapseStates.containsKey(category.getId()) &&
+							!collapseStates.get(category.getId())) {
 						int childListItemCount = category.getItemsByCategories().size();
 
 						for (int j = 0; j < childListItemCount; j++) {
@@ -341,14 +349,12 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 		public Item getItemById(long id, ArrayList list) {
 			if (id > 0) {
-				for (Object c : list) {
-					if (c instanceof Category) {
-						for (Object i : ((Category) c).getItemsByCategories()) {
-							Item item = (Item) i;
+				for (Object o : list) {
+					if (o instanceof Item) {
+						Item item = (Item) o;
 
-							if (item.getIdItem() == id) {
-								return item;
-							}
+						if (item.getIdItem() == id) {
+							return item;
 						}
 					}
 				}
@@ -396,9 +402,12 @@ public class ItemFragment extends CatalogFragment<Item>{
 			return mSearchFilter;
 		}
 
-		public void saveOriginalList() {
+		public void saveOriginalList(boolean isSaveCollapseCategory) {
 			mOriginalList = new ArrayList(mItemList);
-			mOriginalCollapseCategoryStates = new HashMap<>(mCollapseCategoryStates);
+
+			if (isSaveCollapseCategory) {
+				mOriginalCollapseCategoryStates = new HashMap<>(mCollapseCategoryStates);
+			}
 		}
 
 		public List recoveryFromOriginalList() {
@@ -419,25 +428,10 @@ public class ItemFragment extends CatalogFragment<Item>{
 					ArrayList filteredItems = new ArrayList();
 
 					for (Object c : mOriginalList) {
-						if (c instanceof Category) {
-							Category category = new Category((Category) c);
-
-							for (Object i : ((Category) c).getItemsByCategories()) {
-								Item item = new Item((Item) i);
-
-								if (((Item) i).getName().toUpperCase().contains(charSequence.toString().toUpperCase())) {
-
-									if (mIsUseCategory && !filteredItems.contains(category)) {
-										category = new Category((Category) c);
-										filteredItems.add(category);
-										mCollapseCategoryStates.put(category.getId(), false);
-										item.setCategory(category);
-									}
-
-									filteredItems.add(item);
-									category.getItemsByCategories().add(item);
-								}
-							}
+						if (mIsUseCategory) {
+							filteredItems = category(filteredItems, c, charSequence);
+						} else {
+							filteredItems = item(filteredItems, c, charSequence);
 						}
 					}
 
@@ -455,13 +449,45 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 				Item item = getItemById(mLastEditId, mItemList);
 
-				if (item != null) {
+				if (mIsLastEdit && item != null) {
+					mIsLastEdit = false;
 					setScrollPosition(item);
 				}
 
-				if (mScrollToPosition != -1) {
-					mCatalogRV.scrollToPosition(mScrollToPosition);
+				scrollToPosition();
+			}
+
+			private ArrayList category(ArrayList filteredItems, Object originalCategory, CharSequence charSequence) {
+				if (originalCategory instanceof Category) {
+					Category newCategory = new Category((Category) originalCategory);
+
+					for (Object originalItem : ((Category) originalCategory).getItemsByCategories()) {
+						Item newItem = new Item((Item) originalItem);
+
+						if (((Item) originalItem).getName().toUpperCase().contains(charSequence.toString().toUpperCase())) {
+							if (!filteredItems.contains(newCategory)) {
+								filteredItems.add(newCategory);
+								mCollapseCategoryStates.put(newCategory.getId(), false);
+							}
+
+							newItem.setCategory(newCategory);
+							newCategory.getItemsByCategories().add(newItem);
+							filteredItems.add(newItem);
+						}
+					}
 				}
+
+				return filteredItems;
+			}
+
+			private ArrayList item(ArrayList filteredItems, Object originalItem, CharSequence charSequence) {
+				Item newItem = new Item((Item) originalItem);
+
+				if (((Item) originalItem).getName().toUpperCase().contains(charSequence.toString().toUpperCase())) {
+					filteredItems.add(newItem);
+				}
+
+				return filteredItems;
 			}
 		}
 
