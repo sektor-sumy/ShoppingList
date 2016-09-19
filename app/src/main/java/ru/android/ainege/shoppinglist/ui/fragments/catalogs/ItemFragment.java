@@ -353,11 +353,21 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 		public Item getItemById(long id, ArrayList list) {
 			if (id > 0) {
-				for (Object o : list) {
-					if (o instanceof Item) {
-						Item item = (Item) o;
+				for (Object c : list) {
+					if (mIsUseCategory) {
+						if (c instanceof Category) {
+							for (Object i : ((Category) c).getItemsByCategories()) {
+								Item item = (Item) i;
 
-						if (item.getIdItem() == id) {
+								if (item.getId() == id) {
+									return item;
+								}
+							}
+						}
+					} else {
+						Item item = (Item) c;
+
+						if (item.getId() == id) {
 							return item;
 						}
 					}

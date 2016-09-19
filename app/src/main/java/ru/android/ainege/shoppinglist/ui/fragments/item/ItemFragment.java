@@ -109,6 +109,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 	protected SharedPreferences mPrefs;
 	protected boolean mIsUseCategory;
+	protected boolean mIsUpdateSL = false;
 
 	protected abstract TextWatcher getNameChangedListener();
 	protected abstract SimpleCursorAdapter getCompleteTextAdapter();
@@ -237,6 +238,8 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 					HashMap<Integer, Long> modifyCatalog = (HashMap<Integer, Long>) data.getSerializableExtra(CatalogsActivity.LAST_EDIT);
 
 					if (modifyCatalog != null) {
+						mIsUpdateSL = true;
+
 						if (modifyCatalog.containsKey(R.string.catalogs_key_item) &&
 								mItemInList.getIdItem() == modifyCatalog.get(R.string.catalogs_key_item)) {
 							ItemDS.ItemCursor itemCursor = mItemDS.getWithData(mItemInList.getIdItem());
@@ -282,6 +285,10 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 						Image.deleteFile(mItemInList.getItem().getImagePath());
 					}
 
+					if (mIsUpdateSL) {
+						sendResult(-1);
+					}
+
 					if (mOnClickListener != null) {
 						mOnClickListener.onNotSave();
 					}
@@ -323,8 +330,14 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 			dialogFrag.show(getFragmentManager(), IS_SAVE_CHANGES_DATE);
 
 			result = false;
-		} else if (mIsAdded && isDeleteImage(null)) {
-			Image.deleteFile(mItemInList.getItem().getImagePath());
+		} else {
+			if (mIsAdded && isDeleteImage(null)) {
+				Image.deleteFile(mItemInList.getItem().getImagePath());
+			}
+
+			if (mIsUpdateSL) {
+				sendResult(-1);
+			}
 		}
 
 		return result;
@@ -508,7 +521,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	}
 
 	protected void sendResult(long id) {
-		getActivity().setResult(android.app.Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
+		getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
 	}
 
 	private void initKeyboardListener(final View v) {

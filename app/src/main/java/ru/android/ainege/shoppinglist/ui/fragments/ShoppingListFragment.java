@@ -144,7 +144,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 
 			mFAB.setVisibility(View.GONE);
-			mSLMenu.setVisibility(View.INVISIBLE);
+			mSLMenu.setVisibility((mIsUseCategory && mIsCollapsedCategory) ? View.INVISIBLE : View.GONE);
 
 			if (!mIsStartActionMode) {
 				mAdapterRV.extendAllCategory(false);
@@ -173,7 +173,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
 			mFAB.setVisibility(View.VISIBLE);
-			mSLMenu.setVisibility(View.VISIBLE);
+			updateMenu();
+
 			mActionMode = null;
 			mIsStartActionMode = false;
 

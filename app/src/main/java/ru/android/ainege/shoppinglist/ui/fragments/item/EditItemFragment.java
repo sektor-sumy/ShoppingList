@@ -83,7 +83,13 @@ public class EditItemFragment extends ItemFragment {
 	@Override
 	public boolean onBackPressed() {
 		refreshItem();
-		return mItemInList.equals(mOriginalItem) || super.onBackPressed();
+		boolean result = mItemInList.equals(mOriginalItem);
+
+		if (result && mIsUpdateSL) {
+			sendResult(-1);
+		}
+
+		return result || super.onBackPressed();
 	}
 
 	@Override
