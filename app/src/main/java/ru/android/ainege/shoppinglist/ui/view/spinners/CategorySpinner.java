@@ -13,7 +13,7 @@ import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialog
 
 public class CategorySpinner extends GeneralSpinner {
 	public static final int CATEGORY_ADD = 402;
-	protected static final String CATEGORY_ADD_DATE = "addCategoryDialog";
+	private static final String CATEGORY_ADD_DATE = "addCategoryDialog";
 
 	public CategorySpinner(Fragment fragment) {
 		super(fragment);
@@ -38,7 +38,8 @@ public class CategorySpinner extends GeneralSpinner {
 	protected SimpleCursorAdapter getAdapter() {
 		SimpleCursorAdapter spinnerAdapter = new SpinnerColorAdapter(mFragment.getActivity(),
 				R.layout.spinner_color_item,
-				getData());
+				getData(),
+				false);
 		spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_color_item);
 		return spinnerAdapter;
 	}

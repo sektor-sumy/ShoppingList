@@ -476,7 +476,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 	protected SimpleCursorAdapter getCompleteTextAdapter(FilterQueryProvider provider) {
 		SimpleCursorAdapter completeTextAdapter = new SpinnerColorAdapter(getActivity(),
-				R.layout.spinner_autocomplite, null);
+				R.layout.spinner_autocomplite, null, true);
 		completeTextAdapter.setFilterQueryProvider(provider);
 		completeTextAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
 			@Override
@@ -589,6 +589,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		mIsUseCategory = mPrefs.getBoolean(getString(R.string.settings_key_use_category), true);
 		LinearLayout categoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
 		categoryContainer.setVisibility(mIsUseCategory ? View.VISIBLE : View.GONE);
+		((SpinnerColorAdapter) mNameTextView.getAdapter()).updateUseCategoryFromSetting();
 	}
 
 	private void getCurrencyFromDb() {

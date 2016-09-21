@@ -13,13 +13,24 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.TableInterface;
 
 public class SpinnerColorAdapter extends SimpleCursorAdapter {
-	private boolean mIsUseCategory;
+	private Context mContext;
+	private boolean mIsUseCategory = true;
 
-	public SpinnerColorAdapter(Context context, int layout, Cursor c) {
+	public SpinnerColorAdapter(Context context, int layout, Cursor c, boolean isGetUseCategoryFromSetting) {
 		super(context, layout, c, new String[]{}, new int[]{}, 0);
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		mIsUseCategory = prefs.getBoolean(context.getString(R.string.settings_key_use_category), true);
+		mContext = context;
+
+		if (isGetUseCategoryFromSetting) {
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			mIsUseCategory = prefs.getBoolean(context.getString(R.string.settings_key_use_category), true);
+		}
+	}
+
+	public void updateUseCategoryFromSetting() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		mIsUseCategory = prefs.getBoolean(mContext.getString(R.string.settings_key_use_category), true);
+		notifyDataSetChanged();
 	}
 
 	@Override
