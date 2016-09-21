@@ -191,8 +191,11 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 	protected boolean isValidData() {
 		boolean isValid = true;
 
-		if (mName.getText().toString().trim().length() == 0) {
+		if (mName.getText().length() == 0) {
 			mNameInputLayout.setError(getString(R.string.error_name));
+			isValid = false;
+		} else if (mName.getText().length() < 3) {
+			mNameInputLayout.setError(getString(R.string.error_length_name));
 			isValid = false;
 		}
 
