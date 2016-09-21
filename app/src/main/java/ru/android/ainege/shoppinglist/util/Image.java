@@ -41,7 +41,7 @@ public class Image {
 	private static final double MAX_RATIO = 2;
 
 	public static int mLoadingImage = R.drawable.loader;
-	private int mDefaultImage = R.drawable.load_error;
+	public static int mDefaultImage = R.drawable.load_error;
 
 	public static Image create() {
 		return new Image();

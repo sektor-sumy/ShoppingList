@@ -89,6 +89,22 @@ public class EditItemDialogFragment extends ItemDialogFragment{
 		return isSaveData;
 	}
 
+	@Override
+	protected void refreshItem() {
+		super.refreshItem();
+
+		String defaultImage = mEditItem.getDefaultImagePath();
+		int firstCharCode = (int) mName.getText().toString().trim().toUpperCase().charAt(0);
+
+		if (defaultImage.contains(Image.CHARACTER_IMAGE_PATH) &&
+				!defaultImage.contains(String.valueOf(firstCharCode))) {
+			String image = Image.CHARACTER_IMAGE_PATH + firstCharCode + ".png";
+
+			mEditItem.setImagePath(image);
+			mEditItem.setDefaultImagePath(image);
+		}
+	}
+
 	private void deleteOriginalImage() {
 		String originImagePath = mOriginalItem.getImagePath();
 
