@@ -56,6 +56,17 @@
 				android:paddingTop="@dimen/empty_image_padding"
 				android:visibility="gone"/>
 
+			<TextView
+				android:id="@+id/empty_search"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center"
+				android:layout_gravity="center_vertical"
+				android:text="@string/empty_search"
+				android:visibility="gone"
+				android:textSize="20sp"
+				android:paddingBottom="70dp" />
+
 		</LinearLayout>
 	</android.support.v7.widget.CardView>
 

@@ -173,6 +173,7 @@
 	<string name="error_add_exist_item">Товар уже есть в базе и будет обновлен</string>
 	<string name="error_edit_exist_item">Товар с таким именем уже существует</string>
 	<string name="auto_complete_data">Данные для автозаполнения: </string>
+	<string name="empty_search">Ничего не найдено</string>
 
 	<string name="name">Название</string>
 	<string name="error_empty">Не может быть пустым</string>

@@ -47,6 +47,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 	private static final String STATE_SEARCH = "state_search";
 
 	private SearchView mSearchView;
+	private TextView mEmptySearchTextView;
 	private boolean mIsUseCategory;
 	private boolean mIsLastEdit = false;
 
@@ -57,6 +58,15 @@ public class ItemFragment extends CatalogFragment<Item>{
 		if (savedInstanceState != null) {
 			((ItemAdapter) mAdapterRV).setCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_COLLAPSE));
 		}
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View v = super.onCreateView(inflater, container, savedInstanceState);
+
+		mEmptySearchTextView = (TextView) v.findViewById(R.id.empty_search);
+
+		return v;
 	}
 
 	@Override
@@ -461,14 +471,19 @@ public class ItemFragment extends CatalogFragment<Item>{
 				mItemList = (ArrayList) filterResults.values;
 				notifyDataSetChanged();
 
-				Item item = getItemById(mLastEditId, mItemList);
+				if (mItemList.isEmpty()) {
+					mEmptySearchTextView.setVisibility(View.VISIBLE);
+				} else {
+					mEmptySearchTextView.setVisibility(View.GONE);
+					Item item = getItemById(mLastEditId, mItemList);
 
-				if (mIsLastEdit && item != null) {
-					mIsLastEdit = false;
-					setScrollPosition(item);
+					if (mIsLastEdit && item != null) {
+						mIsLastEdit = false;
+						setScrollPosition(item);
+					}
+
+					scrollToPosition();
 				}
-
-				scrollToPosition();
 			}
 
 			private ArrayList category(ArrayList filteredItems, Object originalCategory, CharSequence charSequence) {
