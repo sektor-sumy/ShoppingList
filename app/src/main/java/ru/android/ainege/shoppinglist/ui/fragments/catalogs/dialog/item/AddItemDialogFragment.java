@@ -76,6 +76,7 @@ public class AddItemDialogFragment extends ItemDialogFragment {
 				if (s.length() > 0 && s.toString().equals(s.toString().trim())) {
 					mNameInputLayout.setError(null);
 					mNameInputLayout.setErrorEnabled(false);
+					mInfoTextView.setVisibility(View.GONE);
 					mEditItem.setId(0);
 
 					//check the item in the catalog. If there is - select it
