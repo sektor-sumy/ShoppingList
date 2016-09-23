@@ -17,13 +17,9 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.ListsActivity;
@@ -34,6 +30,7 @@ import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CategoryFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CurrencyFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.UnitFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
+import ru.android.ainege.shoppinglist.util.MobileAd;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity
 		implements NavigationView.OnNavigationItemSelectedListener, OnCreateViewListener {
@@ -44,6 +41,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 	public static final int CATALOGS = 102;
 	public static final int SETTINGS = 103;
 
+	private AdView mAdView;
 	private DrawerLayout mDrawerLayout;
 
 	protected abstract Fragment createFragment();
@@ -54,6 +52,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(getLayout());
+		adsInitialize();
 
 		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
@@ -70,6 +69,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		mAdView.resume();
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
 		if (getFragment() instanceof ListsFragment) {
@@ -93,6 +94,18 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean isUseCategory = sharedPreferences.getBoolean(getString(R.string.settings_key_use_category), true);
 		navigationView.getMenu().findItem(R.id.nav_catalog_catalogs).setEnabled(isUseCategory);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mAdView.pause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mAdView.destroy();
 	}
 
 	@Override
@@ -233,21 +246,9 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 	}
 
 	protected void adsInitialize() {
-		MobileAds.initialize(this, "ca-app-pub-3804902313328755~1215266223");
-
-		final AdView adView = (AdView) findViewById(R.id.adView);
-		AdRequest adRequest = new AdRequest.Builder()
-				.build();
-		adView.loadAd(adRequest);
-
-		adView.setAdListener(new AdListener() {
-			@Override
-			public void onAdLoaded() {
-				super.onAdLoaded();
-				adView.setVisibility(View.VISIBLE);
-			}
-
-		});
+		mAdView = (AdView) findViewById(R.id.adView);
+		MobileAd ad = new MobileAd();
+		ad.adsInitialize(this, mAdView);
 	}
 
 	public long getSavedListId() {

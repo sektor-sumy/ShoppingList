@@ -8,6 +8,10 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
+import com.google.android.gms.ads.AdView;
+
+import ru.android.ainege.shoppinglist.R;
+
 public class AndroidBug5497Workaround {
 	// For more information, see https://code.google.com/p/android/issues/detail?id=5497
 
@@ -15,11 +19,11 @@ public class AndroidBug5497Workaround {
 		return new AndroidBug5497Workaround(activity);
 	}
 
-	OnOpenKeyboardListener mOnOpenKeyboard;
+	private OnOpenKeyboardListener mOnOpenKeyboard;
 
 	public interface OnOpenKeyboardListener {
-		void isOpen(int screenAppHeight);
-		void isClose();
+		void isOpen(int screenAppHeight, AdView adView);
+		void isClose(AdView adView);
 	}
 
 	public void setOnOpenKeyboard(OnOpenKeyboardListener onOpenKeyboard) {
@@ -50,20 +54,21 @@ public class AndroidBug5497Workaround {
 		if (usableHeightNow != usableHeightPrevious) {
 			int usableHeightSansKeyboard = mChildOfContent.getRootView().getHeight();
 			int heightDifference = usableHeightSansKeyboard - usableHeightNow;
+			AdView adView = (AdView) mChildOfContent.findViewById(R.id.adView);
 
 			if (heightDifference > (usableHeightSansKeyboard/4)) {
 				frameLayoutParams.height = usableHeightSansKeyboard - heightDifference;
 
 				// keyboard probably just became visible
 				if (mOnOpenKeyboard != null) {
-					mOnOpenKeyboard.isOpen(frameLayoutParams.height);
+					mOnOpenKeyboard.isOpen(frameLayoutParams.height, adView);
 				}
 			} else {
 				frameLayoutParams.height = defaultHeight;
 
 				// keyboard probably just became hidden
 				if (mOnOpenKeyboard != null) {
-					mOnOpenKeyboard.isClose();
+					mOnOpenKeyboard.isClose(adView);
 				}
 			}
 

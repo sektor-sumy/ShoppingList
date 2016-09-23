@@ -35,6 +35,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.gms.ads.AdView;
+
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -104,7 +106,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	private String mCurrencyList;
 	private boolean mIsOpenedKeyboard = false;
 	private boolean mIsExpandedAppbar = true;
-	private boolean mIsCollapsedMode;
+	private boolean mIsLandscapePhone;
 	private int mScreenAppHeight;
 
 	protected SharedPreferences mPrefs;
@@ -391,7 +393,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	protected void setupView(View v, final Bundle savedInstanceState) {
 		initToolbar(v);
 
-		if (!mIsCollapsedMode && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+		if (mIsLandscapePhone && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.primary_dark));
 		}
 
@@ -525,26 +527,36 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	}
 
 	private void initKeyboardListener(final View v) {
-		if (getResources().getBoolean(R.bool.isLandscape) && getResources().getBoolean(R.bool.isPhone)) {
-			mIsCollapsedMode = false;
-		} else {
-			mIsCollapsedMode = true;
-			AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboardListener() {
-				@Override
-				public void isOpen(int screenAppHeight) {
-					mIsOpenedKeyboard = true;
-					mScreenAppHeight = screenAppHeight;
+		mIsLandscapePhone = getResources().getBoolean(R.bool.isLandscape) && getResources().getBoolean(R.bool.isPhone);
 
+		AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboardListener() {
+			@Override
+			public void isOpen(int screenAppHeight, AdView adView) {
+				mIsOpenedKeyboard = true;
+				mScreenAppHeight = screenAppHeight;
+
+				adView.pause();
+				adView.setVisibility(View.GONE);
+
+				if (!mIsLandscapePhone) {
 					View focusedView = v.findFocus();
 
 					if (focusedView != null && !(focusedView instanceof LinearLayout) && !isViewVisible(focusedView)) {
 						mAppBarLayout.setExpanded(false);
 					}
 				}
+			}
 
-				@Override
-				public void isClose() {
+			@Override
+			public void isClose(final AdView adView) {
+				if (mIsOpenedKeyboard) {
+					adView.setVisibility(View.VISIBLE);
+					adView.resume();
+
 					mIsOpenedKeyboard = false;
+				}
+
+				if (!mIsLandscapePhone) {
 					View focusedView = v.findFocus();
 
 					if (focusedView != null) {
@@ -555,8 +567,8 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 						mAppBarLayout.setExpanded(true);
 					}
 				}
-			});
-		}
+			}
+		});
 	}
 
 	private void initToolbar(View v) {
