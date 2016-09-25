@@ -261,7 +261,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			}
 		}
 
-		getLoaderManager().initLoader(DATA_LOADER, null, this);
+		getLoaderManager().restartLoader(DATA_LOADER, null, this);
 	}
 
 	@Override

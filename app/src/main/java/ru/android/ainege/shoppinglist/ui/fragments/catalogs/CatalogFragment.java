@@ -98,7 +98,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 			mScrollToPosition = savedInstanceState.getInt(STATE_SCROLL_POSITION);
 		}
 
-		getLoaderManager().initLoader(DATA_LOADER, null, this);
+		getLoaderManager().restartLoader(DATA_LOADER, null, this);
 	}
 
 	@Override

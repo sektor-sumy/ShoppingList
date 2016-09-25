@@ -137,8 +137,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			mScrollToPosition = savedInstanceState.getInt(STATE_SCROLL_POSITION);
 		}
 
-		// TODO: 28.08.2016 bug in support lib, not save loader after rotate
-		getLoaderManager().initLoader(DATA_LOADER, null, this);
+		getLoaderManager().restartLoader(DATA_LOADER, null, this);
 	}
 
 	@Override
