@@ -121,7 +121,7 @@ public class AddItemFragment extends ItemFragment {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if (s.length() > 0 && s.toString().equals(s.toString().trim())) {
+				if (s.length() > 0) {
 					disableError(mNameInputLayout);
 					//If selected a existent item and default data are used,
 					//when changing item, fill in the data that have been previously introduced
@@ -137,6 +137,7 @@ public class AddItemFragment extends ItemFragment {
 					//Check is the item in the list. If there is a warning display
 					//If it isn`t, check is it in the catalog of items. If there is select it
 					ShoppingListCursor cursor = mItemsInListDS.getByName(s.toString().trim(), getIdList());
+
 					if (cursor.moveToFirst()) {
 						mInfoTextView.setText(R.string.info_exit_item_in_list);
 						mInfoTextView.setTextColor(Color.RED);
@@ -151,9 +152,11 @@ public class AddItemFragment extends ItemFragment {
 
 						if (mIsProposedItem) {
 							ItemCursor cursorItem = mItemDS.getWithData(s.toString().trim());
+
 							if (cursorItem.moveToFirst()) {
 								setDefaultData(cursorItem.getEntity());
 							}
+
 							cursorItem.close();
 						}
 					}

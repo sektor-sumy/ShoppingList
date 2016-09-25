@@ -109,7 +109,7 @@ public class EditItemFragment extends ItemFragment {
 			public void afterTextChanged(Editable s) {
 				if (s.length() == 0) {
 					mNameInputLayout.setError(getString(R.string.error_name));
-				} else if (s.toString().equals(s.toString().trim())) {
+				} else {
 					disableError(mNameInputLayout);
 					//Check is the item in the list. If there is a warning display
 					//If it isn`t, check is it in the catalog of items. If there is select it
