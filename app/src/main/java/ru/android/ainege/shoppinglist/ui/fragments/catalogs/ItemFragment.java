@@ -480,7 +480,10 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 					if (mOriginalList != null) {
 						list = mOriginalList;
-						mCollapseCategoryStates = new HashMap<>(mOriginalCollapseCategoryStates);
+
+						if (mOriginalCollapseCategoryStates != null) {
+							mCollapseCategoryStates = new HashMap<>(mOriginalCollapseCategoryStates);
+						}
 					} else {
 						list = mItemList;
 					}
