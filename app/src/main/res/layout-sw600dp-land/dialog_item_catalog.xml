@@ -43,7 +43,7 @@
 					android:inputType="textCapSentences"
 					android:maxLength="35"
 					android:paddingLeft="@dimen/padding_hint"
-					android:singleLine="true"/>
+					android:maxLines="1"/>
 
 			</android.support.design.widget.TextInputLayout>
 

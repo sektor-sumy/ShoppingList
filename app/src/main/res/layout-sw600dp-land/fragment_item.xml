@@ -117,7 +117,7 @@
 					android:inputType="textCapSentences"
 					android:maxLength="35"
 					android:paddingLeft="@dimen/padding_hint"
-					android:singleLine="true"/>
+					android:maxLines="1"/>
 
 			</android.support.design.widget.TextInputLayout>
 
@@ -143,7 +143,7 @@
 					android:layout_height="wrap_content"
 					android:layout_marginRight="@dimen/margin_columns"
 					android:layout_marginTop="@dimen/margin_bottom"
-					android:singleLine="true"
+					android:maxLines="1"
 					android:text="@string/amount"/>
 
 				<android.support.design.widget.TextInputLayout
@@ -159,7 +159,7 @@
 						android:digits="0123456789,."
 						android:gravity="center"
 						android:inputType="numberDecimal"
-						android:singleLine="true"/>
+						android:maxLines="1"/>
 
 				</android.support.design.widget.TextInputLayout>
 
@@ -184,7 +184,7 @@
 					android:layout_height="wrap_content"
 					android:layout_marginRight="@dimen/margin_columns"
 					android:layout_marginTop="@dimen/margin_bottom"
-					android:singleLine="true"
+					android:maxLines="1"
 					android:text="@string/price"/>
 
 				<android.support.design.widget.TextInputLayout
@@ -200,7 +200,7 @@
 						android:digits="0123456789.,"
 						android:gravity="center"
 						android:inputType="numberDecimal"
-						android:singleLine="true"/>
+						android:maxLines="1" />
 
 				</android.support.design.widget.TextInputLayout>
 
@@ -236,7 +236,7 @@
 					android:layout_width="@dimen/column_left"
 					android:layout_height="wrap_content"
 					android:layout_marginRight="@dimen/margin_columns"
-					android:singleLine="true"
+					android:maxLines="1"
 					android:text="@string/category"/>
 
 				<Spinner

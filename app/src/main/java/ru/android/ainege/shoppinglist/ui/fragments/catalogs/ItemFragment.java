@@ -3,6 +3,7 @@ package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -45,18 +46,24 @@ import ru.android.ainege.shoppinglist.util.MultiSelection;
 public class ItemFragment extends CatalogFragment<Item>{
 	private static final String STATE_COLLAPSE = "state_collapse";
 	private static final String STATE_SEARCH = "state_search";
+	private static final String STATE_ORIGINAL_COLLAPSE = "state_original_collapse";
 
+	private MenuItem mSearchMenu;
 	private SearchView mSearchView;
 	private TextView mEmptySearchTextView;
 	private boolean mIsUseCategory;
 	private boolean mIsLastEdit = false;
+	protected ItemAdapter mAdapterRV;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		mAdapterRV = (ItemAdapter) super.mAdapterRV;
+
 		if (savedInstanceState != null) {
-			((ItemAdapter) mAdapterRV).setCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_COLLAPSE));
+			mAdapterRV.setCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_COLLAPSE));
+			mAdapterRV.setOriginalCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_ORIGINAL_COLLAPSE));
 		}
 	}
 
@@ -73,8 +80,26 @@ public class ItemFragment extends CatalogFragment<Item>{
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-		outState.putSerializable(STATE_COLLAPSE, ((ItemAdapter) mAdapterRV).getCollapseCategoryStates());
-		outState.putCharSequence(STATE_SEARCH, mSearchView.getQuery());
+		outState.putSerializable(STATE_COLLAPSE, mAdapterRV.getCollapseCategoryStates());
+
+		if (mSearchMenu.isActionViewExpanded()) {
+			outState.putSerializable(STATE_ORIGINAL_COLLAPSE, mAdapterRV.getOriginalCollapseCategoryStates());
+			outState.putCharSequence(STATE_SEARCH, mSearchView.getQuery());
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (resultCode != Activity.RESULT_OK) return;
+
+		switch (requestCode) {
+			case ADD:
+			case EDIT:
+				mIsLastEdit = true;
+				break;
+		}
 	}
 
 	@Override
@@ -133,12 +158,11 @@ public class ItemFragment extends CatalogFragment<Item>{
 	}
 
 	protected void loadData() {
-		if (mSearchView.getQuery().length() != 0) {
-			mIsLastEdit = true;
+		if (mSearchMenu.isActionViewExpanded()) {
 			mAdapterRV.setData(mCatalog, false);
 
-			((ItemAdapter) mAdapterRV).saveOriginalList(false);
-			((ItemAdapter) mAdapterRV).getFilter().filter(mSearchView.getQuery());
+			mAdapterRV.saveOriginalList();
+			mAdapterRV.getFilter().filter(mSearchView.getQuery());
 		} else {
 			Item item = getLastEditItem(mCatalog);
 			mAdapterRV.setData(mCatalog, true);
@@ -160,15 +184,15 @@ public class ItemFragment extends CatalogFragment<Item>{
 		toolbar.setOnMenuItemClickListener(onMenuItemClickListener(menu));
 
 		SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-		MenuItem searchItem = menu.findItem(R.id.action_search);
-		searchItem.setVisible(true);
-		mSearchView = (SearchView) searchItem.getActionView();
+		mSearchMenu = menu.findItem(R.id.action_search);
+		mSearchMenu.setVisible(true);
+		mSearchView = (SearchView) mSearchMenu.getActionView();
 
 		if (savedInstanceState != null) {
 			CharSequence query = savedInstanceState.getCharSequence(STATE_SEARCH);
 
-			if (query.length() > 0) {
-				MenuItemCompat.expandActionView(searchItem);
+			if (query != null) {
+				MenuItemCompat.expandActionView(mSearchMenu);
 				afterExpandedSearchView(menu);
 				mSearchView.setQuery(savedInstanceState.getCharSequence(STATE_SEARCH), false);
 			}
@@ -185,13 +209,12 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				((ItemAdapter) mAdapterRV).getFilter().filter(newText);
-
+				mAdapterRV.getFilter().filter(newText);
 				return true;
 			}
 		});
 
-		MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+		MenuItemCompat.setOnActionExpandListener(mSearchMenu, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				afterExpandedSearchView(menu);
@@ -200,7 +223,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 			@Override
 			public boolean onMenuItemActionCollapse(MenuItem item) {
-				((ItemAdapter) mAdapterRV).recoveryFromOriginalList();
+				mAdapterRV.recoveryFromOriginalList();
 				menu.setGroupVisible(R.id.collapse_category, mIsUseCategory);
 				return true;
 			}
@@ -208,7 +231,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 	}
 
 	private void afterExpandedSearchView(Menu menu) {
-		((ItemAdapter) mAdapterRV).saveOriginalList(true);
+		mAdapterRV.saveOriginalList();
 		menu.setGroupVisible(R.id.collapse_category, false);
 	}
 
@@ -219,7 +242,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 					Item item = (Item) i;
 
 					if (item.getIdItem() == mLastEditId) {
-						((ItemAdapter) mAdapterRV).setCollapseCategoryStates(item.getIdCategory(), false);
+						mAdapterRV.setCollapseCategoryStates(item.getIdCategory(), false);
 						return item;
 					}
 				}
@@ -230,8 +253,8 @@ public class ItemFragment extends CatalogFragment<Item>{
 	}
 
 	private void setScrollPosition(Item item) {
-		int itemPosition = ((ItemAdapter) mAdapterRV).getItemList().indexOf(item);
-		mScrollToPosition = itemPosition != -1 ? itemPosition : ((ItemAdapter) mAdapterRV).getItemList().indexOf(item.getCategory());
+		int itemPosition = mAdapterRV.getItemList().indexOf(item);
+		mScrollToPosition = itemPosition != -1 ? itemPosition : mAdapterRV.getItemList().indexOf(item.getCategory());
 	}
 
 	private Toolbar.OnMenuItemClickListener onMenuItemClickListener (final Menu menu) {
@@ -240,10 +263,10 @@ public class ItemFragment extends CatalogFragment<Item>{
 			public boolean onMenuItemClick(MenuItem item) {
 				switch (item.getItemId()) {
 					case R.id.collapse_all:
-						((ItemAdapter) mAdapterRV).collapseAllCategory(true);
+						mAdapterRV.collapseAllCategory(true);
 						return true;
 					case R.id.expanded_all:
-						((ItemAdapter) mAdapterRV).extendAllCategory(true);
+						mAdapterRV.extendAllCategory(true);
 						return true;
 					default:
 						return false;
@@ -254,10 +277,10 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 	private class ItemAdapter extends NestedListAdapter implements CatalogAdapter, Filterable {
 		private SearchFilter mSearchFilter;
-		private ArrayList mOriginalList = new ArrayList();
-		protected HashMap<Long, Boolean> mOriginalCollapseCategoryStates = new HashMap<>();
+		private ArrayList mOriginalList;
+		private HashMap<Long, Boolean> mOriginalCollapseCategoryStates;
 
-		public ItemAdapter(Activity activity, boolean isUseCategory) {
+		ItemAdapter(Activity activity, boolean isUseCategory) {
 			super(activity);
 			mIsUseCategory = isUseCategory;
 		}
@@ -276,10 +299,9 @@ public class ItemFragment extends CatalogFragment<Item>{
 			ArrayList<Object> list = new ArrayList<>();
 			HashMap<Long, Boolean> collapseStates;
 
-			if (mSearchView.getQuery().length() > 0) {
+			if (mSearchMenu.isActionViewExpanded()) {
 				collapseStates = mOriginalCollapseCategoryStates;
-			}
-			else {
+			} else {
 				collapseStates = mCollapseCategoryStates;
 			}
 
@@ -361,7 +383,7 @@ public class ItemFragment extends CatalogFragment<Item>{
 			return new ItemDS(mActivity);
 		}
 
-		public Item getItemById(long id, ArrayList list) {
+		Item getItemById(long id, ArrayList list) {
 			if (id > 0) {
 				for (Object c : list) {
 					if (mIsUseCategory) {
@@ -426,28 +448,45 @@ public class ItemFragment extends CatalogFragment<Item>{
 			return mSearchFilter;
 		}
 
-		public void saveOriginalList(boolean isSaveCollapseCategory) {
-			mOriginalList = new ArrayList(mItemList);
+		HashMap<Long, Boolean> getOriginalCollapseCategoryStates() {
+			return mOriginalCollapseCategoryStates;
+		}
 
-			if (isSaveCollapseCategory) {
-				mOriginalCollapseCategoryStates = new HashMap<>(mCollapseCategoryStates);
+		void setOriginalCollapseCategoryStates(HashMap<Long, Boolean> originalCollapseCategoryStates) {
+			if (mOriginalCollapseCategoryStates == null && originalCollapseCategoryStates != null) {
+				mOriginalCollapseCategoryStates = new HashMap<>(originalCollapseCategoryStates);
 			}
 		}
 
-		public List recoveryFromOriginalList() {
-			mCollapseCategoryStates = mOriginalCollapseCategoryStates;
+		void saveOriginalList() {
+			mOriginalList = new ArrayList(mItemList);
+			setOriginalCollapseCategoryStates(mCollapseCategoryStates);
+		}
+
+		List recoveryFromOriginalList() {
+			mCollapseCategoryStates = new HashMap<>(mOriginalCollapseCategoryStates);
+			mOriginalCollapseCategoryStates = null;
 			return null;
 		}
 
-		public class SearchFilter extends Filter {
+		class SearchFilter extends Filter {
 
 			@Override
 			protected Filter.FilterResults performFiltering(CharSequence charSequence) {
 				Filter.FilterResults results = new Filter.FilterResults();
 
 				if (charSequence == null || charSequence.length() == 0) {
-					results.values = mOriginalList != null ? mOriginalList : mItemList;
-					results.count = mOriginalList.size();
+					List list;
+
+					if (mOriginalList != null) {
+						list = mOriginalList;
+						mCollapseCategoryStates = new HashMap<>(mOriginalCollapseCategoryStates);
+					} else {
+						list = mItemList;
+					}
+
+					results.values = list;
+					results.count = list.size();
 				} else {
 					ArrayList filteredItems = new ArrayList();
 
@@ -473,8 +512,11 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 				if (mItemList.isEmpty()) {
 					mEmptySearchTextView.setVisibility(View.VISIBLE);
+					mCatalogRV.setVisibility(View.GONE);
 				} else {
 					mEmptySearchTextView.setVisibility(View.GONE);
+					mCatalogRV.setVisibility(View.VISIBLE);
+
 					Item item = getItemById(mLastEditId, mItemList);
 
 					if (mIsLastEdit && item != null) {
@@ -520,13 +562,13 @@ public class ItemFragment extends CatalogFragment<Item>{
 			}
 		}
 
-		public class CategoryViewHolder extends CategoryVH {
-			public LinearLayout mCategoryContainer;
-			public TextView mColor;
-			public TextView mCategory;
-			public TextView mItemsCount;
+		class CategoryViewHolder extends CategoryVH {
+			LinearLayout mCategoryContainer;
+			TextView mColor;
+			TextView mCategory;
+			TextView mItemsCount;
 
-			public CategoryViewHolder(View v) {
+			CategoryViewHolder(View v) {
 				super(v);
 				mCategoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
 				mColor = (TextView) v.findViewById(R.id.color);
@@ -542,14 +584,14 @@ public class ItemFragment extends CatalogFragment<Item>{
 			}
 		}
 
-		public class ItemViewHolder extends ItemVH {
-			public TextView mColor;
-			public ImageView mImage;
-			public TextView mName;
-			public TextView mUnit;
-			public final ImageButton mDelete;
+		class ItemViewHolder extends ItemVH {
+			TextView mColor;
+			ImageView mImage;
+			TextView mName;
+			TextView mUnit;
+			final ImageButton mDelete;
 
-			public ItemViewHolder(View v) {
+			ItemViewHolder(View v) {
 				super(v);
 
 				mColor = (TextView) v.findViewById(R.id.color);

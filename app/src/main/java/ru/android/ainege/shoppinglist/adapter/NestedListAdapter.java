@@ -15,8 +15,8 @@ import ru.android.ainege.shoppinglist.db.entities.ItemData;
 import ru.android.ainege.shoppinglist.util.MultiSelection;
 
 public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-	protected static final int TYPE_CATEGORY = 0;
-	protected static final int TYPE_ITEM = 1;
+	private static final int TYPE_CATEGORY = 0;
+	private static final int TYPE_ITEM = 1;
 
 	protected HashMap<Long, Boolean> mCollapseCategoryStates = new HashMap<>();
 	protected ArrayList<Object> mItemList = new ArrayList<>();
@@ -130,7 +130,7 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 		}
 	}
 
-	protected void collapseCategory(Category category, int position) {
+	private void collapseCategory(Category category, int position) {
 		List<ItemData> itemInList = category.getItemsByCategories();
 
 		if (itemInList != null) {
@@ -141,7 +141,7 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 		}
 	}
 
-	protected void extendCategory(Category category, int position){
+	private void extendCategory(Category category, int position){
 		List<ItemData> itemInList = category.getItemsByCategories();
 
 		if (itemInList != null) {
