@@ -175,6 +175,7 @@ public class PictureView {
 			intent.putExtra("crop", "true");
 			intent.putExtra("scale", true);
 			intent.putExtra("scaleUpIfNeeded", true);
+			intent.putExtra("noFaceDetection", true);
 			intent.putExtra("aspectX", 16);
 			intent.putExtra("aspectY", 9);
 			intent.putExtra("outputX", width);
