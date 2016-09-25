@@ -57,8 +57,9 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 
 	@Override
 	protected void onLastListSelected() {
-		//todo нужно сделать проверку на сохранение и закрыть
-		superOnBackPressed();
+		if (mOnBackPressedListener == null || mOnBackPressedListener.onBackPressed()) {
+			superOnBackPressed();
+		}
 	}
 
 	@Override
