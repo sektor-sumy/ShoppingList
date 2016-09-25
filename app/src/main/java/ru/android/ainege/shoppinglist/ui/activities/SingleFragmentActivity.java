@@ -23,13 +23,14 @@ import com.google.android.gms.ads.AdView;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.ListsActivity;
+import ru.android.ainege.shoppinglist.ui.fragments.catalogs.ItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.list.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.OnCreateViewListener;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CategoryFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CurrencyFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.UnitFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
+
 import ru.android.ainege.shoppinglist.util.MobileAd;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity
@@ -246,7 +247,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		} else if (getFragment() instanceof ShoppingListFragment) {
 			navigationView.setCheckedItem(R.id.nav_last_list);
 		} else if (getFragment() instanceof ItemFragment) {
-			navigationView.setCheckedItem(R.id.nav_last_list);
+			navigationView.setCheckedItem(R.id.nav_catalog_items);
 		} else if (getFragment() instanceof CategoryFragment) {
 			navigationView.setCheckedItem(R.id.nav_catalog_catalogs);
 		} else if (getFragment() instanceof UnitFragment) {
