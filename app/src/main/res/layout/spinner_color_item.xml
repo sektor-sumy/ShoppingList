@@ -18,5 +18,5 @@
         android:ellipsize="marquee"
         android:textAlignment="inherit"
         style="?android:attr/spinnerItemStyle"
-        android:maxLines="1"/>
+        android:singleLine="true" />
 </LinearLayout>

@@ -18,6 +18,6 @@
         android:layout_height="?android:attr/listPreferredItemHeightSmall"
         android:ellipsize="marquee"
         style="?android:attr/spinnerDropDownItemStyle"
-        android:maxLines="1"/>
+        android:singleLine="true"/>
 
 </LinearLayout>

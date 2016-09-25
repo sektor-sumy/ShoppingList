@@ -18,5 +18,5 @@
         android:textAppearance="?android:attr/textAppearanceLargePopupMenu"
         android:ellipsize="marquee"
         style="?android:attr/dropDownItemStyle"
-        android:maxLines="1"/>
+        android:singleLine="true"/>
 </LinearLayout>

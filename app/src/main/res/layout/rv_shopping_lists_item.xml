@@ -50,7 +50,7 @@
 			android:minWidth="@dimen/column_amount_wight"
 			android:textColor="@android:color/black"
 			android:textSize="16sp"
-			android:maxLines="1"/>
+			android:singleLine="true"/>
 
 		<TextView
 			android:id="@+id/item_price_list"
@@ -62,7 +62,7 @@
 			android:minWidth="@dimen/column_price_wight"
 			android:textColor="@android:color/black"
 			android:textSize="16sp"
-			android:maxLines="1"/>
+			android:singleLine="true"/>
 
 	</LinearLayout>
 
