@@ -55,7 +55,7 @@ public class EditItemFragment extends ItemFragment {
 		if (savedInstanceState == null) {
 			setDataToView(savedInstanceState);
 		} else {
-			loadImage(mPictureView.getImagePath());
+			loadImage(savedInstanceState.getString(STATE_IMAGE_PATH));
 		}
 	}
 
@@ -264,11 +264,6 @@ public class EditItemFragment extends ItemFragment {
 
 		if (mNameTextView.length() < 3) {
 			mNameInputLayout.setError(getString(R.string.error_length_name));
-			isValid = false;
-		}
-
-		if (mPictureView.isLoading()) {
-			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
 			isValid = false;
 		}
 

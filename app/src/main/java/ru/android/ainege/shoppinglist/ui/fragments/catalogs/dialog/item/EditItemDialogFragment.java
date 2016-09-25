@@ -41,7 +41,7 @@ public class EditItemDialogFragment extends ItemDialogFragment{
 			mUnitSpinner.setSelected(mEditItem.getUnit().getId());
 			mCategorySpinner.setSelected(mEditItem.getCategory().getId());
 		} else {
-			loadImage(mPictureView.getImagePath());
+			loadImage(savedInstanceState.getString(STATE_IMAGE_PATH));
 		}
 	}
 

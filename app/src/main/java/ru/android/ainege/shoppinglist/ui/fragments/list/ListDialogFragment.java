@@ -36,6 +36,7 @@ import static ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS.Currenc
 public abstract class ListDialogFragment extends DialogFragment implements PictureView.PictureInterface {
 	public static final String ID_LIST = "idList";
 	private static final String STATE_FILE = "state_file";
+	private static final String STATE_IMAGE_PATH = "state_image_path";
 
 	protected EditText mNameEditText;
 	protected Spinner mCurrencySpinner;
@@ -46,6 +47,7 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 	protected abstract long save(ListsDS listDS, String name, long idCurrency);
 	protected abstract void setDataToView();
 
+	@NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -98,14 +100,10 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		mPictureView.setImagePath(mImagePath);
-	}
-
-	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+
+		outState.putString(STATE_IMAGE_PATH, mImagePath);
 		outState.putSerializable(STATE_FILE, mPictureView.getFile());
 	}
 
@@ -137,10 +135,17 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case PictureView.TAKE_PHOTO:
-					mPictureView.takePhotoResult(mImagePath);
+					mPictureView.takePhotoResult();
 					break;
 				case PictureView.FROM_GALLERY:
-					mPictureView.fromGalleryResult(mImagePath, data.getData());
+					mPictureView.fromGalleryResult();
+					break;
+			}
+		} else {
+			switch (requestCode) {
+				case PictureView.TAKE_PHOTO:
+				case PictureView.FROM_GALLERY:
+					mPictureView.cancelResult();
 					break;
 			}
 		}
@@ -199,7 +204,7 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_list, null);
 
-		mPictureView = new PictureView(this, savedInstanceState, this);
+		mPictureView = new PictureView(this, this);
 		mPictureView.setImage(v.findViewById(R.id.image));
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
@@ -211,7 +216,7 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 		if (savedInstanceState == null) {
 			setDataToView();
 		} else {
-			loadImage(mPictureView.getImagePath());
+			loadImage(savedInstanceState.getString(STATE_IMAGE_PATH));
 			mPictureView.setFile((File) savedInstanceState.getSerializable(STATE_FILE));
 		}
 
@@ -257,11 +262,6 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 		} else {
 			mNameInputLayout.setError(null);
 			mNameInputLayout.setErrorEnabled(false);
-		}
-
-		if (mPictureView.isLoading()) {
-			Toast.makeText(getActivity().getApplicationContext(), "Подождите загрузке картинки", Toast.LENGTH_SHORT).show();
-			isValid = false;
 		}
 
 		return isValid;

@@ -30,6 +30,7 @@ import ru.android.ainege.shoppinglist.util.Image;
 
 public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> implements PictureView.PictureInterface{
 	private static final String STATE_FILE = "state_file";
+	protected static final String STATE_IMAGE_PATH = "state_image_path";
 
 	protected PictureView mPictureView;
 	protected TextView mInfoTextView;
@@ -44,7 +45,7 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_item_catalog, null);
 
-		mPictureView = new PictureView(this, savedInstanceState, this);
+		mPictureView = new PictureView(this, this);
 		mUnitSpinner = new UnitSpinner(this);
 		mCategorySpinner = new CategorySpinner(this);
 
@@ -80,15 +81,10 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 	}
 
 	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		mPictureView.setImagePath(mEditItem.getImagePath());
-	}
-
-	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putSerializable(STATE_FILE, mPictureView.getFile());
+		outState.putString(STATE_IMAGE_PATH, mEditItem.getImagePath());
 	}
 
 	@Override
@@ -119,10 +115,10 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case PictureView.TAKE_PHOTO:
-					mPictureView.takePhotoResult(mEditItem.getImagePath());
+					mPictureView.takePhotoResult();
 					break;
 				case PictureView.FROM_GALLERY:
-					mPictureView.fromGalleryResult(mEditItem.getImagePath(), data.getData());
+					mPictureView.fromGalleryResult();
 					break;
 				case UnitSpinner.UNIT_ADD:
 					mUnitSpinner.updateSpinner(data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1), false);
@@ -132,6 +128,10 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 			}
 		} else {
 			switch (requestCode) {
+				case PictureView.TAKE_PHOTO:
+				case PictureView.FROM_GALLERY:
+					mPictureView.cancelResult();
+					break;
 				case UnitSpinner.UNIT_ADD:
 					mUnitSpinner.setSelected(GeneralSpinner.ID_ADD_CATALOG);
 					break;

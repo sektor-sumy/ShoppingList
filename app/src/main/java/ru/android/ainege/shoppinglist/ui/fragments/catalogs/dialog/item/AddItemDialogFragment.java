@@ -54,7 +54,7 @@ public class AddItemDialogFragment extends ItemDialogFragment {
 			mUnitSpinner.setSelected(getActivity().getResources().getStringArray(R.array.units)[0]);
 			mCategorySpinner.setSelected(getActivity().getResources().getStringArray(R.array.categories)[0].split("—")[0]);
 		} else {
-			loadImage(mPictureView.getImagePath());
+			loadImage(savedInstanceState.getString(STATE_IMAGE_PATH));
 		}
 	}
 

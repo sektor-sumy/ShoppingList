@@ -73,6 +73,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	private static final int IS_SAVE_CHANGES = 401;
 	private static final String IS_SAVE_CHANGES_DATE = "answerDialog";
 	private static final String STATE_FILE = "state_file";
+	protected static final String STATE_IMAGE_PATH = "state_image_path";
 	protected static final String STATE_CATEGORY_ID = "state_category_id";
 
 	protected CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -162,7 +163,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefs.registerOnSharedPreferenceChangeListener(this);
 
-		mPictureView = new PictureView(this, savedInstanceState, this);
+		mPictureView = new PictureView(this, this);
 		mUnitSpinner = new UnitSpinner(this);
 		mCategorySpinner = new CategorySpinner(this);
 
@@ -201,7 +202,6 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		mPictureView.setImagePath(mItemInList.getItem().getImagePath());
 
 		mOnCreateViewListener = null;
 		mOnClickListener = null;
@@ -212,6 +212,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
+		outState.putString(STATE_IMAGE_PATH, mItemInList.getItem().getImagePath());
 		outState.putSerializable(STATE_FILE, mPictureView.getFile());
 		outState.putLong(STATE_CATEGORY_ID, mCategorySpinner.getSelected().getId());
 	}
@@ -221,10 +222,10 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case PictureView.TAKE_PHOTO:
-					mPictureView.takePhotoResult(mItemInList.getItem().getImagePath());
+					mPictureView.takePhotoResult();
 					break;
 				case PictureView.FROM_GALLERY:
-					mPictureView.fromGalleryResult(mItemInList.getItem().getImagePath(), data.getData());
+					mPictureView.fromGalleryResult();
 					break;
 				case IS_SAVE_CHANGES:
 					saveItem(true);
@@ -282,6 +283,10 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 			}
 		} else {
 			switch (requestCode) {
+				case PictureView.TAKE_PHOTO:
+				case PictureView.FROM_GALLERY:
+					mPictureView.cancelResult();
+					break;
 				case IS_SAVE_CHANGES:
 					if (isDeleteImage(null)) {
 						Image.deleteFile(mItemInList.getItem().getImagePath());

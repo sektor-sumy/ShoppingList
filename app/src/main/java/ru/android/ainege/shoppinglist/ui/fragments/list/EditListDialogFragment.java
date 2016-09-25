@@ -2,6 +2,7 @@ package ru.android.ainege.shoppinglist.ui.fragments.list;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
@@ -23,6 +24,7 @@ public class EditListDialogFragment extends ListDialogFragment {
 		return fragment;
 	}
 
+	@NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		mOriginalList = new List((List) getArguments().getSerializable(LIST));

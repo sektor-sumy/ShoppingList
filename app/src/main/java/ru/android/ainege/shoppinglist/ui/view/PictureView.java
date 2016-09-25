@@ -5,40 +5,27 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import java.io.File;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.ui.OnFinishedImageListener;
-import ru.android.ainege.shoppinglist.ui.fragments.RetainedFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 
-public class PictureView implements OnFinishedImageListener {
-	public static final int RESULT_OK = RetainedFragment.RESULT_OK;
-	private static final int ERROR_OUT_MEMORY = RetainedFragment.ERROR_OUT_MEMORY;
-	private static final int ERROR_PROCESSING = RetainedFragment.ERROR_PROCESSING;
-
-	private static final String RETAINED_FRAGMENT = "retained_fragment_item";
+public class PictureView {
 	public static final int TAKE_PHOTO = 404;
 	public static final int FROM_GALLERY = 405;
 
 	private Fragment mFragment;
-	private RetainedFragment mRetainedFragment;
 	private PictureInterface mPictureInterface;
 
 	private ImageView mImageView;
@@ -50,19 +37,9 @@ public class PictureView implements OnFinishedImageListener {
 		void loadImage(String path);
 	}
 
-	public PictureView(Fragment fragment, Bundle savedInstanceState, PictureInterface pictureInterface) {
+	public PictureView(Fragment fragment, PictureInterface pictureInterface) {
 		mFragment = fragment;
 		mPictureInterface = pictureInterface;
-		setRetainedFragment(savedInstanceState, this);
-	}
-
-	@Override
-	public void onFinished(int resultCode, String path) {
-		if (resultCode == PictureView.RESULT_OK) {
-			mPictureInterface.loadImage(path);
-		} else {
-			errirLoadingImage(resultCode);
-		}
 	}
 
 	public ImageView getImage() {
@@ -89,24 +66,12 @@ public class PictureView implements OnFinishedImageListener {
 		mFile = file;
 	}
 
-	public String getImagePath() {
-		return mRetainedFragment.getImagePath();
-	}
-
-	public void setImagePath(String imagePath) {
-		mRetainedFragment.setImagePath(imagePath);
-	}
-
 	public void loadImage(String path, String previousPath) {
 		if (mPictureInterface.isDeleteImage(path)) {
 			Image.deleteFile(previousPath);
 		}
 
 		Image.create().insertImageToView(mFragment.getActivity(), path, mImageView);
-	}
-
-	public boolean isLoading() {
-		return mRetainedFragment.isLoading();
 	}
 
 	public void onCreateContextMenu(ContextMenu menu, int itemSetVisible, String title) {
@@ -168,63 +133,21 @@ public class PictureView implements OnFinishedImageListener {
 		}
 	}
 
-	public void takePhotoResult(String imagePath) {
+	public void takePhotoResult() {
 		Image.create().deletePhotoFromGallery(mFragment.getActivity(), mFile);
-		executeLoadImage(imagePath, mFile, null);
+		mPictureInterface.loadImage(Image.getFilePath(mFile));
+		mFile = null;
 	}
 
-	public void fromGalleryResult(String imagePath, Uri selectedImage) {
-		File file = Image.create().createImageFile(mFragment.getActivity());
+	public void fromGalleryResult() {
+		mPictureInterface.loadImage(Image.getFilePath(mFile));
+		mFile = null;
+	}
 
-		try {
-			if (file != null) {
-				Bitmap bitmap = MediaStore.Images.Media.getBitmap(mFragment.getActivity().getContentResolver(), selectedImage);
-				executeLoadImage(imagePath, file, bitmap);
-			} else {
-				Toast.makeText(mFragment.getActivity(), mFragment.getActivity().getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
-			}
-		} catch (OutOfMemoryError | Exception e) {
-			e.printStackTrace();
-			FirebaseCrash.log(mFragment.getActivity().getResources().getString(R.string.catched_exception));
-			FirebaseCrash.report(e);
-			Image.deleteFile(file.getAbsolutePath());
+	public void cancelResult() {
+		if (mFile != null) {
+			mFile = null;
 		}
-	}
-
-	private void executeLoadImage(String imagePath, File file, Bitmap bitmap) {
-		String path = Image.getPathFromResource(mFragment.getActivity(), Image.mLoadingImage);
-		Image.create().insertImageToView(mFragment.getActivity(), path, mImageView);
-
-		DisplayMetrics metrics = mFragment.getResources().getDisplayMetrics();
-		mRetainedFragment.execute(imagePath, file, bitmap, metrics);
-	}
-
-	private void errirLoadingImage(int resultCode) {
-		Image.create().insertImageToView(mFragment.getActivity(), mRetainedFragment.getImagePath(), mImageView);
-		String message;
-
-		switch (resultCode) {
-			case ERROR_OUT_MEMORY:
-				message = mFragment.getString(R.string.error_out_of_memory);
-				break;
-			case ERROR_PROCESSING:
-			default:
-				message = mFragment.getString(R.string.error_bitmap);
-		}
-
-		Toast.makeText(mFragment.getActivity(), message, Toast.LENGTH_SHORT).show();
-	}
-
-	private void setRetainedFragment(Bundle savedInstanceState, OnFinishedImageListener listener) {
-		FragmentManager fm = mFragment.getFragmentManager();
-		mRetainedFragment = (RetainedFragment) fm.findFragmentByTag(RETAINED_FRAGMENT);
-
-		if (mRetainedFragment == null || savedInstanceState == null) {
-			mRetainedFragment = new RetainedFragment();
-			fm.beginTransaction().add(mRetainedFragment, RETAINED_FRAGMENT).commit();
-		}
-
-		mRetainedFragment.setOnLoadedFinish(listener);
 	}
 
 	private boolean hasPermission(String permission){
@@ -233,18 +156,33 @@ public class PictureView implements OnFinishedImageListener {
 
 	private void takePhoto(){
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		mFile = Image.create().createImageFile(mFragment.getActivity());
-
-		if (mFile != null) {
-			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
-			mFragment.startActivityForResult(cameraIntent, TAKE_PHOTO);
-		} else {
-			Toast.makeText(mFragment.getActivity(), mFragment.getActivity().getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
-		}
+		sentIntent(cameraIntent, TAKE_PHOTO);
 	}
 
 	private void selectFromGallery() {
 		Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-		mFragment.startActivityForResult(galleryIntent, FROM_GALLERY);
+		sentIntent(galleryIntent, FROM_GALLERY);
+	}
+
+	private void sentIntent(Intent intent, int requestCode) {
+		mFile = Image.create().createImageFile(mFragment.getActivity());
+
+		if (mFile != null) {
+			int width = mFragment.getResources().getDisplayMetrics().widthPixels;
+			int height = width * 9 / 16;
+
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
+			intent.putExtra("crop", "true");
+			intent.putExtra("scale", true);
+			intent.putExtra("scaleUpIfNeeded", true);
+			intent.putExtra("aspectX", 16);
+			intent.putExtra("aspectY", 9);
+			intent.putExtra("outputX", width);
+			intent.putExtra("outputY", height);
+			intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+			mFragment.startActivityForResult(intent, requestCode);
+		} else {
+			Toast.makeText(mFragment.getActivity(), mFragment.getActivity().getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+		}
 	}
 }

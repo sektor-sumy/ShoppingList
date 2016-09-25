@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import java.text.DecimalFormat;
 
@@ -78,7 +77,7 @@ public class AddItemFragment extends ItemFragment {
 		super.setupView(v, savedInstanceState);
 
 		if (savedInstanceState != null) {
-			loadImage(mPictureView.getImagePath());
+			loadImage(savedInstanceState.getString(STATE_IMAGE_PATH));
 		}
 
 		mUnitSpinner.setSelected(getActivity().getResources().getStringArray(R.array.units)[0]);
@@ -325,11 +324,6 @@ public class AddItemFragment extends ItemFragment {
 			isValid = false;
 		} else if (mNameTextView.length() < 3) {
 			mNameInputLayout.setError(getString(R.string.error_length_name));
-			isValid = false;
-		}
-
-		if (mPictureView.isLoading()) {
-			Toast.makeText(getActivity().getApplicationContext(), getString(R.string.wait_load_image), Toast.LENGTH_SHORT).show();
 			isValid = false;
 		}
 
