@@ -122,6 +122,7 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 					break;
 				case UnitSpinner.UNIT_ADD:
 					mUnitSpinner.updateSpinner(data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1), false);
+					break;
 				case CategorySpinner.CATEGORY_ADD:
 					mCategorySpinner.updateSpinner(data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1), false);
 					break;
