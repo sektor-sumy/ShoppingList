@@ -15,11 +15,12 @@ import ru.android.ainege.shoppinglist.R;
 public class AndroidBug5497Workaround {
 	// For more information, see https://code.google.com/p/android/issues/detail?id=5497
 
+	public static boolean sIsKeyboardOpen = false;
+	private OnOpenKeyboardListener mOnOpenKeyboard;
+
 	public static AndroidBug5497Workaround assistActivity (Activity activity) {
 		return new AndroidBug5497Workaround(activity);
 	}
-
-	private OnOpenKeyboardListener mOnOpenKeyboard;
 
 	public interface OnOpenKeyboardListener {
 		void isOpen(int screenAppHeight, AdView adView);
@@ -61,6 +62,7 @@ public class AndroidBug5497Workaround {
 
 				// keyboard probably just became visible
 				if (mOnOpenKeyboard != null) {
+					sIsKeyboardOpen = true;
 					mOnOpenKeyboard.isOpen(frameLayoutParams.height, adView);
 				}
 			} else {
@@ -68,6 +70,7 @@ public class AndroidBug5497Workaround {
 
 				// keyboard probably just became hidden
 				if (mOnOpenKeyboard != null) {
+					sIsKeyboardOpen = false;
 					mOnOpenKeyboard.isClose(adView);
 				}
 			}

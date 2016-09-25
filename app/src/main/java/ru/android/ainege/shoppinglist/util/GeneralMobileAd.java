@@ -29,7 +29,10 @@ public abstract class GeneralMobileAd {
 			@Override
 			public void onAdLoaded() {
 				super.onAdLoaded();
-				adView.setVisibility(View.VISIBLE);
+
+				if (!AndroidBug5497Workaround.sIsKeyboardOpen) {
+					adView.setVisibility(View.VISIBLE);
+				}
 			}
 		});
 	}

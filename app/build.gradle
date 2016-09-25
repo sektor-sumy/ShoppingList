@@ -30,7 +30,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    ext.supportVersion = "24.2.1"
+    ext.supportVersion = "24.1.1"
     ext.firebaseVersion = "9.4.0"
 
     compile "com.android.support:appcompat-v7:$supportVersion"
