@@ -4,8 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -22,7 +22,7 @@ import ru.android.ainege.shoppinglist.ui.activities.Lists.screen.ItemScreen;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.screen.ListsScreen;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.screen.ShoppingListScreen;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.screen.TabletScreen;
-import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.list.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
@@ -82,7 +82,7 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 				openLastList();
 			}
 		} else {
-			ListsFragment fragment = (ListsFragment) mListsActivity.getFragmentManager().findFragmentByTag(ListsActivity.LISTS_TAG);
+			ListsFragment fragment = (ListsFragment) mListsActivity.getSupportFragmentManager().findFragmentByTag(ListsActivity.LISTS_TAG);
 			mListsScreen.setFragment(fragment);
 			mLastSelectedListId = savedInstanceState.getLong(STATE_LAST_LIST_ID);
 			mLastSelectedItemId = savedInstanceState.getLong(STATE_LAST_ITEM_ID);
@@ -105,16 +105,16 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 				case ShoppingListScreen.SCREEN_ID:
 					mCurrentScreen = mShoppingListScreen;
 
-					shippingListFragment = (ShoppingListFragment) getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
+					shippingListFragment = (ShoppingListFragment) getListsActivity().getSupportFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
 					mShoppingListScreen.setListeners(shippingListFragment);
 					break;
 				case ItemScreen.SCREEN_ID:
 					mCurrentScreen = mItemScreen;
 
-					shippingListFragment = (ShoppingListFragment) getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
+					shippingListFragment = (ShoppingListFragment) getListsActivity().getSupportFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
 					mShoppingListScreen.setListeners(shippingListFragment);
 
-					ItemFragment itemFragment = (ItemFragment) getListsActivity().getFragmentManager().findFragmentByTag(TabletState.ITEM_TAG);
+					ItemFragment itemFragment = (ItemFragment) getListsActivity().getSupportFragmentManager().findFragmentByTag(TabletState.ITEM_TAG);
 					mItemScreen.setListeners(itemFragment);
 					break;
 			}
@@ -388,11 +388,11 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 	}
 	//</editor-fold>
 
-	public class ViewWeightAnimationWrapper {
+	private class ViewWeightAnimationWrapper {
 
 		private View view;
 
-		public ViewWeightAnimationWrapper(View view) {
+		ViewWeightAnimationWrapper(View view) {
 			if (view.getLayoutParams() instanceof LinearLayout.LayoutParams) {
 				this.view = view;
 			} else {
@@ -400,11 +400,11 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 			}
 		}
 
-		public float getWeight() {
+		float getWeight() {
 			return ((LinearLayout.LayoutParams) view.getLayoutParams()).weight;
 		}
 
-		public void setWeight(float weight) {
+		void setWeight(float weight) {
 			LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
 			params.weight = weight;
 			view.setLayoutParams(params);

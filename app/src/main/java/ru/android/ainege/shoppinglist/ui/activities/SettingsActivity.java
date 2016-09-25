@@ -1,59 +1,22 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
-import android.os.Build;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import ru.android.ainege.shoppinglist.ui.fragments.MainPreferenceFragment;
 
-public class SettingsActivity extends SingleFragmentActivity {
-	private final static String FRAGMENT_TAG = "settings_activity_tag";
-
-	private MainPreferenceFragment mPreferenceFragment;
-
+public class SettingsActivity extends AppCompatActivity {
 	@Override
-	protected int getDefaultContainer() {
-		return android.R.id.content;
-	}
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-	@Override
-	protected MainPreferenceFragment createFragment() {
-		mPreferenceFragment = new MainPreferenceFragment();
-		return mPreferenceFragment;
-	}
-
-	@Override
-	protected MainPreferenceFragment getFragment() {
-		return mPreferenceFragment;
-	}
-
-	@Override
-	protected String getTag() {
-		return FRAGMENT_TAG;
-	}
-
-	@Override
-	protected void adsInitialize() {
-
-	}
-
-	@Override
-	protected void onCatalogSelected(int key) {
-		Intent i = new Intent(this, CatalogsActivity.class);
-		i.putExtra(CatalogsActivity.EXTRA_TYPE, getString(key));
-		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			startActivity(i, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-		} else {
-			startActivity(i);
+		if (savedInstanceState == null) {
+			getFragmentManager().beginTransaction()
+					.replace(android.R.id.content, new MainPreferenceFragment())
+					.commit();
 		}
-	}
-
-	@Override
-	protected void onSettingsSelect() {
-
 	}
 
 	@Override

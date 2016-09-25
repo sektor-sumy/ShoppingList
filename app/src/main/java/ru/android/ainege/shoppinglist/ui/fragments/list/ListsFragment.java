@@ -1,14 +1,10 @@
-package ru.android.ainege.shoppinglist.ui.fragments;
+package ru.android.ainege.shoppinglist.ui.fragments.list;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -17,6 +13,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -36,9 +36,8 @@ import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.ListsDS;
 import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
-import ru.android.ainege.shoppinglist.ui.fragments.list.AddListDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.list.EditListDialogFragment;
-import ru.android.ainege.shoppinglist.ui.fragments.list.ListDialogFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.OnCreateViewListener;
+import ru.android.ainege.shoppinglist.ui.fragments.QuestionDialogFragment;
 import ru.android.ainege.shoppinglist.util.Image;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -460,7 +459,7 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static class ListsCursorLoader extends CursorLoader {
 		private final Context mContext;
 
-		public ListsCursorLoader(Context context) {
+		ListsCursorLoader(Context context) {
 			super(context);
 			mContext = context;
 		}
@@ -535,15 +534,15 @@ public class ListsFragment extends Fragment implements LoaderManager.LoaderCallb
 			return statisticsShopping;
 		}
 
-		public class ViewHolder extends RecyclerView.ViewHolder {
-			public ImageView mImage;
-			public TextView mName;
-			public TextView mStatisticsShopping;
-			public LinearLayout mButtonsContainer;
-			public ImageButton mEdit;
-			public ImageButton mDelete;
+		class ViewHolder extends RecyclerView.ViewHolder {
+			ImageView mImage;
+			TextView mName;
+			TextView mStatisticsShopping;
+			LinearLayout mButtonsContainer;
+			ImageButton mEdit;
+			ImageButton mDelete;
 
-			public ViewHolder(View v) {
+			ViewHolder(View v) {
 				super(v);
 				mImage = (ImageView) v.findViewById(R.id.image_list);
 				mName = (TextView) v.findViewById(R.id.name_list);

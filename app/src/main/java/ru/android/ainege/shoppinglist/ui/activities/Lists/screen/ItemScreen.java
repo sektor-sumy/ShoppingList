@@ -34,7 +34,7 @@ public class ItemScreen extends TabletScreen implements ItemFragment.OnClickList
 	}
 
 	public void setListeners(ItemFragment fragment) {
-		mShoppingListFragment = (ShoppingListFragment) mState.getListsActivity().getFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
+		mShoppingListFragment = (ShoppingListFragment) mState.getListsActivity().getSupportFragmentManager().findFragmentByTag(TabletState.SHOPPING_LIST_TAG);
 		mShoppingListFragment.setOnItemChangedListener(this);
 
 		mItemFragment = fragment;

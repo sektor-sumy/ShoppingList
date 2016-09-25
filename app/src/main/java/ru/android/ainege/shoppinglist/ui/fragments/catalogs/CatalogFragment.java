@@ -2,16 +2,16 @@ package ru.android.ainege.shoppinglist.ui.fragments.catalogs;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -304,7 +304,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 	private static class DataCursorLoader extends CursorLoader {
 		private final CatalogDS mDS;
 
-		public DataCursorLoader(Context context, CatalogDS ds) {
+		DataCursorLoader(Context context, CatalogDS ds) {
 			super(context);
 			mDS = ds;
 		}
@@ -317,7 +317,7 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 
 	public abstract class RecyclerViewAdapter<S extends RecyclerViewAdapter.ViewHolder> extends RecyclerView.Adapter<S>
 														implements CatalogAdapter {
-		protected ArrayList<T> mCatalog;
+		private ArrayList<T> mCatalog;
 
 		public abstract S onCreateViewHolder(ViewGroup parent, int viewType);
 
@@ -343,12 +343,12 @@ public abstract class CatalogFragment<T extends Catalog> extends Fragment implem
 			notifyItemRemoved(position);
 		}
 
-		public class ViewHolder extends RecyclerView.ViewHolder {
-			public final TextView mName;
-			public final ImageButton mEdit;
-			public final ImageButton mDelete;
+		class ViewHolder extends RecyclerView.ViewHolder {
+			final TextView mName;
+			final ImageButton mEdit;
+			final ImageButton mDelete;
 
-			public ViewHolder(View v) {
+			ViewHolder(View v) {
 				super(v);
 
 				mName = (TextView) v.findViewById(R.id.name);

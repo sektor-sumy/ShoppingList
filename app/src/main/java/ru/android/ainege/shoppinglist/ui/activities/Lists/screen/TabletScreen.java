@@ -1,6 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.activities.Lists.screen;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import ru.android.ainege.shoppinglist.db.entities.List;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
 import ru.android.ainege.shoppinglist.ui.OnDialogShownListener;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.TabletState;
-import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.list.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.AddItemFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.item.EditItemFragment;

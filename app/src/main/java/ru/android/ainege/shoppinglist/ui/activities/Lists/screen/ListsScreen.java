@@ -5,7 +5,7 @@ import android.support.v7.widget.Toolbar;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.TabletState;
-import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.list.ListsFragment;
 
 public class ListsScreen extends TabletScreen {
 	public static final int SCREEN_ID = 1;
@@ -97,7 +97,7 @@ public class ListsScreen extends TabletScreen {
 
 	}
 
-	public void updateList() {
+	void updateList() {
 		mListsFragment.updateData();
 	}
 }

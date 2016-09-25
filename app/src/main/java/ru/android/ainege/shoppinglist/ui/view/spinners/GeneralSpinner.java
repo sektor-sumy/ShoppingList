@@ -1,9 +1,9 @@
 package ru.android.ainege.shoppinglist.ui.view.spinners;
 
-import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
@@ -20,12 +20,12 @@ public abstract class GeneralSpinner {
 	public static final int ID_ADD_CATALOG = -1;
 
 	protected final Fragment mFragment;
-	protected final SharedPreferences mPrefs;
-
-	protected Spinner mSpinner;
-	protected long mIdSelectedItem;
-	protected boolean mIsUseNewItemInSpinner;
 	protected boolean mIsCenterGravity = false;
+
+	private final SharedPreferences mPrefs;
+	private Spinner mSpinner;
+	private long mIdSelectedItem;
+	private boolean mIsUseNewItemInSpinner;
 
 	protected abstract int getCode();
 	protected abstract String getTeg();

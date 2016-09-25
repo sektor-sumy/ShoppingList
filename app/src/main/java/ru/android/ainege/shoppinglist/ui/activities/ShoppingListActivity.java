@@ -23,7 +23,7 @@ public class ShoppingListActivity extends SingleFragmentActivity implements OnCl
 		super.onCreate(savedInstanceState);
 
 		if (savedInstanceState != null) {
-			mShoppingListFragment = (ShoppingListFragment) getFragmentManager().findFragmentByTag(getTag());
+			mShoppingListFragment = (ShoppingListFragment) getSupportFragmentManager().findFragmentByTag(getTag());
 			setListeners(mShoppingListFragment);
 		}
 

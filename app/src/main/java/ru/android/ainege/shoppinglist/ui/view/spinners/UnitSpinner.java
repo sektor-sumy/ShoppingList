@@ -1,6 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.view.spinners;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.widget.SimpleCursorAdapter;
 
 import ru.android.ainege.shoppinglist.R;
@@ -13,7 +13,7 @@ import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.UnitDialogFra
 
 public class UnitSpinner extends GeneralSpinner {
 	public static final int UNIT_ADD = 403;
-	protected static final String UNIT_ADD_DATE = "addUnitDialog";
+	private static final String UNIT_ADD_DATE = "addUnitDialog";
 
 	public UnitSpinner(Fragment fragment) {
 		super(fragment);

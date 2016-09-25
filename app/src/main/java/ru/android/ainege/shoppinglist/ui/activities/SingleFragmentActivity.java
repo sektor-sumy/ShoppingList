@@ -1,8 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.ActivityOptions;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -11,6 +9,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,7 +23,7 @@ import com.google.android.gms.ads.AdView;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.ListsActivity;
-import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.list.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.OnCreateViewListener;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.CategoryFragment;
@@ -71,41 +71,40 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		super.onResume();
 
 		mAdView.resume();
-		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-
-		if (getFragment() instanceof ListsFragment) {
-			navigationView.setCheckedItem(R.id.nav_main);
-		} else if (getFragment() instanceof ShoppingListFragment) {
-			navigationView.setCheckedItem(R.id.nav_last_list);
-		} else if (getFragment() instanceof ItemFragment) {
-			navigationView.setCheckedItem(R.id.nav_last_list);
-		} else if (getFragment() instanceof CategoryFragment) {
-			navigationView.setCheckedItem(R.id.nav_catalog_catalogs);
-		} else if (getFragment() instanceof UnitFragment) {
-			navigationView.setCheckedItem(R.id.nav_catalog_units);
-		} else if (getFragment() instanceof CurrencyFragment) {
-			navigationView.setCheckedItem(R.id.nav_catalog_currencies);
-		}
-
-		if (getSavedListId() == -1) {
-			navigationView.getMenu().findItem(R.id.nav_last_list).setEnabled(false);
-		}
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean isUseCategory = sharedPreferences.getBoolean(getString(R.string.settings_key_use_category), true);
-		navigationView.getMenu().findItem(R.id.nav_catalog_catalogs).setEnabled(isUseCategory);
+		setCheckedItem();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+
 		mAdView.pause();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+
 		mAdView.destroy();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		switch (requestCode) {
+			case CATALOGS:
+			case SETTINGS:
+				getFragment().onActivityResult(requestCode, resultCode, data);
+				break;
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (!closeDrawer()) {
+			super.onBackPressed();
+		}
 	}
 
 	@Override
@@ -116,6 +115,29 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		toggle.syncState();
 	}
 
+	@Override
+	public void onDeleteSavedList() {
+		((NavigationView) findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_last_list).setEnabled(false);
+	}
+
+	public long getSavedListId() {
+		SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+		return mSettings.getLong(APP_PREFERENCES_ID, -1);
+	}
+
+	protected void superOnBackPressed() {
+		super.onBackPressed();
+	}
+
+	protected int getLayout() {
+		return R.layout.activity_fragment;
+	}
+
+	protected int getDefaultContainer() {
+		return R.id.fragment_container;
+	}
+
+	//<editor-fold desc="navigation drawer">
 	@Override
 	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 		switch (item.getItemId()) {
@@ -161,44 +183,17 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		return true;
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		switch (requestCode) {
-			case CATALOGS:
-			case SETTINGS:
-				getFragment().onActivityResult(requestCode, resultCode, data);
-				break;
-		}
-	}
-
-	@Override
-	public void onBackPressed() {
-		if (!closeDrawer()) {
-			super.onBackPressed();
-		}
-	}
-
-	@Override
-	public void onDeleteSavedList() {
-		((NavigationView) findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_last_list).setEnabled(false);
-	}
-
 	public DrawerLayout getDrawerLayout() {
 		return mDrawerLayout;
 	}
 
-	protected void superOnBackPressed() {
-		super.onBackPressed();
-	}
+	public boolean closeDrawer() {
+		if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+			mDrawerLayout.closeDrawer(GravityCompat.START);
+			return true;
+		}
 
-	protected int getLayout() {
-		return R.layout.activity_fragment;
-	}
-
-	protected int getDefaultContainer() {
-		return R.id.fragment_container;
+		return false;
 	}
 
 	protected void onMainSelected() {
@@ -229,32 +224,46 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		openActivity(new Intent(this, SettingsActivity.class), null, SETTINGS);
 	}
 
-	protected void injectFragment(Integer container, Fragment fragment, String tag) {
-		FragmentManager fm = getFragmentManager();
-		fm.beginTransaction().replace(container, fragment, tag).commit();
-	}
+	private void openActivity(Intent i, int[] flags, int requestCode) {
+		if (flags != null) {
+			for (int flag : flags) {
+				i.addFlags(flag);
+			}
+		}
 
-	protected void removeFragment(String tag) {
-		FragmentManager fm = getFragmentManager();
-		Fragment fragment = fm.findFragmentByTag(tag);
-
-		if (fragment != null) {
-			fm.beginTransaction()
-					.remove(fragment)
-					.commit();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			startActivityForResult(i, requestCode, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+		} else {
+			startActivityForResult(i, requestCode);
 		}
 	}
 
-	protected void adsInitialize() {
-		mAdView = (AdView) findViewById(R.id.adView);
-		MobileAd ad = new MobileAd();
-		ad.adsInitialize(this, mAdView);
-	}
+	private void setCheckedItem() {
+		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-	public long getSavedListId() {
-		SharedPreferences mSettings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-		return mSettings.getLong(APP_PREFERENCES_ID, -1);
+		if (getFragment() instanceof ListsFragment) {
+			navigationView.setCheckedItem(R.id.nav_main);
+		} else if (getFragment() instanceof ShoppingListFragment) {
+			navigationView.setCheckedItem(R.id.nav_last_list);
+		} else if (getFragment() instanceof ItemFragment) {
+			navigationView.setCheckedItem(R.id.nav_last_list);
+		} else if (getFragment() instanceof CategoryFragment) {
+			navigationView.setCheckedItem(R.id.nav_catalog_catalogs);
+		} else if (getFragment() instanceof UnitFragment) {
+			navigationView.setCheckedItem(R.id.nav_catalog_units);
+		} else if (getFragment() instanceof CurrencyFragment) {
+			navigationView.setCheckedItem(R.id.nav_catalog_currencies);
+		}
+
+		if (getSavedListId() == -1) {
+			navigationView.getMenu().findItem(R.id.nav_last_list).setEnabled(false);
+		}
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean isUseCategory = sharedPreferences.getBoolean(getString(R.string.settings_key_use_category), true);
+		navigationView.getMenu().findItem(R.id.nav_catalog_catalogs).setEnabled(isUseCategory);
 	}
+	//</editor-fold>
 
 	public boolean openLastList() {
 		long id = getSavedListId();
@@ -271,26 +280,25 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		return result;
 	}
 
-	public boolean closeDrawer() {
-		if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-			mDrawerLayout.closeDrawer(GravityCompat.START);
-			return true;
-		}
-
-		return false;
+	protected void injectFragment(Integer container, Fragment fragment, String tag) {
+		FragmentManager fm = getSupportFragmentManager();
+		fm.beginTransaction().replace(container, fragment, tag).commit();
 	}
 
-	private void openActivity(Intent i, int[] flags, int requestCode) {
-		if (flags != null) {
-			for (int flag : flags) {
-				i.addFlags(flag);
-			}
-		}
+	protected void removeFragment(String tag) {
+		FragmentManager fm = getSupportFragmentManager();
+		Fragment fragment = fm.findFragmentByTag(tag);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			startActivityForResult(i, requestCode, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-		} else {
-			startActivityForResult(i, requestCode);
+		if (fragment != null) {
+			fm.beginTransaction()
+					.remove(fragment)
+					.commit();
 		}
+	}
+
+	protected void adsInitialize() {
+		mAdView = (AdView) findViewById(R.id.adView);
+		MobileAd ad = new MobileAd();
+		ad.adsInitialize(this, mAdView);
 	}
 }

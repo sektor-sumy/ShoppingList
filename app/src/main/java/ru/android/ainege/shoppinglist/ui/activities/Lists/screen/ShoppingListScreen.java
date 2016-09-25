@@ -6,7 +6,7 @@ import android.support.v7.widget.Toolbar;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.ui.activities.Lists.TabletState;
-import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.list.ListsFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.ShoppingListFragment;
 import ru.android.ainege.shoppinglist.util.Showcase;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;

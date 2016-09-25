@@ -1,6 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.view.spinners;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.widget.SimpleCursorAdapter;
 
 import ru.android.ainege.shoppinglist.R;

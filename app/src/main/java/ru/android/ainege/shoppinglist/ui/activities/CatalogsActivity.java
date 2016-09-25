@@ -29,7 +29,7 @@ public class CatalogsActivity extends SingleFragmentActivity {
 		super.onCreate(savedInstanceState);
 
 		if (savedInstanceState != null) {
-			mCatalogFragment = (CatalogFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+			mCatalogFragment = (CatalogFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
 		}
 	}
 

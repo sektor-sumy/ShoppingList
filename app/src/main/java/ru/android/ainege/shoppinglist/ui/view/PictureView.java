@@ -1,8 +1,6 @@
 package ru.android.ainege.shoppinglist.ui.view;
 
 import android.Manifest;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.ContextMenu;
@@ -30,8 +30,8 @@ import ru.android.ainege.shoppinglist.util.Image;
 
 public class PictureView implements OnFinishedImageListener {
 	public static final int RESULT_OK = RetainedFragment.RESULT_OK;
-	public static final int ERROR_OUT_MEMORY = RetainedFragment.ERROR_OUT_MEMORY;
-	public static final int ERROR_PROCESSING = RetainedFragment.ERROR_PROCESSING;
+	private static final int ERROR_OUT_MEMORY = RetainedFragment.ERROR_OUT_MEMORY;
+	private static final int ERROR_PROCESSING = RetainedFragment.ERROR_PROCESSING;
 
 	private static final String RETAINED_FRAGMENT = "retained_fragment_item";
 	public static final int TAKE_PHOTO = 404;

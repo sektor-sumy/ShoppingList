@@ -1,17 +1,17 @@
 package ru.android.ainege.shoppinglist.ui.activities.Lists;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 
 import ru.android.ainege.shoppinglist.R;
 import ru.android.ainege.shoppinglist.db.dataSources.CurrenciesDS;
 import ru.android.ainege.shoppinglist.ui.activities.SingleFragmentActivity;
-import ru.android.ainege.shoppinglist.ui.fragments.ListsFragment;
+import ru.android.ainege.shoppinglist.ui.fragments.list.ListsFragment;
 import ru.android.ainege.shoppinglist.util.FirebaseAnalytic;
 
 public class ListsActivity extends SingleFragmentActivity {
