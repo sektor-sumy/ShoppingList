@@ -16,8 +16,8 @@
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeightSmall"
-        android:singleLine="true"
         android:ellipsize="marquee"
-        style="?android:attr/spinnerDropDownItemStyle"/>
+        style="?android:attr/spinnerDropDownItemStyle"
+        android:maxLines="1"/>
 
 </LinearLayout>

@@ -29,8 +29,8 @@
 			android:paddingLeft="@dimen/padding_hint"
 			android:hint="@string/list_name"
 			android:maxLength="20"
-			android:singleLine="true"
-			android:inputType="textCapSentences"/>
+			android:inputType="textCapSentences"
+			android:maxLines="1"/>
 
 	</android.support.design.widget.TextInputLayout>
 

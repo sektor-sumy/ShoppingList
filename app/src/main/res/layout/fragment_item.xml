@@ -152,7 +152,8 @@
 						android:digits="0123456789,."
 						android:gravity="center"
 						android:inputType="numberDecimal"
-						android:maxLines="1"/>
+						android:imeOptions="actionNext"
+						android:maxLines="1" />
 
 				</android.support.design.widget.TextInputLayout>
 
@@ -193,6 +194,7 @@
 						android:digits="0123456789.,"
 						android:gravity="center"
 						android:inputType="numberDecimal"
+						android:imeOptions="actionNext"
 						android:maxLines="1"/>
 
 				</android.support.design.widget.TextInputLayout>
@@ -252,6 +254,7 @@
 					android:layout_height="wrap_content"
 					android:hint="@string/comment"
 					android:inputType="textCapSentences|textMultiLine"
+					android:imeOptions="actionNext"
 					android:maxLength="210"
 					android:maxLines="5"/>
 

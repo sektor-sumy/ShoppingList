@@ -159,6 +159,7 @@
 						android:digits="0123456789,."
 						android:gravity="center"
 						android:inputType="numberDecimal"
+						android:imeOptions="actionNext"
 						android:maxLines="1"/>
 
 				</android.support.design.widget.TextInputLayout>
@@ -200,6 +201,7 @@
 						android:digits="0123456789.,"
 						android:gravity="center"
 						android:inputType="numberDecimal"
+						android:imeOptions="actionNext"
 						android:maxLines="1" />
 
 				</android.support.design.widget.TextInputLayout>

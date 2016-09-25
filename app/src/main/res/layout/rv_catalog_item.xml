@@ -44,9 +44,9 @@
 		android:ellipsize="middle"
 		android:gravity="center_horizontal"
 		android:minWidth="@dimen/column_amount_wight"
-		android:singleLine="true"
 		android:textColor="@android:color/black"
-		android:textSize="16sp"/>
+		android:textSize="16sp"
+		android:maxLines="1"/>
 
 	<ImageButton
 		android:id="@+id/delete"

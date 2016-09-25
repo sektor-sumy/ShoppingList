@@ -25,9 +25,9 @@
 		android:layout_marginRight="@dimen/padding_8dp"
 		android:layout_weight="0.6"
 		android:paddingBottom="@dimen/padding_4dp"
-		android:singleLine="true"
 		android:textColor="@android:color/black"
-		android:textSize="18sp"/>
+		android:textSize="18sp"
+		android:maxLines="1"/>
 
 	<TextView
 		android:id="@+id/sum_category"
@@ -37,6 +37,6 @@
 		android:layout_weight="0.4"
 		android:gravity="right"
 		android:paddingBottom="@dimen/padding_4dp"
-		android:singleLine="true"/>
+		android:maxLines="1"/>
 
 </LinearLayout>

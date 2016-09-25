@@ -48,9 +48,9 @@
 			android:ellipsize="middle"
 			android:gravity="center_horizontal"
 			android:minWidth="@dimen/column_amount_wight"
-			android:singleLine="true"
 			android:textColor="@android:color/black"
-			android:textSize="16sp"/>
+			android:textSize="16sp"
+			android:maxLines="1"/>
 
 		<TextView
 			android:id="@+id/item_price_list"
@@ -60,9 +60,9 @@
 			android:ellipsize="end"
 			android:gravity="center_horizontal"
 			android:minWidth="@dimen/column_price_wight"
-			android:singleLine="true"
 			android:textColor="@android:color/black"
-			android:textSize="16sp"/>
+			android:textSize="16sp"
+			android:maxLines="1"/>
 
 	</LinearLayout>
 

@@ -26,9 +26,10 @@
 				android:layout_height="wrap_content"
 				android:hint="@string/name"
 				android:inputType="textCapSentences"
+				android:imeOptions="actionNext"
 				android:maxLength="30"
 				android:paddingLeft="@dimen/padding_hint"
-				android:singleLine="true"/>
+				android:maxLines="1"/>
 
 		</android.support.design.widget.TextInputLayout>
 
@@ -50,7 +51,7 @@
 				android:inputType="textCapSentences"
 				android:maxLength="5"
 				android:paddingLeft="@dimen/padding_hint"
-				android:singleLine="true"/>
+				android:maxLines="1"/>
 
 		</android.support.design.widget.TextInputLayout>
 

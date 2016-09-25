@@ -15,8 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/name"
-        android:singleLine="true"
         android:ellipsize="marquee"
         android:textAlignment="inherit"
-        style="?android:attr/spinnerItemStyle"/>
+        style="?android:attr/spinnerItemStyle"
+        android:maxLines="1"/>
 </LinearLayout>
