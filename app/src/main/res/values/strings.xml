@@ -195,4 +195,9 @@
 	<string name="feedback_email">Ainege@gmail.com</string>
 	<string name="subject">Приложение \"За покупками\"</string>
 	<string name="feedback_error">Упс... Похоже у Вас нет почтового клиента</string>
+
+	<!--Crop Activity-->
+	<string name="crop_image_menu_rotate_right">Поворот</string>
+	<string name="crop_image_menu_crop">Обрезать</string>
+	<string name="error_crop">Ошибка обработки</string>
 </resources>

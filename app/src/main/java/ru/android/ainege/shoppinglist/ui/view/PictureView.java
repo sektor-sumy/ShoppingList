@@ -1,9 +1,9 @@
 package ru.android.ainege.shoppinglist.ui.view;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -14,6 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.firebase.crash.FirebaseCrash;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 
@@ -133,20 +136,43 @@ public class PictureView {
 		}
 	}
 
-	public void takePhotoResult() {
-		Image.create().deletePhotoFromGallery(mFragment.getActivity(), mFile);
-		mPictureInterface.loadImage(Image.getFilePath(mFile));
-		mFile = null;
-	}
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			switch (requestCode) {
+				case PictureView.TAKE_PHOTO:
+					takePhotoResult(Uri.fromFile(mFile));
+					break;
+				case PictureView.FROM_GALLERY:
+					fromGalleryResult(data.getData());
+					break;
+				case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+					mPictureInterface.loadImage(Image.getFilePath(mFile));
+					mFile = null;
+					break;
+			}
+		} else {
+			switch (requestCode) {
+				case PictureView.TAKE_PHOTO:
+				case PictureView.FROM_GALLERY:
+					cancelResult();
+					break;
+				case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+					CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
-	public void fromGalleryResult() {
-		mPictureInterface.loadImage(Image.getFilePath(mFile));
-		mFile = null;
-	}
+					if (result != null) {
+						Exception error = result.getError();
 
-	public void cancelResult() {
-		if (mFile != null) {
-			mFile = null;
+						FirebaseCrash.log("Catched exception");
+						FirebaseCrash.report(error);
+
+						Toast.makeText(mFragment.getActivity(), mFragment.getActivity().getString(R.string.error_crop), Toast.LENGTH_LONG).show();
+					}
+
+					Image.deleteFile(Image.getFilePath(mFile));
+					cancelResult();
+
+					break;
+			}
 		}
 	}
 
@@ -154,36 +180,52 @@ public class PictureView {
 		return ContextCompat.checkSelfPermission(mFragment.getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
 	}
 
-	private void takePhoto(){
+	private void takePhoto() {
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		sentIntent(cameraIntent, TAKE_PHOTO);
+		mFile = Image.create().createImageFile(mFragment.getActivity());
+
+		if (mFile != null) {
+			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
+			mFragment.startActivityForResult(cameraIntent, TAKE_PHOTO);
+		} else {
+			Toast.makeText(mFragment.getActivity(), mFragment.getActivity().getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	private void selectFromGallery() {
 		Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-		sentIntent(galleryIntent, FROM_GALLERY);
+		mFragment.startActivityForResult(galleryIntent, FROM_GALLERY);
 	}
 
-	private void sentIntent(Intent intent, int requestCode) {
+	private void takePhotoResult(Uri photoUri) {
+		Image.create().deletePhotoFromGallery(mFragment.getActivity(), mFile);
+		sentCropIntent(photoUri, photoUri);
+	}
+
+	private void fromGalleryResult(Uri selectedImage) {
 		mFile = Image.create().createImageFile(mFragment.getActivity());
 
 		if (mFile != null) {
-			int width = mFragment.getResources().getDisplayMetrics().widthPixels;
-			int height = width * 9 / 16;
-
-			intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mFile));
-			intent.putExtra("crop", "true");
-			intent.putExtra("scale", true);
-			intent.putExtra("scaleUpIfNeeded", true);
-			intent.putExtra("noFaceDetection", true);
-			intent.putExtra("aspectX", 16);
-			intent.putExtra("aspectY", 9);
-			intent.putExtra("outputX", width);
-			intent.putExtra("outputY", height);
-			intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
-			mFragment.startActivityForResult(intent, requestCode);
+			sentCropIntent(selectedImage, Uri.fromFile(mFile));
 		} else {
 			Toast.makeText(mFragment.getActivity(), mFragment.getActivity().getString(R.string.error_file_not_create), Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	private void sentCropIntent(Uri from, Uri to) {
+		int width = mFragment.getResources().getDisplayMetrics().widthPixels;
+		int height = width * 9 / 16;
+
+		CropImage.activity(from)
+				.setAspectRatio(16, 9)
+				.setRequestedSize(width, height)
+				.setOutputUri(to)
+				.start(mFragment.getContext(), mFragment);
+	}
+
+	private void cancelResult() {
+		if (mFile != null) {
+			mFile = null;
 		}
 	}
 }

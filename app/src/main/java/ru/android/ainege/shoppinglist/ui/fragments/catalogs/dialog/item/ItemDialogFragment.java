@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 
@@ -112,14 +113,16 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case PictureView.TAKE_PHOTO:
+			case PictureView.FROM_GALLERY:
+			case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+				mPictureView.onActivityResult(requestCode, resultCode, data);
+				return;
+		}
+
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
-				case PictureView.TAKE_PHOTO:
-					mPictureView.takePhotoResult();
-					break;
-				case PictureView.FROM_GALLERY:
-					mPictureView.fromGalleryResult();
-					break;
 				case UnitSpinner.UNIT_ADD:
 					mUnitSpinner.updateSpinner(data.getLongExtra(GeneralDialogFragment.ID_ITEM, 1), false);
 					break;
@@ -129,10 +132,6 @@ public abstract class ItemDialogFragment extends GeneralDialogFragment<Item> imp
 			}
 		} else {
 			switch (requestCode) {
-				case PictureView.TAKE_PHOTO:
-				case PictureView.FROM_GALLERY:
-					mPictureView.cancelResult();
-					break;
 				case UnitSpinner.UNIT_ADD:
 					mUnitSpinner.setSelected(GeneralSpinner.ID_ADD_CATALOG);
 					break;

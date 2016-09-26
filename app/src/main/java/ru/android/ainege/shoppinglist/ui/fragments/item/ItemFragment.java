@@ -36,6 +36,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.ads.AdView;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -219,14 +220,16 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case PictureView.TAKE_PHOTO:
+			case PictureView.FROM_GALLERY:
+			case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+				mPictureView.onActivityResult(requestCode, resultCode, data);
+				return;
+		}
+
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
-				case PictureView.TAKE_PHOTO:
-					mPictureView.takePhotoResult();
-					break;
-				case PictureView.FROM_GALLERY:
-					mPictureView.fromGalleryResult();
-					break;
 				case IS_SAVE_CHANGES:
 					saveItem(true);
 					break;
@@ -283,10 +286,6 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 			}
 		} else {
 			switch (requestCode) {
-				case PictureView.TAKE_PHOTO:
-				case PictureView.FROM_GALLERY:
-					mPictureView.cancelResult();
-					break;
 				case IS_SAVE_CHANGES:
 					if (isDeleteImage(null)) {
 						Image.deleteFile(mItemInList.getItem().getImagePath());

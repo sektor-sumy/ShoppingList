@@ -19,7 +19,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
+
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.util.Random;
@@ -132,22 +133,12 @@ public abstract class ListDialogFragment extends DialogFragment implements Pictu
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == Activity.RESULT_OK) {
-			switch (requestCode) {
-				case PictureView.TAKE_PHOTO:
-					mPictureView.takePhotoResult();
-					break;
-				case PictureView.FROM_GALLERY:
-					mPictureView.fromGalleryResult();
-					break;
-			}
-		} else {
-			switch (requestCode) {
-				case PictureView.TAKE_PHOTO:
-				case PictureView.FROM_GALLERY:
-					mPictureView.cancelResult();
-					break;
-			}
+		switch (requestCode) {
+			case PictureView.TAKE_PHOTO:
+			case PictureView.FROM_GALLERY:
+			case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+				mPictureView.onActivityResult(requestCode, resultCode, data);
+				return;
 		}
 	}
 
