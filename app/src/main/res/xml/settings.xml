@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory
 		android:title="@string/settings_list">
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="false"
 			android:key="@string/settings_key_open_last_list"
 			android:summary="@string/settings_summary_open_last_list"
@@ -15,17 +15,17 @@
 			android:key="@string/settings_key_sort_type"
 			android:summary="@string/settings_summary_sort_type"
 			android:title="@string/settings_title_sort_type"/>
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="true"
 			android:key="@string/settings_key_sort_is_bought"
 			android:summary="@string/settings_summary_sort_is_bought"
 			android:title="@string/settings_title_sort_is_bought"/>
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="true"
 			android:key="@string/settings_key_use_category"
 			android:summary="@string/settings_summary_use_category"
 			android:title="@string/settings_title_use_category"/>
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="true"
 			android:dependency="@string/settings_key_use_category"
 			android:key="@string/settings_key_collapse_category"
@@ -34,7 +34,7 @@
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/settings_category_data_item">
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="true"
 			android:key="@string/settings_key_auto_complete_data"
 			android:summary="@string/settings_summary_auto_complete_data"
@@ -44,22 +44,44 @@
 			android:key="@string/settings_key_auto_complete_screen"
 			android:title="@string/settings_title_auto_complete_screen">
 
-			<CheckBoxPreference
-				android:defaultValue="true"
-				android:key="@string/settings_key_auto_complete_amount"
-				android:title="@string/settings_title_auto_complete_amount"/>
-			<CheckBoxPreference
-				android:defaultValue="true"
-				android:key="@string/settings_key_auto_complete_unit"
-				android:title="@string/settings_title_auto_complete_unit"/>
-			<CheckBoxPreference
-				android:defaultValue="true"
-				android:key="@string/settings_key_auto_complete_price"
-				android:title="@string/settings_title_auto_complete_price"/>
-			<CheckBoxPreference
-				android:defaultValue="true"
-				android:key="@string/settings_key_auto_complete_comment"
-				android:title="@string/settings_title_auto_complete_comment"/>
+			<PreferenceCategory
+				android:title="@string/settings_title_add_item">
+				<CheckBoxPreference
+					android:defaultValue="true"
+					android:key="@string/settings_key_auto_complete_amount_add"
+					android:title="@string/settings_title_auto_complete_amount"/>
+				<CheckBoxPreference
+					android:defaultValue="true"
+					android:key="@string/settings_key_auto_complete_unit_add"
+					android:title="@string/settings_title_auto_complete_unit"/>
+				<CheckBoxPreference
+					android:defaultValue="true"
+					android:key="@string/settings_key_auto_complete_price_add"
+					android:title="@string/settings_title_auto_complete_price"/>
+				<CheckBoxPreference
+					android:defaultValue="true"
+					android:key="@string/settings_key_auto_complete_comment_add"
+					android:title="@string/settings_title_auto_complete_comment"/>
+			</PreferenceCategory>
+			<PreferenceCategory
+				android:title="@string/settings_title_edit_item">
+				<CheckBoxPreference
+					android:defaultValue="false"
+					android:key="@string/settings_key_auto_complete_amount_edit"
+					android:title="@string/settings_title_auto_complete_amount"/>
+				<CheckBoxPreference
+					android:defaultValue="false"
+					android:key="@string/settings_key_auto_complete_unit_edit"
+					android:title="@string/settings_title_auto_complete_unit"/>
+				<CheckBoxPreference
+					android:defaultValue="false"
+					android:key="@string/settings_key_auto_complete_price_edit"
+					android:title="@string/settings_title_auto_complete_price"/>
+				<CheckBoxPreference
+					android:defaultValue="false"
+					android:key="@string/settings_key_auto_complete_comment_edit"
+					android:title="@string/settings_title_auto_complete_comment"/>
+			</PreferenceCategory>
 		</PreferenceScreen>
 		<PreferenceScreen
 			android:key="@string/settings_key_text_selection_screen"
@@ -82,7 +104,7 @@
 				android:key="@string/settings_key_text_selection_comment"
 				android:title="@string/settings_title_text_selection_comment"/>
 		</PreferenceScreen>
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="true"
 			android:key="@string/settings_key_fast_edit"
 			android:summary="@string/settings_summary_fast_edit"

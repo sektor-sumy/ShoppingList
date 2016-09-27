@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -25,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -73,50 +75,66 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	public static final String ID_ITEM = "idItem";
 	private static final int IS_SAVE_CHANGES = 401;
 	private static final String IS_SAVE_CHANGES_DATE = "answerDialog";
-	private static final String STATE_FILE = "state_file";
+
 	protected static final String STATE_IMAGE_PATH = "state_image_path";
 	protected static final String STATE_CATEGORY_ID = "state_category_id";
+	private static final String STATE_FILE = "state_file";
+	private static final String STATE_IS_SELECTED_ITEM = "state_is_selected_item";
+	private static final String STATE_ITEM_NAME = "state_item_name";
+	private static final String STATE_ADDED_AMOUNT = "state_added_amount";
+	private static final String STATE_ADDED_UNIT = "state_added_unit";
+	private static final String STATE_ADDED_PRICE = "state_added_price";
+	private static final String STATE_ADDED_CATEGORY = "state_added_category";
+	private static final String STATE_ADDED_COMMENT = "state_added_comment";
 
 	protected CollapsingToolbarLayout mCollapsingToolbarLayout;
 	protected TextInputLayout mNameInputLayout;
-	protected AutoCompleteTextView mNameTextView;
+	protected AutoCompleteTextView mNameEditText;
 	protected TextView mInfoTextView;
 	protected TextInputLayout mAmountInputLayout;
 	protected EditText mAmountEditText;
 	protected TextInputLayout mPriceInputLayout;
 	protected EditText mPriceEditText;
 	protected EditText mCommentEditText;
+	protected PictureView mPictureView;
+	protected UnitSpinner mUnitSpinner;
+	protected CategorySpinner mCategorySpinner;
 	private ToggleButton mIsBoughtButton;
 	private AppBarLayout mAppBarLayout;
 	private TextView mCurrencyTextView;
 	private TextView mFinishPriceTextView;
 
-	protected PictureView mPictureView;
-	protected UnitSpinner mUnitSpinner;
-	protected CategorySpinner mCategorySpinner;
-
 	protected ItemDS mItemDS;
 	protected ShoppingListDS mItemsInListDS;
+
+	protected boolean mIsAddMode = false;
+	protected ShoppingList mOriginalItem;
+	protected ShoppingList mItemInList;
+	protected boolean mIsProposedItem = false;
+	private String mCurrencyList;
+	private boolean mIsOpenedKeyboard = false;
+	private boolean mIsExpandedAppbar = true;
+	private int mScreenAppHeight;
+	private boolean mIsLandscapePhone;
+
+	protected SharedPreferences mPrefs;
+	protected boolean mIsUseCategory;
+	protected boolean mIsUpdateSL = false;
+	private boolean mIsUseDefaultData = false;
+	private boolean mIsSelectedItem = false;
+	private String mItemName = "";
+	private String mAddedAmount = "";
+	private long mIdAddedUnit;
+	private String mAddedPrice = "";
+	private long mIdAddedCategory;
+	private String mAddedComment = "";
 
 	private OnCreateViewListener mOnCreateViewListener;
 	private OnClickListener mOnClickListener;
 	private OnItemChangedListener mOnItemChangedListener;
 
-	protected ShoppingList mItemInList;
-	protected boolean mIsProposedItem = false;
-	protected boolean mIsAdded = false;
-	private String mCurrencyList;
-	private boolean mIsOpenedKeyboard = false;
-	private boolean mIsExpandedAppbar = true;
-	private boolean mIsLandscapePhone;
-	private int mScreenAppHeight;
-
-	protected SharedPreferences mPrefs;
-	protected boolean mIsUseCategory;
-	protected boolean mIsUpdateSL = false;
-
-	protected abstract TextWatcher getNameChangedListener();
 	protected abstract SimpleCursorAdapter getCompleteTextAdapter();
+	protected abstract void fillItemFromAutoComplete(Item item);
 	protected abstract boolean saveData();
 	protected abstract long getIdList();
 
@@ -163,6 +181,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefs.registerOnSharedPreferenceChangeListener(this);
+		mIsUseDefaultData = mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_data), true);
 
 		mPictureView = new PictureView(this, this);
 		mUnitSpinner = new UnitSpinner(this);
@@ -170,6 +189,14 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 		if (savedInstanceState != null) {
 			mPictureView.setFile((File) savedInstanceState.getSerializable(STATE_FILE));
+
+			mIsSelectedItem = savedInstanceState.getBoolean(STATE_IS_SELECTED_ITEM);
+			mItemName = savedInstanceState.getString(STATE_ITEM_NAME);
+			mAddedAmount = savedInstanceState.getString(STATE_ADDED_AMOUNT);
+			mIdAddedUnit = savedInstanceState.getLong(STATE_ADDED_UNIT);
+			mAddedPrice = savedInstanceState.getString(STATE_ADDED_PRICE);
+			mIdAddedCategory = savedInstanceState.getLong(STATE_ADDED_CATEGORY);
+			mAddedComment = savedInstanceState.getString(STATE_ADDED_COMMENT);
 		}
 	}
 
@@ -216,6 +243,14 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		outState.putString(STATE_IMAGE_PATH, mItemInList.getItem().getImagePath());
 		outState.putSerializable(STATE_FILE, mPictureView.getFile());
 		outState.putLong(STATE_CATEGORY_ID, mCategorySpinner.getSelected().getId());
+
+		outState.putString(STATE_ITEM_NAME, mItemName);
+		outState.putString(STATE_ADDED_AMOUNT, mAddedAmount);
+		outState.putLong(STATE_ADDED_UNIT, mIdAddedUnit);
+		outState.putString(STATE_ADDED_PRICE, mAddedPrice);
+		outState.putLong(STATE_ADDED_CATEGORY, mIdAddedCategory);
+		outState.putString(STATE_ADDED_COMMENT, mAddedComment);
+		outState.putBoolean(STATE_IS_SELECTED_ITEM, mIsSelectedItem);
 	}
 
 	@Override
@@ -254,7 +289,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 								Item item = itemCursor.getEntity();
 
 								loadImage(item.getImagePath());
-								mNameTextView.setText(item.getName());
+								mNameEditText.setText(item.getName());
 								mItemInList.getItem().setName(item.getName());
 							} else {
 								if (mOnClickListener != null) {
@@ -330,14 +365,14 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	public boolean onBackPressed() {
 		boolean result = true;
 
-		if (mNameTextView.length() != 0) {
+		if (mNameEditText.length() != 0) {
 			QuestionDialogFragment dialogFrag = QuestionDialogFragment.newInstance(getString(R.string.ask_save_item), -1);
 			dialogFrag.setTargetFragment(this, IS_SAVE_CHANGES);
 			dialogFrag.show(getFragmentManager(), IS_SAVE_CHANGES_DATE);
 
 			result = false;
 		} else {
-			if (mIsAdded && isDeleteImage(null)) {
+			if (mIsAddMode && isDeleteImage(null)) {
 				Image.deleteFile(mItemInList.getItem().getImagePath());
 			}
 
@@ -354,6 +389,16 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		if (isAdded()) {
 			if (key.equals(getString(R.string.settings_key_use_category))) {
 				updateUseCategory(getView());
+			} else if (key.equals(getString(R.string.settings_key_auto_complete_data))) {
+				mIsUseDefaultData = mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_data), true);
+			} else if (key.equals(getString(R.string.settings_key_text_selection_name))) {
+				setSelectAllOnFocus(mNameEditText, key);
+			} else if (key.equals(getString(R.string.settings_key_text_selection_amount))) {
+				setSelectAllOnFocus(mAmountEditText, key);
+			} else if (key.equals(getString(R.string.settings_key_text_selection_price))) {
+				setSelectAllOnFocus(mPriceEditText, key);
+			} else if (key.equals(getString(R.string.settings_key_text_selection_comment))) {
+				setSelectAllOnFocus(mCommentEditText, key);
 			} else if (key.equals(getString(R.string.settings_key_fast_edit))) {
 				mUnitSpinner.updateSpinner(GeneralSpinner.ID_ADD_CATALOG, true);
 				mCategorySpinner.updateSpinner(GeneralSpinner.ID_ADD_CATALOG, true);
@@ -368,6 +413,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		mCollapsingToolbarLayout.setTitle("");
 	}
 
+	//<editor-fold desc="Set fragment listeners">
 	public void setListeners(OnClickListener onClickListener, OnItemChangedListener onItemChangedListener) {
 		setOnClickListener(onClickListener);
 		setOnItemChangedListener(onItemChangedListener);
@@ -380,20 +426,9 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 	public void setOnItemChangedListener(OnItemChangedListener onItemChangedListener) {
 		mOnItemChangedListener = onItemChangedListener;
 	}
+	//</editor-fold>
 
-	public void setIsBoughtButton(boolean isBoughtButton) {
-		mIsBoughtButton.setChecked(isBoughtButton);
-	}
-
-	public void updateCurrency() {
-		getCurrencyFromDb();
-		mCurrencyTextView.setText(mCurrencyList);
-
-		if (mFinishPriceTextView.getVisibility() == View.VISIBLE) {
-			setFinishPrice();
-		}
-	}
-
+	//<editor-fold desc="Set up view">
 	protected void setupView(View v, final Bundle savedInstanceState) {
 		initToolbar(v);
 
@@ -417,12 +452,11 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 
 
 		mNameInputLayout = (TextInputLayout) v.findViewById(R.id.name_input_layout);
-		mNameTextView = (AutoCompleteTextView) v.findViewById(R.id.new_item_name);
-		mNameTextView.addTextChangedListener(getNameChangedListener());
-		mNameTextView.setAdapter(getCompleteTextAdapter());
-		if (mPrefs.getBoolean(getString(R.string.settings_key_text_selection_name), false)) {
-			mNameTextView.setSelectAllOnFocus(true);
-		}
+		mNameEditText = (AutoCompleteTextView) v.findViewById(R.id.new_item_name);
+		mNameEditText.addTextChangedListener(getNameChangedListener());
+		mNameEditText.setAdapter(getCompleteTextAdapter());
+		mNameEditText.setOnItemClickListener(getOnNameClickListener());
+		setSelectAllOnFocus(mNameEditText, getString(R.string.settings_key_text_selection_name));
 
 		mInfoTextView = (TextView) v.findViewById(R.id.info);
 
@@ -437,9 +471,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 				}
 			}
 		});
-		if (mPrefs.getBoolean(getString(R.string.settings_key_text_selection_amount), false)) {
-			mAmountEditText.setSelectAllOnFocus(true);
-		}
+		setSelectAllOnFocus(mAmountEditText, getString(R.string.settings_key_text_selection_amount));
 
 		mUnitSpinner.setSpinner(v.findViewById(R.id.amount_unit), true);
 
@@ -454,9 +486,7 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 				}
 			}
 		});
-		if (mPrefs.getBoolean(getString(R.string.settings_key_text_selection_price), false)) {
-			mPriceEditText.setSelectAllOnFocus(true);
-		}
+		setSelectAllOnFocus(mPriceEditText, getString(R.string.settings_key_text_selection_price));
 
 		mCurrencyTextView = (TextView) v.findViewById(R.id.currency);
 		mCurrencyTextView.setText(mCurrencyList);
@@ -475,8 +505,13 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 				}
 			}
 		});
-		if (mPrefs.getBoolean(getString(R.string.settings_key_text_selection_comment), false)) {
-			mCommentEditText.setSelectAllOnFocus(true);
+		setSelectAllOnFocus(mCommentEditText, getString(R.string.settings_key_text_selection_comment));
+	}
+
+	protected void disableError(TextInputLayout field) {
+		if (field.getError() != null) {
+			field.setError(null);
+			field.setErrorEnabled(false);
 		}
 	}
 
@@ -491,88 +526,6 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 			}
 		});
 		return completeTextAdapter;
-	}
-
-	protected void disableError(TextInputLayout field) {
-		if (field.getError() != null) {
-			field.setError(null);
-			field.setErrorEnabled(false);
-		}
-	}
-
-	protected String getName() {
-		return mNameTextView.getText().toString().trim();
-	}
-
-	protected ShoppingList refreshItem() {
-		double amount = 0;
-		if (mAmountEditText.getText().length() > 0) {
-			amount = Double.parseDouble(mAmountEditText.getText().toString().replace(',', '.'));
-		}
-		mItemInList.setAmount(amount);
-		mItemInList.setUnit(mUnitSpinner.getSelected());
-
-		double price = 0;
-		if (mPriceEditText.getText().length() > 0) {
-			price = Double.parseDouble(mPriceEditText.getText().toString().replace(',', '.'));
-		}
-		mItemInList.setPrice(price);
-
-		mItemInList.setCategory(mCategorySpinner.getSelected());
-		mItemInList.setComment(mCommentEditText.getText().toString());
-
-		mItemInList.setBought(mIsBoughtButton.isChecked());
-
-		return mItemInList;
-	}
-
-	protected void sendResult(long id) {
-		getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
-	}
-
-	private void initKeyboardListener(final View v) {
-		mIsLandscapePhone = getResources().getBoolean(R.bool.isLandscape) && getResources().getBoolean(R.bool.isPhone);
-
-		AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboardListener() {
-			@Override
-			public void isOpen(int screenAppHeight, AdView adView) {
-				mIsOpenedKeyboard = true;
-				mScreenAppHeight = screenAppHeight;
-
-				adView.pause();
-				adView.setVisibility(View.GONE);
-
-				if (!mIsLandscapePhone) {
-					View focusedView = v.findFocus();
-
-					if (focusedView != null && !(focusedView instanceof LinearLayout) && !isViewVisible(focusedView)) {
-						mAppBarLayout.setExpanded(false);
-					}
-				}
-			}
-
-			@Override
-			public void isClose(final AdView adView) {
-				if (mIsOpenedKeyboard) {
-					adView.setVisibility(View.VISIBLE);
-					adView.resume();
-
-					mIsOpenedKeyboard = false;
-				}
-
-				if (!mIsLandscapePhone) {
-					View focusedView = v.findFocus();
-
-					if (focusedView != null) {
-						focusedView.clearFocus();
-					}
-
-					if (mIsExpandedAppbar) {
-						mAppBarLayout.setExpanded(true);
-					}
-				}
-			}
-		});
 	}
 
 	private void initToolbar(View v) {
@@ -601,19 +554,130 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		mOnCreateViewListener.onCreateViewListener(this, toolbar);
 	}
 
-	private void updateUseCategory(View v) {
-		mIsUseCategory = mPrefs.getBoolean(getString(R.string.settings_key_use_category), true);
-		LinearLayout categoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
-		categoryContainer.setVisibility(mIsUseCategory ? View.VISIBLE : View.GONE);
-		((SpinnerColorAdapter) mNameTextView.getAdapter()).updateUseCategoryFromSetting();
+	private TextWatcher getNameChangedListener() {
+		return new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (s.length() == 0) {
+					mNameInputLayout.setError(getString(R.string.error_name));
+				} else {
+					disableError(mNameInputLayout);
+					//If selected a existent item and default data are used,
+					//when changing item, fill in the data that have been previously introduced
+					if (mIsUseDefaultData && mIsSelectedItem && !mItemName.equals(s.toString().trim())) {
+						mAmountEditText.setText(mAddedAmount);
+						mUnitSpinner.setSelected(mIdAddedUnit);
+						mPriceEditText.setText(mAddedPrice);
+						mCategorySpinner.setSelected(mIdAddedCategory);
+						mCommentEditText.setText(mAddedComment);
+						mItemInList.setIdItem(0);
+						mIsSelectedItem = false;
+					}
+					//Check is the item in the list. If there is a warning display
+					//If it isn`t, check is it in the catalog of items. If there is select it
+					if (mOriginalItem != null && s.toString().equals(mOriginalItem.getItem().getName())) {
+						return;
+					}
+
+					ShoppingListDS.ShoppingListCursor cursor = mItemsInListDS.getByName(s.toString().trim(), getIdList());
+
+					if (cursor.moveToFirst()) {
+						mInfoTextView.setText(R.string.info_exit_item_in_list);
+						mInfoTextView.setTextColor(Color.RED);
+						mInfoTextView.setVisibility(View.VISIBLE);
+
+						ShoppingList itemInList = cursor.getEntity();
+						mItemInList.setIdItemData(itemInList.getIdItemData());
+						setDefaultData(itemInList.getItem());
+					} else {
+						mInfoTextView.setVisibility(View.GONE);
+
+						if (mOriginalItem == null) {
+							mItemInList.setIdItem(0);
+						} else {
+							mItemInList.setIdItemData(mOriginalItem.getIdItemData());
+						}
+
+						if (mIsProposedItem) {
+							ItemDS.ItemCursor cursorItem = mItemDS.getWithData(s.toString().trim());
+
+							if (cursorItem.moveToFirst()) {
+								setDefaultData(cursorItem.getEntity());
+							}
+
+							cursorItem.close();
+						}
+					}
+					cursor.close();
+				}
+			}
+
+			private void setDefaultData(Item item) {
+				if (mIsAddMode) {
+					mItemInList.setIdItem(item.getId());
+					mItemInList.getItem().setDefaultImagePath(item.getDefaultImagePath());
+					mItemInList.getItem().setIdItemData(item.getIdItemData());
+				} else {
+					mItemInList.setItem(item);
+				}
+
+				loadImage(item.getImagePath());
+
+				int res = mIsAddMode ? R.string.settings_key_auto_complete_unit_add : R.string.settings_key_auto_complete_unit_edit;
+
+				if (mPrefs.getBoolean(getString(res), mIsAddMode)) {
+					mUnitSpinner.setSelected(item.getIdUnit());
+				}
+
+				mCategorySpinner.setSelected(item.getIdCategory());
+			}
+		};
 	}
 
-	private void getCurrencyFromDb() {
-		CurrencyCursor cursor = new CurrenciesDS(getActivity()).getByList(getIdList());
-		if (cursor.moveToFirst()) {
-			mCurrencyList = cursor.getEntity().getSymbol();
-		}
-		cursor.close();
+	private AdapterView.OnItemClickListener getOnNameClickListener() {
+		return new AdapterView.OnItemClickListener() {
+			@Override // TODO: id != l
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				mItemInList.setIdItem(l);
+
+				mIsSelectedItem = true;
+				//If default data are used, they fill in the fields
+				// and save previously introduced data
+				if (mIsUseDefaultData) {
+					mAddedAmount = mAmountEditText.getText().toString();
+					mIdAddedUnit = mUnitSpinner.getSelected().getId();
+					mAddedPrice = mPriceEditText.getText().toString();
+					mIdAddedCategory = mCategorySpinner.getSelected().getId();
+					mAddedComment = mCommentEditText.getText().toString();
+
+					ItemDS.ItemCursor c = mItemDS.getWithData(mItemInList.getIdItem());
+					c.moveToFirst();
+					Item item = c.getEntity();
+					c.close();
+
+					mItemName = item.getName();
+
+					if (mInfoTextView.getVisibility() == View.GONE) {
+						mItemInList.getItem().setDefaultImagePath(item.getDefaultImagePath());
+						mItemInList.getItem().setIdItemData(item.getIdItemData());
+						loadImage(item.getImagePath());
+					}
+
+					fillItemFromAutoComplete(item);
+					mCategorySpinner.setSelected(item.getIdCategory());
+				}
+			}
+		};
 	}
 
 	private TextWatcher getAmountChangedListener() {
@@ -682,6 +746,133 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		};
 	}
 
+	private void setSelectAllOnFocus(EditText v, String key) {
+		boolean isSelectAll = mPrefs.getBoolean(key, false);
+		v.setSelectAllOnFocus(isSelectAll);
+	}
+
+	private void onElementFocused(EditText v, int preff) {
+		if (!mPrefs.getBoolean(getString(preff), false)) {
+			v.setSelection(v.getText().length());
+		}
+
+		if (mIsOpenedKeyboard && !isViewVisible(v)) {
+			mAppBarLayout.setExpanded(false);
+		}
+	}
+	//</editor-fold>
+
+	//<editor-fold desc="Save data">
+	protected ShoppingList refreshItem() {
+		double amount = 0;
+		if (mAmountEditText.getText().length() > 0) {
+			amount = Double.parseDouble(mAmountEditText.getText().toString().replace(',', '.'));
+		}
+		mItemInList.setAmount(amount);
+		mItemInList.setUnit(mUnitSpinner.getSelected());
+
+		double price = 0;
+		if (mPriceEditText.getText().length() > 0) {
+			price = Double.parseDouble(mPriceEditText.getText().toString().replace(',', '.'));
+		}
+		mItemInList.setPrice(price);
+
+		mItemInList.setCategory(mCategorySpinner.getSelected());
+		mItemInList.setComment(mCommentEditText.getText().toString());
+
+		mItemInList.setBought(mIsBoughtButton.isChecked());
+
+		return mItemInList;
+	}
+
+	protected void sendResult(long id) {
+		getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(ID_ITEM, id));
+	}
+
+	private void saveItem(boolean isClose) {
+		if (saveData()) {
+			if (mOnClickListener != null) {
+				closeKeyboard();
+				mOnClickListener.onItemSave(mItemInList.getIdItem(), mIsAddMode, isClose);
+			}
+		} else {
+			Toast.makeText(getActivity().getApplicationContext(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
+		}
+	}
+	//</editor-fold>
+
+	public void setIsBoughtButton(boolean isBoughtButton) {
+		mIsBoughtButton.setChecked(isBoughtButton);
+	}
+
+	public void updateCurrency() {
+		getCurrencyFromDb();
+		mCurrencyTextView.setText(mCurrencyList);
+
+		if (mFinishPriceTextView.getVisibility() == View.VISIBLE) {
+			setFinishPrice();
+		}
+	}
+
+	protected String getName() {
+		return mNameEditText.getText().toString().trim();
+	}
+
+	private void getCurrencyFromDb() {
+		CurrencyCursor cursor = new CurrenciesDS(getActivity()).getByList(getIdList());
+
+		if (cursor.moveToFirst()) {
+			mCurrencyList = cursor.getEntity().getSymbol();
+		}
+
+		cursor.close();
+	}
+
+	private void initKeyboardListener(final View v) {
+		mIsLandscapePhone = getResources().getBoolean(R.bool.isLandscape) && getResources().getBoolean(R.bool.isPhone);
+
+		AndroidBug5497Workaround.assistActivity(getActivity()).setOnOpenKeyboard(new AndroidBug5497Workaround.OnOpenKeyboardListener() {
+			@Override
+			public void isOpen(int screenAppHeight, AdView adView) {
+				mIsOpenedKeyboard = true;
+				mScreenAppHeight = screenAppHeight;
+
+				adView.pause();
+				adView.setVisibility(View.GONE);
+
+				if (!mIsLandscapePhone) {
+					View focusedView = v.findFocus();
+
+					if (focusedView != null && !(focusedView instanceof LinearLayout) && !isViewVisible(focusedView)) {
+						mAppBarLayout.setExpanded(false);
+					}
+				}
+			}
+
+			@Override
+			public void isClose(final AdView adView) {
+				if (mIsOpenedKeyboard) {
+					adView.setVisibility(View.VISIBLE);
+					adView.resume();
+
+					mIsOpenedKeyboard = false;
+				}
+
+				if (!mIsLandscapePhone) {
+					View focusedView = v.findFocus();
+
+					if (focusedView != null) {
+						focusedView.clearFocus();
+					}
+
+					if (mIsExpandedAppbar) {
+						mAppBarLayout.setExpanded(true);
+					}
+				}
+			}
+		});
+	}
+
 	private void setFinishPrice() {
 		try {
 			double amount = Double.parseDouble(mAmountEditText.getText().toString().replace(',', '.'));
@@ -701,17 +892,6 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		return nf.format(value);
 	}
 
-	private void saveItem(boolean isClose) {
-		if (saveData()) {
-			if (mOnClickListener != null) {
-				closeKeyboard();
-				mOnClickListener.onItemSave(mItemInList.getIdItem(), mIsAdded, isClose);
-			}
-		} else {
-			Toast.makeText(getActivity().getApplicationContext(), R.string.info_wrong_value, Toast.LENGTH_LONG).show();
-		}
-	}
-
 	private boolean isViewVisible(View v) {
 		int[] array = new int[2];
 		v.getLocationOnScreen(array);
@@ -720,14 +900,11 @@ public abstract class ItemFragment extends Fragment implements PictureView.Pictu
 		return viewBottom < mScreenAppHeight;
 	}
 
-	private void onElementFocused(EditText v, int preff) {
-		if (!mPrefs.getBoolean(getString(preff), false)) {
-			v.setSelection(v.getText().length());
-		}
-
-		if (mIsOpenedKeyboard && !isViewVisible(v)) {
-			mAppBarLayout.setExpanded(false);
-		}
+	private void updateUseCategory(View v) {
+		mIsUseCategory = mPrefs.getBoolean(getString(R.string.settings_key_use_category), true);
+		LinearLayout categoryContainer = (LinearLayout) v.findViewById(R.id.category_container);
+		categoryContainer.setVisibility(mIsUseCategory ? View.VISIBLE : View.GONE);
+		((SpinnerColorAdapter) mNameEditText.getAdapter()).updateUseCategoryFromSetting();
 	}
 
 	private void closeKeyboard() {

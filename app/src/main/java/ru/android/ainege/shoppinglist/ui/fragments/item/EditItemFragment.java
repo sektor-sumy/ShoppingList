@@ -2,20 +2,15 @@ package ru.android.ainege.shoppinglist.ui.fragments.item;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
 import ru.android.ainege.shoppinglist.R;
-import ru.android.ainege.shoppinglist.db.dataSources.ItemDS.ItemCursor;
 import ru.android.ainege.shoppinglist.db.dataSources.ShoppingListDS.ShoppingListCursor;
 import ru.android.ainege.shoppinglist.db.entities.Item;
 import ru.android.ainege.shoppinglist.db.entities.ShoppingList;
@@ -27,8 +22,6 @@ import static java.lang.String.format;
 
 public class EditItemFragment extends ItemFragment {
 	private static final String ITEM_IN_LIST = "itemInList";
-
-	private ShoppingList mOriginalItem;
 
 	public static EditItemFragment newInstance(ShoppingList itemInList) {
 		Bundle args = new Bundle();
@@ -93,65 +86,6 @@ public class EditItemFragment extends ItemFragment {
 	}
 
 	@Override
-	protected TextWatcher getNameChangedListener() {
-		return new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (s.length() == 0) {
-					mNameInputLayout.setError(getString(R.string.error_name));
-				} else {
-					disableError(mNameInputLayout);
-					//Check is the item in the list. If there is a warning display
-					//If it isn`t, check is it in the catalog of items. If there is select it
-					ShoppingListCursor cursor = mItemsInListDS.getByName(s.toString().trim(), mItemInList.getIdList());
-
-					if (cursor.moveToFirst() && !(s.toString().equals(mOriginalItem.getItem().getName()))) {
-						mInfoTextView.setText(R.string.info_exit_item_in_list);
-						mInfoTextView.setTextColor(Color.RED);
-						mInfoTextView.setVisibility(View.VISIBLE);
-
-						ShoppingList itemInList = cursor.getEntity();
-						mItemInList.setIdItemData(itemInList.getIdItemData());
-						setDefaultData(itemInList.getItem());
-					} else {
-						mInfoTextView.setVisibility(View.GONE);
-						mItemInList.setIdItemData(mOriginalItem.getIdItemData());
-
-						if (mIsProposedItem) {
-							ItemCursor cursorItem = mItemDS.getWithData(s.toString().trim());
-
-							if (cursorItem.moveToFirst()) {
-								setDefaultData(cursorItem.getEntity());
-							}
-
-							cursorItem.close();
-						}
-					}
-					cursor.close();
-				}
-			}
-
-			private void setDefaultData(Item item) {
-				loadImage(item.getImagePath());
-				mUnitSpinner.setSelected(item.getIdUnit());
-				mCategorySpinner.setSelected(item.getIdCategory());
-
-				mItemInList.setItem(item);
-			}
-		};
-	}
-
-	@Override
 	protected SimpleCursorAdapter getCompleteTextAdapter() {
 		return super.getCompleteTextAdapter(new FilterQueryProvider() {
 			@Override
@@ -169,6 +103,25 @@ public class EditItemFragment extends ItemFragment {
 				return managedCursor;
 			}
 		});
+	}
+
+	@Override
+	protected void fillItemFromAutoComplete(Item item) {
+		if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_amount_edit), false) && item.getAmount() != 0) {
+			mAmountEditText.setText(new DecimalFormat("#.######").format(item.getAmount()));
+		}
+
+		if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_unit_edit), false)) {
+			mUnitSpinner.setSelected(item.getIdUnit());
+		}
+
+		if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_price_edit), false) && item.getPrice() != 0) {
+			mPriceEditText.setText(String.format("%.2f", item.getPrice()));
+		}
+
+		if (mPrefs.getBoolean(getString(R.string.settings_key_auto_complete_comment_edit), false)) {
+			mCommentEditText.setText(item.getComment());
+		}
 	}
 
 	@Override
@@ -236,7 +189,7 @@ public class EditItemFragment extends ItemFragment {
 	private void setDataToView(Bundle savedInstanceState) {
 		loadImage(mItemInList.getItem().getImagePath());
 
-		mNameTextView.setText(mItemInList.getItem().getName());
+		mNameEditText.setText(mItemInList.getItem().getName());
 
 		if (mItemInList.getAmount() != 0) {
 			mAmountEditText.setText(new DecimalFormat("#.######").format(mItemInList.getAmount()));
@@ -262,7 +215,7 @@ public class EditItemFragment extends ItemFragment {
 	private boolean isValidData() {
 		boolean isValid = true;
 
-		if (mNameTextView.length() < 3) {
+		if (mNameEditText.length() < 3) {
 			mNameInputLayout.setError(getString(R.string.error_length_name));
 			isValid = false;
 		}
