@@ -107,12 +107,21 @@ public abstract class ItemData implements Serializable {
 	}
 
 	public boolean equals(ItemData item) {
+		boolean equalsComment;
+
+		if (mComment == null) {
+			equalsComment = item.getComment() == null || item.getComment().length() == 0;
+		} else {
+			equalsComment = (mComment.length() == 0 && (item.getComment() == null || item.getComment().length() == 0))
+					|| mComment.equals(item.getComment());
+		}
+
 		return mIdItemData == item.getIdItemData() &&
 				mAmount == item.getAmount() &&
 				mIdUnit == item.getIdUnit() &&
 				mPrice == item.getPrice() &&
 				mIdCategory == item.getIdCategory() &&
-				mComment.equals(item.getComment());
+				equalsComment;
 	}
 
 	@Override

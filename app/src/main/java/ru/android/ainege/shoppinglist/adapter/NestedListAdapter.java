@@ -19,6 +19,7 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 	private static final int TYPE_ITEM = 1;
 
 	protected HashMap<Long, Boolean> mCollapseCategoryStates = new HashMap<>();
+	protected HashMap<Long, Boolean> mOriginalCollapseCategoryStates;
 	protected ArrayList<Object> mItemList = new ArrayList<>();
 
 	protected Activity mActivity;
@@ -110,6 +111,11 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 			if (item.getCategory().getItemsByCategories().size() == 0) {
 				mItemList.remove(categoryPosition);
 				mCollapseCategoryStates.remove(item.getCategory().getId());
+
+				if (mOriginalCollapseCategoryStates != null) {
+					mOriginalCollapseCategoryStates.remove(item.getCategory().getId());
+				}
+
 				notifyItemRemoved(categoryPosition);
 			} else {
 				notifyItemChanged(categoryPosition);
@@ -152,31 +158,40 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 		}
 	}
 
-	public void extendAllCategory(boolean isSave) {
+	public void extendAllCategory() {
 		for (int i = 0; i < mItemList.size(); i++) {
 			if (mItemList.get(i) instanceof Category && mCollapseCategoryStates.get(((Category) mItemList.get(i)).getId())) {
 				extendCategory((Category) mItemList.get(i), i);
-
-				if (isSave){
-					setCollapseCategoryStates(((Category) mItemList.get(i)).getId(), false);
-				}
+				setCollapseCategoryStates(((Category) mItemList.get(i)).getId(), false);
 			}
 		}
 	}
 
-	public void collapseAllCategory(boolean isSave) {
+	public void collapseAllCategory() {
 		for (int i = mItemList.size() - 1; i >= 0; i--) {
 			if (mItemList.get(i) instanceof Category && !mCollapseCategoryStates.get(((Category) mItemList.get(i)).getId())) {
 				collapseCategory((Category) mItemList.get(i), i);
-
-				if (isSave){
-					setCollapseCategoryStates(((Category) mItemList.get(i)).getId(), true);
-				}
+				setCollapseCategoryStates(((Category) mItemList.get(i)).getId(), true);
 			}
 		}
 	}
 
+	public HashMap<Long, Boolean> getOriginalCollapseCategoryStates() {
+		return mOriginalCollapseCategoryStates;
+	}
+
+	public void setOriginalCollapseCategoryStates(HashMap<Long, Boolean> originalCollapseCategoryStates) {
+		mOriginalCollapseCategoryStates = originalCollapseCategoryStates;
+	}
+
+	public void saveOriginalCollapseCategory() {
+		mOriginalCollapseCategoryStates = new HashMap<>(mCollapseCategoryStates);
+	}
+
 	public void recoveryCollapseAllCategory() {
+		mCollapseCategoryStates = new HashMap<>(mOriginalCollapseCategoryStates);
+		mOriginalCollapseCategoryStates = null;
+
 		for (int i = mItemList.size() - 1; i >= 0; i--) {
 			if (mItemList.get(i) instanceof Category && mCollapseCategoryStates.get(((Category) mItemList.get(i)).getId())) {
 				collapseCategory((Category) mItemList.get(i), i);

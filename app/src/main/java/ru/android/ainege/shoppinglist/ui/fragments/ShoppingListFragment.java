@@ -77,7 +77,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 	private static final String STATE_SPENT_SUM = "state_spent_sum";
 	private static final String STATE_TOTAL_SUM = "state_total_sum";
 	private static final String STATE_ACTION_MODE = "state_action_mode";
-	private static final String STATE_ACTION_DATA = "state_action_data";
+	private static final String STATE_ORIGINAL_COLLAPSE = "state_action_data";
 
 	public static final int ADD_ITEM = 0;
 	public static final int EDIT_ITEM = 1;
@@ -147,7 +147,8 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			mSLMenu.setVisibility((mIsUseCategory && mIsCollapsedCategory) ? View.INVISIBLE : View.GONE);
 
 			if (!mIsStartActionMode) {
-				mAdapterRV.extendAllCategory(false);
+				mAdapterRV.saveOriginalCollapseCategory();
+				mAdapterRV.extendAllCategory();
 			}
 
 			return true;
@@ -257,7 +258,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 
 			if (savedInstanceState.getBoolean(STATE_ACTION_MODE)) {
 				mIsStartActionMode = true;
-				mAdapterRV.setSelectedItems((ArrayList) savedInstanceState.getSerializable(STATE_ACTION_DATA));
+				mAdapterRV.setOriginalCollapseCategoryStates((HashMap<Long, Boolean>) savedInstanceState.getSerializable(STATE_ORIGINAL_COLLAPSE));
 			}
 		}
 
@@ -395,7 +396,7 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 		outState.putDouble(STATE_SPENT_SUM, mSaveSpentMoney);
 		outState.putDouble(STATE_TOTAL_SUM, mSaveTotalMoney);
 		outState.putBoolean(STATE_ACTION_MODE, mActionMode != null);
-		outState.putSerializable(STATE_ACTION_DATA, mAdapterRV.getSelectedItems());
+		outState.putSerializable(STATE_ORIGINAL_COLLAPSE, mAdapterRV.getOriginalCollapseCategoryStates());
 	}
 
 	private Toolbar.OnMenuItemClickListener onMenuItemClickListener () {
@@ -442,13 +443,13 @@ public class ShoppingListFragment extends Fragment implements LoaderManager.Load
 			public boolean onMenuItemClick(MenuItem item) {
 				switch (item.getItemId()) {
 					case R.id.collapse_all:
-						mAdapterRV.collapseAllCategory(true);
+						mAdapterRV.collapseAllCategory();
 
 						addAnalytics(FirebaseAnalytic.COLLAPSE_CATEGORY, FirebaseAnalytic.COLLAPSE);
 
 						return true;
 					case R.id.expanded_all:
-						mAdapterRV.extendAllCategory(true);
+						mAdapterRV.extendAllCategory();
 
 						addAnalytics(FirebaseAnalytic.COLLAPSE_CATEGORY, FirebaseAnalytic.EXTEND);
 

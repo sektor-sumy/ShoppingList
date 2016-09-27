@@ -262,10 +262,10 @@ public class ItemFragment extends CatalogFragment<Item>{
 			public boolean onMenuItemClick(MenuItem item) {
 				switch (item.getItemId()) {
 					case R.id.collapse_all:
-						mAdapterRV.collapseAllCategory(true);
+						mAdapterRV.collapseAllCategory();
 						return true;
 					case R.id.expanded_all:
-						mAdapterRV.extendAllCategory(true);
+						mAdapterRV.extendAllCategory();
 						return true;
 					default:
 						return false;
@@ -277,7 +277,6 @@ public class ItemFragment extends CatalogFragment<Item>{
 	private class ItemAdapter extends NestedListAdapter implements CatalogAdapter, Filterable {
 		private SearchFilter mSearchFilter;
 		private ArrayList mOriginalList;
-		private HashMap<Long, Boolean> mOriginalCollapseCategoryStates;
 
 		ItemAdapter(Activity activity, boolean isUseCategory) {
 			super(activity);
@@ -425,7 +424,6 @@ public class ItemFragment extends CatalogFragment<Item>{
 
 				if (originalItem.getCategory().getItemsByCategories().size() == 0) {
 					mOriginalList.remove(originalItem.getCategory());
-					mOriginalCollapseCategoryStates.remove(originalItem.getCategory().getId());
 				}
 			} else {
 				if (mItemList.size() == 0) {
@@ -444,11 +442,8 @@ public class ItemFragment extends CatalogFragment<Item>{
 			return mSearchFilter;
 		}
 
-		HashMap<Long, Boolean> getOriginalCollapseCategoryStates() {
-			return mOriginalCollapseCategoryStates;
-		}
-
-		void setOriginalCollapseCategoryStates(HashMap<Long, Boolean> originalCollapseCategoryStates) {
+		@Override
+		public void setOriginalCollapseCategoryStates(HashMap<Long, Boolean> originalCollapseCategoryStates) {
 			if (mOriginalCollapseCategoryStates == null && originalCollapseCategoryStates != null) {
 				mOriginalCollapseCategoryStates = new HashMap<>(originalCollapseCategoryStates);
 			}
