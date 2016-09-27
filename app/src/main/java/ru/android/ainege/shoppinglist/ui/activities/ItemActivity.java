@@ -22,8 +22,8 @@ public class ItemActivity extends SingleFragmentActivity implements ItemFragment
 		super.onCreate(savedInstanceState);
 
 		if (savedInstanceState != null) {
-			ItemFragment itemFragment = (ItemFragment) getSupportFragmentManager().findFragmentByTag(getTag());
-			setListeners(itemFragment);
+			mItemFragment = (ItemFragment) getSupportFragmentManager().findFragmentByTag(getTag());
+			setListeners(mItemFragment);
 		}
 	}
 
