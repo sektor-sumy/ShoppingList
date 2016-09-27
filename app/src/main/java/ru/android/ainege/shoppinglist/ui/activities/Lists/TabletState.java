@@ -238,6 +238,10 @@ public class TabletState implements StateInterface, OnDialogShownListener,
 		mCurrentScreen = currentScreen;
 	}
 
+	public TabletScreen getCurrentScreen() {
+		return mCurrentScreen;
+	}
+
 	public ListsScreen getListsScreen() {
 		return mListsScreen;
 	}

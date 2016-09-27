@@ -39,18 +39,17 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 
 	@Override
 	public boolean onCreateViewListener(Toolbar toolbar) {
-
-		if (!mState.isLandscape()) {
-			return true;
-		} else {
+		if (mState.isLandscape()) {
 			mToggle = new ActionBarDrawerToggle(
 					mState.getListsActivity(), mState.getListsActivity().getDrawerLayout(), toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 			mState.getListsActivity().getDrawerLayout().addDrawerListener(mToggle);
 			mToggle.syncState();
 
-			mToggle.setDrawerIndicatorEnabled(false);
+			mToggle.setDrawerIndicatorEnabled(mState.getCurrentScreen() instanceof ItemScreen);
 			return false;
 		}
+
+		return true;
 	}
 
 	@Override
@@ -170,13 +169,13 @@ public class ShoppingListScreen extends TabletScreen implements	ListsFragment.On
 	}
 
 	void showDrawerIcon() {
-		if (mState.isLandscape()) {
+		if (mState.isLandscape() && mToggle != null) {
 			mToggle.setDrawerIndicatorEnabled(true);
 		}
 	}
 
 	void hideDrawerIcon() {
-		if (mState.isLandscape()) {
+		if (mState.isLandscape() && mToggle != null) {
 			mToggle.setDrawerIndicatorEnabled(false);
 		}
 	}

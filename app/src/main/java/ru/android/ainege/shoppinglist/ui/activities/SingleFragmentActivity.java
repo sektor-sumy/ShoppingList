@@ -246,6 +246,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 			navigationView.setCheckedItem(R.id.nav_main);
 		} else if (getFragment() instanceof ShoppingListFragment) {
 			navigationView.setCheckedItem(R.id.nav_last_list);
+		} else if (getFragment() instanceof ru.android.ainege.shoppinglist.ui.fragments.item.ItemFragment) {
+			navigationView.setCheckedItem(R.id.nav_last_list);
 		} else if (getFragment() instanceof ItemFragment) {
 			navigationView.setCheckedItem(R.id.nav_catalog_items);
 		} else if (getFragment() instanceof CategoryFragment) {
