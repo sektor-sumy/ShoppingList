@@ -41,7 +41,6 @@ import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.GeneralDialog
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.item.AddItemDialogFragment;
 import ru.android.ainege.shoppinglist.ui.fragments.catalogs.dialog.item.EditItemDialogFragment;
 import ru.android.ainege.shoppinglist.util.Image;
-import ru.android.ainege.shoppinglist.util.MultiSelection;
 
 public class ItemFragment extends CatalogFragment<Item>{
 	private static final String STATE_COLLAPSE = "state_collapse";
@@ -371,11 +370,8 @@ public class ItemFragment extends CatalogFragment<Item>{
 			}
 
 			Image.create().insertImageToView(mActivity, item.getImagePath(), holder.mImage);
-			holder.mImage.setSelected(MultiSelection.getInstance().isContains(item));
 			holder.mName.setText(item.getName());
 			holder.mUnit.setText(item.getUnit().getName());
-
-			holder.itemView.setSelected(MultiSelection.getInstance().isContains(itemInList));
 		}
 
 		@Override

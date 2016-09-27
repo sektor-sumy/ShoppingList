@@ -105,4 +105,18 @@ public abstract class ItemData implements Serializable {
 			mIdCategory = mCategory.getId();
 		}
 	}
+
+	public boolean equals(ItemData item) {
+		return mIdItemData == item.getIdItemData() &&
+				mAmount == item.getAmount() &&
+				mIdUnit == item.getIdUnit() &&
+				mPrice == item.getPrice() &&
+				mIdCategory == item.getIdCategory() &&
+				mComment.equals(item.getComment());
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		return object instanceof ItemData && equals((ItemData) object);
+	}
 }

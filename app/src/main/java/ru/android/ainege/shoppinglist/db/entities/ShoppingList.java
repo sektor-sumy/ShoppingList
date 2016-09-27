@@ -165,12 +165,7 @@ public class ShoppingList extends ItemData {
 	public boolean equals(ShoppingList item) {
 		return mItem.getName().equals(item.getItem().getName()) &&
 				mItem.getImagePath().equals(item.getItem().getImagePath()) &&
-				mIsBought == item.isBought() &&
-				mAmount == item.getAmount() &&
-				mIdUnit == item.getIdUnit() &&
-				mPrice == item.getPrice() &&
-				mIdCategory == item.getIdCategory() &&
-				mComment.equals(item.getComment());
+				mIsBought == item.isBought() && super.equals(item);
 	}
 
 	public long updateItem(Context context) {

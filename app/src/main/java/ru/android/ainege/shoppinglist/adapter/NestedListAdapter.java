@@ -100,7 +100,7 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 
 	public void removeItem(ItemData item) {
 		int position = mItemList.indexOf(item);
-		mItemList.remove(item);
+		mItemList.remove(position);
 		item.getCategory().getItemsByCategories().remove(item);
 		notifyItemRemoved(position);
 
@@ -108,7 +108,7 @@ public abstract class NestedListAdapter extends RecyclerView.Adapter<RecyclerVie
 
 		if (categoryPosition != -1) {
 			if (item.getCategory().getItemsByCategories().size() == 0) {
-				mItemList.remove(item.getCategory());
+				mItemList.remove(categoryPosition);
 				mCollapseCategoryStates.remove(item.getCategory().getId());
 				notifyItemRemoved(categoryPosition);
 			} else {

@@ -62,6 +62,15 @@ public class Category implements Catalog {
 		return mName;
 	}
 
+	public boolean equals(Category category) {
+		return mId == category.getId();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		return object instanceof Category && equals((Category) object);
+	}
+
 	public ArrayList getItemsByCategories() {
 		return mItemsByCategories;
 	}
@@ -117,7 +126,7 @@ public class Category implements Catalog {
 		for (Object item : mItemsByCategories) {
 			ShoppingList itemInList = ((ShoppingList) item);
 
-			if ((onlyBought && itemInList.isBought()) || !onlyBought) {
+			if (!onlyBought || itemInList.isBought()) {
 				sum += itemInList.getSum();
 			}
 		}
