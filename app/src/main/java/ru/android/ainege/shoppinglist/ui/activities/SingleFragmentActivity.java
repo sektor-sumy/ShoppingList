@@ -1,6 +1,7 @@
 package ru.android.ainege.shoppinglist.ui.activities;
 
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -17,6 +18,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdView;
@@ -62,6 +65,13 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		}
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+			@Override
+			public void onDrawerOpened(View drawerView) {
+				closeKeyboard();
+				super.onDrawerOpened(drawerView);
+			}
+		});
 
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
@@ -303,5 +313,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 		mAdView = (AdView) findViewById(R.id.adView);
 		MobileAd ad = new MobileAd();
 		ad.adsInitialize(this, mAdView);
+	}
+
+	private void closeKeyboard() {
+		View view = getCurrentFocus();
+
+		if (view != null) {
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
 	}
 }
